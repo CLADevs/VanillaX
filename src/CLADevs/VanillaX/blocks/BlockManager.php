@@ -4,7 +4,6 @@ namespace CLADevs\VanillaX\blocks;
 
 use CLADevs\VanillaX\blocks\tiles\CommandBlockTile;
 use CLADevs\VanillaX\blocks\tiles\MobSpawnerTile;
-use CLADevs\VanillaX\blocks\types\AnvilBlock;
 use CLADevs\VanillaX\blocks\types\CommandBlock;
 use CLADevs\VanillaX\blocks\types\EnchantmentTableBlock;
 use CLADevs\VanillaX\blocks\types\MobSpawnerBlock;

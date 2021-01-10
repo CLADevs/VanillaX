@@ -4,6 +4,7 @@ namespace CLADevs\VanillaX;
 
 use CLADevs\VanillaX\blocks\tiles\CommandBlockTile;
 use CLADevs\VanillaX\inventories\EnchantInventory;
+use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\server\DataPacketReceiveEvent;
 use pocketmine\level\Position;
@@ -11,6 +12,7 @@ use pocketmine\network\mcpe\protocol\CommandBlockUpdatePacket;
 use pocketmine\network\mcpe\protocol\InventoryTransactionPacket;
 use pocketmine\network\mcpe\protocol\PlayerActionPacket;
 use pocketmine\network\mcpe\protocol\types\WindowTypes;
+use pocketmine\Player;
 
 class VanillaListener implements Listener{
 
@@ -43,6 +45,30 @@ class VanillaListener implements Listener{
 //                    $window->handlePacket($player, $packet);
 //                }
 //            }
+        }
+        if($packet instanceof PlayerActionPacket && in_array($packet->action, [PlayerActionPacket::ACTION_START_GLIDE, PlayerActionPacket::ACTION_STOP_GLIDE])){
+            $session = VanillaX::getInstance()->getSessionManager()->get($player);
+            $session->setGliding($packet->action === PlayerActionPacket::ACTION_START_GLIDE);
+        }
+    }
+
+    public function onDamage(EntityDamageEvent $event): void{
+        if(!$event->isCancelled() && $event->getCause() === EntityDamageEvent::CAUSE_FALL){
+            $entity = $event->getEntity();
+
+            if($entity instanceof Player){
+                $session = VanillaX::getInstance()->getSessionManager()->get($entity);
+
+                if($session->isGliding()){
+                    $event->setCancelled();
+                }else{
+                    $time = $session->getEndGlideTime() - $session->getStartGlideTime();
+
+                    if($time < 1){
+                        $event->setCancelled();
+                    }
+                }
+            }
         }
     }
 }

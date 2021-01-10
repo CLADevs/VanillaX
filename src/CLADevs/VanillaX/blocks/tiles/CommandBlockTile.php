@@ -5,7 +5,6 @@ namespace CLADevs\VanillaX\blocks\tiles;
 use CLADevs\VanillaX\blocks\TileIdentifiers;
 use CLADevs\VanillaX\blocks\types\CommandBlock;
 use pocketmine\block\BlockFactory;
-use pocketmine\level\Level;
 use pocketmine\level\Position;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\IntTag;
@@ -29,10 +28,6 @@ class CommandBlockTile extends Spawnable{
     public string $commandBlockName = "";
     public string $command = "";
     public string $lastOutput = "";
-
-    public function __construct(Level $level, CompoundTag $nbt){
-        parent::__construct($level, $nbt);
-    }
 
     public function handleCommandBlockUpdateReceive(CommandBlockUpdatePacket $pk): void{
         if($pk->commandBlockMode !== $this->commandBlockMode){
@@ -108,6 +103,12 @@ class CommandBlockTile extends Spawnable{
         }
     }
 
+    protected function addAdditionalSpawnData(CompoundTag $nbt): void{
+        $nbt->setString("CustomName", $this->commandBlockName);
+        $nbt->setString("Command", $this->command);
+        //TODO add more tags, idk what are other tags LMAO
+    }
+
     public static function generateTile(Position $position, int $commandBlockMode): CommandBlockTile{
         $nbt = new CompoundTag("", [
             new StringTag("id", TileIdentifiers::COMMAND_BLOCK),
@@ -117,11 +118,5 @@ class CommandBlockTile extends Spawnable{
             new IntTag("z", $position->z),
         ]);
         return new self($position->getLevel(), $nbt);
-    }
-
-    protected function addAdditionalSpawnData(CompoundTag $nbt): void{
-        $nbt->setString("CustomName", $this->commandBlockName);
-        $nbt->setString("Command", $this->command);
-        //TODO add more tags, idk what are other tags LMAO
     }
 }
