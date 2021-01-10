@@ -2,9 +2,9 @@
 
 namespace CLADevs\VanillaX\inventories;
 
-use pocketmine\inventory\transaction\action\SlotChangeAction;
+use pocketmine\network\mcpe\protocol\InventoryTransactionPacket;
+use pocketmine\network\mcpe\protocol\PlayerActionPacket;
 use pocketmine\network\mcpe\protocol\types\inventory\UIInventorySlotOffset;
-use pocketmine\network\mcpe\protocol\types\NetworkInventoryAction;
 use pocketmine\network\mcpe\protocol\types\WindowTypes;
 use pocketmine\Player;
 
@@ -12,37 +12,33 @@ class EnchantInventory extends \pocketmine\inventory\EnchantInventory{
 
     /**
      * @param Player $player
-     * @param NetworkInventoryAction[] $actions
+     * @param PlayerActionPacket|InventoryTransactionPacket $packet
      */
-    public function handleTransaction(Player $player, array $actions): void{
-        if(count($actions) < 1){
-            //var_dump("Null actions");
-            return;
-        }
-        $actions = $this->createInventoryAction($player, $actions);
-        foreach($actions as $action){
-            $inv = $action->getInventory();
-            $inv->setItem($action->getSlot(), $action->getTargetItem());
+    public function handlePacket(Player $player, $packet): void{
+        if($packet instanceof InventoryTransactionPacket){
+            $actions = $packet->actions;
+
+            if(count($actions) < 1){
+                //var_dump("Null actions");
+                return;
+            }
+            foreach($actions as $key => $action){
+                $slot = $action->inventorySlot;
+                $inv = $this;
+                if($action->windowId === WindowTypes::CONTAINER){
+                    $inv = $player->getInventory();
+                }else{
+                    if(array_key_exists($slot, UIInventorySlotOffset::ENCHANTING_TABLE)){
+                        $slot = UIInventorySlotOffset::ENCHANTING_TABLE[$slot];
+                    }
+                }
+                $inv->setItem($slot, $action->newItem);
+            }
+        }elseif($packet->action === PlayerActionPacket::ACTION_SET_ENCHANTMENT_SEED){
+            $this->onSuccess($player);
         }
     }
 
-    /**
-     * @param Player $player
-     * @param NetworkInventoryAction[] $actions
-     * @return SlotChangeAction[]
-     */
-    public function createInventoryAction(Player $player, array $actions): array{
-        foreach($actions as $key => $action){
-            $slot = $action->inventorySlot;
-            if(array_key_exists($slot, UIInventorySlotOffset::ENCHANTING_TABLE)){
-                $slot = UIInventorySlotOffset::ENCHANTING_TABLE[$slot];
-            }
-            $inv = $this;
-            if($action->windowId === WindowTypes::CONTAINER){
-                $inv = $player->getInventory();
-            }
-            $actions[$key] = new SlotChangeAction($inv, $slot, $action->oldItem, $action->newItem);
-        }
-        return $actions;
+    public function onSuccess(Player $player): void{
     }
 }

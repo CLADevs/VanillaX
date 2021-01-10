@@ -4,6 +4,7 @@ namespace CLADevs\VanillaX\blocks;
 
 use CLADevs\VanillaX\blocks\tiles\CommandBlockTile;
 use CLADevs\VanillaX\blocks\tiles\MobSpawnerTile;
+use CLADevs\VanillaX\blocks\types\AnvilBlock;
 use CLADevs\VanillaX\blocks\types\CommandBlock;
 use CLADevs\VanillaX\blocks\types\EnchantmentTableBlock;
 use CLADevs\VanillaX\blocks\types\MobSpawnerBlock;
@@ -25,6 +26,7 @@ class BlockManager{
     public function initializeBlocks(): void{
         BlockFactory::registerBlock(new MobSpawnerBlock(), true);
         BlockFactory::registerBlock(new EnchantmentTableBlock(), true);
+    //TODO    BlockFactory::registerBlock(new AnvilBlock(), true);
 
         $blocks = [
             new CommandBlock(BlockIds::COMMAND_BLOCK),

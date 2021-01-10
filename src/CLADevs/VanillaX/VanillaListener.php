@@ -9,6 +9,7 @@ use pocketmine\event\server\DataPacketReceiveEvent;
 use pocketmine\level\Position;
 use pocketmine\network\mcpe\protocol\CommandBlockUpdatePacket;
 use pocketmine\network\mcpe\protocol\InventoryTransactionPacket;
+use pocketmine\network\mcpe\protocol\PlayerActionPacket;
 use pocketmine\network\mcpe\protocol\types\WindowTypes;
 
 class VanillaListener implements Listener{
@@ -24,12 +25,24 @@ class VanillaListener implements Listener{
             if($tile instanceof CommandBlockTile){
                 $tile->handleCommandBlockUpdateReceive($packet);
             }
-        }elseif($packet instanceof InventoryTransactionPacket){
-            $window = $player->getWindow(WindowTypes::ENCHANTMENT);
+        }else{
+            /** Enchantment Table */
+            if($packet instanceof InventoryTransactionPacket || $packet instanceof PlayerActionPacket){
+                $window = $player->getWindow(WindowTypes::ENCHANTMENT);
 
-            if($window instanceof EnchantInventory){
-                $window->handleTransaction($player, $packet->actions);
+                if($window instanceof EnchantInventory){
+                    $window->handlePacket($player, $packet);
+                    return;
+                }
             }
+//            /** Anvil */
+//            if($packet instanceof InventoryTransactionPacket || $packet instanceof FilterTextPacket || $packet instanceof AnvilDamagePacket){
+//                $window = $player->getWindow(WindowTypes::ANVIL);
+//
+//                if($window instanceof AnvilInventory){
+//                    $window->handlePacket($player, $packet);
+//                }
+//            }
         }
     }
 }

@@ -5,6 +5,7 @@
 ### This plugin adds blocks, items, entities etc to your server.
 #### Blocks:
 - Mob Spawner
+- Enchantment Table
 - Command Block(Unfinished)
 
 #### Entities:
