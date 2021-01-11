@@ -19,9 +19,6 @@ class VanillaX extends PluginBase{
     private SessionManager $sessionManager;
 
     public function onLoad(): void{
-        foreach($this->getResources() as $path => $resource){
-            $this->saveResource($path);
-        }
         self::$instance = $this;
         $this->entityManager = new EntityManager();
         $this->blockManager = new BlockManager();
