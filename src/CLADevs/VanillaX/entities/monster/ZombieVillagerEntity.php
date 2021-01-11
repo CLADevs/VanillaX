@@ -2,9 +2,9 @@
 
 namespace CLADevs\VanillaX\entities\monster;
 
-use pocketmine\entity\Living;
+use CLADevs\VanillaX\entities\LivingEntity;
 
-class ZombieVillagerEntity extends Living{
+class ZombieVillagerEntity extends LivingEntity{
 
     public $width = 0.6;
     public $height = 1.9;

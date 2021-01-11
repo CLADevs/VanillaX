@@ -2,9 +2,9 @@
 
 namespace CLADevs\VanillaX\entities\passive;
 
-use pocketmine\entity\Living;
+use CLADevs\VanillaX\entities\LivingEntity;
 
-class ZombieHorseEntity extends Living{
+class ZombieHorseEntity extends LivingEntity{
 
     public $width = 1.4;
     public $height = 1.6;

@@ -2,19 +2,23 @@
 
 namespace CLADevs\VanillaX\entities\monster;
 
-use pocketmine\entity\Living;
+use CLADevs\VanillaX\entities\LivingEntity;
+use CLADevs\VanillaX\entities\traits\EntityAgeable;
+use pocketmine\item\ItemIds;
 use pocketmine\network\mcpe\protocol\AddActorPacket;
 use pocketmine\Player;
 
-class HoglinEntity extends Living{
+class HoglinEntity extends LivingEntity{
 
-    public $width = 0.85;
-    public $height = 0.85;
+    public $width = 0.9;
+    public $height = 0.9;
 
     const NETWORK_ID = 124; //HOGLIN ID
 
     protected function initEntity(): void{
         parent::initEntity();
+        $this->ageable = new EntityAgeable($this, [0.85, 0.86], [0.9, 0.9]);
+        //TODO add Crimson Fungus Item
         $this->setMaxHealth(40);
     }
 

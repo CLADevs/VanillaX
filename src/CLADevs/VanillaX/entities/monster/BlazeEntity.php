@@ -2,9 +2,9 @@
 
 namespace CLADevs\VanillaX\entities\monster;
 
-use pocketmine\entity\Living;
+use CLADevs\VanillaX\entities\LivingEntity;
 
-class BlazeEntity extends Living{
+class BlazeEntity extends LivingEntity{
 
     public $width = 0.5;
     public $height = 1.8;

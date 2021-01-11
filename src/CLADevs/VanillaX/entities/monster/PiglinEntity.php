@@ -2,11 +2,12 @@
 
 namespace CLADevs\VanillaX\entities\monster;
 
-use pocketmine\entity\Living;
+use CLADevs\VanillaX\entities\LivingEntity;
+use CLADevs\VanillaX\entities\traits\EntityAgeable;
 use pocketmine\network\mcpe\protocol\AddActorPacket;
 use pocketmine\Player;
 
-class PiglinEntity extends Living{
+class PiglinEntity extends LivingEntity{
 
     public $width = 0.6;
     public $height = 1.9;
@@ -15,6 +16,9 @@ class PiglinEntity extends Living{
 
     protected function initEntity(): void{
         parent::initEntity();
+        //TODO
+        $this->ageable = new EntityAgeable($this, [0.6, 1.9], [0.6, 1.9]);
+        $this->ageable->setCanBeBredByPlayer(false);
         $this->setMaxHealth(16);
     }
 

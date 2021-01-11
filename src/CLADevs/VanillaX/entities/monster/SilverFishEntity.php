@@ -2,9 +2,9 @@
 
 namespace CLADevs\VanillaX\entities\monster;
 
-use pocketmine\entity\Living;
+use CLADevs\VanillaX\entities\LivingEntity;
 
-class SilverFishEntity extends Living{
+class SilverFishEntity extends LivingEntity{
 
     public $width = 0.4;
     public $height = 0.3;

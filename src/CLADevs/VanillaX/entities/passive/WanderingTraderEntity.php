@@ -2,11 +2,11 @@
 
 namespace CLADevs\VanillaX\entities\passive;
 
-use pocketmine\entity\Living;
+use CLADevs\VanillaX\entities\LivingEntity;
 use pocketmine\network\mcpe\protocol\AddActorPacket;
 use pocketmine\Player;
 
-class WanderingTraderEntity extends Living{
+class WanderingTraderEntity extends LivingEntity{
 
     public $width = 0.6;
     public $height = 1.9;

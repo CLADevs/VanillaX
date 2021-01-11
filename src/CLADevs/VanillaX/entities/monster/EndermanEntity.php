@@ -2,9 +2,9 @@
 
 namespace CLADevs\VanillaX\entities\monster;
 
-use pocketmine\entity\Living;
+use CLADevs\VanillaX\entities\LivingEntity;
 
-class EndermanEntity extends Living{
+class EndermanEntity extends LivingEntity{
 
     public $width = 0.6;
     public $height = 2.9;

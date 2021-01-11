@@ -2,11 +2,13 @@
 
 namespace CLADevs\VanillaX\entities\passive;
 
-use pocketmine\entity\Living;
+use CLADevs\VanillaX\entities\LivingEntity;
+use CLADevs\VanillaX\entities\traits\EntityAgeable;
+use pocketmine\item\ItemIds;
 use pocketmine\network\mcpe\protocol\AddActorPacket;
 use pocketmine\Player;
 
-class StriderEntity extends Living{
+class StriderEntity extends LivingEntity{
 
     public $width = 0.9;
     public $height = 1.7;
@@ -15,6 +17,8 @@ class StriderEntity extends Living{
 
     protected function initEntity(): void{
         parent::initEntity();
+        $this->ageable = new EntityAgeable($this, [0.45, 0.85], [0.9, 1.7]);
+        //TODO item Warped fungus
         $this->setMaxHealth(20);
     }
 

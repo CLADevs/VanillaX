@@ -9,7 +9,7 @@
 - Command Block(Unfinished)
 
 #### Entities:
-- Pig
+- All Minecraft Entities (Not functional)
 
 #### Installation
 -  [poggit](https://poggit.pmmp.io/ci/CLADevs/VanillaX) or [github](https://github.com/CLADevs/VanillaX)

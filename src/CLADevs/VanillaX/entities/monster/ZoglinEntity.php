@@ -2,11 +2,11 @@
 
 namespace CLADevs\VanillaX\entities\monster;
 
-use pocketmine\entity\Living;
+use CLADevs\VanillaX\entities\LivingEntity;
 use pocketmine\network\mcpe\protocol\AddActorPacket;
 use pocketmine\Player;
 
-class ZoglinEntity extends Living{
+class ZoglinEntity extends LivingEntity{
 
     public $width = 0.9;
     public $height = 0.9;

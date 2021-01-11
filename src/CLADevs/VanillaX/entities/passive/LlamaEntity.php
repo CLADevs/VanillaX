@@ -2,9 +2,9 @@
 
 namespace CLADevs\VanillaX\entities\passive;
 
-use pocketmine\entity\Living;
+use CLADevs\VanillaX\entities\LivingEntity;
 
-class LlamaEntity extends Living{
+class LlamaEntity extends LivingEntity{
 
     public $width = 0.9;
     public $height = 1.87;

@@ -2,11 +2,11 @@
 
 namespace CLADevs\VanillaX\entities\monster;
 
-use pocketmine\entity\Living;
+use CLADevs\VanillaX\entities\LivingEntity;
 use pocketmine\network\mcpe\protocol\AddActorPacket;
 use pocketmine\Player;
 
-class PiglinBruteEntity extends Living{
+class PiglinBruteEntity extends LivingEntity{
 
     public $width = 0.6;
     public $height = 1.9;

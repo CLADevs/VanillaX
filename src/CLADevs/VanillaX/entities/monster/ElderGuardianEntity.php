@@ -2,9 +2,9 @@
 
 namespace CLADevs\VanillaX\entities\monster;
 
-use pocketmine\entity\Living;
+use CLADevs\VanillaX\entities\LivingEntity;
 
-class ElderGuardianEntity extends Living{
+class ElderGuardianEntity extends LivingEntity{
 
     public $width = 1.99;
     public $height = 1.99;

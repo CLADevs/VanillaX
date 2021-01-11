@@ -2,16 +2,24 @@
 
 namespace CLADevs\VanillaX\entities\monster;
 
-use pocketmine\entity\Living;
+use CLADevs\VanillaX\entities\LivingEntity;
+use CLADevs\VanillaX\entities\traits\EntityAgeable;
 
-class DrownedEntity extends Living{
+class DrownedEntity extends LivingEntity{
 
     public $width = 0.6;
     public $height = 1.9;
 
-    const NETWORK_ID = self::BLAZE;
+    const NETWORK_ID = self::DROWNED;
+
+    protected function initEntity(): void{
+        parent::initEntity();
+        $this->ageable = new EntityAgeable($this, [0.3, 0.95], [0.6, 1.9]);
+        $this->ageable->setCanBeBredByPlayer(false);
+        //TODO
+    }
 
     public function getName(): string{
-        return "Blaze";
+        return "Drowned";
     }
 }

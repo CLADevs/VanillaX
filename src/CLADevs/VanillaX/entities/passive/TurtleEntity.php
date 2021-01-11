@@ -2,9 +2,10 @@
 
 namespace CLADevs\VanillaX\entities\passive;
 
-use pocketmine\entity\Living;
+use CLADevs\VanillaX\entities\LivingEntity;
+use CLADevs\VanillaX\entities\traits\EntityAgeable;
 
-class TurtleEntity extends Living{
+class TurtleEntity extends LivingEntity{
 
     public $width = 1.2;
     public $height = 0.4;
@@ -13,6 +14,8 @@ class TurtleEntity extends Living{
 
     protected function initEntity(): void{
         parent::initEntity();
+        $this->ageable = new EntityAgeable($this, [0.096, 0.032], [1.2, 0.4]);
+        //TODO item Seagrass
         $this->setMaxHealth(30);
     }
 

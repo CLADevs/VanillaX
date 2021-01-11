@@ -3,6 +3,7 @@
 namespace CLADevs\VanillaX;
 
 use CLADevs\VanillaX\blocks\tiles\CommandBlockTile;
+use CLADevs\VanillaX\entities\passive\StriderEntity;
 use CLADevs\VanillaX\inventories\EnchantInventory;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\Listener;
@@ -57,6 +58,11 @@ class VanillaListener implements Listener{
             $entity = $event->getEntity();
 
             if($entity instanceof Player){
+                $en = new StriderEntity($entity->getLevel(), StriderEntity::createBaseNBT($entity));
+                if($en->getAgeable() !== null){
+                    $en->getAgeable()->setBaby(true);
+                }
+                $en->spawnToAll();
                 $session = VanillaX::getInstance()->getSessionManager()->get($entity);
 
                 if($session->isGliding()){

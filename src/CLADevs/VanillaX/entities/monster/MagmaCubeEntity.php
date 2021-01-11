@@ -2,9 +2,9 @@
 
 namespace CLADevs\VanillaX\entities\monster;
 
-use pocketmine\entity\Living;
+use CLADevs\VanillaX\entities\LivingEntity;
 
-class MagmaCubeEntity extends Living{
+class MagmaCubeEntity extends LivingEntity{
 
     public $width = 2.08;
     public $height = 2.08;

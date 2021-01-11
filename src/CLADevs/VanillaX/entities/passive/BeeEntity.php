@@ -2,9 +2,12 @@
 
 namespace CLADevs\VanillaX\entities\passive;
 
-use pocketmine\entity\Living;
+use CLADevs\VanillaX\entities\LivingEntity;
+use CLADevs\VanillaX\entities\traits\EntityAgeable;
+use pocketmine\item\ItemFactory;
+use pocketmine\item\ItemIds;
 
-class BeeEntity extends Living{
+class BeeEntity extends LivingEntity{
 
     public $width = 0.55;
     public $height = 0.5;
@@ -13,6 +16,16 @@ class BeeEntity extends Living{
 
     protected function initEntity(): void{
         parent::initEntity();
+        $this->ageable = new EntityAgeable($this, [0.275, 0.25], [0.55, 0.5]);
+        $this->ageable->setGrowthItems([
+            ItemIds::RED_FLOWER,
+            ItemIds::YELLOW_FLOWER,
+            //TODO WITHER ROSE
+            ItemIds::DOUBLE_PLANT, //Sunflower
+            ItemFactory::get(ItemIds::DOUBLE_PLANT, 1), //Lilac
+            ItemFactory::get(ItemIds::DOUBLE_PLANT, 4), //Rose Bush
+            ItemFactory::get(ItemIds::DOUBLE_PLANT, 5), //Peony
+        ]);
         $this->setMaxHealth(10);
     }
 

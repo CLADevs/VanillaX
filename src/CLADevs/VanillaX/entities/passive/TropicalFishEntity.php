@@ -2,9 +2,9 @@
 
 namespace CLADevs\VanillaX\entities\passive;
 
-use pocketmine\entity\Living;
+use CLADevs\VanillaX\entities\LivingEntity;
 
-class TropicalFishEntity extends Living{
+class TropicalFishEntity extends LivingEntity{
 
     public $width = 0.4;
     public $height = 0.4;

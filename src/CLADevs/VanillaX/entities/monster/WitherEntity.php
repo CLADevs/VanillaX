@@ -2,9 +2,9 @@
 
 namespace CLADevs\VanillaX\entities\monster;
 
-use pocketmine\entity\Living;
+use CLADevs\VanillaX\entities\LivingEntity;
 
-class WitherEntity extends Living{
+class WitherEntity extends LivingEntity{
 
     public $width = 1;
     public $height = 3;

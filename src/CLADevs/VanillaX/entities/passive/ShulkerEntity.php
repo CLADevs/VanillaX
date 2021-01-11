@@ -2,9 +2,9 @@
 
 namespace CLADevs\VanillaX\entities\passive;
 
-use pocketmine\entity\Living;
+use CLADevs\VanillaX\entities\LivingEntity;
 
-class ShulkerEntity extends Living{
+class ShulkerEntity extends LivingEntity{
 
     public $width = 1;
     public $height = 1;

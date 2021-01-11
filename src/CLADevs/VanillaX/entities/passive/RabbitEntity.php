@@ -2,9 +2,11 @@
 
 namespace CLADevs\VanillaX\entities\passive;
 
-use pocketmine\entity\Living;
+use CLADevs\VanillaX\entities\LivingEntity;
+use CLADevs\VanillaX\entities\traits\EntityAgeable;
+use pocketmine\item\ItemIds;
 
-class RabbitEntity extends Living{
+class RabbitEntity extends LivingEntity{
 
     public $width = 0.67;
     public $height = 0.67;
@@ -13,6 +15,8 @@ class RabbitEntity extends Living{
 
     protected function initEntity(): void{
         parent::initEntity();
+        $this->ageable = new EntityAgeable($this, [0.268, 0.268], [0.402, 0.402]);
+        $this->ageable->setGrowthItems([ItemIds::GOLDEN_CARROT, ItemIds::CARROT, ItemIds::YELLOW_FLOWER]);
         $this->setMaxHealth(3);
     }
 

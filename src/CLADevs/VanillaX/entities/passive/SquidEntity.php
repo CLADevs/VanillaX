@@ -2,9 +2,10 @@
 
 namespace CLADevs\VanillaX\entities\passive;
 
-use pocketmine\entity\Living;
+use CLADevs\VanillaX\entities\LivingEntity;
+use CLADevs\VanillaX\entities\traits\EntityAgeable;
 
-class SquidEntity extends Living{
+class SquidEntity extends LivingEntity{
 
     public $width = 0.95;
     public $height = 0.95;
@@ -13,6 +14,8 @@ class SquidEntity extends Living{
 
     protected function initEntity(): void{
         parent::initEntity();
+        $this->ageable = new EntityAgeable($this, [0.3, 0.95], [0.6, 1.9]);
+        $this->ageable->setCanBeBredByPlayer(false);
         $this->setMaxHealth(10);
     }
 
