@@ -63,7 +63,7 @@ class VanillaListener implements Listener{
                     $event->setCancelled();
                 }else{
                     if(($end = $session->getEndGlideTime()) !== null && ($start = $session->getStartGlideTime()) !== null){
-                        if(($end - $start) < 1){
+                        if(($end - $start) < 3){
                             $event->setCancelled();
                         }
                     }
