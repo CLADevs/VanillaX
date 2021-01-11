@@ -15,7 +15,6 @@ class VillagerEntity extends LivingEntity{
     protected function initEntity(): void{
         parent::initEntity();
         $this->ageable = new EntityAgeable($this, [0.3, 0.95], [0.6, 1.9]);
-        //TODO cannot be breeded if its zombie villager
     }
 
     public function getName(): string{

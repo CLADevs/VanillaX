@@ -19,4 +19,8 @@ class VexEntity extends LivingEntity{
     public function getName(): string{
         return "Vex";
     }
+
+    public function getLootExperience(): int{
+        return 5;
+    }
 }

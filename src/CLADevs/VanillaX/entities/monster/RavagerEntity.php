@@ -2,16 +2,17 @@
 
 namespace CLADevs\VanillaX\entities\monster;
 
+use CLADevs\VanillaX\entities\Entity;
 use CLADevs\VanillaX\entities\LivingEntity;
-use pocketmine\network\mcpe\protocol\AddActorPacket;
-use pocketmine\Player;
+use pocketmine\item\ItemFactory;
+use pocketmine\item\ItemIds;
 
 class RavagerEntity extends LivingEntity{
 
     public $width = 1.9;
     public $height = 1.2;
 
-    const NETWORK_ID = 59; //RAVAGER ID
+    const NETWORK_ID = self::RAVAGER;
 
     protected function initEntity(): void{
         parent::initEntity();
@@ -22,17 +23,11 @@ class RavagerEntity extends LivingEntity{
         return "Ravager";
     }
 
-    protected function sendSpawnPacket(Player $player) : void{
-        $pk = new AddActorPacket();
-        $pk->entityRuntimeId = $this->getId();
-        $pk->type ="minecraft:ravager";
-        $pk->position = $this->asVector3();
-        $pk->motion = $this->getMotion();
-        $pk->yaw = $this->yaw;
-        $pk->headYaw = $this->yaw; //TODO
-        $pk->pitch = $this->pitch;
-        $pk->attributes = $this->attributeMap->getAll();
-        $pk->metadata = $this->propertyManager->getAll();
-        $player->dataPacket($pk);
+    public function getLootItems(Entity $killer): array{
+        return [ItemFactory::get(ItemIds::SADDLE, 0, 1)];
+    }
+
+    public function getLootExperience(): int{
+        return 20;
     }
 }

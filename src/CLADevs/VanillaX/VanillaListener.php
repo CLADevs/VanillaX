@@ -3,7 +3,7 @@
 namespace CLADevs\VanillaX;
 
 use CLADevs\VanillaX\blocks\tiles\CommandBlockTile;
-use CLADevs\VanillaX\entities\passive\StriderEntity;
+
 use CLADevs\VanillaX\inventories\EnchantInventory;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\Listener;

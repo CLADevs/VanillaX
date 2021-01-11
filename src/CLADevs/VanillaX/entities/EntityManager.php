@@ -2,6 +2,7 @@
 
 namespace CLADevs\VanillaX\entities;
 
+
 class EntityManager{
 
     public function startup(): void{

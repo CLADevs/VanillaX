@@ -2,18 +2,18 @@
 
 namespace CLADevs\VanillaX\entities\monster;
 
+use CLADevs\VanillaX\entities\Entity;
 use CLADevs\VanillaX\entities\LivingEntity;
 use CLADevs\VanillaX\entities\traits\EntityAgeable;
+use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
-use pocketmine\network\mcpe\protocol\AddActorPacket;
-use pocketmine\Player;
 
 class HoglinEntity extends LivingEntity{
 
     public $width = 0.9;
     public $height = 0.9;
 
-    const NETWORK_ID = 124; //HOGLIN ID
+    const NETWORK_ID = self::HOGLIN;
 
     protected function initEntity(): void{
         parent::initEntity();
@@ -26,17 +26,20 @@ class HoglinEntity extends LivingEntity{
         return "Hoglin";
     }
 
-    protected function sendSpawnPacket(Player $player) : void{
-        $pk = new AddActorPacket();
-        $pk->entityRuntimeId = $this->getId();
-        $pk->type ="minecraft:hoglin";
-        $pk->position = $this->asVector3();
-        $pk->motion = $this->getMotion();
-        $pk->yaw = $this->yaw;
-        $pk->headYaw = $this->yaw; //TODO
-        $pk->pitch = $this->pitch;
-        $pk->attributes = $this->attributeMap->getAll();
-        $pk->metadata = $this->propertyManager->getAll();
-        $player->dataPacket($pk);
+    public function getLootItems(Entity $killer): array{
+        $pork = ItemFactory::get(ItemIds::PORKCHOP, 0, mt_rand(2, 4));
+        if(($looting = $this->getKillerEnchantment($killer)) > 0){
+            $pork->setCount($pork->getCount() + mt_rand(0, $looting));
+        }
+
+        $leather = ItemFactory::get(ItemIds::LEATHER, 0, mt_rand(0, 2));
+        if(($looting = $this->getKillerEnchantment($killer)) > 0){
+            $leather->setCount($leather->getCount() + mt_rand(0, $looting));
+        }
+        return [$pork, $leather];
+    }
+
+    public function getLootExperience(): int{
+        return $this->ageable->isBaby() ? 0 : mt_rand(1, 3);
     }
 }

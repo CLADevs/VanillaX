@@ -19,4 +19,8 @@ class EndermiteEntity extends LivingEntity{
     public function getName(): string{
         return "Endermite";
     }
+
+    public function getLootExperience(): int{
+        return 3;
+    }
 }

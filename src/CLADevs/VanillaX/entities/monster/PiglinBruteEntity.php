@@ -2,16 +2,19 @@
 
 namespace CLADevs\VanillaX\entities\monster;
 
+use CLADevs\VanillaX\entities\Entity;
 use CLADevs\VanillaX\entities\LivingEntity;
-use pocketmine\network\mcpe\protocol\AddActorPacket;
-use pocketmine\Player;
+use pocketmine\item\Durable;
+use pocketmine\item\ItemFactory;
+use pocketmine\item\ItemIds;
+use pocketmine\utils\Random;
 
 class PiglinBruteEntity extends LivingEntity{
 
     public $width = 0.6;
     public $height = 1.9;
 
-    const NETWORK_ID = 127; //PIGLIN BRUTE ID
+    const NETWORK_ID = self::PIGLIN_BRUTE;
 
     protected function initEntity(): void{
         parent::initEntity();
@@ -22,17 +25,20 @@ class PiglinBruteEntity extends LivingEntity{
         return "Piglin Brute";
     }
 
-    protected function sendSpawnPacket(Player $player) : void{
-        $pk = new AddActorPacket();
-        $pk->entityRuntimeId = $this->getId();
-        $pk->type ="minecraft:piglin_brute";
-        $pk->position = $this->asVector3();
-        $pk->motion = $this->getMotion();
-        $pk->yaw = $this->yaw;
-        $pk->headYaw = $this->yaw; //TODO
-        $pk->pitch = $this->pitch;
-        $pk->attributes = $this->attributeMap->getAll();
-        $pk->metadata = $this->propertyManager->getAll();
-        $player->dataPacket($pk);
+    public function getLootItems(Entity $killer): array{
+        $random = new Random();
+
+        if($random->nextFloat() < 0.85){
+            $axe = ItemFactory::get(ItemIds::GOLDEN_AXE, 0, 1);
+            if($axe instanceof Durable){
+                $axe->setDamage(mt_rand(0, $axe->getMaxDurability() - 1));
+            }
+            return [$axe];
+        }
+        return [];
+    }
+
+    public function getLootExperience(): int{
+        return 20;
     }
 }

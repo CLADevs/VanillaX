@@ -9,7 +9,7 @@ class ShulkerEntity extends LivingEntity{
     public $width = 1;
     public $height = 1;
 
-    const NETWORK_ID = self::SHEEP;
+    const NETWORK_ID = self::SHULKER;
 
     protected function initEntity(): void{
         parent::initEntity();

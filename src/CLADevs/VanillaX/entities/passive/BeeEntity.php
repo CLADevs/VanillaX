@@ -12,7 +12,7 @@ class BeeEntity extends LivingEntity{
     public $width = 0.55;
     public $height = 0.5;
 
-    const NETWORK_ID = 122; //BEE ID
+    const NETWORK_ID = self::BEE;
 
     protected function initEntity(): void{
         parent::initEntity();
