@@ -58,11 +58,11 @@ class VanillaListener implements Listener{
             $entity = $event->getEntity();
 
             if($entity instanceof Player){
-                $en = new StriderEntity($entity->getLevel(), StriderEntity::createBaseNBT($entity));
-                if($en->getAgeable() !== null){
-                    $en->getAgeable()->setBaby(true);
-                }
-                $en->spawnToAll();
+                //$en = new StriderEntity($entity->getLevel(), StriderEntity::createBaseNBT($entity));
+                //if($en->getAgeable() !== null){
+                    //$en->getAgeable()->setBaby(true);
+                //}
+                //$en->spawnToAll();
                 $session = VanillaX::getInstance()->getSessionManager()->get($entity);
 
                 if($session->isGliding()){
