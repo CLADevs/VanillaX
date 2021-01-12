@@ -2,7 +2,7 @@
 
 namespace CLADevs\VanillaX\entities\projectile;
 
-use CLADevs\VanillaX\entities\Entity;
+use pocketmine\entity\Entity;
 
 class LlamaSpitEntity extends Entity{
 

@@ -2,11 +2,8 @@
 
 namespace CLADevs\VanillaX\entities\monster;
 
-use CLADevs\VanillaX\entities\Entity;
 use CLADevs\VanillaX\entities\LivingEntity;
 use CLADevs\VanillaX\entities\traits\EntityAgeable;
-use pocketmine\item\ItemFactory;
-use pocketmine\item\ItemIds;
 
 class HoglinEntity extends LivingEntity{
 
@@ -24,22 +21,5 @@ class HoglinEntity extends LivingEntity{
 
     public function getName(): string{
         return "Hoglin";
-    }
-
-    public function getLootItems(Entity $killer): array{
-        $pork = ItemFactory::get(ItemIds::PORKCHOP, 0, mt_rand(2, 4));
-        if(($looting = $this->getKillerEnchantment($killer)) > 0){
-            $pork->setCount($pork->getCount() + mt_rand(0, $looting));
-        }
-
-        $leather = ItemFactory::get(ItemIds::LEATHER, 0, mt_rand(0, 2));
-        if(($looting = $this->getKillerEnchantment($killer)) > 0){
-            $leather->setCount($leather->getCount() + mt_rand(0, $looting));
-        }
-        return [$pork, $leather];
-    }
-
-    public function getLootExperience(): int{
-        return $this->ageable->isBaby() ? 0 : mt_rand(1, 3);
     }
 }

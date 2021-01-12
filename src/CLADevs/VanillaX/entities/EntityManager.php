@@ -2,13 +2,26 @@
 
 namespace CLADevs\VanillaX\entities;
 
+use CLADevs\VanillaX\entities\loot\LootManager;
+use pocketmine\entity\Entity;
 
 class EntityManager{
 
+    private LootManager $lootManager;
+
+    public function __construct(){
+        $this->lootManager = new LootManager();
+    }
+
     public function startup(): void{
+        $this->lootManager->startup();
         $this->registerEntity("object");
         $this->registerEntity("passive");
         $this->registerEntity("monster");
+    }
+
+    public function getLootManager(): LootManager{
+        return $this->lootManager;
     }
 
     public function registerEntity(string $directory): void{

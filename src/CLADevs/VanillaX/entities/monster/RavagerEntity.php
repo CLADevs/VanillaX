@@ -2,10 +2,7 @@
 
 namespace CLADevs\VanillaX\entities\monster;
 
-use CLADevs\VanillaX\entities\Entity;
 use CLADevs\VanillaX\entities\LivingEntity;
-use pocketmine\item\ItemFactory;
-use pocketmine\item\ItemIds;
 
 class RavagerEntity extends LivingEntity{
 
@@ -21,13 +18,5 @@ class RavagerEntity extends LivingEntity{
 
     public function getName(): string{
         return "Ravager";
-    }
-
-    public function getLootItems(Entity $killer): array{
-        return [ItemFactory::get(ItemIds::SADDLE, 0, 1)];
-    }
-
-    public function getLootExperience(): int{
-        return 20;
     }
 }

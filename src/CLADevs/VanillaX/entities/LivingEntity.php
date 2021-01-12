@@ -1,8 +1,10 @@
-<?php /** @noinspection PhpUnusedParameterInspection */
+<?php
 
 namespace CLADevs\VanillaX\entities;
 
 use CLADevs\VanillaX\entities\traits\EntityAgeable;
+use CLADevs\VanillaX\VanillaX;
+use pocketmine\entity\Entity;
 use pocketmine\entity\Living;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
@@ -38,33 +40,36 @@ abstract class LivingEntity extends Living{
     ];
 
     protected ?EntityAgeable $ageable = null;
-    protected ?\pocketmine\entity\Entity $killer = null;
+    protected ?Entity $killer = null;
 
     public function getAgeable(): ?EntityAgeable{
         return $this->ageable;
     }
 
-    /**
-     * @param \pocketmine\entity\Entity $killer
-     * @return Item[]
-     */
-    public function getLootItems(\pocketmine\entity\Entity $killer): array{
-        return [];
-    }
-
-    public function getLootExperience(): int{
-        return 0;
+    public function getLootName(): string{
+        return strtolower(str_replace(" ", "_", $this->getName()));
     }
 
     public function getXpDropAmount(): int{
-        return $this->getLootExperience(); //TODO
+        return 0; //TODO
     }
 
     public function getDrops(): array{
-        return $this->killer instanceof \pocketmine\entity\Entity ? $this->getLootItems($this->killer) : [];
+        $loot = [];
+
+        if($lootTable = VanillaX::getInstance()->getEntityManager()->getLootManager()->getLootTableFor($this->getLootName())){
+            foreach($lootTable->getPools() as $pool){
+                foreach($pool->getEntries() as $entry){
+                    $loot[] = $entry->apply($this->killer);
+                }
+            }
+        }else{
+            var_dump("Unknown Loot table for: " . $this->getLootName());
+        }
+        return $loot;
     }
 
-    public function getKillerEnchantment(\pocketmine\entity\Entity $killer, int $enchantment = Enchantment::LOOTING, bool $bypassMaxCheck = false): int{
+    public function getKillerEnchantment(Entity $killer, int $enchantment = Enchantment::LOOTING, bool $bypassMaxCheck = false): int{
         if($killer instanceof Player){
             $held = $killer->getInventory()->getItemInHand();
 
@@ -85,9 +90,7 @@ abstract class LivingEntity extends Living{
         if(!$source->isCancelled()){
             if(($source->getEntity()->getHealth() - $source->getFinalDamage()) <= 0){
                 if($this->killer === null && $source instanceof EntityDamageByEntityEvent){
-                    if($source->getEntity() !== $source->getDamager()){
-                        $this->killer = $source->getDamager();
-                    }
+                    $this->killer = $source->getDamager();
                 }
             }
             parent::attack($source);

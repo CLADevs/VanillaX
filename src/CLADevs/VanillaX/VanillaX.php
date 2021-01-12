@@ -19,6 +19,7 @@ class VanillaX extends PluginBase{
     private SessionManager $sessionManager;
 
     public function onLoad(): void{
+        @mkdir($this->getDataFolder());
         self::$instance = $this;
         $this->entityManager = new EntityManager();
         $this->blockManager = new BlockManager();

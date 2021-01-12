@@ -2,7 +2,7 @@
 
 namespace CLADevs\VanillaX\entities\object;
 
-use CLADevs\VanillaX\entities\Entity;
+use pocketmine\entity\Entity;
 
 class ArmorStandEntity extends Entity{
 

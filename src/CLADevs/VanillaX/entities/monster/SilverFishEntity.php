@@ -19,8 +19,4 @@ class SilverFishEntity extends LivingEntity{
     public function getName(): string{
         return "SilverFish";
     }
-
-    public function getLootExperience(): int{
-        return 5;
-    }
 }
