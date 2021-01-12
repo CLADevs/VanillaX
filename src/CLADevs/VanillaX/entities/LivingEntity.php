@@ -64,7 +64,7 @@ abstract class LivingEntity extends Living{
                 }
             }
         }else{
-            var_dump("Unknown Loot table for: " . $this->getLootName());
+           // var_dump("Unknown Loot table for: " . $this->getLootName());
         }
         return $loot;
     }
