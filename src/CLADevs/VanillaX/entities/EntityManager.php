@@ -18,6 +18,7 @@ class EntityManager{
         $this->registerEntity("object");
         $this->registerEntity("passive");
         $this->registerEntity("monster");
+        $this->registerEntity("projectile");
     }
 
     public function getLootManager(): LootManager{

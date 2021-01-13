@@ -2,6 +2,24 @@
 
 namespace CLADevs\VanillaX\enchantments;
 
+use CLADevs\VanillaX\enchantments\types\AquaAffinityEnchantment;
+use CLADevs\VanillaX\enchantments\types\BaneofArthropodsEnchantment;
+use CLADevs\VanillaX\enchantments\types\BindingEnchantment;
+use CLADevs\VanillaX\enchantments\types\ChannelingEnchantment;
+use CLADevs\VanillaX\enchantments\types\DepthStriderEnchantment;
+use CLADevs\VanillaX\enchantments\types\FortuneEnchantment;
+use CLADevs\VanillaX\enchantments\types\FrostWalkerEnchantment;
+use CLADevs\VanillaX\enchantments\types\ImpalingEnchantment;
+use CLADevs\VanillaX\enchantments\types\LootingEnchantment;
+use CLADevs\VanillaX\enchantments\types\LoyaltyEnchantment;
+use CLADevs\VanillaX\enchantments\types\LuckOfTheSeaEnchantment;
+use CLADevs\VanillaX\enchantments\types\LureEnchantment;
+use CLADevs\VanillaX\enchantments\types\RiptideEnchantment;
+use CLADevs\VanillaX\enchantments\types\SmiteEnchantment;
+use pocketmine\event\Event;
+use pocketmine\event\inventory\InventoryTransactionEvent;
+use pocketmine\inventory\PlayerInventory;
+use pocketmine\inventory\transaction\action\SlotChangeAction;
 use pocketmine\item\Armor;
 use pocketmine\item\Axe;
 use pocketmine\item\enchantment\Enchantment;
@@ -28,7 +46,22 @@ class EnchantmentManager{
     public static array $fishingRod = [Enchantment::LUCK_OF_THE_SEA, Enchantment::LURE];
 
     public function startup(): void{
-
+        Enchantment::registerEnchantment(new DepthStriderEnchantment());
+        Enchantment::registerEnchantment(new AquaAffinityEnchantment());
+        Enchantment::registerEnchantment(new SmiteEnchantment());
+        Enchantment::registerEnchantment(new BaneofArthropodsEnchantment());
+        Enchantment::registerEnchantment(new LootingEnchantment());
+        Enchantment::registerEnchantment(new FortuneEnchantment());
+        Enchantment::registerEnchantment(new LuckOfTheSeaEnchantment());
+        Enchantment::registerEnchantment(new LureEnchantment());
+        Enchantment::registerEnchantment(new FrostWalkerEnchantment());
+        Enchantment::registerEnchantment(new ImpalingEnchantment());
+        Enchantment::registerEnchantment(new BindingEnchantment());
+        Enchantment::registerEnchantment(new ImpalingEnchantment());
+        Enchantment::registerEnchantment(new RiptideEnchantment());
+        Enchantment::registerEnchantment(new LoyaltyEnchantment());
+        Enchantment::registerEnchantment(new ChannelingEnchantment());
+        //TODO Crossbow enchantment
     }
 
     /**
@@ -105,5 +138,24 @@ class EnchantmentManager{
             return array_merge($global, $enchantments);
         }
         return $enchantments;
+    }
+
+    public function handleReceivedEvent(Event $event): void{
+        if(!$event->isCancelled()){
+            if($event instanceof InventoryTransactionEvent){
+                $tr = $event->getTransaction();
+
+                foreach($tr->getActions() as $act){
+                    if($act instanceof SlotChangeAction){
+                        $source = $act->getSourceItem();
+                        $inv = $act->getInventory();
+
+                        if($inv instanceof PlayerInventory && $source->hasEnchantment(Enchantment::BINDING)){
+                            $event->setCancelled();
+                        }
+                    }
+                }
+            }
+        }
     }
 }

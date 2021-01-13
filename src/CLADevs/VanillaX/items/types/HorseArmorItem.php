@@ -2,9 +2,13 @@
 
 namespace CLADevs\VanillaX\items\types;
 
+use CLADevs\VanillaX\entities\traits\EntityInteractable;
+use pocketmine\entity\Entity;
+use pocketmine\entity\EntityIds;
 use pocketmine\item\Item;
+use pocketmine\Player;
 
-class HorseArmorItem extends Item{
+class HorseArmorItem extends Item implements EntityInteractable{
 
     public function __construct(int $id, int $meta = 0, string $name = "Unknown"){
         switch($id){
@@ -22,6 +26,12 @@ class HorseArmorItem extends Item{
                 break;
         }
         parent::__construct($id, $meta, $name);
+    }
+
+    public function onInteractWithEntity(Player $player, Entity $entity): void{
+        if($entity->getId() === EntityIds::HORSE){
+            //TODO
+        }
     }
 
     public function getMaxStackSize(): int{

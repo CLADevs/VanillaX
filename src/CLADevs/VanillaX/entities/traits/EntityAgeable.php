@@ -2,8 +2,8 @@
 
 namespace CLADevs\VanillaX\entities\traits;
 
-use CLADevs\VanillaX\entities\Entity;
 use CLADevs\VanillaX\entities\LivingEntity;
+use pocketmine\entity\Entity;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\Player;

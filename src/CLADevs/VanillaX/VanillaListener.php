@@ -5,17 +5,25 @@ namespace CLADevs\VanillaX;
 use CLADevs\VanillaX\blocks\tiles\CommandBlockTile;
 
 use CLADevs\VanillaX\blocks\tiles\HopperTile;
+use CLADevs\VanillaX\entities\object\ArmorStandEntity;
+use CLADevs\VanillaX\entities\traits\EntityInteractable;
 use CLADevs\VanillaX\inventories\EnchantInventory;
 use pocketmine\entity\object\ItemEntity;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\entity\EntitySpawnEvent;
+use pocketmine\event\inventory\InventoryTransactionEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerDropItemEvent;
 use pocketmine\event\server\DataPacketReceiveEvent;
+use pocketmine\item\ItemIds;
 use pocketmine\level\Position;
+use pocketmine\network\mcpe\protocol\BatchPacket;
 use pocketmine\network\mcpe\protocol\CommandBlockUpdatePacket;
 use pocketmine\network\mcpe\protocol\InventoryTransactionPacket;
+use pocketmine\network\mcpe\protocol\MovePlayerPacket;
 use pocketmine\network\mcpe\protocol\PlayerActionPacket;
+use pocketmine\network\mcpe\protocol\ServerSettingsRequestPacket;
+use pocketmine\network\mcpe\protocol\ServerSettingsResponsePacket;
 use pocketmine\network\mcpe\protocol\types\WindowTypes;
 use pocketmine\Player;
 
@@ -54,6 +62,24 @@ class VanillaListener implements Listener{
         if($packet instanceof PlayerActionPacket && in_array($packet->action, [PlayerActionPacket::ACTION_START_GLIDE, PlayerActionPacket::ACTION_STOP_GLIDE])){
             $session = VanillaX::getInstance()->getSessionManager()->get($player);
             $session->setGliding($packet->action === PlayerActionPacket::ACTION_START_GLIDE);
+        }elseif($packet instanceof InventoryTransactionPacket && $packet->transactionType === InventoryTransactionPacket::TYPE_USE_ITEM_ON_ENTITY){
+            if($packet->trData->actionType === InventoryTransactionPacket::USE_ITEM_ON_ENTITY_ACTION_INTERACT){
+                $entity = $player->getLevel()->getEntity($packet->trData->entityRuntimeId);
+                $item = $packet->trData->itemInHand;
+
+                if($entity instanceof EntityInteractable){
+                    $entity->onInteract($player, $item);
+                }
+                if($item instanceof EntityInteractable){
+                    $item->onInteractWithEntity($player, $entity);
+                }
+            }
+        }
+        if(!$packet instanceof MovePlayerPacket && !$packet instanceof BatchPacket){
+            var_dump($packet->getName());
+            if($packet instanceof ServerSettingsResponsePacket || $packet instanceof ServerSettingsRequestPacket){
+                var_dump($packet);
+            }
         }
     }
 
@@ -82,6 +108,9 @@ class VanillaListener implements Listener{
         }
     }
 
+    public function onTransaction(InventoryTransactionEvent $event): void{
+        VanillaX::getInstance()->getEnchantmentManager()->handleReceivedEvent($event);
+    }
 //    public function onEntitySpawn(EntitySpawnEvent $event): void{
 //        $entity = $event->getEntity();
 //

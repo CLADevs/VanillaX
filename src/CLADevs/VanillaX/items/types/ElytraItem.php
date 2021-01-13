@@ -24,7 +24,7 @@ class ElytraItem extends Armor{
     public function onClickAir(Player $player, Vector3 $directionVector): bool{
         if($player->getArmorInventory()->getChestplate()->isNull()){
             $player->getArmorInventory()->setChestplate($this);
-            if(!$player->isSurvival() || !$player->isAdventure()) $this->pop();
+            if($player->isSurvival() || $player->isAdventure()) $this->pop();
         }
         return true;
     }

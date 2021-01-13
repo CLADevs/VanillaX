@@ -2,9 +2,12 @@
 
 namespace CLADevs\VanillaX\entities\object;
 
+use CLADevs\VanillaX\entities\traits\EntityInteractable;
 use pocketmine\entity\Entity;
+use pocketmine\item\Item;
+use pocketmine\Player;
 
-class ArmorStandEntity extends Entity{
+class ArmorStandEntity extends Entity implements EntityInteractable{
 
     public $width = 0.5;
     public $height = 1.975;
@@ -15,5 +18,9 @@ class ArmorStandEntity extends Entity{
     protected function initEntity(): void{
         parent::initEntity();
         $this->setMaxHealth(6);
+        $this->setHealth(6);
+    }
+
+    public function onInteract(Player $player, Item $item): void{
     }
 }
