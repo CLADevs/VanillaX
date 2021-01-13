@@ -8,6 +8,10 @@
 - Enchantment Table
 - Command Block(Unfinished)
 
+#### WIP Blocks:
+- Anvil
+- Hopper
+
 #### Entities:
 - All Minecraft Entities (Not functional)
 

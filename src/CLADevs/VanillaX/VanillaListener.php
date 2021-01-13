@@ -4,9 +4,13 @@ namespace CLADevs\VanillaX;
 
 use CLADevs\VanillaX\blocks\tiles\CommandBlockTile;
 
+use CLADevs\VanillaX\blocks\tiles\HopperTile;
 use CLADevs\VanillaX\inventories\EnchantInventory;
+use pocketmine\entity\object\ItemEntity;
 use pocketmine\event\entity\EntityDamageEvent;
+use pocketmine\event\entity\EntitySpawnEvent;
 use pocketmine\event\Listener;
+use pocketmine\event\player\PlayerDropItemEvent;
 use pocketmine\event\server\DataPacketReceiveEvent;
 use pocketmine\level\Position;
 use pocketmine\network\mcpe\protocol\CommandBlockUpdatePacket;
@@ -77,4 +81,18 @@ class VanillaListener implements Listener{
             }
         }
     }
+
+//    public function onEntitySpawn(EntitySpawnEvent $event): void{
+//        $entity = $event->getEntity();
+//
+//        if($entity instanceof ItemEntity){
+//            $tiles = $entity->getLevel()->getChunkAtPosition($entity)->getTiles();
+//
+//            foreach($tiles as $tile){
+//                if($tile instanceof HopperTile){
+//                   $tile->onDrop();
+//                }
+//            }
+//        }
+//    }
 }

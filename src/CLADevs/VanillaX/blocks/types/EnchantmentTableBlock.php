@@ -25,7 +25,7 @@ class EnchantmentTableBlock extends Transparent{
     }
 
     public function onActivate(Item $item, Player $player = null): bool{
-        if($player !==null){
+        if($player !== null){
             if(!$this->getLevel()->getTile($this) instanceof EnchantTable){
                 Tile::createTile(Tile::ENCHANT_TABLE, $this->getLevel(), EnchantTable::createNBT($this));
             }

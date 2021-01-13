@@ -3,9 +3,11 @@
 namespace CLADevs\VanillaX\blocks;
 
 use CLADevs\VanillaX\blocks\tiles\CommandBlockTile;
+use CLADevs\VanillaX\blocks\tiles\HopperTile;
 use CLADevs\VanillaX\blocks\tiles\MobSpawnerTile;
 use CLADevs\VanillaX\blocks\types\CommandBlock;
 use CLADevs\VanillaX\blocks\types\EnchantmentTableBlock;
+use CLADevs\VanillaX\blocks\types\HopperBlock;
 use CLADevs\VanillaX\blocks\types\MobSpawnerBlock;
 use pocketmine\block\BlockFactory;
 use pocketmine\block\BlockIds;
@@ -25,7 +27,8 @@ class BlockManager{
     public function initializeBlocks(): void{
         BlockFactory::registerBlock(new MobSpawnerBlock(), true);
         BlockFactory::registerBlock(new EnchantmentTableBlock(), true);
-    //TODO    BlockFactory::registerBlock(new AnvilBlock(), true);
+        //TODO BlockFactory::registerBlock(new HopperBlock(), true);
+        //TODO BlockFactory::registerBlock(new AnvilBlock(), true);
 
         $blocks = [
             new CommandBlock(BlockIds::COMMAND_BLOCK),
@@ -43,5 +46,6 @@ class BlockManager{
     public function initializeTiles(): void{
         Tile::registerTile(MobSpawnerTile::class, [Tile::MOB_SPAWNER, "minecraft:mob_spawner"]);
         Tile::registerTile(CommandBlockTile::class, [TileIdentifiers::COMMAND_BLOCK, "minecraft:command_block"]);
+        Tile::registerTile(HopperTile::class, [TileIdentifiers::HOPPER, "minecraft:hopper"]);
     }
 }
