@@ -75,12 +75,12 @@ class VanillaListener implements Listener{
                 }
             }
         }
-        if(!$packet instanceof MovePlayerPacket && !$packet instanceof BatchPacket){
-            var_dump($packet->getName());
-            if($packet instanceof ServerSettingsResponsePacket || $packet instanceof ServerSettingsRequestPacket){
-                var_dump($packet);
-            }
-        }
+//        if(!$packet instanceof MovePlayerPacket && !$packet instanceof BatchPacket){
+//            var_dump($packet->getName());
+//            if($packet instanceof ServerSettingsResponsePacket || $packet instanceof ServerSettingsRequestPacket){
+//                var_dump($packet);
+//            }
+//        }
     }
 
     public function onDamage(EntityDamageEvent $event): void{
