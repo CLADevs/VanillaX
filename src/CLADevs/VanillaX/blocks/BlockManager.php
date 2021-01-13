@@ -46,6 +46,6 @@ class BlockManager{
     public function initializeTiles(): void{
         Tile::registerTile(MobSpawnerTile::class, [Tile::MOB_SPAWNER, "minecraft:mob_spawner"]);
         Tile::registerTile(CommandBlockTile::class, [TileIdentifiers::COMMAND_BLOCK, "minecraft:command_block"]);
-        Tile::registerTile(HopperTile::class, [TileIdentifiers::HOPPER, "minecraft:hopper"]);
+        //TODO Tile::registerTile(HopperTile::class, [TileIdentifiers::HOPPER, "minecraft:hopper"]);
     }
 }
