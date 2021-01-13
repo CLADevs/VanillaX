@@ -3,14 +3,13 @@
 namespace CLADevs\VanillaX\items\types;
 
 use pocketmine\item\Armor;
-use pocketmine\item\Item;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 
-class ElytraItem extends Armor{
+class TurtleHelmetItem extends Armor{
 
     public function __construct(int $meta = 0){
-        parent::__construct(self::ELYTRA, $meta, "Elytra");
+        parent::__construct(self::TURTLE_HELMET, $meta, "Turtle Helmet");
     }
 
     public function getMaxStackSize(): int{
@@ -18,12 +17,12 @@ class ElytraItem extends Armor{
     }
 
     public function getMaxDurability(): int{
-        return 432;
+        return 276;
     }
 
     public function onClickAir(Player $player, Vector3 $directionVector): bool{
-        if($player->getArmorInventory()->getChestplate()->isNull()){
-            $player->getArmorInventory()->setChestplate($this);
+        if($player->getArmorInventory()->getHelmet()->isNull()){
+            $player->getArmorInventory()->setHelmet($this);
             if(!$player->isSurvival() || !$player->isAdventure()) $this->pop();
         }
         return true;
