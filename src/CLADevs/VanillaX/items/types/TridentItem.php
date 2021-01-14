@@ -4,15 +4,13 @@ namespace CLADevs\VanillaX\items\types;
 
 use CLADevs\VanillaX\entities\projectile\TridentEntity;
 use CLADevs\VanillaX\session\Session;
-use pocketmine\block\BlockIds;
-
 use pocketmine\block\Water;
 use pocketmine\entity\Entity;
+use pocketmine\item\Durable;
 use pocketmine\item\enchantment\Enchantment;
-use pocketmine\item\Item;
 use pocketmine\Player;
 
-class TridentItem extends Item{
+class TridentItem extends Durable{
 
     public function __construct(int $meta = 0){
         parent::__construct(self::TRIDENT, $meta, "Trident");
@@ -30,6 +28,7 @@ class TridentItem extends Item{
     }
 
     public function spawnTride(Player $player): void{
+        $this->applyDamage(1);
         $nbt = Entity::createBaseNBT(
             $player->add(0, $player->getEyeHeight(), 0),
             $player->getDirectionVector(),
@@ -39,9 +38,11 @@ class TridentItem extends Item{
 
         $diff = $player->getItemUseDuration();
         $p = $diff / 20;
-        $baseForce = min((($p ** 2) + $p * 2) / 3, 1);
-        $entity = new TridentEntity($player->getLevel(), $nbt, clone $this, $player);
-        $entity->setMotion($entity->getMotion()->multiply($baseForce));
+        $baseForce = min((($p ** 2) + $p * 2) / 2, 1);
+        $entity = new TridentEntity($player->getLevel(), $nbt);
+        $entity->setParent(clone $this);
+        $entity->setOwningEntity($player);
+        $entity->setMotion($entity->getMotion()->multiply($baseForce * 2));
         $entity->spawnToAll();
         Session::playSound($player, "item.trident.throw");
         $this->pop();
@@ -50,5 +51,9 @@ class TridentItem extends Item{
 
     public function getMaxStackSize(): int{
         return 1;
+    }
+
+    public function getMaxDurability(): int{
+        return 250;
     }
 }

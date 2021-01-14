@@ -2,6 +2,7 @@
 
 namespace CLADevs\VanillaX\session;
 
+use CLADevs\VanillaX\entities\projectile\TridentEntity;
 use pocketmine\network\mcpe\protocol\PlaySoundPacket;
 use pocketmine\Player;
 
@@ -14,6 +15,9 @@ class Session{
     private ?int $endGlideTime = null;
 
     private bool $inBoat = false;
+
+    /** @var TridentEntity[] */
+    private array $thrownTridents = [];
 
     public function __construct(Player $player){
         $this->player = $player;
@@ -46,6 +50,21 @@ class Session{
 
     public function setInBoat(bool $inBoat): void{
         $this->inBoat = $inBoat;
+    }
+
+    /**
+     * @return TridentEntity[]
+     */
+    public function getThrownTridents(): array{
+        return $this->thrownTridents;
+    }
+
+    public function addTrident(TridentEntity $entity): void{
+        $this->thrownTridents[$entity->getId()] = $entity;
+    }
+
+    public function removeTrident(TridentEntity $entity): void{
+        if(isset($this->thrownTridents[$entity->getId()])) unset($this->thrownTridents[$entity->getId()]);
     }
 
     public static function playSound(Player $player, string $sound, float $pitch = 1, float $volume = 1): void{

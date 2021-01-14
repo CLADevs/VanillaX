@@ -9,6 +9,7 @@ use CLADevs\VanillaX\inventories\EnchantInventory;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\inventory\InventoryTransactionEvent;
 use pocketmine\event\Listener;
+use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\event\server\DataPacketReceiveEvent;
 use pocketmine\level\Position;
 use pocketmine\network\mcpe\protocol\CommandBlockUpdatePacket;
@@ -108,6 +109,20 @@ class VanillaListener implements Listener{
     public function onTransaction(InventoryTransactionEvent $event): void{
         VanillaX::getInstance()->getEnchantmentManager()->handleReceivedEvent($event);
     }
+
+    public function onQuit(PlayerQuitEvent $event): void{
+        $player = $event->getPlayer();
+        $manager = VanillaX::getInstance()->getSessionManager();
+        $session = $manager->get($player);
+
+        foreach($session->getThrownTridents() as $entity){
+            if($entity->isAlive() && !$entity->isFlaggedForDespawn()){
+                $entity->onCollideWithPlayer($player);
+            }
+        }
+        $manager->remove($player);
+    }
+
 //    public function onEntitySpawn(EntitySpawnEvent $event): void{
 //        $entity = $event->getEntity();
 //

@@ -3,6 +3,7 @@
 namespace CLADevs\VanillaX\entities\projectile;
 
 use CLADevs\VanillaX\session\Session;
+use CLADevs\VanillaX\VanillaX;
 use pocketmine\block\Block;
 use pocketmine\entity\Entity;
 use pocketmine\entity\projectile\Projectile;
@@ -12,10 +13,8 @@ use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\item\enchantment\Enchantment;
 use pocketmine\item\Item;
-use pocketmine\level\Level;
 use pocketmine\math\RayTraceResult;
 use pocketmine\math\Vector3;
-use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\network\mcpe\protocol\TakeItemActorPacket;
 use pocketmine\Player;
 
@@ -38,14 +37,6 @@ class TridentEntity extends Projectile{
     private int $returnTick = 10;
     private ?int $forceReturnTick = null;
 
-    public function __construct(Level $level, CompoundTag $nbt, Item $item, ?Entity $shootingEntity = null){
-        parent::__construct($level, $nbt, $shootingEntity);
-        $this->parent = $item;
-        if($item->hasEnchantment(Enchantment::LOYALTY)){
-            $this->hasLoyalty = true;
-        }
-    }
-
     public function entityBaseTick(int $tickDiff = 1): bool{
         $parent = parent::entityBaseTick($tickDiff);
 
@@ -61,6 +52,10 @@ class TridentEntity extends Projectile{
                 $z /= $xz;
                 $y = 0;
 
+                if(!$this->getGenericFlag(self::DATA_FLAG_SHOW_TRIDENT_ROPE)){
+                    $this->setGenericFlag(self::DATA_FLAG_SHOW_TRIDENT_ROPE, true);
+                }
+                //TODO No Clip
                 if($this->forceReturnTick === null){
                   //  $this->forceReturnTick = min(mt_rand(20 * 4, 20 * 6), $x + $z * 4);
                     $this->forceReturnTick = mt_rand(20 * 4, 20 * 6);
@@ -73,7 +68,7 @@ class TridentEntity extends Projectile{
                 }
                 $this->setMotion(new Vector3($x, $y, $z));
                 $this->move($x, $y, $z);
-                //TODO make it go thr wall and add particle thingy
+                $this->updateMovement();
 
                 $owner = $this->getOwningEntity();
                 if(!$this->isReturnSoundPlayed){
@@ -151,5 +146,32 @@ class TridentEntity extends Projectile{
 
         $player->getInventory()->addItem($this->parent);
         $this->flagForDespawn();
+    }
+
+    public function flagForDespawn(): void{
+        $owner = $this->getOwningEntity();
+        if($owner instanceof Player){
+            $session = VanillaX::getInstance()->getSessionManager()->get($owner);
+            $session->removeTrident($this);
+        }
+        parent::flagForDespawn();
+    }
+
+    public function setOwningEntity(?Entity $owner): void{
+        parent::setOwningEntity($owner);
+        if($owner !== null){
+            if($owner instanceof Player){
+                $session = VanillaX::getInstance()->getSessionManager()->get($owner);
+                $session->addTrident($this);
+            }
+            $this->getDataPropertyManager()->setLong(self::DATA_OWNER_EID, $owner->getId());
+        }
+    }
+
+    public function setParent(Item $parent): void{
+        $this->parent = $parent;
+        if($parent->hasEnchantment(Enchantment::LOYALTY)){
+            $this->hasLoyalty = true;
+        }
     }
 }
