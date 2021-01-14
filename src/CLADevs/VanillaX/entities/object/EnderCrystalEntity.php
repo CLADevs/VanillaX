@@ -12,6 +12,8 @@ class EnderCrystalEntity extends Entity{
     public $width = 0.98;
     public $height = 0.98;
 
+    protected $gravity = 0.00;
+
     const NETWORK_ID = self::ENDER_CRYSTAL;
 
     protected function initEntity(): void{

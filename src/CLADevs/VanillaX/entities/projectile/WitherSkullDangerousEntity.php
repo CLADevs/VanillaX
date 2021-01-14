@@ -2,12 +2,17 @@
 
 namespace CLADevs\VanillaX\entities\projectile;
 
-use pocketmine\entity\Entity;
+use pocketmine\event\entity\ProjectileHitEvent;
+use pocketmine\level\Explosion;
+use pocketmine\level\Position;
 
-class WitherSkullDangerousEntity extends Entity{
-
-    public $width = 0.15;
-    public $height = 0.15;
+class WitherSkullDangerousEntity extends WitherSkullEntity{
 
     const NETWORK_ID = self::WITHER_SKULL_DANGEROUS;
+
+    protected function onHit(ProjectileHitEvent $event): void{
+        $exp = new Explosion(Position::fromObject($this->add(0, $this->height / 2, 0), $this->level), 4, $this);
+        $exp->explodeA();
+        $exp->explodeB();
+    }
 }

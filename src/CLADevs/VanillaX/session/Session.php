@@ -3,6 +3,8 @@
 namespace CLADevs\VanillaX\session;
 
 use CLADevs\VanillaX\entities\projectile\TridentEntity;
+use pocketmine\math\Vector3;
+use pocketmine\network\mcpe\protocol\DataPacket;
 use pocketmine\network\mcpe\protocol\PlaySoundPacket;
 use pocketmine\Player;
 
@@ -67,7 +69,15 @@ class Session{
         if(isset($this->thrownTridents[$entity->getId()])) unset($this->thrownTridents[$entity->getId()]);
     }
 
-    public static function playSound(Player $player, string $sound, float $pitch = 1, float $volume = 1): void{
+    /**
+     * @param Player|Vector3 $player
+     * @param string $sound
+     * @param float|int $pitch
+     * @param float|int $volume
+     * @param bool $packet
+     * @return DataPacket|null
+     */
+    public static function playSound($player, string $sound, float $pitch = 1, float $volume = 1, bool $packet = false): ?DataPacket{
         $pk = new PlaySoundPacket();
         $pk->soundName = $sound;
         $pk->x = $player->x;
@@ -75,6 +85,11 @@ class Session{
         $pk->z = $player->z;
         $pk->pitch = $pitch;
         $pk->volume = $volume;
-        $player->dataPacket($pk);
+        if($packet){
+            return $pk;
+        }elseif($player instanceof Player){
+            $player->dataPacket($pk);
+        }
+        return null;
     }
 }
