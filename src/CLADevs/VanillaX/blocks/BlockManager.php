@@ -3,11 +3,9 @@
 namespace CLADevs\VanillaX\blocks;
 
 use CLADevs\VanillaX\blocks\tiles\CommandBlockTile;
-use CLADevs\VanillaX\blocks\tiles\HopperTile;
 use CLADevs\VanillaX\blocks\tiles\MobSpawnerTile;
 use CLADevs\VanillaX\blocks\types\CommandBlock;
 use CLADevs\VanillaX\blocks\types\EnchantmentTableBlock;
-use CLADevs\VanillaX\blocks\types\HopperBlock;
 use CLADevs\VanillaX\blocks\types\MobSpawnerBlock;
 use pocketmine\block\BlockFactory;
 use pocketmine\block\BlockIds;
