@@ -2,6 +2,7 @@
 
 namespace CLADevs\VanillaX\entities\projectile;
 
+use CLADevs\VanillaX\session\Session;
 use pocketmine\block\Block;
 use pocketmine\entity\Entity;
 use pocketmine\entity\projectile\Projectile;
@@ -13,6 +14,7 @@ use pocketmine\item\enchantment\Enchantment;
 use pocketmine\item\Item;
 use pocketmine\level\Level;
 use pocketmine\math\RayTraceResult;
+use pocketmine\math\Vector3;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\network\mcpe\protocol\TakeItemActorPacket;
 use pocketmine\Player;
@@ -30,6 +32,11 @@ class TridentEntity extends Projectile{
     private Item $parent;
     private bool $hasLoyalty = false;
     private bool $canReturn = false;
+    private bool $isReturnSoundPlayed = false;
+    private bool $hitSoundPlayed = false;
+
+    private int $returnTick = 10;
+    private ?int $forceReturnTick = null;
 
     public function __construct(Level $level, CompoundTag $nbt, Item $item, ?Entity $shootingEntity = null){
         parent::__construct($level, $nbt, $shootingEntity);
@@ -42,17 +49,57 @@ class TridentEntity extends Projectile{
     public function entityBaseTick(int $tickDiff = 1): bool{
         $parent = parent::entityBaseTick($tickDiff);
 
-//        if($this->hasLoyalty && $this->canReturn){
-//            $x = abs($this->x - $this->getOwningEntity()->x);
-//            $y = abs($this->y - $this->getOwningEntity()->y);
-//            $z = abs($this->z - $this->getOwningEntity()->z);
-//            var_dump("$x, $y, $z");
-//        }
+        if($this->canReturn && $this->hasLoyalty){
+            if($this->returnTick > 0) $this->returnTick--;
+            if($this->returnTick <= 0){
+                if($this->forceReturnTick !== null && $this->forceReturnTick > 0) $this->forceReturnTick--;
+                $this->tryChangeMovement();
+                $x = $this->getOwningEntity()->x - $this->x;
+                $z = $this->getOwningEntity()->z - $this->z;
+                $xz = sqrt($x * $x + $z * $z);
+                $x /= $xz;
+                $z /= $xz;
+                $y = 0;
+
+                if($this->forceReturnTick === null){
+                  //  $this->forceReturnTick = min(mt_rand(20 * 4, 20 * 6), $x + $z * 4);
+                    $this->forceReturnTick = mt_rand(20 * 4, 20 * 6);
+                }
+                if($this->y < $this->getOwningEntity()->getY()){
+                    $diff = $this->getOwningEntity()->getY() - $this->y;
+                    $y = ($diff / 10);
+                }elseif($this->y > ($this->getOwningEntity()->getY() + 4)){
+                    $y = -0.2;
+                }
+                $this->setMotion(new Vector3($x, $y, $z));
+                $this->move($x, $y, $z);
+                //TODO make it go thr wall and add particle thingy
+
+                $owner = $this->getOwningEntity();
+                if(!$this->isReturnSoundPlayed){
+                    if($owner instanceof Player){
+                        Session::playSound($owner, "item.trident.return");
+                        $this->isReturnSoundPlayed = true;
+                    }
+                }
+                if($this->forceReturnTick !== null && $this->forceReturnTick <= 0 && !$this->isFlaggedForDespawn() && $owner instanceof Player){
+                    $this->onCollideWithPlayer($owner);
+                }
+            }
+        }
         return $parent;
     }
 
     protected function onHitBlock(Block $blockHit, RayTraceResult $hitResult): void{
         parent::onHitBlock($blockHit, $hitResult);
+        if(!$this->hitSoundPlayed){
+            $owner = $this->getOwningEntity();
+
+            if($owner instanceof Player){
+                Session::playSound($owner, "item.trident.hit_ground");
+                $this->hitSoundPlayed = true;
+            }
+        }
         $this->canReturn = true;
     }
 
@@ -76,13 +123,20 @@ class TridentEntity extends Projectile{
                 }
             }
         }
-        //$this->flagForDespawn();
+        if(!$this->hitSoundPlayed){
+            $owner = $this->getOwningEntity();
+
+            if($owner instanceof Player){
+                Session::playSound($owner, "item.trident.hit");
+                $this->hitSoundPlayed = true;
+            }
+        }
         $this->canReturn = true;
+        //$this->flagForDespawn();
     }
 
-
     public function onCollideWithPlayer(Player $player): void{
-        if($this->canReturn === null) return;
+        if(!$this->canReturn) return;
         if($this->hasLoyalty){
             /** @var Player|null $owner */
             $owner = $this->getOwningEntity();

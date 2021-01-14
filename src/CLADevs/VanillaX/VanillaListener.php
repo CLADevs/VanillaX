@@ -4,28 +4,22 @@ namespace CLADevs\VanillaX;
 
 use CLADevs\VanillaX\blocks\tiles\CommandBlockTile;
 
-use CLADevs\VanillaX\blocks\tiles\HopperTile;
-use CLADevs\VanillaX\entities\object\ArmorStandEntity;
 use CLADevs\VanillaX\entities\traits\EntityInteractable;
 use CLADevs\VanillaX\inventories\EnchantInventory;
-use pocketmine\entity\object\ItemEntity;
 use pocketmine\event\entity\EntityDamageEvent;
-use pocketmine\event\entity\EntitySpawnEvent;
 use pocketmine\event\inventory\InventoryTransactionEvent;
 use pocketmine\event\Listener;
-use pocketmine\event\player\PlayerDropItemEvent;
 use pocketmine\event\server\DataPacketReceiveEvent;
-use pocketmine\item\ItemIds;
 use pocketmine\level\Position;
-use pocketmine\network\mcpe\protocol\BatchPacket;
 use pocketmine\network\mcpe\protocol\CommandBlockUpdatePacket;
 use pocketmine\network\mcpe\protocol\InventoryTransactionPacket;
-use pocketmine\network\mcpe\protocol\MovePlayerPacket;
 use pocketmine\network\mcpe\protocol\PlayerActionPacket;
-use pocketmine\network\mcpe\protocol\ServerSettingsRequestPacket;
-use pocketmine\network\mcpe\protocol\ServerSettingsResponsePacket;
+use pocketmine\network\mcpe\protocol\SetDefaultGameTypePacket;
+use pocketmine\network\mcpe\protocol\SetDifficultyPacket;
+use pocketmine\network\mcpe\protocol\SetPlayerGameTypePacket;
 use pocketmine\network\mcpe\protocol\types\WindowTypes;
 use pocketmine\Player;
+use pocketmine\Server;
 
 class VanillaListener implements Listener{
 
@@ -75,12 +69,15 @@ class VanillaListener implements Listener{
                 }
             }
         }
-//        if(!$packet instanceof MovePlayerPacket && !$packet instanceof BatchPacket){
-//            var_dump($packet->getName());
-//            if($packet instanceof ServerSettingsResponsePacket || $packet instanceof ServerSettingsRequestPacket){
-//                var_dump($packet);
-//            }
-//        }
+        if($player->isOp()){
+            if($packet instanceof SetPlayerGameTypePacket){
+                $player->setGamemode($packet->gamemode);
+            }elseif($packet instanceof SetDefaultGameTypePacket){
+                Server::getInstance()->setConfigInt("gamemode", $packet->gamemode);
+            }elseif($packet instanceof SetDifficultyPacket){
+                $player->getLevel()->setDifficulty($packet->difficulty);
+            }
+        }
     }
 
     public function onDamage(EntityDamageEvent $event): void{
