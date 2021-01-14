@@ -2,7 +2,6 @@
 
 namespace CLADevs\VanillaX\entities\traits;
 
-use pocketmine\entity\Entity;
 use pocketmine\item\Item;
 use pocketmine\nbt\NBT;
 use pocketmine\nbt\tag\CompoundTag;
@@ -11,8 +10,6 @@ use pocketmine\tile\Container;
 
 trait EntityContainer{
 
-    abstract public function getEntity(): Entity;
-    
     public function getContainerSaveName(): string{
         return Container::TAG_ITEMS;
     }
@@ -39,7 +36,8 @@ trait EntityContainer{
     abstract public function setItem(Item $item, int $slot = 0): void;
 
     /**
+     * @param bool $includeEmpty
      * @return Item[]
      */
-    abstract public function getContents(): array;
+    abstract public function getContents(bool $includeEmpty = false): array;
 }
