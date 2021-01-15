@@ -12,7 +12,7 @@ use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
 use pocketmine\level\Level;
-use pocketmine\nbt\LittleEndianNBTStream;
+use pocketmine\nbt\NetworkLittleEndianNBTStream;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\network\mcpe\protocol\types\WindowTypes;
 use pocketmine\network\mcpe\protocol\UpdateTradePacket;
@@ -44,6 +44,7 @@ class VillagerEntity extends LivingEntity implements EntityInteractable{
     const WEAPONSMITH = 14;
 
     private ?VillagerProfession $profession = null;
+    private TradeInventory $inventory;
 
     public function __construct(Level $level, CompoundTag $nbt){
         parent::__construct($level, $nbt);
@@ -54,6 +55,7 @@ class VillagerEntity extends LivingEntity implements EntityInteractable{
         if($this->profession === null){
             $this->profession = VanillaX::getInstance()->getEntityManager()->getVillagerProfessionFor(self::UNEMPLOYED);
         }
+        $this->inventory = new TradeInventory($this);
     }
 
     public function getName(): string{
@@ -66,19 +68,18 @@ class VillagerEntity extends LivingEntity implements EntityInteractable{
     }
 
     public function onInteract(Player $player, Item $item): void{
-        $windowId = $player->addWindow(new TradeInventory($this));
-
+        $windowId = $player->addWindow($this->inventory); //Useless, ContainerOpenPacket would've work but let just do this
         $pk = new UpdateTradePacket();
-        $pk->windowId = $windowId;
+        $pk->windowId = $windowId; //Really unneeded .-.
         $pk->windowType = WindowTypes::TRADING;
-        $pk->windowSlotCount = 1;
+        $pk->windowSlotCount = 0;
         $pk->tradeTier = 0;
         $pk->traderEid = $this->getId();
         $pk->playerEid = $player->getId();
         $pk->displayName = $this->profession->getName();
         $pk->isV2Trading = true;
         $pk->isWilling = false;
-        $pk->offers = (new LittleEndianNBTStream())->write(ItemFactory::get(ItemIds::TNT)->nbtSerialize());
+        $pk->offers = (new NetworkLittleEndianNBTStream())->write(ItemFactory::get(ItemIds::TNT)->nbtSerialize());
         $player->dataPacket($pk);
     }
 }

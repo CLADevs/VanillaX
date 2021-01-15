@@ -6,14 +6,19 @@ use CLADevs\VanillaX\blocks\tiles\CommandBlockTile;
 
 use CLADevs\VanillaX\entities\traits\EntityInteractable;
 use CLADevs\VanillaX\inventories\EnchantInventory;
+use CLADevs\VanillaX\inventories\TradeInventory;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\inventory\InventoryTransactionEvent;
 use pocketmine\event\Listener;
+use pocketmine\event\player\PlayerMoveEvent;
 use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\event\server\DataPacketReceiveEvent;
 use pocketmine\level\Position;
+use pocketmine\network\mcpe\protocol\BatchPacket;
 use pocketmine\network\mcpe\protocol\CommandBlockUpdatePacket;
+use pocketmine\network\mcpe\protocol\ContainerClosePacket;
 use pocketmine\network\mcpe\protocol\InventoryTransactionPacket;
+use pocketmine\network\mcpe\protocol\MovePlayerPacket;
 use pocketmine\network\mcpe\protocol\PlayerActionPacket;
 use pocketmine\network\mcpe\protocol\SetDefaultGameTypePacket;
 use pocketmine\network\mcpe\protocol\SetDifficultyPacket;
@@ -78,6 +83,9 @@ class VanillaListener implements Listener{
             }elseif($packet instanceof SetDifficultyPacket){
                 $player->getLevel()->setDifficulty($packet->difficulty);
             }
+        }
+        if($packet instanceof ContainerClosePacket && $packet->windowId === 255){
+            $player->dataPacket($packet);
         }
     }
 
