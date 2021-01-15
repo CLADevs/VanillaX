@@ -1,6 +1,6 @@
 <?php
 
-namespace CLADevs\VanillaX\entities\traits;
+namespace CLADevs\VanillaX\entities\utils;
 
 use CLADevs\VanillaX\entities\LivingEntity;
 use pocketmine\entity\Entity;

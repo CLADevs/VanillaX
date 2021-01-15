@@ -3,9 +3,11 @@
 namespace CLADevs\VanillaX\entities\passive;
 
 use CLADevs\VanillaX\entities\LivingEntity;
-use CLADevs\VanillaX\entities\traits\EntityAgeable;
-use CLADevs\VanillaX\entities\traits\EntityInteractable;
-use CLADevs\VanillaX\entities\traits\VillagerProfession;
+use CLADevs\VanillaX\entities\utils\EntityAgeable;
+use CLADevs\VanillaX\entities\utils\EntityInteractable;
+use CLADevs\VanillaX\entities\utils\trade\VillagerOffer;
+use CLADevs\VanillaX\entities\utils\trade\VillagerProfession;
+use CLADevs\VanillaX\entities\utils\trade\VillagerTradeNBTStream;
 use CLADevs\VanillaX\inventories\TradeInventory;
 use CLADevs\VanillaX\VanillaX;
 use pocketmine\item\Item;
@@ -13,7 +15,10 @@ use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
 use pocketmine\level\Level;
 use pocketmine\nbt\NetworkLittleEndianNBTStream;
+use pocketmine\nbt\tag\ByteTag;
 use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\nbt\tag\IntTag;
+use pocketmine\nbt\tag\ListTag;
 use pocketmine\network\mcpe\protocol\types\WindowTypes;
 use pocketmine\network\mcpe\protocol\UpdateTradePacket;
 use pocketmine\Player;
@@ -69,17 +74,24 @@ class VillagerEntity extends LivingEntity implements EntityInteractable{
 
     public function onInteract(Player $player, Item $item): void{
         $windowId = $player->addWindow($this->inventory); //Useless, ContainerOpenPacket would've work but let just do this
+
+        $testOffer = new VillagerOffer(10, 10, 100, ItemIds::EMERALD, null, ItemIds::DIAMOND);
+        $testOffer2 = new VillagerOffer(2, 5, 300, ItemIds::DIAMOND, ItemIds::REDSTONE_DUST, ItemIds::SADDLE);
+        $stream = new VillagerTradeNBTStream();
+        $stream->addOffer([$testOffer, $testOffer2]);
+        $stream->initialize();
+
         $pk = new UpdateTradePacket();
         $pk->windowId = $windowId; //Really unneeded .-.
         $pk->windowType = WindowTypes::TRADING;
         $pk->windowSlotCount = 0;
-        $pk->tradeTier = 0;
+        $pk->tradeTier = 1;
         $pk->traderEid = $this->getId();
         $pk->playerEid = $player->getId();
         $pk->displayName = $this->profession->getName();
         $pk->isV2Trading = true;
         $pk->isWilling = false;
-        $pk->offers = (new NetworkLittleEndianNBTStream())->write(ItemFactory::get(ItemIds::TNT)->nbtSerialize());
+        $pk->offers = $stream->getBuffer();
         $player->dataPacket($pk);
     }
 }

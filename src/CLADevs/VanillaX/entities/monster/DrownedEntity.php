@@ -3,7 +3,7 @@
 namespace CLADevs\VanillaX\entities\monster;
 
 use CLADevs\VanillaX\entities\LivingEntity;
-use CLADevs\VanillaX\entities\traits\EntityAgeable;
+use CLADevs\VanillaX\entities\utils\EntityAgeable;
 
 class DrownedEntity extends LivingEntity{
 

@@ -3,7 +3,7 @@
 namespace CLADevs\VanillaX\entities\passive;
 
 use CLADevs\VanillaX\entities\LivingEntity;
-use CLADevs\VanillaX\entities\traits\EntityAgeable;
+use CLADevs\VanillaX\entities\utils\EntityAgeable;
 
 class StriderEntity extends LivingEntity{
 

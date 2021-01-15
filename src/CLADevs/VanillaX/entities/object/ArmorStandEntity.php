@@ -2,7 +2,7 @@
 
 namespace CLADevs\VanillaX\entities\object;
 
-use CLADevs\VanillaX\entities\traits\EntityInteractable;
+use CLADevs\VanillaX\entities\utils\EntityInteractable;
 use pocketmine\entity\Entity;
 use pocketmine\item\Item;
 use pocketmine\Player;

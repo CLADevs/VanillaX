@@ -1,6 +1,6 @@
 <?php
 
-namespace CLADevs\VanillaX\entities\traits;
+namespace CLADevs\VanillaX\entities\utils\trade;
 
 use pocketmine\block\Block;
 use pocketmine\block\BlockFactory;

@@ -5,7 +5,7 @@ namespace CLADevs\VanillaX\entities\projectile;
 use pocketmine\entity\Effect;
 use pocketmine\entity\EffectInstance;
 use pocketmine\entity\Entity;
-use pocketmine\entity\Living;
+use CLADevs\VanillaX\entities\LivingEntity;
 use pocketmine\entity\projectile\Projectile;
 use pocketmine\event\entity\ProjectileHitEvent;
 use pocketmine\level\Explosion;

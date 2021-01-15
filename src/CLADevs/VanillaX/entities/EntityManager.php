@@ -4,7 +4,7 @@ namespace CLADevs\VanillaX\entities;
 
 use CLADevs\VanillaX\entities\loot\LootManager;
 use CLADevs\VanillaX\entities\passive\VillagerEntity;
-use CLADevs\VanillaX\entities\traits\VillagerProfession;
+use CLADevs\VanillaX\entities\utils\trade\VillagerProfession;
 use pocketmine\entity\Entity;
 
 class EntityManager{

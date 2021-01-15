@@ -1,6 +1,6 @@
 <?php
 
-namespace CLADevs\VanillaX\entities\traits;
+namespace CLADevs\VanillaX\entities\utils;
 
 use pocketmine\item\Item;
 use pocketmine\nbt\NBT;

@@ -2,14 +2,13 @@
 
 namespace CLADevs\VanillaX\entities;
 
-use CLADevs\VanillaX\entities\traits\EntityAgeable;
+use CLADevs\VanillaX\entities\utils\EntityAgeable;
 use CLADevs\VanillaX\VanillaX;
 use pocketmine\entity\Entity;
 use pocketmine\entity\Living;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\item\enchantment\Enchantment;
-use pocketmine\item\Item;
 use pocketmine\network\mcpe\protocol\AddActorPacket;
 use pocketmine\Player;
 
