@@ -5,6 +5,7 @@ namespace CLADevs\VanillaX\entities;
 use CLADevs\VanillaX\entities\loot\LootManager;
 use CLADevs\VanillaX\entities\passive\VillagerEntity;
 use CLADevs\VanillaX\entities\utils\trade\VillagerProfession;
+use CLADevs\VanillaX\utils\Utils;
 use pocketmine\entity\Entity;
 
 class EntityManager{
@@ -21,10 +22,13 @@ class EntityManager{
     public function startup(): void{
         $this->initializeVillagerProfession();
         $this->lootManager->startup();
-        $this->registerEntity("object");
-        $this->registerEntity("passive");
-        $this->registerEntity("monster");
-        $this->registerEntity("projectile");
+
+        $callable = function (string $namespace): void{
+            Entity::registerEntity($namespace, true);
+        };
+        foreach(["object", "passive", "monster", "projectile"] as $path){
+            Utils::callDirectory("entities" . DIRECTORY_SEPARATOR . $path, $callable);
+        }
     }
 
     public function initializeVillagerProfession(): void{
@@ -58,7 +62,7 @@ class EntityManager{
         return $this->villagerProfessionList[$id] ?? null;
     }
 
-    public function registerEntity(string $directory): void{
+    public function registefrEntity(string $directory): void{
         $path = __DIR__ . DIRECTORY_SEPARATOR . $directory;
 
         foreach(array_diff(scandir($path), [".", ".."]) as $file){

@@ -3,12 +3,13 @@
 namespace CLADevs\VanillaX\items\types;
 
 use CLADevs\VanillaX\entities\utils\EntityInteractable;
+use CLADevs\VanillaX\items\utils\NonAutomaticCallItemTrait;
 use pocketmine\entity\Entity;
 use pocketmine\entity\EntityIds;
 use pocketmine\item\Item;
 use pocketmine\Player;
 
-class HorseArmorItem extends Item implements EntityInteractable{
+class HorseArmorItem extends Item implements EntityInteractable, NonAutomaticCallItemTrait{
 
     public function __construct(int $id, int $meta = 0, string $name = "Unknown"){
         switch($id){

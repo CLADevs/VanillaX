@@ -8,12 +8,13 @@ use CLADevs\VanillaX\entities\object\CommandBlockMinecartEntity;
 use CLADevs\VanillaX\entities\object\HopperMinecartEntity;
 use CLADevs\VanillaX\entities\object\MinecartEntity;
 use CLADevs\VanillaX\entities\object\TNTMinecartEntity;
+use CLADevs\VanillaX\items\utils\NonAutomaticCallItemTrait;
 use pocketmine\block\Block;
 use pocketmine\item\Item;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 
-class MinecartItem extends Item{
+class MinecartItem extends Item implements NonAutomaticCallItemTrait{
 
     public function __construct(int $id, int $meta = 0, string $name = "Unknown"){
         if($name === "Unknown"){

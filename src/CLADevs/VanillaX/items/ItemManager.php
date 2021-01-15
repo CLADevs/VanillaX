@@ -2,22 +2,13 @@
 
 namespace CLADevs\VanillaX\items;
 
-use CLADevs\VanillaX\items\types\ArmorStandItem;
-use CLADevs\VanillaX\items\types\BoatItem;
-use CLADevs\VanillaX\items\types\ElytraItem;
-use CLADevs\VanillaX\items\types\EndCrystalItem;
-use CLADevs\VanillaX\items\types\EnderEyeItem;
-use CLADevs\VanillaX\items\types\FireChargeItem;
-use CLADevs\VanillaX\items\types\FireworkRocketItem;
-use CLADevs\VanillaX\items\types\FireworkStarItem;
 use CLADevs\VanillaX\items\types\HorseArmorItem;
-use CLADevs\VanillaX\items\types\LeadItem;
 use CLADevs\VanillaX\items\types\MapItem;
 use CLADevs\VanillaX\items\types\MinecartItem;
-use CLADevs\VanillaX\items\types\NameTagItem;
-use CLADevs\VanillaX\items\types\SaddleItem;
-use CLADevs\VanillaX\items\types\TridentItem;
-use CLADevs\VanillaX\items\types\TurtleHelmetItem;
+use CLADevs\VanillaX\items\utils\NonAutomaticCallItemTrait;
+use CLADevs\VanillaX\items\utils\NonCreativeItemTrait;
+use CLADevs\VanillaX\items\utils\NonOverwriteItemTrait;
+use CLADevs\VanillaX\utils\Utils;
 use pocketmine\item\Armor;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
@@ -26,24 +17,17 @@ use pocketmine\item\ItemIds;
 class ItemManager{
 
     public function startup(): void{
-        //TODO Armor function
-        self::register(new ElytraItem(), true);
-        self::register(new SaddleItem(), true);
-        self::register(new ArmorStandItem(), true);
-        self::register(new Item(ItemIds::KELP), true); //ITEM
+        Utils::callDirectory("items" . DIRECTORY_SEPARATOR . "types", function (string $namespace): void{
+            if(!isset(class_implements($namespace)[NonAutomaticCallItemTrait::class])){
+                $class = new $namespace();
+                self::register($class, !$class instanceof NonCreativeItemTrait, !$class instanceof NonOverwriteItemTrait);
+            }
+        });
+
         self::register(new Item(ItemIds::CARROT_ON_A_STICK), true); //ITEM
         self::register(new Item(ItemIds::ENCHANTED_BOOK)); //ITEM
-        self::register(new EnderEyeItem(), true);
-        self::register(new FireChargeItem(), true);
-        self::register(new FireworkRocketItem(), true);
-        self::register(new FireworkStarItem(), true);
-        self::register(new LeadItem(), true);
-        self::register(new NameTagItem(), true);
-        self::register(new EndCrystalItem(), true);
-        self::register(new TridentItem(), true);
-        self::register(new TurtleHelmetItem(), true);
-        self::register(new BoatItem(), true);
-
+        self::register(new Item(ItemIdentifiers::NETHERITE_INGOT)); //ITEM
+        self::register(new Item(ItemIdentifiers::NETHERITE_SCRAP)); //ITEM
         self::register(new MinecartItem(ItemIds::MINECART));
         self::register(new MinecartItem(ItemIds::MINECART_WITH_CHEST, 0, "Chest"));
         self::register(new MinecartItem(ItemIds::MINECART_WITH_TNT, 0, "TNT"));
