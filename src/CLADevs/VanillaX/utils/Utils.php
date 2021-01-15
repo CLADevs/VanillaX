@@ -2,10 +2,22 @@
 
 namespace CLADevs\VanillaX\utils;
 
+use CLADevs\VanillaX\VanillaX;
+
 class Utils{
 
+    public static function getVanillaXPath(): string{
+        if(VanillaX::getInstance()->isPhar()){
+            $path = self::removeLastDirectory(VanillaX::getInstance()->getDescription()->getMain());
+            $path = VanillaX::getInstance()->getFile() . DIRECTORY_SEPARATOR . "src" . DIRECTORY_SEPARATOR . $path;
+            return $path;
+        }else{
+            return (self::removeLastDirectory( __DIR__, 2));
+        }
+    }
+
     public static function callDirectory(string $directory, callable $callable): void{
-        $dirname = (self::removeLastDirectory( __DIR__, 2));
+        $dirname = self::getVanillaXPath();
         $path = $dirname . DIRECTORY_SEPARATOR . $directory;
 
         foreach(array_diff(scandir($path), [".", ".."]) as $file){

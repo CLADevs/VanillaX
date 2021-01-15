@@ -41,6 +41,14 @@ class VanillaX extends PluginBase{
         $this->getServer()->getPluginManager()->registerEvents(new VanillaListener(), $this);
     }
 
+    public function getFile(): string{
+        return parent::getFile();
+    }
+
+    public function isPhar(): bool{
+        return parent::isPhar();
+    }
+
     public static function getInstance(): VanillaX{
         return self::$instance;
     }
