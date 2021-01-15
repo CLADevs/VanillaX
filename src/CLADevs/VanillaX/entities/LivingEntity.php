@@ -40,6 +40,7 @@ abstract class LivingEntity extends Living{
 
     protected ?EntityAgeable $ageable = null;
     protected ?Entity $killer = null;
+    protected bool $initialHealth = false;
 
     public function getAgeable(): ?EntityAgeable{
         return $this->ageable;
@@ -82,6 +83,14 @@ abstract class LivingEntity extends Living{
 
     public function recalculateBoundingBox(): void{
         parent::recalculateBoundingBox();
+    }
+
+    public function setMaxHealth(int $amount): void{
+        parent::setMaxHealth($amount);
+        if(!$this->initialHealth){
+            $this->initialHealth = true;
+            $this->setHealth($amount);
+        }
     }
 
     public function attack(EntityDamageEvent $source): void{
