@@ -16,6 +16,10 @@ class NetheritePickaxeItem extends Pickaxe{
         return 2032;
     }
 
+    protected function getBaseMiningEfficiency(): float{
+        return 10;
+    }
+
     protected static function getBaseDamageFromTier(int $tier): int{
         static $levels = [
             self::TIER_WOODEN => 5,
