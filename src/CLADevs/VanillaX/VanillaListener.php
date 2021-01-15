@@ -75,7 +75,7 @@ class VanillaListener implements Listener{
                     $entity->onInteract(new EntityInteractResult($player, $item));
                 }
                 if($item instanceof EntityInteractable){
-                    $item->onInteractWithEntity($player, $entity);
+                    $entity->onInteract(new EntityInteractResult($player, null, $entity));
                 }
             }
         }
