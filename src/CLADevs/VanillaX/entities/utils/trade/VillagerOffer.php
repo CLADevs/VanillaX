@@ -17,20 +17,23 @@ class VillagerOffer{
     private int $uses;
     private int $maxUses;
     private int $rewardExp;
+    private int $priceMultiplier;
 
     /**
      * VillagerOffer constructor.
-     * @param int $uses
-     * @param int $maxUses
      * @param int $rewardExp
+     * @param int $priceMultiplier
+     * @param int $maxUses
+     * @param int $uses
      * @param Item|int|null $input
      * @param Item|int|null $input2
      * @param Item|int|null $result
      */
-    public function __construct(int $uses, int $maxUses, int $rewardExp = 0, $input = null, $input2 = null, $result = null){
-        $this->uses = $uses;
-        $this->maxUses = $maxUses;
+    public function __construct(int $rewardExp = 0, int $priceMultiplier = 1, int $maxUses = 100, int $uses = 0, $input = null, $input2 = null, $result = null){
         $this->rewardExp = $rewardExp;
+        $this->priceMultiplier = $priceMultiplier;
+        $this->maxUses = $maxUses;
+        $this->uses = $uses;
         $this->setInput($input, $input2);
         $this->setResult($result);
         $this->initializeNBT();
@@ -40,7 +43,8 @@ class VillagerOffer{
         $this->namedtag = new CompoundTag("", [
             new IntTag("uses", $this->uses),
             new IntTag("maxUses", $this->maxUses),
-            new IntTag("rewardExp", $this->rewardExp)
+            new IntTag("rewardExp", $this->rewardExp),
+            new IntTag("priceMultiplier", $this->priceMultiplier),
         ]);
     }
 

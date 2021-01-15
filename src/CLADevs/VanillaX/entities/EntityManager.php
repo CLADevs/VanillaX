@@ -33,21 +33,21 @@ class EntityManager{
 
     public function initializeVillagerProfession(): void{
         /** This will be moved later on for optimization */
-        $this->addVillagerProfession(new VillagerProfession(VillagerEntity::UNEMPLOYED, "Villager"));
-        $this->addVillagerProfession(new VillagerProfession(VillagerEntity::NITWIT, "Nitwit"));
-        $this->addVillagerProfession(new VillagerProfession(VillagerEntity::ARMORER, "Armorer"));
-        $this->addVillagerProfession(new VillagerProfession(VillagerEntity::BUTCHER, "Butcher"));
-        $this->addVillagerProfession(new VillagerProfession(VillagerEntity::CARTOGRAPHER, "Cartographer"));
-        $this->addVillagerProfession(new VillagerProfession(VillagerEntity::CLERIC, "Cleric"));
-        $this->addVillagerProfession(new VillagerProfession(VillagerEntity::FARMER, "Farmer"));
-        $this->addVillagerProfession(new VillagerProfession(VillagerEntity::FISHERMAN, "Fisherman"));
-        $this->addVillagerProfession(new VillagerProfession(VillagerEntity::FLETCHER, "Fletcher"));
-        $this->addVillagerProfession(new VillagerProfession(VillagerEntity::LEATHERWORKER, "Leatherworker"));
-        $this->addVillagerProfession(new VillagerProfession(VillagerEntity::LIBRARIAN, "Librarian"));
-        $this->addVillagerProfession(new VillagerProfession(VillagerEntity::STONE_MASON, "Stone Mason"));
-        $this->addVillagerProfession(new VillagerProfession(VillagerEntity::SHEPHERD, "Shepherd"));
-        $this->addVillagerProfession(new VillagerProfession(VillagerEntity::TOOLSMITH, "Toolsmith"));
-        $this->addVillagerProfession(new VillagerProfession(VillagerEntity::WEAPONSMITH, "Weaponsmith"));
+        $this->addVillagerProfession(new VillagerProfession(VillagerProfession::UNEMPLOYED, "Villager"));
+        $this->addVillagerProfession(new VillagerProfession(VillagerProfession::NITWIT, "Nitwit"));
+        $this->addVillagerProfession(new VillagerProfession(VillagerProfession::ARMORER, "Armorer"));
+        $this->addVillagerProfession(new VillagerProfession(VillagerProfession::BUTCHER, "Butcher"));
+        $this->addVillagerProfession(new VillagerProfession(VillagerProfession::CARTOGRAPHER, "Cartographer"));
+        $this->addVillagerProfession(new VillagerProfession(VillagerProfession::CLERIC, "Cleric"));
+        $this->addVillagerProfession(new VillagerProfession(VillagerProfession::FARMER, "Farmer"));
+        $this->addVillagerProfession(new VillagerProfession(VillagerProfession::FISHERMAN, "Fisherman"));
+        $this->addVillagerProfession(new VillagerProfession(VillagerProfession::FLETCHER, "Fletcher"));
+        $this->addVillagerProfession(new VillagerProfession(VillagerProfession::LEATHERWORKER, "Leatherworker"));
+        $this->addVillagerProfession(new VillagerProfession(VillagerProfession::LIBRARIAN, "Librarian"));
+        $this->addVillagerProfession(new VillagerProfession(VillagerProfession::STONE_MASON, "Stone Mason"));
+        $this->addVillagerProfession(new VillagerProfession(VillagerProfession::SHEPHERD, "Shepherd"));
+        $this->addVillagerProfession(new VillagerProfession(VillagerProfession::TOOLSMITH, "Toolsmith"));
+        $this->addVillagerProfession(new VillagerProfession(VillagerProfession::WEAPONSMITH, "Weaponsmith"));
     }
 
     public function getLootManager(): LootManager{
@@ -60,32 +60,5 @@ class EntityManager{
 
     public function getVillagerProfessionFor(int $id): ?VillagerProfession{
         return $this->villagerProfessionList[$id] ?? null;
-    }
-
-    public function registefrEntity(string $directory): void{
-        $path = __DIR__ . DIRECTORY_SEPARATOR . $directory;
-
-        foreach(array_diff(scandir($path), [".", ".."]) as $file){
-            if(is_dir($path . DIRECTORY_SEPARATOR . $file)){
-                $this->registerEntity($directory . DIRECTORY_SEPARATOR . $file);
-            }else{
-                $i = explode(".", $file);
-                $extension = $i[count($i) - 1];
-
-                if($extension === "php"){
-                    $name = $i[0];
-                    $namespace = "";
-                    $i = explode(DIRECTORY_SEPARATOR, str_replace(getcwd() . DIRECTORY_SEPARATOR, "", __DIR__));
-                    for($v = 0; $v <= 2; $v++){
-                        unset($i[$v]);
-                    }
-                    foreach($i as $key => $string){
-                        $namespace .= $string . DIRECTORY_SEPARATOR;
-                    }
-                    $namespace .= $directory . DIRECTORY_SEPARATOR . $name;
-                    Entity::registerEntity($namespace, true);
-                }
-            }
-        }
     }
 }

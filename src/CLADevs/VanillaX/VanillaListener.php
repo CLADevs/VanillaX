@@ -5,6 +5,7 @@ namespace CLADevs\VanillaX;
 use CLADevs\VanillaX\blocks\tiles\CommandBlockTile;
 use CLADevs\VanillaX\entities\utils\EntityInteractable;
 use CLADevs\VanillaX\inventories\EnchantInventory;
+use CLADevs\VanillaX\inventories\TradeInventory;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\inventory\InventoryTransactionEvent;
 use pocketmine\event\Listener;
@@ -42,7 +43,6 @@ class VanillaListener implements Listener{
 
                 if($window instanceof EnchantInventory){
                     $window->handlePacket($player, $packet);
-                    return;
                 }
             }
 //            /** Anvil */
@@ -53,6 +53,14 @@ class VanillaListener implements Listener{
 //                    $window->handlePacket($player, $packet);
 //                }
 //            }
+            /** Trade */
+            if($packet instanceof InventoryTransactionPacket){
+                $window = $player->getWindow(WindowTypes::TRADING);
+
+                if($window instanceof TradeInventory){
+                    $window->handlePacket($player, $packet);
+                }
+            }
         }
         if($packet instanceof PlayerActionPacket && in_array($packet->action, [PlayerActionPacket::ACTION_START_GLIDE, PlayerActionPacket::ACTION_STOP_GLIDE])){
             $session = VanillaX::getInstance()->getSessionManager()->get($player);
