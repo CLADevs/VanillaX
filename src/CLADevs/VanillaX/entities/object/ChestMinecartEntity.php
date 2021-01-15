@@ -4,11 +4,11 @@ namespace CLADevs\VanillaX\entities\object;
 
 use CLADevs\VanillaX\entities\utils\EntityContainer;
 use CLADevs\VanillaX\entities\utils\EntityInteractable;
+use CLADevs\VanillaX\entities\utils\EntityInteractResult;
 use CLADevs\VanillaX\inventories\FakeBlockInventory;
 use pocketmine\item\Item;
 use pocketmine\level\Level;
 use pocketmine\nbt\tag\CompoundTag;
-use pocketmine\Player;
 
 class ChestMinecartEntity extends MinecartEntity implements EntityInteractable{
 use EntityContainer;
@@ -28,8 +28,10 @@ use EntityContainer;
         parent::saveNBT();
     }
 
-    public function onInteract(Player $player, Item $item): void{
-        $player->addWindow($this->inventory);
+    public function onInteract(EntityInteractResult $result): void{
+        if($result->isEntity()){
+            $result->getPlayer()->addWindow($this->inventory);
+        }
     }
 
     public function getContainerSaveName(): string{

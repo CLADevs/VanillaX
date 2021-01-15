@@ -72,8 +72,8 @@ class Session{
     /**
      * @param Player|Vector3 $player
      * @param string $sound
-     * @param float|int $pitch
-     * @param float|int $volume
+     * @param float $pitch
+     * @param float $volume
      * @param bool $packet
      * @return DataPacket|null
      */

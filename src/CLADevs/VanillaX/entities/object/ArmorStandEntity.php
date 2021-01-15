@@ -3,9 +3,8 @@
 namespace CLADevs\VanillaX\entities\object;
 
 use CLADevs\VanillaX\entities\utils\EntityInteractable;
+use CLADevs\VanillaX\entities\utils\EntityInteractResult;
 use pocketmine\entity\Entity;
-use pocketmine\item\Item;
-use pocketmine\Player;
 
 class ArmorStandEntity extends Entity implements EntityInteractable{
 
@@ -21,6 +20,6 @@ class ArmorStandEntity extends Entity implements EntityInteractable{
         $this->setHealth(6);
     }
 
-    public function onInteract(Player $player, Item $item): void{
+    public function onInteract(EntityInteractResult $result): void{
     }
 }

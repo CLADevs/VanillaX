@@ -30,10 +30,12 @@ class MobSpawnerBlock extends MonsterSpawner{
             if(!$tile instanceof MobSpawnerTile){
                 $tile = Tile::createTile(Tile::MOB_SPAWNER, $this->getLevel(), MobSpawnerTile::createNBT($this));
             }
-            if($tile->getEntityId() !== ($newId = $item->getDamage())){
-                $tile->setEntityId($newId);
-                if(!$player->isCreative()) $item->pop();
-                return true;
+            if($tile instanceof MobSpawnerTile){
+                if($tile->getEntityId() !== ($newId = $item->getDamage())){
+                    $tile->setEntityId($newId);
+                    if(!$player->isCreative()) $item->pop();
+                    return true;
+                }
             }
         }
         return false;

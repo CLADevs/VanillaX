@@ -12,7 +12,7 @@ class Utils{
             $path = VanillaX::getInstance()->getFile() . DIRECTORY_SEPARATOR . "src" . DIRECTORY_SEPARATOR . $path;
             return $path;
         }else{
-            return (self::removeLastDirectory( __DIR__, 2));
+            return (self::removeLastDirectory( __DIR__));
         }
     }
 
@@ -46,9 +46,9 @@ class Utils{
 
     private static function removeLastDirectory(string $str, int $loop = 1): string{
         for($i = 0; $i < $loop; $i++){
-            $i = explode(DIRECTORY_SEPARATOR, $str);
-            unset($i[array_key_last($i)]);
-            $str = implode(DIRECTORY_SEPARATOR, $i);
+            $exp = explode(DIRECTORY_SEPARATOR, $str);
+            unset($exp[array_key_last($exp)]);
+            $str = implode(DIRECTORY_SEPARATOR, $exp);
         }
         return $str;
     }

@@ -8,7 +8,9 @@ class SetBannerDetailsFunction extends LootFunction{
 
     const NAME = "set_banner_details";
 
+    private int $type;
+
     public function __construct(int $type){
-        //TODO
+        $this->type = $type;
     }
 }

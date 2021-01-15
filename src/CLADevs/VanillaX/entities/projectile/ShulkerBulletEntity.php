@@ -7,7 +7,7 @@ use pocketmine\block\Block;
 use pocketmine\entity\Effect;
 use pocketmine\entity\EffectInstance;
 use pocketmine\entity\Entity;
-use CLADevs\VanillaX\entities\LivingEntity;
+use pocketmine\entity\Living;
 use pocketmine\entity\projectile\Projectile;
 use pocketmine\level\particle\ExplodeParticle;
 use pocketmine\math\RayTraceResult;

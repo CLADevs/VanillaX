@@ -32,7 +32,9 @@ class HopperBlock extends Transparent{
             if($tile === null){
                 $tile = Tile::createTile(TileIdentifiers::HOPPER, $this->getLevel(), HopperTile::createNBT($this));;
             }
-            $player->addWindow($tile->getInventory());
+            if($tile instanceof HopperTile){
+                $player->addWindow($tile->getInventory());
+            }
         }
         return true;
     }

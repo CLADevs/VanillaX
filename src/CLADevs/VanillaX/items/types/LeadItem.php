@@ -3,9 +3,8 @@
 namespace CLADevs\VanillaX\items\types;
 
 use CLADevs\VanillaX\entities\utils\EntityInteractable;
-use pocketmine\entity\Entity;
+use CLADevs\VanillaX\entities\utils\EntityInteractResult;
 use pocketmine\item\Item;
-use pocketmine\Player;
 
 class LeadItem extends Item implements EntityInteractable{
 
@@ -13,7 +12,9 @@ class LeadItem extends Item implements EntityInteractable{
         parent::__construct(self::LEAD, $meta, "Lead");
     }
 
-    public function onInteractWithEntity(Player $player, Entity $entity): void{
-        //TODO
+    public function onInteract(EntityInteractResult $result): void{
+        if($result->isItem()){
+            //TODO
+        }
     }
 }

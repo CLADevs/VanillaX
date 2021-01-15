@@ -3,9 +3,8 @@
 namespace CLADevs\VanillaX\entities\object;
 
 use CLADevs\VanillaX\entities\utils\EntityInteractable;
+use CLADevs\VanillaX\entities\utils\EntityInteractResult;
 use pocketmine\entity\Entity;
-use pocketmine\item\Item;
-use pocketmine\Player;
 
 class BoatEntity extends Entity implements EntityInteractable{
 
@@ -15,6 +14,6 @@ class BoatEntity extends Entity implements EntityInteractable{
 
     const NETWORK_ID = self::BOAT;
 
-    public function onInteract(Player $player, Item $item): void{
+    public function onInteract(EntityInteractResult $result): void{
     }
 }

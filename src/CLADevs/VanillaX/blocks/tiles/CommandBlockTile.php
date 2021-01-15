@@ -81,16 +81,16 @@ class CommandBlockTile extends Spawnable{
             $this->tickDelay = $nbt->getInt($tag);
         }
         if($nbt->hasTag($tag = "isRedstoneMode")){
-            $this->isRedstoneMode = $nbt->getInt($tag);
+            $this->isRedstoneMode = boolval($nbt->getInt($tag));
         }
         if($nbt->hasTag($tag = "isConditional")){
-            $this->isConditional = $nbt->getInt($tag);
+            $this->isConditional = boolval($nbt->getInt($tag));
         }
         if($nbt->hasTag($tag = "shouldTrackOutput")){
-            $this->shouldTrackOutput = $nbt->getInt($tag);
+            $this->shouldTrackOutput = boolval($nbt->getInt($tag));
         }
         if($nbt->hasTag($tag = "executeOnFirstTick")){
-            $this->executeOnFirstTick = $nbt->getInt($tag);
+            $this->executeOnFirstTick = boolval($nbt->getInt($tag));
         }
         if($nbt->hasTag($tag = "name")){
             $this->commandBlockName = $nbt->getString($tag);

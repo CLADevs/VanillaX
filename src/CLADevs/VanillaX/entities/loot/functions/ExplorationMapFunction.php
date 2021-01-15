@@ -8,7 +8,9 @@ class ExplorationMapFunction extends LootFunction{
 
     const NAME = "exploration_map";
 
+    private string $destination;
+
     public function __construct(string $destination){
-        //TODO
+        $this->destination = $destination;
     }
 }

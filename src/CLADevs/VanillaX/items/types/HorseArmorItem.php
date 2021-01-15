@@ -3,11 +3,10 @@
 namespace CLADevs\VanillaX\items\types;
 
 use CLADevs\VanillaX\entities\utils\EntityInteractable;
+use CLADevs\VanillaX\entities\utils\EntityInteractResult;
 use CLADevs\VanillaX\items\utils\NonAutomaticCallItemTrait;
-use pocketmine\entity\Entity;
 use pocketmine\entity\EntityIds;
 use pocketmine\item\Item;
-use pocketmine\Player;
 
 class HorseArmorItem extends Item implements EntityInteractable, NonAutomaticCallItemTrait{
 
@@ -28,10 +27,13 @@ class HorseArmorItem extends Item implements EntityInteractable, NonAutomaticCal
         }
         parent::__construct($id, $meta, $name);
     }
+    public function onInteract(EntityInteractResult $result): void{
+        if($result->isItem()){
+            $entity = $result->getEntity();
 
-    public function onInteractWithEntity(Player $player, Entity $entity): void{
-        if($entity->getId() === EntityIds::HORSE){
-            //TODO
+            if($entity->getId() === EntityIds::HORSE){
+                //TODO
+            }
         }
     }
 

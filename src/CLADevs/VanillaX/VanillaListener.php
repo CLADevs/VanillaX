@@ -4,6 +4,7 @@ namespace CLADevs\VanillaX;
 
 use CLADevs\VanillaX\blocks\tiles\CommandBlockTile;
 use CLADevs\VanillaX\entities\utils\EntityInteractable;
+use CLADevs\VanillaX\entities\utils\EntityInteractResult;
 use CLADevs\VanillaX\inventories\EnchantInventory;
 use CLADevs\VanillaX\inventories\TradeInventory;
 use pocketmine\event\entity\EntityDamageEvent;
@@ -71,7 +72,7 @@ class VanillaListener implements Listener{
                 $item = $packet->trData->itemInHand;
 
                 if($entity instanceof EntityInteractable){
-                    $entity->onInteract($player, $item);
+                    $entity->onInteract(new EntityInteractResult($player, $item));
                 }
                 if($item instanceof EntityInteractable){
                     $item->onInteractWithEntity($player, $entity);
