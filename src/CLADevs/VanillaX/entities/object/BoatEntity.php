@@ -15,5 +15,6 @@ class BoatEntity extends Entity implements EntityInteractable{
     const NETWORK_ID = self::BOAT;
 
     public function onInteract(EntityInteractResult $result): void{
+        //TODO
     }
 }

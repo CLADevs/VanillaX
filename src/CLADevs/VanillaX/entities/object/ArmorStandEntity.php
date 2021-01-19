@@ -21,5 +21,6 @@ class ArmorStandEntity extends Entity implements EntityInteractable{
     }
 
     public function onInteract(EntityInteractResult $result): void{
+        //TODO
     }
 }

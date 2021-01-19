@@ -56,7 +56,7 @@ class VillagerEntity extends LivingEntity implements EntityInteractable{
     }
 
     public function onInteract(EntityInteractResult $result): void{
-        if($result->isEntity() && $this->canHaveGUI){
+        if($this->canHaveGUI){
             $player = $result->getPlayer();
             $windowId = $player->addWindow($this->inventory, WindowTypes::TRADING); //Useless, ContainerOpenPacket would've work but let just do this
 

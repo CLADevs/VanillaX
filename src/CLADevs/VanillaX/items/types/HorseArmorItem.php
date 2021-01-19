@@ -28,12 +28,10 @@ class HorseArmorItem extends Item implements EntityInteractable, NonAutomaticCal
         parent::__construct($id, $meta, $name);
     }
     public function onInteract(EntityInteractResult $result): void{
-        if($result->isItem()){
-            $entity = $result->getEntity();
+        $entity = $result->getEntity();
 
-            if($entity->getId() === EntityIds::HORSE){
-                //TODO
-            }
+        if($entity->getId() === EntityIds::HORSE){
+            //TODO
         }
     }
 

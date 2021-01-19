@@ -13,18 +13,16 @@ class NameTagItem extends Item implements EntityInteractable{
     }
 
     public function onInteract(EntityInteractResult $result): void{
-        if($result->isItem()){
-            $player = $result->getPlayer();
-            $entity = $result->getEntity();
+        $player = $result->getPlayer();
+        $entity = $result->getEntity();
 
-            if($this->getName() === $this->getVanillaName() || $entity->getNameTag() === $this->getName()){
-                return;
-            }
-            $entity->setNameTag($this->getName());
-            if($player->isSurvival() || $player->isAdventure()){
-                $this->pop();
-                $player->getInventory()->setItemInHand($this);
-            }
+        if($this->getName() === $this->getVanillaName() || $entity->getNameTag() === $this->getName()){
+            return;
+        }
+        $entity->setNameTag($this->getName());
+        if($player->isSurvival() || $player->isAdventure()){
+            $this->pop();
+            $player->getInventory()->setItemInHand($this);
         }
     }
 }

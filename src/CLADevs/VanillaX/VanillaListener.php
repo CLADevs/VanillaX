@@ -72,10 +72,12 @@ class VanillaListener implements Listener{
                 $item = $packet->trData->itemInHand;
 
                 if($entity instanceof EntityInteractable){
+                    /** If a player interacts with entity with a item */
                     $entity->onInteract(new EntityInteractResult($player, $item));
                 }
                 if($item instanceof EntityInteractable){
-                    $entity->onInteract(new EntityInteractResult($player, null, $entity));
+                    /** If a player interacts with entity with a item that has EntityInteractable trait */
+                    $item->onInteract(new EntityInteractResult($player, null, $entity));
                 }
             }
         }

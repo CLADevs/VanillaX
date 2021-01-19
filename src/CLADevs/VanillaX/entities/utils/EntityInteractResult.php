@@ -30,7 +30,7 @@ class EntityInteractResult{
         $this->item = $item;
     }
 
-    public function isItem(): bool{
+    public function canUseItem(): bool{
         return $this->item !== null;
     }
 
@@ -42,7 +42,7 @@ class EntityInteractResult{
         $this->entity = $entity;
     }
 
-    public function isEntity(): bool{
+    public function canUseEntity(): bool{
         return $this->entity !== null;
     }
 }

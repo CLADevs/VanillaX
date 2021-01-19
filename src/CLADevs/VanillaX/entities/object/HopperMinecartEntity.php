@@ -31,9 +31,7 @@ use EntityContainer;
     }
 
     public function onInteract(EntityInteractResult $result): void{
-        if($result->isEntity()){
-            $result->getPlayer()->addWindow($this->inventory);
-        }
+        $result->getPlayer()->addWindow($this->inventory);
     }
 
     public function getContainerSaveName(): string{

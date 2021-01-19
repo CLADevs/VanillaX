@@ -13,8 +13,6 @@ class LeadItem extends Item implements EntityInteractable{
     }
 
     public function onInteract(EntityInteractResult $result): void{
-        if($result->isItem()){
-            //TODO
-        }
+        //TODO
     }
 }
