@@ -3,6 +3,7 @@
 namespace CLADevs\VanillaX\session;
 
 use CLADevs\VanillaX\entities\projectile\TridentEntity;
+use CLADevs\VanillaX\inventories\FakeBlockInventory;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\DataPacket;
 use pocketmine\network\mcpe\protocol\PlaySoundPacket;
@@ -20,6 +21,8 @@ class Session{
 
     /** @var TridentEntity[] */
     private array $thrownTridents = [];
+
+    private ?FakeBlockInventory $currentWindow = null;
 
     public function __construct(Player $player){
         $this->player = $player;
@@ -67,6 +70,14 @@ class Session{
 
     public function removeTrident(TridentEntity $entity): void{
         if(isset($this->thrownTridents[$entity->getId()])) unset($this->thrownTridents[$entity->getId()]);
+    }
+
+    public function getCurrentWindow(): ?FakeBlockInventory{
+        return $this->currentWindow;
+    }
+
+    public function setCurrentWindow(?FakeBlockInventory $currentWindow): void{
+        $this->currentWindow = $currentWindow;
     }
 
     /**

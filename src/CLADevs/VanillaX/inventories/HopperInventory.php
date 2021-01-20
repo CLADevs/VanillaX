@@ -2,20 +2,13 @@
 
 namespace CLADevs\VanillaX\inventories;
 
-use pocketmine\inventory\ContainerInventory;
+use pocketmine\block\BlockIds;
+use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\types\WindowTypes;
 
-class HopperInventory extends ContainerInventory{
+class HopperInventory extends FakeBlockInventory{
 
-    public function getName(): string{
-        return "Hopper";
-    }
-
-    public function getNetworkType(): int{
-        return WindowTypes::HOPPER;
-    }
-
-    public function getDefaultSize(): int{
-        return 5;
+    public function __construct(Vector3 $holder){
+        parent::__construct($holder, 5, BlockIds::AIR, WindowTypes::HOPPER);
     }
 }

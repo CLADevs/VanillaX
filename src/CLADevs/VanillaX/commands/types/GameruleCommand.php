@@ -1,8 +1,8 @@
 <?php
 
-namespace CLADevs\VanillaX\commands;
+namespace CLADevs\VanillaX\commands\types;
 
-use pocketmine\command\Command;
+use CLADevs\VanillaX\commands\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\network\mcpe\protocol\GameRulesChangedPacket;
 use pocketmine\Server;

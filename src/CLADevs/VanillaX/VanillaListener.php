@@ -5,13 +5,12 @@ namespace CLADevs\VanillaX;
 use CLADevs\VanillaX\blocks\tiles\CommandBlockTile;
 use CLADevs\VanillaX\entities\utils\EntityInteractable;
 use CLADevs\VanillaX\entities\utils\EntityInteractResult;
-use CLADevs\VanillaX\inventories\EnchantInventory;
-use CLADevs\VanillaX\inventories\TradeInventory;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\inventory\InventoryTransactionEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\event\server\DataPacketReceiveEvent;
+use pocketmine\event\server\DataPacketSendEvent;
 use pocketmine\level\Position;
 use pocketmine\network\mcpe\protocol\CommandBlockUpdatePacket;
 use pocketmine\network\mcpe\protocol\ContainerClosePacket;
@@ -20,15 +19,20 @@ use pocketmine\network\mcpe\protocol\PlayerActionPacket;
 use pocketmine\network\mcpe\protocol\SetDefaultGameTypePacket;
 use pocketmine\network\mcpe\protocol\SetDifficultyPacket;
 use pocketmine\network\mcpe\protocol\SetPlayerGameTypePacket;
-use pocketmine\network\mcpe\protocol\types\WindowTypes;
 use pocketmine\Player;
 use pocketmine\Server;
 
 class VanillaListener implements Listener{
 
+
+    public function handlePacketSend(DataPacketSendEvent $event): void{
+        //TODO command args
+    }
+
     public function handlePacketReceive(DataPacketReceiveEvent $event): void{
         $packet = $event->getPacket();
         $player = $event->getPlayer();
+        $session = VanillaX::getInstance()->getSessionManager()->get($player);
 
         if($packet instanceof CommandBlockUpdatePacket){
             $position = new Position($packet->x, $packet->y, $packet->z, $player->getLevel());
@@ -38,33 +42,13 @@ class VanillaListener implements Listener{
                 $tile->handleCommandBlockUpdateReceive($packet);
             }
         }else{
-            /** Enchantment Table */
-            if($packet instanceof InventoryTransactionPacket || $packet instanceof PlayerActionPacket){
-                $window = $player->getWindow(WindowTypes::ENCHANTMENT);
+            $window = $session->getCurrentWindow();
 
-                if($window instanceof EnchantInventory){
-                    $window->handlePacket($player, $packet);
-                }
-            }
-//            /** Anvil */
-//            if($packet instanceof InventoryTransactionPacket || $packet instanceof FilterTextPacket || $packet instanceof AnvilDamagePacket){
-//                $window = $player->getWindow(WindowTypes::ANVIL);
-//
-//                if($window instanceof AnvilInventory){
-//                    $window->handlePacket($player, $packet);
-//                }
-//            }
-            /** Trade */
-            if($packet instanceof InventoryTransactionPacket){
-                $window = $player->getWindow(WindowTypes::TRADING);
-
-                if($window instanceof TradeInventory){
-                    $window->handlePacket($player, $packet);
-                }
+            if($window !== null){
+                $window->handlePacket($player, $packet);
             }
         }
         if($packet instanceof PlayerActionPacket && in_array($packet->action, [PlayerActionPacket::ACTION_START_GLIDE, PlayerActionPacket::ACTION_STOP_GLIDE])){
-            $session = VanillaX::getInstance()->getSessionManager()->get($player);
             $session->setGliding($packet->action === PlayerActionPacket::ACTION_START_GLIDE);
         }elseif($packet instanceof InventoryTransactionPacket && $packet->transactionType === InventoryTransactionPacket::TYPE_USE_ITEM_ON_ENTITY){
             if($packet->trData->actionType === InventoryTransactionPacket::USE_ITEM_ON_ENTITY_ACTION_INTERACT){
@@ -90,6 +74,8 @@ class VanillaListener implements Listener{
                 $player->getLevel()->setDifficulty($packet->difficulty);
             }
         }
+
+        /** Fixes trade gui not opening for second time bug */
         if($packet instanceof ContainerClosePacket && $packet->windowId === 255){
             $player->dataPacket($packet);
         }
