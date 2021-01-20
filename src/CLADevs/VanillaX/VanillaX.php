@@ -3,6 +3,7 @@
 namespace CLADevs\VanillaX;
 
 use CLADevs\VanillaX\blocks\BlockManager;
+use CLADevs\VanillaX\commands\CommandManager;
 use CLADevs\VanillaX\enchantments\EnchantmentManager;
 use CLADevs\VanillaX\entities\EntityManager;
 use CLADevs\VanillaX\items\ItemManager;
@@ -19,6 +20,7 @@ class VanillaX extends PluginBase{
     private ItemManager $itemManager;
     private SessionManager $sessionManager;
     private EnchantmentManager $enchantmentManager;
+    private CommandManager $commandManager;
 
     public function onLoad(): void{
         @mkdir($this->getDataFolder());
@@ -28,6 +30,7 @@ class VanillaX extends PluginBase{
         $this->itemManager = new ItemManager();
         $this->sessionManager = new SessionManager();
         $this->enchantmentManager = new EnchantmentManager();
+        $this->commandManager = new CommandManager();
     }
 
     /**
@@ -38,6 +41,7 @@ class VanillaX extends PluginBase{
         $this->blockManager->startup();
         $this->itemManager->startup();
         $this->enchantmentManager->startup();
+        $this->commandManager->startup();
         $this->getServer()->getPluginManager()->registerEvents(new VanillaListener(), $this);
     }
 
