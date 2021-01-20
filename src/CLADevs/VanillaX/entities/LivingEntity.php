@@ -38,6 +38,19 @@ abstract class LivingEntity extends Living{
         self::PIGLIN_BRUTE => "minecraft:piglin_brute",
     ];
 
+    const ARTHROPODS = [
+        self::BEE, self::CAVE_SPIDER, self::ENDERMITE,
+        self::SILVERFISH, self::SPIDER
+    ];
+
+    const UNDEAD = [
+        self::DROWNED, self::HUSK, self::PHANTOM,
+        self::SKELETON, self::SKELETON_HORSE, self::STRAY,
+        self::WITHER, self::WITHER_SKELETON, self::ZOGLIN,
+        self::ZOMBIE, self::ZOMBIE_HORSE, self::ZOMBIE_VILLAGER,
+        self::ZOMBIE_PIGMAN
+    ];
+
     protected ?EntityAgeable $ageable = null;
     protected ?Entity $killer = null;
     protected bool $initialHealth = false;

@@ -3,7 +3,6 @@
 namespace CLADevs\VanillaX\entities;
 
 use CLADevs\VanillaX\entities\loot\LootManager;
-use CLADevs\VanillaX\entities\passive\VillagerEntity;
 use CLADevs\VanillaX\entities\utils\trade\VillagerProfession;
 use CLADevs\VanillaX\utils\Utils;
 use pocketmine\entity\Entity;
@@ -26,7 +25,7 @@ class EntityManager{
         $callable = function (string $namespace): void{
             Entity::registerEntity($namespace, true);
         };
-        foreach(["object", "passive", "monster", "projectile"] as $path){
+        foreach(["object", "boss", "passive", "neutral", "monster", "projectile"] as $path){
             Utils::callDirectory("entities" . DIRECTORY_SEPARATOR . $path, $callable);
         }
     }

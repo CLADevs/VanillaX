@@ -82,6 +82,8 @@ class VanillaListener implements Listener{
     }
 
     public function onDamage(EntityDamageEvent $event): void{
+        VanillaX::getInstance()->getEnchantmentManager()->handleDamage($event);
+
         if(!$event->isCancelled() && $event->getCause() === EntityDamageEvent::CAUSE_FALL){
             $entity = $event->getEntity();
 
@@ -107,7 +109,7 @@ class VanillaListener implements Listener{
     }
 
     public function onTransaction(InventoryTransactionEvent $event): void{
-        VanillaX::getInstance()->getEnchantmentManager()->handleReceivedEvent($event);
+        VanillaX::getInstance()->getEnchantmentManager()->handleInventoryTransaction($event);
     }
 
     public function onQuit(PlayerQuitEvent $event): void{

@@ -1,6 +1,6 @@
 <?php
 
-namespace CLADevs\VanillaX\entities\monster;
+namespace CLADevs\VanillaX\entities\neutral;
 
 use CLADevs\VanillaX\entities\LivingEntity;
 

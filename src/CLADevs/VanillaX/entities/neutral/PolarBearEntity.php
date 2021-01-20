@@ -1,6 +1,6 @@
 <?php
 
-namespace CLADevs\VanillaX\entities\passive;
+namespace CLADevs\VanillaX\entities\neutral;
 
 use CLADevs\VanillaX\entities\LivingEntity;
 use CLADevs\VanillaX\entities\utils\EntityAgeable;

@@ -2,22 +2,14 @@
 
 namespace CLADevs\VanillaX\enchantments;
 
-use CLADevs\VanillaX\enchantments\types\AquaAffinityEnchantment;
-use CLADevs\VanillaX\enchantments\types\BaneofArthropodsEnchantment;
-use CLADevs\VanillaX\enchantments\types\BindingEnchantment;
-use CLADevs\VanillaX\enchantments\types\ChannelingEnchantment;
-use CLADevs\VanillaX\enchantments\types\DepthStriderEnchantment;
-use CLADevs\VanillaX\enchantments\types\FortuneEnchantment;
-use CLADevs\VanillaX\enchantments\types\FrostWalkerEnchantment;
-use CLADevs\VanillaX\enchantments\types\ImpalingEnchantment;
-use CLADevs\VanillaX\enchantments\types\LootingEnchantment;
-use CLADevs\VanillaX\enchantments\types\LoyaltyEnchantment;
-use CLADevs\VanillaX\enchantments\types\LuckOfTheSeaEnchantment;
-use CLADevs\VanillaX\enchantments\types\LureEnchantment;
-use CLADevs\VanillaX\enchantments\types\RiptideEnchantment;
-use CLADevs\VanillaX\enchantments\types\SmiteEnchantment;
-use pocketmine\event\Event;
+use CLADevs\VanillaX\entities\LivingEntity;
+use CLADevs\VanillaX\utils\Utils;
+use pocketmine\entity\Effect;
+use pocketmine\entity\EffectInstance;
+use pocketmine\event\entity\EntityDamageByEntityEvent;
+use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\inventory\InventoryTransactionEvent;
+use pocketmine\inventory\ArmorInventory;
 use pocketmine\inventory\PlayerInventory;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
 use pocketmine\item\Armor;
@@ -28,6 +20,7 @@ use pocketmine\item\ItemIds;
 use pocketmine\item\Pickaxe;
 use pocketmine\item\Shovel;
 use pocketmine\item\Sword;
+use pocketmine\Player;
 
 class EnchantmentManager{
 
@@ -46,21 +39,18 @@ class EnchantmentManager{
     public static array $fishingRod = [Enchantment::LUCK_OF_THE_SEA, Enchantment::LURE];
 
     public function startup(): void{
-        Enchantment::registerEnchantment(new DepthStriderEnchantment());
-        Enchantment::registerEnchantment(new AquaAffinityEnchantment());
-        Enchantment::registerEnchantment(new SmiteEnchantment());
-        Enchantment::registerEnchantment(new BaneofArthropodsEnchantment());
-        Enchantment::registerEnchantment(new LootingEnchantment());
-        Enchantment::registerEnchantment(new FortuneEnchantment());
-        Enchantment::registerEnchantment(new LuckOfTheSeaEnchantment());
-        Enchantment::registerEnchantment(new LureEnchantment());
-        Enchantment::registerEnchantment(new FrostWalkerEnchantment());
-        Enchantment::registerEnchantment(new ImpalingEnchantment());
-        Enchantment::registerEnchantment(new BindingEnchantment());
-        Enchantment::registerEnchantment(new ImpalingEnchantment());
-        Enchantment::registerEnchantment(new RiptideEnchantment());
-        Enchantment::registerEnchantment(new LoyaltyEnchantment());
-        Enchantment::registerEnchantment(new ChannelingEnchantment());
+        Enchantment::registerEnchantment(new Enchantment(Enchantment::AQUA_AFFINITY, "Aqua Affinity", Enchantment::RARITY_RARE, Enchantment::SLOT_HEAD, Enchantment::SLOT_NONE, 1));
+        Enchantment::registerEnchantment(new Enchantment(Enchantment::BANE_OF_ARTHROPODS, "Bane of Arthropods", Enchantment::RARITY_RARE, Enchantment::SLOT_SWORD, Enchantment::SLOT_AXE, 5));
+        Enchantment::registerEnchantment(new Enchantment(Enchantment::SMITE, "Smite", Enchantment::RARITY_RARE, Enchantment::SLOT_SWORD, Enchantment::SLOT_AXE, 5));
+        Enchantment::registerEnchantment(new Enchantment(Enchantment::BINDING, "Curse of Binding", Enchantment::RARITY_RARE, Enchantment::SLOT_ARMOR, Enchantment::SLOT_ELYTRA, 1));
+        Enchantment::registerEnchantment(new Enchantment(Enchantment::CHANNELING, "Channeling", Enchantment::RARITY_RARE, Enchantment::SLOT_TRIDENT, Enchantment::SLOT_NONE, 1));
+        Enchantment::registerEnchantment(new Enchantment(Enchantment::RIPTIDE, "Riptide", Enchantment::RARITY_RARE, Enchantment::SLOT_TRIDENT, Enchantment::SLOT_NONE, 3));
+        Enchantment::registerEnchantment(new Enchantment(Enchantment::LOYALTY, "Loyalty", Enchantment::RARITY_RARE, Enchantment::SLOT_TRIDENT, Enchantment::SLOT_NONE, 3));
+        Enchantment::registerEnchantment(new Enchantment(Enchantment::IMPALING, "Impaling", Enchantment::RARITY_RARE, Enchantment::SLOT_TRIDENT, Enchantment::SLOT_NONE, 5));
+        Enchantment::registerEnchantment(new Enchantment(Enchantment::DEPTH_STRIDER, "Depth Strider", Enchantment::RARITY_RARE, Enchantment::SLOT_FEET, Enchantment::SLOT_NONE, 3));
+        Utils::callDirectory("enchantments" . DIRECTORY_SEPARATOR . "types", function (string $namespace): void{
+            Enchantment::registerEnchantment(new $namespace());
+        });
         //TODO Crossbow enchantment
     }
 
@@ -140,19 +130,47 @@ class EnchantmentManager{
         return $enchantments;
     }
 
-    public function handleReceivedEvent(Event $event): void{
+    public function handleInventoryTransaction(InventoryTransactionEvent $event): void{
         if(!$event->isCancelled()){
-            if($event instanceof InventoryTransactionEvent){
-                $tr = $event->getTransaction();
+            $tr = $event->getTransaction();
+            $player = $tr->getSource();
 
-                foreach($tr->getActions() as $act){
-                    if($act instanceof SlotChangeAction){
-                        $source = $act->getSourceItem();
-                        $inv = $act->getInventory();
+            foreach($tr->getActions() as $act){
+                if($act instanceof SlotChangeAction){
+                    $source = $act->getSourceItem();
+                    $inv = $act->getInventory();
 
-                        if($inv instanceof PlayerInventory && $source->hasEnchantment(Enchantment::BINDING)){
-                            $event->setCancelled();
-                        }
+                    if(!$player->isCreative() && $source->hasEnchantment(Enchantment::BINDING) && ($inv instanceof PlayerInventory || $inv instanceof ArmorInventory)){
+                        $event->setCancelled();
+                    }
+                }
+            }
+        }
+    }
+
+    public function handleDamage(EntityDamageEvent $event): void{
+        if(!$event->isCancelled()){
+            if($event instanceof EntityDamageByEntityEvent){
+                $entity = $event->getEntity();
+                $damager = $event->getDamager();
+
+                if($damager instanceof Player && $entity instanceof LivingEntity){
+                    $item = $damager->getInventory()->getItemInHand();
+
+                    /** Bane of Arthropods  */
+                    if($item->hasEnchantment(Enchantment::BANE_OF_ARTHROPODS) && isset(LivingEntity::ARTHROPODS[$entity::NETWORK_ID])){
+                        $level = $item->getEnchantmentLevel(Enchantment::BANE_OF_ARTHROPODS);
+                        $event->setBaseDamage($event->getBaseDamage() + ($level * 2.5));
+
+                        $duration = mt_rand(10, 15) / 10; //this just gets 1 to 1.5
+                        $duration += $level > 1 ? (0.5 * $level) : 0;
+                        $entity->addEffect(new EffectInstance(Effect::getEffect(Effect::SLOWNESS), 20 * $duration, 4));
+                    }
+
+                    /** Smite  */
+                    if($item->hasEnchantment(Enchantment::SMITE) && isset(LivingEntity::UNDEAD[$entity::NETWORK_ID])){
+                        $level = $item->getEnchantmentLevel(Enchantment::SMITE);
+                        $event->setBaseDamage($event->getBaseDamage() + ($level * 2.5));
                     }
                 }
             }
