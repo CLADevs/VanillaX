@@ -1,0 +1,101 @@
+Items:
+- Boats
+- Armor Stands
+- Seeds
+- Crossbow
+- Firework Rocket
+- Eye of Ender
+- Fishing Rod
+- Kelp (Dried too)
+- Lead
+- Lingering Potion
+- Minecarts
+- Nether Wart
+- Painting
+- Beetroot Soup
+- Book and Quill
+- Written Book
+- Chorus Fruit (Popped too)
+- Maps
+- Honey Bottle
+- Music
+- Netherite (every)
+- Pufferfish
+- Shield
+- Suspicious Stew
+- Totem
+- Turtle Shell
+- Banner Patterns
+- Heart of the Sea
+- Honeycomb
+- Nautilus Shell
+- Phantom Membrane
+- Shulker Shell
+- Rabbit (Hide and Foot)
+
+Blocks Possible in 3.0:
+- Pressure Plates
+- Rails
+- Buttons
+- Anvil
+- Beacon
+- Enchantment Table
+- Banners
+- Cauldron
+- Chorus (Flower and Plant)
+- Cocoa
+- Dispenser
+- Flower Pot
+- Jukebox
+- Note Block
+- Shulker Box
+- Structure Void
+- Structure Blocks
+- Command Blocks
+- Lever
+- Light Block
+- Megma Block
+- Melon
+- Sponge
+- Observer
+- Stonecutter
+- All Redstone items
+
+Blocks Possible in 4.0:
+- Ancient Debris
+- Bamboo
+- Barrel
+- Barrier
+- Basalt
+- Bee Hive
+- Bee Nest
+- Bell
+- Bubble Coral
+- Bubble Coral Block
+- Bubble Coral Fan
+- Campfire (Soul Too)
+- Pumpkins
+- Chain
+- Chiseled Blocks (every)
+- Cracked Blocks (every)
+- Warped Blocks (every)
+- Crimson (every)
+- Kelp (every)
+- Blackstone (every)
+- Conduit
+- Crying Obsidian
+- Cartography
+- Fletching
+- Honey Blocks
+- Lantern (Soul Too)
+- Lectern
+- Smithing
+- Smoker
+- Nether Gold Ore
+- Nether Sprouts
+- Soul (Fire, Soil, Torch)
+- Stonecutter Block
+- Stripped Blocks (every)
+- Sweet Berry (every)
+- Turtle Egg
+- Twisting Vines

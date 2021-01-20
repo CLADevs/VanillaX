@@ -38,7 +38,6 @@ class GameruleCommand extends Command{
         $value = $args[1];
         $rule = self::GAME_RULES[array_search($args[0], self::GAME_RULES)];
         if(in_array($rule, ["maxCommandChainLength", "randomTickSpeed", "spawnRadius"])){
-            var_dump($value);
             if(!is_numeric($value) && $value >= 0){
                 $sender->sendMessage(TextFormat::RED . "Value must be a number.");
                 return;
