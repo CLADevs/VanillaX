@@ -1,37 +1,6 @@
-Items:
-- Boats
-- Armor Stands
-- Seeds
-- Crossbow
-- Firework Rocket
-- Eye of Ender
-- Fishing Rod
-- Kelp (Dried too)
-- Lead
-- Lingering Potion
-- Minecarts
-- Nether Wart
-- Painting
-- Beetroot Soup
-- Book and Quill
-- Written Book
-- Chorus Fruit (Popped too)
-- Maps
-- Honey Bottle
-- Music
-- Netherite (every)
-- Pufferfish
-- Shield
-- Suspicious Stew
-- Totem
-- Turtle Shell
-- Banner Patterns
-- Heart of the Sea
-- Honeycomb
-- Nautilus Shell
-- Phantom Membrane
-- Shulker Shell
-- Rabbit (Hide and Foot)
+Features:
+- Farm System
+- Redstone System
 
 Blocks Possible in 3.0:
 - Pressure Plates
