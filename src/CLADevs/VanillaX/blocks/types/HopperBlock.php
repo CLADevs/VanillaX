@@ -38,21 +38,4 @@ class HopperBlock extends Transparent{
         }
         return true;
     }
-
-    public function hasEntityCollision(): bool{
-        return true;
-    }
-
-//    public function onEntityCollide(Entity $entity): void{
-//        if($entity instanceof ItemEntity){
-//            var_dump('Collided');
-//            /** @var HopperTile|null $tile */
-//            $tile = $this->getLevel()->getTile($this);
-//
-//            if($tile === null){
-//                $tile = Tile::createTile(TileIdentifiers::HOPPER, $this->getLevel(), HopperTile::createNBT($this));;
-//            }
-//            $tile->onItemCollide($entity);
-//        }
-//    }
 }

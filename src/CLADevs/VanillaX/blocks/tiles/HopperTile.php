@@ -3,8 +3,6 @@
 namespace CLADevs\VanillaX\blocks\tiles;
 
 use CLADevs\VanillaX\inventories\HopperInventory;
-use pocketmine\entity\object\ItemEntity;
-use pocketmine\item\Item;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\tile\Container;
 use pocketmine\tile\ContainerTrait;
@@ -29,44 +27,9 @@ use ContainerTrait;
         return $this->inventory;
     }
 
-    public function onUpdate(): bool{
-        if($this->tick > 0){
-            $this->tick--;
-            if($this->transferCooldown > 0) $this->transferCooldown--;
-        }else{
-            $this->tick = 20;
-        }
-        //TODO move this on block collision
-        foreach($this->getLevel()->getChunkAtPosition($this)->getEntities() as $entity){
-            if($entity instanceof ItemEntity){
-                if($entity->getY() >= $this->y && $entity->getY() <= $this->y + 1){
-                    $this->onItemCollide($entity);
-                }
-            }
-        }
-        return true;
-    }
-
-    public function onItemCollide(ItemEntity $entity): void{
-        $item = $entity->getItem();
-        $this->onAddItem($item);
-        if($item->getCount() <= 0 && !$entity->isFlaggedForDespawn()) $entity->flagForDespawn();
-    }
-
-    public function onAddItem(Item $item): bool{
-        $clone = clone $item;
-        if($this->inventory->canAddItem($clone->setCount(1))){
-            $this->inventory->addItem($clone);
-            $item->pop();
-            return true;
-        }
-        return false;
-    }
-
     protected function readSaveData(CompoundTag $nbt): void{
         $this->inventory = new HopperInventory($this);
         $this->loadItems($nbt);
-        $this->scheduleUpdate();
     }
 
     protected function writeSaveData(CompoundTag $nbt): void{

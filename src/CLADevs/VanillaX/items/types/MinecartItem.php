@@ -9,8 +9,8 @@ use CLADevs\VanillaX\entities\object\HopperMinecartEntity;
 use CLADevs\VanillaX\entities\object\MinecartEntity;
 use CLADevs\VanillaX\entities\object\TNTMinecartEntity;
 use CLADevs\VanillaX\items\utils\NonAutomaticCallItemTrait;
+use pocketmine\block\BaseRail;
 use pocketmine\block\Block;
-use pocketmine\block\BlockIds;
 use pocketmine\item\Item;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
@@ -27,7 +27,7 @@ class MinecartItem extends Item implements NonAutomaticCallItemTrait{
     }
 
     public function onActivate(Player $player, Block $blockReplace, Block $blockClicked, int $face, Vector3 $clickVector): bool{
-        if($blockReplace->getId() == BlockIds::RAIL){ //TODO check for other rails too better to check if its instanceof rail(custom class)
+        if($blockReplace instanceof BaseRail){
             $args = [$player->getLevel(), ArmorStandEntity::createBaseNBT($blockReplace->add(0.5, 0, 0.5))];
             $entity = null;
             switch($this->getMinecartBlock()){
