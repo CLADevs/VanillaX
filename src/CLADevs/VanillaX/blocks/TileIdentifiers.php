@@ -6,4 +6,5 @@ interface TileIdentifiers{
 
     const COMMAND_BLOCK = "CommandBlock";
     const HOPPER = "Hopper";
+    const JUKEBOX = "Jukebox";
 }

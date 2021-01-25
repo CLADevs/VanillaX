@@ -3,9 +3,6 @@
 namespace CLADevs\VanillaX\items\types;
 
 use pocketmine\item\Armor;
-use pocketmine\item\Item;
-use pocketmine\math\Vector3;
-use pocketmine\Player;
 
 class ElytraItem extends Armor{
 
@@ -19,13 +16,5 @@ class ElytraItem extends Armor{
 
     public function getMaxDurability(): int{
         return 432;
-    }
-
-    public function onClickAir(Player $player, Vector3 $directionVector): bool{
-        if($player->getArmorInventory()->getChestplate()->isNull()){
-            $player->getArmorInventory()->setChestplate($this);
-            if($player->isSurvival() || $player->isAdventure()) $this->pop();
-        }
-        return true;
     }
 }

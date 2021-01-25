@@ -2,13 +2,10 @@
 
 namespace CLADevs\VanillaX\items\types;
 
-use CLADevs\VanillaX\entities\utils\EntityInteractable;
-use CLADevs\VanillaX\entities\utils\EntityInteractResult;
 use CLADevs\VanillaX\items\utils\NonAutomaticCallItemTrait;
-use pocketmine\entity\EntityIds;
 use pocketmine\item\Item;
 
-class HorseArmorItem extends Item implements EntityInteractable, NonAutomaticCallItemTrait{
+class HorseArmorItem extends Item implements NonAutomaticCallItemTrait{
 
     public function __construct(int $id, int $meta = 0, string $name = "Unknown"){
         switch($id){
@@ -26,13 +23,6 @@ class HorseArmorItem extends Item implements EntityInteractable, NonAutomaticCal
                 break;
         }
         parent::__construct($id, $meta, $name);
-    }
-    public function onInteract(EntityInteractResult $result): void{
-        $entity = $result->getEntity();
-
-        if($entity->getId() === EntityIds::HORSE){
-            //TODO
-        }
     }
 
     public function getMaxStackSize(): int{

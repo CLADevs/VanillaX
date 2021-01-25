@@ -36,6 +36,7 @@ class ItemManager{
         self::register(new Item(Item::TOTEM, 0, "Totem of Undying")); //ITEM
         self::register(new Item(Item::TURTLE_SHELL_PIECE, 0, "Turtle Shell")); //ITEM
         self::register(new Item(Item::PHANTOM_MEMBRANE, 0, "Phantom Membrane")); //ITEM
+        self::register(new Item(Item::FIREWORKS_CHARGE, 0, "Fireworks Charge")); //ITEM
         self::register(new MinecartItem(ItemIds::MINECART));
         self::register(new MinecartItem(ItemIds::MINECART_WITH_CHEST, 0, "Chest"));
         self::register(new MinecartItem(ItemIds::MINECART_WITH_TNT, 0, "TNT"));
@@ -65,10 +66,10 @@ class ItemManager{
         if($creative && !Item::isCreativeItem($item)) Item::addCreativeItem($item);
     }
 
-    public static function getArmorSlot(Item $item): ?int{
+    public static function getArmorSlot(Item $item, bool $includeElytra = false): ?int{
         if($item instanceof Armor){
             if(in_array($item->getId(), self::getHelmetList())) return 0;
-            if(in_array($item->getId(), self::getChestplateList())) return 1;
+            if(in_array($item->getId(), self::getChestplateList($includeElytra))) return 1;
             if(in_array($item->getId(), self::getLeggingsList())) return 2;
             if(in_array($item->getId(), self::getBootsList())) return 3;
         }
@@ -79,8 +80,12 @@ class ItemManager{
         return [ItemIds::TURTLE_HELMET, ItemIds::LEATHER_HELMET, ItemIds::CHAIN_HELMET, ItemIds::IRON_HELMET, ItemIds::GOLD_HELMET, ItemIds::DIAMOND_HELMET];
     }
 
-    public static function getChestplateList(): array{
-        return [ItemIds::LEATHER_CHESTPLATE, ItemIds::CHAIN_CHESTPLATE, ItemIds::IRON_CHESTPLATE, ItemIds::GOLD_CHESTPLATE, ItemIds::DIAMOND_CHESTPLATE];
+    public static function getChestplateList(bool $elytra = false): array{
+        $items = [ItemIds::LEATHER_CHESTPLATE, ItemIds::CHAIN_CHESTPLATE, ItemIds::IRON_CHESTPLATE, ItemIds::GOLD_CHESTPLATE, ItemIds::DIAMOND_CHESTPLATE];
+        if($elytra){
+            $items[] = ItemIds::ELYTRA;
+        }
+        return $items;
     }
 
     public static function getLeggingsList(): array{

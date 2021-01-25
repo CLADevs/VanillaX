@@ -14,11 +14,11 @@ class FireworkRocketEntity extends Projectile{
 
     const NETWORK_ID = self::FIREWORKS_ROCKET;
 
-    private int $age = 25;
+    private int $age;
 
     public function __construct(Level $level, CompoundTag $nbt, ?Entity $shootingEntity = null){
         parent::__construct($level, $nbt, $shootingEntity);
-        $this->age += mt_rand(0, 7);
+        $this->age = 25 + mt_rand(0, 7);
     }
 
     public function entityBaseTick(int $tickDiff = 1): bool{

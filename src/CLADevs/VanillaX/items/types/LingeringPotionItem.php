@@ -21,6 +21,7 @@ class LingeringPotionItem extends ProjectileItem{
     }
 
     public function onClickAir(Player $player, Vector3 $directionVector): bool{
+        //TODO cancels spawning lingering potion projectile
         return true;
     }
 }

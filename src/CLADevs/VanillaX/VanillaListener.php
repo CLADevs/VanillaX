@@ -5,9 +5,11 @@ namespace CLADevs\VanillaX;
 use CLADevs\VanillaX\blocks\tiles\CommandBlockTile;
 use CLADevs\VanillaX\entities\utils\EntityInteractable;
 use CLADevs\VanillaX\entities\utils\EntityInteractResult;
+use CLADevs\VanillaX\items\ItemManager;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\inventory\InventoryTransactionEvent;
 use pocketmine\event\Listener;
+use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\event\server\DataPacketReceiveEvent;
 use pocketmine\event\server\DataPacketSendEvent;
@@ -88,11 +90,6 @@ class VanillaListener implements Listener{
             $entity = $event->getEntity();
 
             if($entity instanceof Player){
-                //$en = new StriderEntity($entity->getLevel(), StriderEntity::createBaseNBT($entity));
-                //if($en->getAgeable() !== null){
-                    //$en->getAgeable()->setBaby(true);
-                //}
-                //$en->spawnToAll();
                 $session = VanillaX::getInstance()->getSessionManager()->get($entity);
 
                 if($session->isGliding()){
@@ -125,17 +122,16 @@ class VanillaListener implements Listener{
         $manager->remove($player);
     }
 
-//    public function onEntitySpawn(EntitySpawnEvent $event): void{
-//        $entity = $event->getEntity();
-//
-//        if($entity instanceof ItemEntity){
-//            $tiles = $entity->getLevel()->getChunkAtPosition($entity)->getTiles();
-//
-//            foreach($tiles as $tile){
-//                if($tile instanceof HopperTile){
-//                   $tile->onDrop();
-//                }
-//            }
-//        }
-//    }
+    public function onInteract(PlayerInteractEvent $event): void{
+        $player = $event->getPlayer();
+        $item = $event->getItem();
+
+        if(($slot = ItemManager::getArmorSlot($item, true)) !== null){
+            if($player->getArmorInventory()->getItem($slot)->isNull()){
+                $player->getArmorInventory()->setItem($slot, $item);
+                $item->pop();
+                $player->getInventory()->setItemInHand($item);
+            }
+        }
+    }
 }
