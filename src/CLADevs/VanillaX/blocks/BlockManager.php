@@ -9,7 +9,6 @@ use CLADevs\VanillaX\blocks\tiles\DropperTile;
 use CLADevs\VanillaX\blocks\tiles\HopperTile;
 use CLADevs\VanillaX\blocks\tiles\JukeboxTile;
 use CLADevs\VanillaX\blocks\tiles\MobSpawnerTile;
-use CLADevs\VanillaX\blocks\tiles\StoneCutterTile;
 use CLADevs\VanillaX\blocks\types\CommandBlock;
 use CLADevs\VanillaX\blocks\types\redstone\RedstoneComparator;
 use CLADevs\VanillaX\blocks\types\redstone\RedstoneLamp;
@@ -61,6 +60,6 @@ class BlockManager{
         Tile::registerTile(BeaconTile::class, [TileIdentifiers::BEACON, "minecraft:beacon"]);
         Tile::registerTile(DispenserTile::class, [TileIdentifiers::DISPENSER, "minecraft:dispenser"]);
         Tile::registerTile(DropperTile::class, [TileIdentifiers::DROPPER, "minecraft:dropper"]);
-        Tile::registerTile(StoneCutterTile::class, [TileIdentifiers::STONECUTTER, "minecraft:stonecutter"]);
+        //TODO Tile::registerTile(StoneCutterTile::class, [TileIdentifiers::STONECUTTER, "minecraft:stonecutter"]);
     }
 }

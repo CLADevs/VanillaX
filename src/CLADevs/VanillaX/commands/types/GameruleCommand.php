@@ -46,7 +46,7 @@ class GameruleCommand extends Command{
             $pk->gameRules = [$rule => [0, $value]];
         }else{
             $value = boolval($value);
-            if($value === true || $value === false){
+            if($value !== true && $value !== false){
                 $sender->sendMessage(TextFormat::RED . "Value must be true or false.");
                 return;
             }

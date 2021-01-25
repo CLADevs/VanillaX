@@ -4,6 +4,7 @@ namespace CLADevs\VanillaX\items\types;
 
 use CLADevs\VanillaX\items\ItemIdentifiers;
 use pocketmine\entity\Effect;
+use pocketmine\entity\EffectInstance;
 use pocketmine\item\Food;
 
 class SuspiciousStewItem extends Food{
@@ -27,23 +28,23 @@ class SuspiciousStewItem extends Food{
     public function getAdditionalEffects(): array{
         switch($this->meta){
             case 0:
-                return [Effect::NIGHT_VISION];
+                return [new EffectInstance(Effect::getEffect(Effect::NIGHT_VISION))];
             case 1:
-                return [Effect::JUMP_BOOST];
+                return [new EffectInstance(Effect::getEffect(Effect::JUMP_BOOST))];
             case 2:
-                return [Effect::WEAKNESS];
+                return [new EffectInstance(Effect::getEffect(Effect::WEAKNESS))];
             case 3:
-                return [Effect::BLINDNESS];
+                return [new EffectInstance(Effect::getEffect(Effect::BLINDNESS))];
             case 4:
-                return [Effect::POISON];
+                return [new EffectInstance(Effect::getEffect(Effect::POISON))];
             case 6:
-                return [Effect::SATURATION];
+                return [new EffectInstance(Effect::getEffect(Effect::SATURATION))];
             case 7:
-                return [Effect::FIRE_RESISTANCE];
+                return [new EffectInstance(Effect::getEffect(Effect::FIRE_RESISTANCE))];
             case 8:
-                return [Effect::REGENERATION];
+                return [new EffectInstance(Effect::getEffect(Effect::REGENERATION))];
             case 9:
-                return [Effect::WITHER];
+                return [new EffectInstance(Effect::getEffect(Effect::WITHER))];
         }
         return [];
     }
