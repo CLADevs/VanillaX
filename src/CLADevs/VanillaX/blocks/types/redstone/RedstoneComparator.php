@@ -4,13 +4,16 @@ namespace CLADevs\VanillaX\blocks\types\redstone;
 
 use CLADevs\VanillaX\items\utils\NonAutomaticCallItemTrait;
 use pocketmine\block\Transparent;
+use pocketmine\item\ItemIds;
 
 class RedstoneComparator extends Transparent implements NonAutomaticCallItemTrait{
 
     private bool $powered;
 
     public function __construct(bool $powered, int $meta = 0){
-        parent::__construct($powered ? self::POWERED_COMPARATOR : self::UNPOWERED_COMPARATOR, $meta);
+        $id = $powered ? self::POWERED_COMPARATOR : self::UNPOWERED_COMPARATOR;
+        $name = ($powered ? "Powered" : "Unpowered") . " Comparator";
+        parent::__construct($id, $meta, $name, ItemIds::COMPARATOR);
         $this->powered = $powered;
     }
 

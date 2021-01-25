@@ -22,7 +22,7 @@ class AnvilInventory extends FakeBlockInventory{
         parent::__construct($holder, 2, BlockIds::AIR, WindowTypes::ANVIL);
     }
 
-    public function onClose(Player $who) : void{
+    public function onClose(Player $who): void{
         parent::onClose($who);
 
         foreach($this->getContents() as $item){

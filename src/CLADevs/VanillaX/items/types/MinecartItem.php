@@ -27,7 +27,7 @@ class MinecartItem extends Item implements NonAutomaticCallItemTrait{
     }
 
     public function onActivate(Player $player, Block $blockReplace, Block $blockClicked, int $face, Vector3 $clickVector): bool{
-        if($blockReplace instanceof BaseRail){
+        if($blockClicked instanceof BaseRail){
             $args = [$player->getLevel(), ArmorStandEntity::createBaseNBT($blockReplace->add(0.5, 0, 0.5))];
             $entity = null;
             switch($this->getMinecartBlock()){

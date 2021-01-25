@@ -2,12 +2,24 @@
 
 namespace CLADevs\VanillaX\blocks\types\redstone;
 
-use pocketmine\block\Transparent;
+use pocketmine\block\Block;
+use pocketmine\block\Flowable;
+use pocketmine\item\Item;
+use pocketmine\item\ItemIds;
+use pocketmine\math\Vector3;
+use pocketmine\Player;
 
-class RedstoneWire extends Transparent{
+class RedstoneWire extends Flowable{
 
     public function __construct(int $meta = 0){
-        parent::__construct(self::REDSTONE_WIRE, $meta);
+        parent::__construct(self::REDSTONE_WIRE, $meta, "Redstone Dust", ItemIds::REDSTONE_DUST);
+    }
+
+    public function place(Item $item, Block $blockReplace, Block $blockClicked, int $face, Vector3 $clickVector, Player $player = null): bool{
+        if($blockClicked->getId() === self::REDSTONE_WIRE){
+            return false;
+        }
+        return parent::place($item, $blockReplace, $blockClicked, $face, $clickVector, $player);
     }
 
     public function getHardness(): float{

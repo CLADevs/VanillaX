@@ -2,9 +2,14 @@
 
 namespace CLADevs\VanillaX\blocks;
 
+use CLADevs\VanillaX\blocks\tiles\BeaconTile;
 use CLADevs\VanillaX\blocks\tiles\CommandBlockTile;
+use CLADevs\VanillaX\blocks\tiles\DispenserTile;
+use CLADevs\VanillaX\blocks\tiles\DropperTile;
 use CLADevs\VanillaX\blocks\tiles\HopperTile;
+use CLADevs\VanillaX\blocks\tiles\JukeboxTile;
 use CLADevs\VanillaX\blocks\tiles\MobSpawnerTile;
+use CLADevs\VanillaX\blocks\tiles\StoneCutterTile;
 use CLADevs\VanillaX\blocks\types\CommandBlock;
 use CLADevs\VanillaX\blocks\types\redstone\RedstoneComparator;
 use CLADevs\VanillaX\blocks\types\redstone\RedstoneLamp;
@@ -52,5 +57,10 @@ class BlockManager{
         Tile::registerTile(MobSpawnerTile::class, [Tile::MOB_SPAWNER, "minecraft:mob_spawner"]);
         Tile::registerTile(CommandBlockTile::class, [TileIdentifiers::COMMAND_BLOCK, "minecraft:command_block"]);
         Tile::registerTile(HopperTile::class, [TileIdentifiers::HOPPER, "minecraft:hopper"]);
+        Tile::registerTile(JukeboxTile::class, [TileIdentifiers::JUKEBOX, "minecraft:jukebox"]);
+        Tile::registerTile(BeaconTile::class, [TileIdentifiers::BEACON, "minecraft:beacon"]);
+        Tile::registerTile(DispenserTile::class, [TileIdentifiers::DISPENSER, "minecraft:dispenser"]);
+        Tile::registerTile(DropperTile::class, [TileIdentifiers::DROPPER, "minecraft:dropper"]);
+        Tile::registerTile(StoneCutterTile::class, [TileIdentifiers::STONECUTTER, "minecraft:stonecutter"]);
     }
 }
