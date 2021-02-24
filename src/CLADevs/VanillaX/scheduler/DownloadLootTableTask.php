@@ -23,7 +23,7 @@ class DownloadLootTableTask extends AsyncTask{
 
     public function onRun(): void{
         if(!file_exists($this->destination)){
-            file_put_contents($this->destination, fopen("https://aka.ms/behaviorpacktemplate", "r"));
+            file_put_contents($this->destination, fopen("https://aka.ms/behaviorpacktemplate", "r", false, stream_context_create(["ssl"=> ["verify_peer" => false, "verify_peer_name"=>false]])));
         }
         $zip = new ZipArchive;
         if($zip->open($this->destination) === true){

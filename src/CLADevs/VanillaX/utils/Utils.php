@@ -9,7 +9,7 @@ class Utils{
     public static function getVanillaXPath(): string{
         if(VanillaX::getInstance()->isPhar()){
             $path = self::removeLastDirectory(VanillaX::getInstance()->getDescription()->getMain());
-            $path = VanillaX::getInstance()->getFile() . DIRECTORY_SEPARATOR . "src" . DIRECTORY_SEPARATOR . $path;
+            $path = VanillaX::getInstance()->getFile() . "src" . DIRECTORY_SEPARATOR . $path;
             return $path;
         }else{
             return (self::removeLastDirectory( __DIR__));
@@ -19,6 +19,7 @@ class Utils{
     public static function callDirectory(string $directory, callable $callable): void{
         $dirname = self::getVanillaXPath();
         $path = $dirname . DIRECTORY_SEPARATOR . $directory;
+        $phar = VanillaX::getInstance()->isPhar();
 
         foreach(array_diff(scandir($path), [".", ".."]) as $file){
             if(is_dir($path . DIRECTORY_SEPARATOR . $file)){
@@ -31,13 +32,14 @@ class Utils{
                     $name = $i[0];
                     $namespace = "";
                     $i = explode(DIRECTORY_SEPARATOR, str_replace(getcwd() . DIRECTORY_SEPARATOR, "", $dirname));
-                    for($v = 0; $v <= 2; $v++){
+                    for($v = 0; $v <= ($phar ? 1 : 2); $v++){
                         unset($i[$v]);
                     }
                     foreach($i as $key => $string){
                         $namespace .= $string . DIRECTORY_SEPARATOR;
                     }
                     $namespace .= $directory . DIRECTORY_SEPARATOR . $name;
+                    $namespace = str_replace("/", "\\", $namespace);
                     $callable($namespace);
                 }
             }

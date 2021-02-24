@@ -2,6 +2,7 @@
 
 namespace CLADevs\VanillaX\entities;
 
+use AnimeX\Fandom;
 use CLADevs\VanillaX\entities\loot\LootManager;
 use CLADevs\VanillaX\entities\utils\trade\VillagerProfession;
 use CLADevs\VanillaX\utils\Utils;
