@@ -19,6 +19,7 @@ class Utils{
     public static function callDirectory(string $directory, callable $callable): void{
         $dirname = self::getVanillaXPath();
         $path = $dirname . DIRECTORY_SEPARATOR . $directory;
+        $path = str_replace(["phar:///", "phar://", "//", "phar:\\\\", "\\"], ["phar:\\\\/", "phar:\\\\", "/", "phar://", "/"], $path);
         $phar = VanillaX::getInstance()->isPhar();
 
         foreach(array_diff(scandir($path), [".", ".."]) as $file){
@@ -40,6 +41,9 @@ class Utils{
                     }
                     $namespace .= $directory . DIRECTORY_SEPARATOR . $name;
                     $namespace = str_replace("/", "\\", $namespace);
+                    if(($pos = strpos($namespace, "src\\")) !== false){
+                        $namespace = substr($namespace, $pos + 4);
+                    }
                     $callable($namespace);
                 }
             }
@@ -47,10 +51,12 @@ class Utils{
     }
 
     private static function removeLastDirectory(string $str, int $loop = 1): string{
+        $delimiter = strpos($str, DIRECTORY_SEPARATOR) ? DIRECTORY_SEPARATOR : "\\";
+
         for($i = 0; $i < $loop; $i++){
-            $exp = explode(DIRECTORY_SEPARATOR, $str);
+            $exp = explode($delimiter, $str);
             unset($exp[array_key_last($exp)]);
-            $str = implode(DIRECTORY_SEPARATOR, $exp);
+            $str = implode($delimiter, $exp);
         }
         return $str;
     }

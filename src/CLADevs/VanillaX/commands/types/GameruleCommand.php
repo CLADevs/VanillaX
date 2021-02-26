@@ -27,7 +27,7 @@ class GameruleCommand extends Command{
     public function execute(CommandSender $sender, string $commandLabel, array $args): void{
         //TODO save it with level
         if(!isset($args[1])){
-            $sender->sendMessage("Usage: $commandLabel <rule> <value>");
+            $sender->sendMessage("Usage: /$commandLabel <rule> <value>");
             return;
         }
         if(!in_array($args[0], self::GAME_RULES)){
@@ -42,15 +42,13 @@ class GameruleCommand extends Command{
                 $sender->sendMessage(TextFormat::RED . "Value must be a number.");
                 return;
             }
-            $value = intval($value);
-            $pk->gameRules = [$rule => [0, $value]];
+            $pk->gameRules = [$rule => [0, intval($value)]];
         }else{
-            $value = boolval($value);
-            if($value !== true && $value !== false){
+            if(!in_array(strtolower($value), ["true", "false", "0", "1"])){
                 $sender->sendMessage(TextFormat::RED . "Value must be true or false.");
                 return;
             }
-            $pk->gameRules = [$rule => [1, $value]];
+            $pk->gameRules = [$rule => [1, boolval($value)]];
         }
         foreach(Server::getInstance()->getOnlinePlayers() as $player){
             $player->dataPacket($pk);
