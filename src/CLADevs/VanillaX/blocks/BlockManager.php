@@ -15,8 +15,10 @@ use CLADevs\VanillaX\blocks\types\redstone\RedstoneLamp;
 use CLADevs\VanillaX\blocks\types\redstone\RedstoneRepeater;
 use CLADevs\VanillaX\items\utils\NonAutomaticCallItemTrait;
 use CLADevs\VanillaX\utils\Utils;
+use pocketmine\block\Block;
 use pocketmine\block\BlockFactory;
 use pocketmine\block\BlockIds;
+use pocketmine\Server;
 use pocketmine\tile\Tile;
 use ReflectionException;
 
@@ -33,7 +35,12 @@ class BlockManager{
     public function initializeBlocks(): void{
         Utils::callDirectory("blocks" . DIRECTORY_SEPARATOR . "types", function (string $namespace): void{
             if(!isset(class_implements($namespace)[NonAutomaticCallItemTrait::class])){
-                BlockFactory::registerBlock(new $namespace(), true);
+                BlockFactory::registerBlock(($class = new $namespace()), true);
+                if($class instanceof Block && $class->ticksRandomly()){
+                    foreach(Server::getInstance()->getLevels() as $level){
+                        $level->addRandomTickedBlock($class->getId());
+                    }
+                }
             }
         });
 

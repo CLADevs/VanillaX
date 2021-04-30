@@ -21,6 +21,7 @@ use pocketmine\network\mcpe\protocol\PlayerActionPacket;
 use pocketmine\network\mcpe\protocol\SetDefaultGameTypePacket;
 use pocketmine\network\mcpe\protocol\SetDifficultyPacket;
 use pocketmine\network\mcpe\protocol\SetPlayerGameTypePacket;
+use pocketmine\network\mcpe\protocol\types\inventory\UseItemOnEntityTransactionData;
 use pocketmine\Player;
 use pocketmine\Server;
 
@@ -52,10 +53,10 @@ class VanillaListener implements Listener{
         }
         if($packet instanceof PlayerActionPacket && in_array($packet->action, [PlayerActionPacket::ACTION_START_GLIDE, PlayerActionPacket::ACTION_STOP_GLIDE])){
             $session->setGliding($packet->action === PlayerActionPacket::ACTION_START_GLIDE);
-        }elseif($packet instanceof InventoryTransactionPacket && $packet->transactionType === InventoryTransactionPacket::TYPE_USE_ITEM_ON_ENTITY){
-            if($packet->trData->actionType === InventoryTransactionPacket::USE_ITEM_ON_ENTITY_ACTION_INTERACT){
-                $entity = $player->getLevel()->getEntity($packet->trData->entityRuntimeId);
-                $item = $packet->trData->itemInHand;
+        }elseif($packet instanceof InventoryTransactionPacket && $packet->trData instanceof UseItemOnEntityTransactionData){
+            if($packet->trData->getActionType() === UseItemOnEntityTransactionData::ACTION_INTERACT){
+                $entity = $player->getLevel()->getEntity($packet->trData->getEntityRuntimeId());
+                $item = $packet->trData->getItemInHand()->getItemStack();
 
                 if($entity instanceof EntityInteractable){
                     /** If a player interacts with entity with a item */

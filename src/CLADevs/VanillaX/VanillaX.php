@@ -8,8 +8,10 @@ use CLADevs\VanillaX\enchantments\EnchantmentManager;
 use CLADevs\VanillaX\entities\EntityManager;
 use CLADevs\VanillaX\items\ItemManager;
 use CLADevs\VanillaX\session\SessionManager;
+use pocketmine\block\BlockFactory;
 use pocketmine\plugin\PluginBase;
 use ReflectionException;
+use ReflectionProperty;
 
 class VanillaX extends PluginBase{
 
@@ -23,7 +25,7 @@ class VanillaX extends PluginBase{
     private CommandManager $commandManager;
 
     public function onLoad(): void{
-        @mkdir($this->getDataFolder());
+        $this->saveDefaultConfig();
         self::$instance = $this;
         $this->entityManager = new EntityManager();
         $this->blockManager = new BlockManager();
@@ -37,6 +39,19 @@ class VanillaX extends PluginBase{
      * @throws ReflectionException
      */
     public function onEnable(): void{
+        $reflection = new ReflectionProperty(BlockFactory::class, "fullList");
+        $reflection->setAccessible(true);
+        $value = $reflection->getValue();
+        $value->setSize(16384);
+        $reflection->setValue(null, $value);
+        BlockFactory::$light->setSize(16384);
+        BlockFactory::$lightFilter->setSize(16384);
+        BlockFactory::$solid->setSize(16384);
+        BlockFactory::$hardness->setSize(16384);
+        BlockFactory::$transparent->setSize(16384);
+        BlockFactory::$diffusesSkyLight->setSize(16384);
+        BlockFactory::$blastResistance->setSize(16384);
+
         $this->entityManager->startup();
         $this->blockManager->startup();
         $this->itemManager->startup();

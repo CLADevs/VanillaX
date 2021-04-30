@@ -1,0 +1,4 @@
+---
+#If this is false mobs will not register through VanillaX plugin
+mobs: true
+...
