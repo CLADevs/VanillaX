@@ -4,9 +4,9 @@ namespace CLADevs\VanillaX\entities\object;
 
 use CLADevs\VanillaX\entities\utils\EntityInteractable;
 use CLADevs\VanillaX\entities\utils\EntityInteractResult;
-use pocketmine\entity\Entity;
+use pocketmine\entity\Living;
 
-class ArmorStandEntity extends Entity implements EntityInteractable{
+class ArmorStandEntity extends Living implements EntityInteractable{
 
     public $width = 0.5;
     public $height = 1.975;
@@ -16,11 +16,23 @@ class ArmorStandEntity extends Entity implements EntityInteractable{
 
     protected function initEntity(): void{
         parent::initEntity();
-        $this->setMaxHealth(6);
-        $this->setHealth(6);
+        $this->setMaxHealth(1);
+        $this->setHealth(1);
+    }
+
+    public function getName(): string{
+        return "ArmorStand";
     }
 
     public function onInteract(EntityInteractResult $result): void{
-        //TODO
+//        $item = $result->getItem();
+//
+//        if($item instanceof Armor){
+//            $slot = ItemManager::getArmorSlot($item);
+//
+//            if($slot !== null && $this->getArmorInventory()->getItem($slot)->isNull()){
+//                $this->getArmorInventory()->setItem($slot, $item);
+//            }
+//        }
     }
 }

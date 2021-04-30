@@ -16,8 +16,8 @@ class ArmorStandItem extends Item{
     }
 
     public function onActivate(Player $player, Block $blockReplace, Block $blockClicked, int $face, Vector3 $clickVector): bool{
-        $yaw = $player->getYaw() % 360;
-        $entity = new ArmorStandEntity($player->getLevel(), ArmorStandEntity::createBaseNBT($blockReplace->add(0.5, 0, 0.5), null, $yaw));
+        $entity = new ArmorStandEntity($player->getLevel(), ArmorStandEntity::createBaseNBT($blockReplace->add(0.5, 0, 0.5), null));
+        $entity->lookAt($player);
         $entity->spawnToAll();
         Session::playSound($player, "mob.armor_stand.place");
         if($player->isSurvival() || $player->isAdventure()) $this->pop();

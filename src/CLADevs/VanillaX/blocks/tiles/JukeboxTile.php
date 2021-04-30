@@ -49,6 +49,11 @@ class JukeboxTile extends Tile{
         return true;
     }
 
+    public function close(): void{
+        $this->removeTrack();
+        parent::close();
+    }
+
     protected function readSaveData(CompoundTag $nbt): void{
         if($nbt->hasTag($tag = "RecordItem")){
             $this->recordItem = Item::nbtDeserialize($nbt->getCompoundTag("RecordItem"));

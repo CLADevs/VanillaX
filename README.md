@@ -16,6 +16,34 @@
 #### Entities:
 - All Minecraft Entities (Not functional)
 
+
+#### Items:
+- Elytra
+- End Crystal
+- Fire Charge
+- Fire Rockets
+- Honey Bottle
+- Minecart
+- Music Disc
+- Name Tag
+- Suspicious Stew
+- Trident
+- Turtle Helmet
+- Netherite Armor/Tools
+
+#### TODO Items:
+- Crossbow
+- Fishing Road
+- Boat
+- Banner Patterns
+- Lead
+- Lingering Potion
+- Map
+- Painting 
+- Saddle
+- Shield
+- ArmorStand
+
 #### Installation
 -  [poggit](https://poggit.pmmp.io/ci/CLADevs/VanillaX) or [github](https://github.com/CLADevs/VanillaX)
 
