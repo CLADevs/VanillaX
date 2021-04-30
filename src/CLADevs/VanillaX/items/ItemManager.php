@@ -14,6 +14,7 @@ use pocketmine\item\Armor;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
+use pocketmine\network\mcpe\protocol\LevelSoundEventPacket;
 
 class ItemManager{
 
@@ -49,15 +50,38 @@ class ItemManager{
             self::register(new HorseArmorItem($i), true);
         }
 
-        $musicDics = ["13", "cat", "blocks", "chrip", "far", "mall", "mellohi", "stal", "strad", "ward", "11", "wait", "Pigstep"];
+        $musicDics = [
+            "13" => LevelSoundEventPacket::SOUND_RECORD_13,
+            "cat" => LevelSoundEventPacket::SOUND_RECORD_CAT,
+            "blocks" => LevelSoundEventPacket::SOUND_RECORD_BLOCKS,
+            "chrip" => LevelSoundEventPacket::SOUND_RECORD_CHIRP,
+            "far" => LevelSoundEventPacket::SOUND_RECORD_FAR,
+            "mall" => LevelSoundEventPacket::SOUND_RECORD_MALL,
+            "mellohi" => LevelSoundEventPacket::SOUND_RECORD_MELLOHI,
+            "stal" => LevelSoundEventPacket::SOUND_RECORD_STAL,
+            "strad" => LevelSoundEventPacket::SOUND_RECORD_STRAD,
+            "ward" => LevelSoundEventPacket::SOUND_RECORD_WARD,
+            "11" => LevelSoundEventPacket::SOUND_RECORD_11,
+            "wait" => LevelSoundEventPacket::SOUND_RECORD_WAIT,
+            "Pigstep" => LevelSoundEventPacket::SOUND_RECORD_PIGSTEP
+        ];
         $startId = 500;
-        foreach($musicDics as $name){
+        foreach($musicDics as $name => $soundId){
             if($startId === 512){
-                self::register(new MusicDiscItem(759, 0, "Lena Raine - " . $name));
+                self::register(new MusicDiscItem(759, 0, "Lena Raine - " . $name, $soundId), true);
             }else{
-                self::register(new MusicDiscItem($startId, 0, "C418 - " . $name));
+                self::register(new MusicDiscItem($startId, 0, "C418 - " . $name, $soundId), true);
             }
             $startId++;
+        }
+
+        $creativeItems = [ItemIds::JUKEBOX];
+        foreach($creativeItems as $id){
+            $item = ItemFactory::get($id);
+
+            if(!Item::isCreativeItem($item)){
+                Item::addCreativeItem($item);
+            }
         }
     }
     

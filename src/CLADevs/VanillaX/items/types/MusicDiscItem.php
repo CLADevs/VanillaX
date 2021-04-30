@@ -2,27 +2,22 @@
 
 namespace CLADevs\VanillaX\items\types;
 
-use CLADevs\VanillaX\blocks\tiles\JukeboxTile;
 use CLADevs\VanillaX\items\utils\NonAutomaticCallItemTrait;
-use pocketmine\block\Block;
-use pocketmine\block\BlockIds;
 use pocketmine\item\Item;
-use pocketmine\math\Vector3;
-use pocketmine\Player;
 
 class MusicDiscItem extends Item implements NonAutomaticCallItemTrait{
 
     const RECORD_PIGSTEP = 759;
 
-    public function onActivate(Player $player, Block $blockReplace, Block $blockClicked, int $face, Vector3 $clickVector): bool{
-        if($blockReplace->getId() === BlockIds::JUKEBOX){
-            $tile = $player->getLevel()->getTile($blockReplace);
+    private ?int $soundId;
 
-            if($tile instanceof JukeboxTile){
-                $tile->insertTrack($this);
-            }
-        }
-        return true;
+    public function __construct(int $id, int $meta = 0, string $name = "Unknown", ?int $soundId = null){
+        parent::__construct($id, $meta, $name);
+        $this->soundId = $soundId;
+    }
+
+    public function getSoundId(): ?int{
+        return $this->soundId;
     }
 
     public static function getRecordName(int $id, bool $returnNull = false): ?string{

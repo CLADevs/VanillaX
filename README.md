@@ -4,6 +4,7 @@
 
 ### This plugin adds blocks, items, entities etc to your server.
 #### Blocks:
+- Jukebox
 - Mob Spawner
 - Enchantment Table
 - Command Block(Unfinished)
