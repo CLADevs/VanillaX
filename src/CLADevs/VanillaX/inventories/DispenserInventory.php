@@ -5,7 +5,6 @@ namespace CLADevs\VanillaX\inventories;
 use pocketmine\block\BlockIds;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\types\WindowTypes;
-use pocketmine\Player;
 
 class DispenserInventory extends FakeBlockInventory{
 

@@ -19,7 +19,7 @@ class EnchantInventory extends FakeBlockInventory{
 
     public function handlePacket(Player $player, DataPacket $packet): bool{
         if($packet instanceof InventoryTransactionPacket){
-            $actions = $packet->actions;
+            $actions = $packet->trData->getActions();
 
             if(count($actions) < 1){
                 //var_dump("Null actions");
@@ -35,7 +35,7 @@ class EnchantInventory extends FakeBlockInventory{
                         $slot = UIInventorySlotOffset::ENCHANTING_TABLE[$slot];
                     }
                 }
-                $inv->setItem($slot, $action->newItem);
+                $inv->setItem($slot, $action->newItem->getItemStack());
             }
         }elseif($packet instanceof PlayerActionPacket && $packet->action === PlayerActionPacket::ACTION_SET_ENCHANTMENT_SEED){
             $this->onSuccess($player);

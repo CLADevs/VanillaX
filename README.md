@@ -21,7 +21,6 @@
 - Elytra
 - End Crystal
 - Fire Charge
-- Fire Rockets
 - Honey Bottle
 - Minecart
 - Music Disc
@@ -30,6 +29,7 @@
 - Trident
 - Turtle Helmet
 - Netherite Armor/Tools
+- ArmorStand
 
 #### TODO Items:
 - Crossbow
@@ -42,7 +42,8 @@
 - Painting 
 - Saddle
 - Shield
-- ArmorStand
+- Firework Rocket
+- Firework Star
 
 #### Installation
 -  [poggit](https://poggit.pmmp.io/ci/CLADevs/VanillaX) or [github](https://github.com/CLADevs/VanillaX)

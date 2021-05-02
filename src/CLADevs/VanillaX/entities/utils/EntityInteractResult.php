@@ -4,6 +4,7 @@ namespace CLADevs\VanillaX\entities\utils;
 
 use pocketmine\entity\Entity;
 use pocketmine\item\Item;
+use pocketmine\math\Vector3;
 use pocketmine\Player;
 
 class EntityInteractResult{
@@ -11,15 +12,21 @@ class EntityInteractResult{
     private Player $player;
     private ?Item $item;
     private ?Entity $entity;
+    private ?Vector3 $clickPos;
 
-    public function __construct(Player $player, ?Item $item = null, ?Entity $entity = null){
+    public function __construct(Player $player, ?Item $item = null, ?Entity $entity = null, ?Vector3 $clickPos = null){
         $this->player = $player;
         $this->item = $item;
         $this->entity = $entity;
+        $this->clickPos = $clickPos;
     }
 
     public function getPlayer(): Player{
         return $this->player;
+    }
+
+    public function getClickPos(): ?Vector3{
+        return $this->clickPos;
     }
 
     public function getItem(): ?Item{

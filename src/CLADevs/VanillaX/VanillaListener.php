@@ -3,6 +3,7 @@
 namespace CLADevs\VanillaX;
 
 use CLADevs\VanillaX\blocks\tiles\CommandBlockTile;
+use CLADevs\VanillaX\entities\object\ArmorStandEntity;
 use CLADevs\VanillaX\entities\utils\EntityInteractable;
 use CLADevs\VanillaX\entities\utils\EntityInteractResult;
 use CLADevs\VanillaX\items\ItemManager;
@@ -27,6 +28,11 @@ use pocketmine\Server;
 
 class VanillaListener implements Listener{
 
+    /**
+     * @var array
+     * this prevents armor stand glitch where you could dupe
+     */
+    public array $armorStandItemsQueue = [];
 
     public function handlePacketSend(DataPacketSendEvent $event): void{
         //TODO command args
@@ -60,7 +66,10 @@ class VanillaListener implements Listener{
 
                 if($entity instanceof EntityInteractable){
                     /** If a player interacts with entity with a item */
-                    $entity->onInteract(new EntityInteractResult($player, $item));
+                    $entity->onInteract(new EntityInteractResult($player, $item, null, $packet->trData->getClickPos()));
+                    if($entity instanceof ArmorStandEntity){
+                        $this->armorStandItemsQueue[$player->getName()] = $packet->trData->getHotbarSlot();
+                    }
                 }
                 if($item instanceof EntityInteractable){
                     /** If a player interacts with entity with a item that has EntityInteractable trait */
@@ -127,8 +136,17 @@ class VanillaListener implements Listener{
         $player = $event->getPlayer();
         $item = $event->getItem();
 
-        if(($slot = ItemManager::getArmorSlot($item, true)) !== null){
+        if(!$event->isCancelled() && ($slot = ItemManager::getArmorSlot($item, true)) !== null){
             if($player->getArmorInventory()->getItem($slot)->isNull()){
+                if(isset($this->armorStandItemsQueue[$player->getName()])){
+                    $slot = $this->armorStandItemsQueue[$player->getName()];
+
+                    if($item->equalsExact($player->getInventory()->getHotbarSlotItem($slot))){
+                        unset($this->armorStandItemsQueue[$player->getName()]);
+                        $event->setCancelled();
+                        return;
+                    }
+                }
                 $player->getArmorInventory()->setItem($slot, $item);
                 $item->pop();
                 $player->getInventory()->setItemInHand($item);

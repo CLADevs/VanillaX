@@ -30,7 +30,7 @@ class TradeInventory extends FakeBlockInventory{
 
     public function handlePacket(Player $player, DataPacket $packet): bool{
         if($packet instanceof InventoryTransactionPacket){
-            $actions = $packet->actions;
+            $actions = $packet->trData->getActions();
 
             if(count($actions) < 1){
                 //var_dump("Null actions");
@@ -46,7 +46,7 @@ class TradeInventory extends FakeBlockInventory{
                         $slot = UIInventorySlotOffset::TRADE2_INGREDIENT[$slot];
                     }
                 }
-                $inv->setItem($slot, $action->newItem);
+                $inv->setItem($slot, $action->newItem->getItemStack());
             }
         }
         return true;

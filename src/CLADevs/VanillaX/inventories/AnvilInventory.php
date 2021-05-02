@@ -33,7 +33,7 @@ class AnvilInventory extends FakeBlockInventory{
 
     public function handlePacket(Player $player, DataPacket $packet): bool{
         if($packet instanceof InventoryTransactionPacket){
-            $actions = $packet->actions;
+            $actions = $packet->trData->getActions();
 
             if(count($actions) < 1){
                 //var_dump("Null actions");
@@ -42,7 +42,7 @@ class AnvilInventory extends FakeBlockInventory{
             foreach($actions as $key => $action){
                 $slot = $action->inventorySlot;
                 $inv = $this;
-                $item = $action->newItem;
+                $item = $action->newItem->getItemStack();
 
                 if($action->windowId === WindowTypes::CONTAINER){
                     $inv = $player->getInventory();
