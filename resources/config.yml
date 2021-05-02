@@ -1,4 +1,29 @@
 ---
 #If this is false mobs will not register through VanillaX plugin
 mobs: true
+
+#Anything listed here, would not be registered from this plugin.
+#If you would like all of these to be registered, delete the disabled section from the config.yml
+#file. or you would want enchantments to be registered, but other to not be registered,
+#simpily delete the enchantments section and you should be set.
+disabled:
+  #Mobs includes armor stand, zombies, etc.
+  mobs:
+    - 43 #this would be blaze entity Id
+
+  #List of blocks that wont be registered
+  blocks:
+    - 145 #This would be anvil block Id
+
+  #Items includes Firework, Armor Stand and so on
+  items:
+    - 513 #This would be shield item Id
+
+  #Commands that wont be registered, they must be all lowercase.
+  commands:
+    - "gamerule"
+
+  #Enchantments that wont be register
+  enchantments:
+    - 25 #ID of the Frost Walker Enchantment
 ...

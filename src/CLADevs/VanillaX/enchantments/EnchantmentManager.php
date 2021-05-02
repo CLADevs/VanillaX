@@ -4,6 +4,7 @@ namespace CLADevs\VanillaX\enchantments;
 
 use CLADevs\VanillaX\entities\LivingEntity;
 use CLADevs\VanillaX\utils\Utils;
+use CLADevs\VanillaX\VanillaX;
 use pocketmine\entity\Effect;
 use pocketmine\entity\EffectInstance;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
@@ -39,19 +40,25 @@ class EnchantmentManager{
     public static array $fishingRod = [Enchantment::LUCK_OF_THE_SEA, Enchantment::LURE];
 
     public function startup(): void{
-        Enchantment::registerEnchantment(new Enchantment(Enchantment::AQUA_AFFINITY, "Aqua Affinity", Enchantment::RARITY_RARE, Enchantment::SLOT_HEAD, Enchantment::SLOT_NONE, 1));
-        Enchantment::registerEnchantment(new Enchantment(Enchantment::BANE_OF_ARTHROPODS, "Bane of Arthropods", Enchantment::RARITY_RARE, Enchantment::SLOT_SWORD, Enchantment::SLOT_AXE, 5));
-        Enchantment::registerEnchantment(new Enchantment(Enchantment::SMITE, "Smite", Enchantment::RARITY_RARE, Enchantment::SLOT_SWORD, Enchantment::SLOT_AXE, 5));
-        Enchantment::registerEnchantment(new Enchantment(Enchantment::BINDING, "Curse of Binding", Enchantment::RARITY_RARE, Enchantment::SLOT_ARMOR, Enchantment::SLOT_ELYTRA, 1));
-        Enchantment::registerEnchantment(new Enchantment(Enchantment::CHANNELING, "Channeling", Enchantment::RARITY_RARE, Enchantment::SLOT_TRIDENT, Enchantment::SLOT_NONE, 1));
-        Enchantment::registerEnchantment(new Enchantment(Enchantment::RIPTIDE, "Riptide", Enchantment::RARITY_RARE, Enchantment::SLOT_TRIDENT, Enchantment::SLOT_NONE, 3));
-        Enchantment::registerEnchantment(new Enchantment(Enchantment::LOYALTY, "Loyalty", Enchantment::RARITY_RARE, Enchantment::SLOT_TRIDENT, Enchantment::SLOT_NONE, 3));
-        Enchantment::registerEnchantment(new Enchantment(Enchantment::IMPALING, "Impaling", Enchantment::RARITY_RARE, Enchantment::SLOT_TRIDENT, Enchantment::SLOT_NONE, 5));
-        Enchantment::registerEnchantment(new Enchantment(Enchantment::DEPTH_STRIDER, "Depth Strider", Enchantment::RARITY_RARE, Enchantment::SLOT_FEET, Enchantment::SLOT_NONE, 3));
+        self::registerEnchantment(new Enchantment(Enchantment::AQUA_AFFINITY, "Aqua Affinity", Enchantment::RARITY_RARE, Enchantment::SLOT_HEAD, Enchantment::SLOT_NONE, 1));
+        self::registerEnchantment(new Enchantment(Enchantment::BANE_OF_ARTHROPODS, "Bane of Arthropods", Enchantment::RARITY_RARE, Enchantment::SLOT_SWORD, Enchantment::SLOT_AXE, 5));
+        self::registerEnchantment(new Enchantment(Enchantment::SMITE, "Smite", Enchantment::RARITY_RARE, Enchantment::SLOT_SWORD, Enchantment::SLOT_AXE, 5));
+        self::registerEnchantment(new Enchantment(Enchantment::BINDING, "Curse of Binding", Enchantment::RARITY_RARE, Enchantment::SLOT_ARMOR, Enchantment::SLOT_ELYTRA, 1));
+        self::registerEnchantment(new Enchantment(Enchantment::CHANNELING, "Channeling", Enchantment::RARITY_RARE, Enchantment::SLOT_TRIDENT, Enchantment::SLOT_NONE, 1));
+        self::registerEnchantment(new Enchantment(Enchantment::RIPTIDE, "Riptide", Enchantment::RARITY_RARE, Enchantment::SLOT_TRIDENT, Enchantment::SLOT_NONE, 3));
+        self::registerEnchantment(new Enchantment(Enchantment::LOYALTY, "Loyalty", Enchantment::RARITY_RARE, Enchantment::SLOT_TRIDENT, Enchantment::SLOT_NONE, 3));
+        self::registerEnchantment(new Enchantment(Enchantment::IMPALING, "Impaling", Enchantment::RARITY_RARE, Enchantment::SLOT_TRIDENT, Enchantment::SLOT_NONE, 5));
+        self::registerEnchantment(new Enchantment(Enchantment::DEPTH_STRIDER, "Depth Strider", Enchantment::RARITY_RARE, Enchantment::SLOT_FEET, Enchantment::SLOT_NONE, 3));
         Utils::callDirectory("enchantments" . DIRECTORY_SEPARATOR . "types", function (string $namespace): void{
-            Enchantment::registerEnchantment(new $namespace());
+            self::registerEnchantment(new $namespace());
         });
         //TODO Crossbow enchantment
+    }
+
+    public function registerEnchantment(Enchantment $enchantment): void{
+        if(!in_array($enchantment->getId(), VanillaX::getInstance()->getConfig()->getNested("disabled.enchantments", []))){
+            Enchantment::registerEnchantment($enchantment);
+        }
     }
 
     /**

@@ -10,6 +10,7 @@ use CLADevs\VanillaX\items\utils\NonAutomaticCallItemTrait;
 use CLADevs\VanillaX\items\utils\NonCreativeItemTrait;
 use CLADevs\VanillaX\items\utils\NonOverwriteItemTrait;
 use CLADevs\VanillaX\utils\Utils;
+use CLADevs\VanillaX\VanillaX;
 use pocketmine\item\Armor;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
@@ -75,19 +76,23 @@ class ItemManager{
             $startId++;
         }
 
-        $creativeItems = [ItemIds::JUKEBOX];
-        foreach($creativeItems as $id){
-            $item = ItemFactory::get($id);
-
-            if(!Item::isCreativeItem($item)){
-                Item::addCreativeItem($item);
-            }
-        }
+//        $creativeItems = [ItemIds::JUKEBOX];
+//        foreach($creativeItems as $id){
+//            $item = ItemFactory::get($id);
+//
+//            if(!Item::isCreativeItem($item)){
+//                Item::addCreativeItem($item);
+//            }
+//        }
     }
     
-    public static function register(Item $item, bool $creative = false, bool $overwrite = true): void{
+    public static function register(Item $item, bool $creative = false, bool $overwrite = true): bool{
+        if(in_array($item->getId(), VanillaX::getInstance()->getConfig()->getNested("disabled.items", []))){
+            return false;
+        }
         ItemFactory::registerItem($item, $overwrite);
         if($creative && !Item::isCreativeItem($item)) Item::addCreativeItem($item);
+        return true;
     }
 
     public static function getArmorSlot(Item $item, bool $includeElytra = false): ?int{

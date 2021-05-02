@@ -20,13 +20,16 @@ class EntityManager{
     }
 
     public function startup(): void{
-        $this->initializeVillagerProfession();
-        $this->lootManager->startup();
-
         if(VanillaX::getInstance()->getConfig()->get("mobs", true)){
+            $this->initializeVillagerProfession();
+            $this->lootManager->startup();
+
+            $disabledMobs = VanillaX::getInstance()->getConfig()->getNested("disabled.mobs", []);
             foreach(["object", "boss", "passive", "neutral", "monster", "projectile"] as $path){
-                Utils::callDirectory("entities" . DIRECTORY_SEPARATOR . $path, function (string $namespace): void{
-                    Entity::registerEntity($namespace, true);
+                Utils::callDirectory("entities" . DIRECTORY_SEPARATOR . $path, function (string $namespace)use($disabledMobs): void{
+                    if(!in_array($namespace::NETWORK_ID, $disabledMobs)){
+                        Entity::registerEntity($namespace, true);
+                    }
                 });
             }
         }

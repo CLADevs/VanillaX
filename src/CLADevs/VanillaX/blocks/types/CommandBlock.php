@@ -4,6 +4,7 @@ namespace CLADevs\VanillaX\blocks\types;
 
 use CLADevs\VanillaX\blocks\tiles\CommandBlockTile;
 use CLADevs\VanillaX\items\utils\NonAutomaticCallItemTrait;
+use CLADevs\VanillaX\items\utils\NonCreativeItemTrait;
 use pocketmine\block\Block;
 use pocketmine\block\BlockIds;
 use pocketmine\item\Item;
@@ -13,7 +14,7 @@ use pocketmine\network\mcpe\protocol\types\ContainerIds;
 use pocketmine\network\mcpe\protocol\types\WindowTypes;
 use pocketmine\Player;
 
-class CommandBlock extends Block implements NonAutomaticCallItemTrait{
+class CommandBlock extends Block implements NonAutomaticCallItemTrait, NonCreativeItemTrait{
 
     public function __construct(int $id){
         parent::__construct($id, 0, self::asCommandBlockName($id), $id);
