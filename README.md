@@ -30,6 +30,7 @@
 - Turtle Helmet
 - Netherite Armor/Tools
 - ArmorStand
+- Shield
 
 #### TODO Items:
 - Crossbow
@@ -41,7 +42,6 @@
 - Map
 - Painting 
 - Saddle
-- Shield
 - Firework Rocket
 - Firework Star
 

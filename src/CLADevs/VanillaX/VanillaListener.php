@@ -7,17 +7,23 @@ use CLADevs\VanillaX\entities\object\ArmorStandEntity;
 use CLADevs\VanillaX\entities\utils\EntityInteractable;
 use CLADevs\VanillaX\entities\utils\EntityInteractResult;
 use CLADevs\VanillaX\items\ItemManager;
+use CLADevs\VanillaX\items\types\ShieldItem;
+use pocketmine\entity\Entity;
+use pocketmine\entity\Living;
+use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\inventory\InventoryTransactionEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\event\player\PlayerQuitEvent;
+use pocketmine\event\player\PlayerToggleSneakEvent;
 use pocketmine\event\server\DataPacketReceiveEvent;
 use pocketmine\event\server\DataPacketSendEvent;
 use pocketmine\level\Position;
 use pocketmine\network\mcpe\protocol\CommandBlockUpdatePacket;
 use pocketmine\network\mcpe\protocol\ContainerClosePacket;
 use pocketmine\network\mcpe\protocol\InventoryTransactionPacket;
+use pocketmine\network\mcpe\protocol\LevelSoundEventPacket;
 use pocketmine\network\mcpe\protocol\PlayerActionPacket;
 use pocketmine\network\mcpe\protocol\SetDefaultGameTypePacket;
 use pocketmine\network\mcpe\protocol\SetDifficultyPacket;
@@ -94,11 +100,10 @@ class VanillaListener implements Listener{
     }
 
     public function onDamage(EntityDamageEvent $event): void{
+        $entity = $event->getEntity();
+
         VanillaX::getInstance()->getEnchantmentManager()->handleDamage($event);
-
         if(!$event->isCancelled() && $event->getCause() === EntityDamageEvent::CAUSE_FALL){
-            $entity = $event->getEntity();
-
             if($entity instanceof Player){
                 $session = VanillaX::getInstance()->getSessionManager()->get($entity);
 
@@ -110,6 +115,20 @@ class VanillaListener implements Listener{
                             $event->setCancelled();
                         }
                     }
+                }
+            }
+        }
+        if(!$event->isCancelled() && $event instanceof EntityDamageByEntityEvent && $entity instanceof Player){
+            $item = $entity->getInventory()->getItemInHand();
+            if($item instanceof ShieldItem && $entity->isSneaking()){
+                $damager = $event->getDamager();
+
+                if($damager instanceof Living && $damager->getDirection() !== $entity->getDirection()){
+                    $event->setCancelled();
+                    $item->applyDamage(1);
+                    $entity->getInventory()->setItemInHand($item);
+                    $entity->getLevel()->broadcastLevelSoundEvent($entity, LevelSoundEventPacket::SOUND_ITEM_SHIELD_BLOCK);
+                    $damager->knockBack($entity, 0, $damager->x - $entity->x, $damager->z - $entity->z, 0.5);
                 }
             }
         }
@@ -151,6 +170,14 @@ class VanillaListener implements Listener{
                 $item->pop();
                 $player->getInventory()->setItemInHand($item);
             }
+        }
+    }
+
+    public function onSneak(PlayerToggleSneakEvent $event): void{
+        $player = $event->getPlayer();
+
+        if($player->getInventory()->getItemInHand() instanceof ShieldItem){
+            $player->setGenericFlag(Entity::DATA_FLAG_BLOCKING, $event->isSneaking());
         }
     }
 }

@@ -1,6 +1,7 @@
 Features:
 - Farm System
 - Redstone System
+- Offhands
 
 Blocks Possible in 4.0:
 - Ancient Debris
