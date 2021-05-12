@@ -7,6 +7,7 @@ use CLADevs\VanillaX\commands\CommandManager;
 use CLADevs\VanillaX\enchantments\EnchantmentManager;
 use CLADevs\VanillaX\entities\EntityManager;
 use CLADevs\VanillaX\items\ItemManager;
+use CLADevs\VanillaX\network\NetworkManager;
 use CLADevs\VanillaX\session\SessionManager;
 use pocketmine\block\BlockFactory;
 use pocketmine\plugin\PluginBase;
@@ -17,22 +18,24 @@ class VanillaX extends PluginBase{
 
     private static VanillaX $instance;
 
+    private EnchantmentManager $enchantmentManager;
     private EntityManager $entityManager;
     private BlockManager $blockManager;
     private ItemManager $itemManager;
     private SessionManager $sessionManager;
-    private EnchantmentManager $enchantmentManager;
     private CommandManager $commandManager;
+    private NetworkManager $networkManager;
 
     public function onLoad(): void{
         $this->saveDefaultConfig();
         self::$instance = $this;
+        $this->enchantmentManager = new EnchantmentManager();
         $this->entityManager = new EntityManager();
         $this->blockManager = new BlockManager();
         $this->itemManager = new ItemManager();
         $this->sessionManager = new SessionManager();
-        $this->enchantmentManager = new EnchantmentManager();
         $this->commandManager = new CommandManager();
+        $this->networkManager = new NetworkManager();
     }
 
     /**
@@ -52,11 +55,12 @@ class VanillaX extends PluginBase{
         BlockFactory::$diffusesSkyLight->setSize(16384);
         BlockFactory::$blastResistance->setSize(16384);
 
+        $this->enchantmentManager->startup();
         $this->entityManager->startup();
         $this->blockManager->startup();
         $this->itemManager->startup();
-        $this->enchantmentManager->startup();
         $this->commandManager->startup();
+        $this->networkManager->startup();
         $this->getServer()->getPluginManager()->registerEvents(new VanillaListener(), $this);
     }
 
@@ -90,5 +94,9 @@ class VanillaX extends PluginBase{
 
     public function getEntityManager(): EntityManager{
         return $this->entityManager;
+    }
+
+    public function getNetworkManager(): NetworkManager{
+        return $this->networkManager;
     }
 }

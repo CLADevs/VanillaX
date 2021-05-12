@@ -2,6 +2,7 @@
 
 namespace CLADevs\VanillaX\items;
 
+use CLADevs\VanillaX\enchantments\EnchantmentManager;
 use CLADevs\VanillaX\items\types\HorseArmorItem;
 use CLADevs\VanillaX\items\types\MapItem;
 use CLADevs\VanillaX\items\types\MinecartItem;
@@ -12,6 +13,8 @@ use CLADevs\VanillaX\items\utils\NonOverwriteItemTrait;
 use CLADevs\VanillaX\utils\Utils;
 use CLADevs\VanillaX\VanillaX;
 use pocketmine\item\Armor;
+use pocketmine\item\enchantment\Enchantment;
+use pocketmine\item\enchantment\EnchantmentInstance;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
@@ -76,14 +79,17 @@ class ItemManager{
             $startId++;
         }
 
-//        $creativeItems = [ItemIds::JUKEBOX];
-//        foreach($creativeItems as $id){
-//            $item = ItemFactory::get($id);
-//
-//            if(!Item::isCreativeItem($item)){
-//                Item::addCreativeItem($item);
-//            }
-//        }
+        foreach(EnchantmentManager::getAllEnchantments() as $enchantment){
+            $enchant = Enchantment::getEnchantment($enchantment);
+
+            if($enchant instanceof Enchantment){
+                for($i = 1; $i <= $enchant->getMaxLevel(); $i++){
+                    $item = ItemFactory::get(ItemIds::ENCHANTED_BOOK);
+                    $item->addEnchantment(new EnchantmentInstance($enchant, $i));
+                    if(!Item::isCreativeItem($item)) Item::addCreativeItem($item);
+                }
+            }
+        }
     }
     
     public static function register(Item $item, bool $creative = false, bool $overwrite = true): bool{

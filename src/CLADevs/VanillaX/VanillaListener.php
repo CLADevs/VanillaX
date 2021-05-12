@@ -8,8 +8,12 @@ use CLADevs\VanillaX\entities\utils\EntityInteractable;
 use CLADevs\VanillaX\entities\utils\EntityInteractResult;
 use CLADevs\VanillaX\items\ItemManager;
 use CLADevs\VanillaX\items\types\ShieldItem;
+use CLADevs\VanillaX\session\Session;
+use pocketmine\block\BlockIds;
 use pocketmine\entity\Entity;
 use pocketmine\entity\Living;
+use pocketmine\entity\object\FallingBlock;
+use pocketmine\event\entity\EntityBlockChangeEvent;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\inventory\InventoryTransactionEvent;
@@ -178,6 +182,17 @@ class VanillaListener implements Listener{
 
         if($player->getInventory()->getItemInHand() instanceof ShieldItem){
             $player->setGenericFlag(Entity::DATA_FLAG_BLOCKING, $event->isSneaking());
+        }
+    }
+
+    public function onAnvilLandFall(EntityBlockChangeEvent $event): void{
+        if(!$event->isCancelled()){
+            $entity = $event->getEntity();
+
+            if($entity instanceof FallingBlock && ($to = $event->getTo())->getId() === BlockIds::ANVIL){
+                $pk = Session::playSound($to->asVector3(), "random.anvil_land", 1, 1, true);
+                $to->getLevel()->broadcastPacketToViewers($to, $pk);
+            }
         }
     }
 }

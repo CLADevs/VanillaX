@@ -16,6 +16,8 @@ class FakeBlockInventory extends ContainerInventory{
 
     private int $defaultSize;
     private int $windowType;
+
+    private ?Player $owner;
     private Block $block;
 
     /** @var null|callable */
@@ -29,7 +31,7 @@ class FakeBlockInventory extends ContainerInventory{
      * @param int $windowType
      * @param callable|null $packetCallable
      */
-    public function __construct(Vector3 $holder, int $size = 27, $block = BlockIds::CHEST, int $windowType = WindowTypes::CONTAINER, callable $packetCallable = null){
+    public function __construct(Vector3 $holder, int $size = 27, $block = BlockIds::CHEST, int $windowType = WindowTypes::CONTAINER, callable $packetCallable = null, ?Player $owner = null){
         $holder->x = intval($holder->x);
         $holder->y = intval($holder->y);
         $holder->z = intval($holder->z);
@@ -40,11 +42,16 @@ class FakeBlockInventory extends ContainerInventory{
         $this->defaultSize = $size;
         $this->windowType = $windowType;
         $this->packetCallable = $packetCallable;
+        $this->owner = $owner;
         parent::__construct($holder, [], $size, null);
     }
 
     public function setTitle(string $title): void{
         $this->title = $this->name = $title;
+    }
+
+    public function getOwner(): ?Player{
+        return $this->owner;
     }
 
     public function getNetworkType(): int{

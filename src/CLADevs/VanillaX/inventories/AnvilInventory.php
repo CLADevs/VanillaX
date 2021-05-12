@@ -2,24 +2,20 @@
 
 namespace CLADevs\VanillaX\inventories;
 
+use CLADevs\VanillaX\network\protocol\FilterTextPacketX;
 use pocketmine\block\BlockIds;
-use pocketmine\item\ItemFactory;
-use pocketmine\item\ItemIds;
+use pocketmine\item\Item;
 use pocketmine\math\Vector3;
-use pocketmine\network\mcpe\protocol\AnvilDamagePacket;
+use pocketmine\network\mcpe\protocol\ActorEventPacket;
 use pocketmine\network\mcpe\protocol\DataPacket;
-use pocketmine\network\mcpe\protocol\FilterTextPacket;
-use pocketmine\network\mcpe\protocol\InventoryTransactionPacket;
-use pocketmine\network\mcpe\protocol\types\inventory\UIInventorySlotOffset;
+use pocketmine\network\mcpe\protocol\LevelSoundEventPacket;
 use pocketmine\network\mcpe\protocol\types\WindowTypes;
 use pocketmine\Player;
 
 class AnvilInventory extends FakeBlockInventory{
 
-    private string $currentName = "";
-
     public function __construct(Vector3 $holder){
-        parent::__construct($holder, 2, BlockIds::AIR, WindowTypes::ANVIL);
+        parent::__construct($holder, 2, BlockIds::AIR, WindowTypes::ANVIL, null);
     }
 
     public function onClose(Player $who): void{
@@ -32,45 +28,21 @@ class AnvilInventory extends FakeBlockInventory{
     }
 
     public function handlePacket(Player $player, DataPacket $packet): bool{
-        if($packet instanceof InventoryTransactionPacket){
-            $actions = $packet->trData->getActions();
-
-            if(count($actions) < 1){
-                //var_dump("Null actions");
-                return true;
+        if($packet instanceof ActorEventPacket && $packet->event === ActorEventPacket::PLAYER_ADD_XP_LEVELS){
+            if(!$player->isCreative()){
+                $player->setXpLevel($player->getXpLevel() - abs($packet->data));
             }
-            foreach($actions as $key => $action){
-                $slot = $action->inventorySlot;
-                $inv = $this;
-                $item = $action->newItem->getItemStack();
-
-                if($action->windowId === WindowTypes::CONTAINER){
-                    $inv = $player->getInventory();
-                }else{
-                    if(array_key_exists($slot, UIInventorySlotOffset::ANVIL)){
-                        $slot = UIInventorySlotOffset::ANVIL[$slot];
-
-                        if($slot === 0){
-                            $this->currentName = $item->getId() === ItemIds::AIR ? "" : $item->getName();
-                        }
-                    }
-                }
-                $inv->setItem($slot, $item);
-            }
-        }elseif($packet instanceof FilterTextPacket){
-            $this->onNameChange($packet);
-        }elseif($packet instanceof AnvilDamagePacket){ //TODO Change this to transaction
-            $this->onSuccess($player);
+        }elseif($packet instanceof FilterTextPacketX){
+            $player->dataPacket(FilterTextPacketX::create($packet->getText(), true));
         }
         return true;
     }
 
-    public function onSuccess(Player $player): void{
-        $this->setItem(0, ItemFactory::get(ItemIds::AIR));
-        $this->setItem(1, ItemFactory::get(ItemIds::AIR));
-    }
-
-    private function onNameChange(FilterTextPacket $packet): void{
-        $this->currentName = $packet->getText();
+    /**
+     * @param Player $player, returns player who successfully repaired/renamed their item
+     * @param Item $item, returns a new item after its repaired/renamed
+     */
+    public function onSuccess(Player $player, Item $item): void{
+        $player->getLevel()->broadcastLevelSoundEvent($this->getHolder(), LevelSoundEventPacket::SOUND_RANDOM_ANVIL_USE);
     }
 }

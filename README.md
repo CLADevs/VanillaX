@@ -7,11 +7,11 @@
 - Jukebox
 - Mob Spawner
 - Enchantment Table
-- Command Block(Unfinished)
+- Anvil
 
 #### WIP Blocks:
-- Anvil
 - Hopper
+- Command Block
 
 #### Entities:
 - All Minecraft Entities (Not functional)
@@ -50,3 +50,6 @@
 
 ## Need Help?
   Open an Issue [here](https://github.com/CLADevs/VanillaX/issues/new).
+
+## Helpful Sources
+  Nukkit [here](https://github.com/CloudburstMC/Nukkit).
