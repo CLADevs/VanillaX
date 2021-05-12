@@ -31,7 +31,7 @@ class EnchantmentTableBlock extends Transparent{
             }
             $player->addWindow(new EnchantInventory($this), WindowTypes::ENCHANTMENT);
         }
-        return false;
+        return true;
     }
 
     public function getBlastResistance(): float{

@@ -2,16 +2,14 @@
 
 namespace CLADevs\VanillaX\inventories\actions;
 
-use CLADevs\VanillaX\inventories\AnvilInventory;
+use CLADevs\VanillaX\inventories\EnchantInventory;
 use pocketmine\block\BlockIds;
 use pocketmine\inventory\transaction\action\InventoryAction;
 use pocketmine\item\Item;
 use pocketmine\network\mcpe\protocol\types\WindowTypes;
 use pocketmine\Player;
 
-class RepairItemAction extends InventoryAction{
-
-    /** Nukkit Repair Item Action */
+class EnchantItemAction extends InventoryAction{
 
     private int $sourceType;
 
@@ -21,7 +19,7 @@ class RepairItemAction extends InventoryAction{
     }
 
     public function isValid(Player $source): bool{
-        return $source->getWindow(WindowTypes::ANVIL) !== null;
+        return $source->getWindow(WindowTypes::ENCHANTMENT) !== null;
     }
 
     public function execute(Player $source): bool{
@@ -29,9 +27,9 @@ class RepairItemAction extends InventoryAction{
     }
 
     public function onExecuteSuccess(Player $source): void{
-        $inv = $source->getWindow(WindowTypes::ANVIL);
+        $inv = $source->getWindow(WindowTypes::ENCHANTMENT);
 
-        if($inv instanceof AnvilInventory && $this->targetItem->getId() === BlockIds::AIR){
+        if($inv instanceof EnchantInventory && $this->targetItem->getId() === BlockIds::AIR){
             $inv->onSuccess($source, $this->sourceItem);
         }
     }
