@@ -19,6 +19,14 @@ class DispenserBlock extends Solid{
     }
 
     public function place(Item $item, Block $blockReplace, Block $blockClicked, int $face, Vector3 $clickVector, Player $player = null): bool{
+        $faces = [
+            Vector3::SIDE_DOWN => 0,
+            Vector3::SIDE_UP => 1,
+            Vector3::SIDE_NORTH => 2,
+            Vector3::SIDE_SOUTH => 3,
+            Vector3::SIDE_WEST => 4,
+            Vector3::SIDE_EAST => 5
+        ];
         $this->meta = $faces[$face] ?? $face;
         parent::place($item, $blockReplace, $blockClicked, $face, $clickVector, $player);
         Tile::createTile(TileIdentifiers::DISPENSER, $this->getLevel(), DispenserTile::createNBT($this));

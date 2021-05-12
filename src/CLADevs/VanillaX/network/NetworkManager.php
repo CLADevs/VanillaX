@@ -4,6 +4,7 @@ namespace CLADevs\VanillaX\network;
 
 use CLADevs\VanillaX\network\protocol\ActorEventPacketX;
 use CLADevs\VanillaX\network\protocol\AnvilDamagePacketX;
+use CLADevs\VanillaX\network\protocol\CommandBlockUpdatePacketX;
 use CLADevs\VanillaX\network\protocol\FilterTextPacketX;
 use CLADevs\VanillaX\network\protocol\InventoryTransactionPacketX;
 use CLADevs\VanillaX\network\protocol\PlayerActionPacketX;
@@ -17,5 +18,6 @@ class NetworkManager{
         PacketPool::registerPacket(new AnvilDamagePacketX());
         PacketPool::registerPacket(new ActorEventPacketX());
         PacketPool::registerPacket(new PlayerActionPacketX());
+        PacketPool::registerPacket(new CommandBlockUpdatePacketX());
     }
 }

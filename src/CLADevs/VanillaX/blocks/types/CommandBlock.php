@@ -21,6 +21,15 @@ class CommandBlock extends Block implements NonAutomaticCallItemTrait, NonCreati
     }
 
     public function place(Item $item, Block $blockReplace, Block $blockClicked, int $face, Vector3 $clickVector, Player $player = null): bool{
+        $faces = [
+            Vector3::SIDE_DOWN => 0,
+            Vector3::SIDE_UP => 1,
+            Vector3::SIDE_NORTH => 2,
+            Vector3::SIDE_SOUTH => 3,
+            Vector3::SIDE_WEST => 4,
+            Vector3::SIDE_EAST => 5
+        ];
+        $this->meta = $faces[$face] ?? $face;
         parent::place($item, $blockReplace, $blockClicked, $face, $clickVector, $player);
         CommandBlockTile::generateTile($blockReplace, $this->getMode());
         return true;
@@ -39,18 +48,18 @@ class CommandBlock extends Block implements NonAutomaticCallItemTrait, NonCreati
             $pk->x = $tile->x;
             $pk->y = $tile->y;
             $pk->z = $tile->z;
-            $player->dataPacket($pk);
+            $player->dataPacket($pk);;
         }
         return true;
     }
 
     public function getMode(): int{
         if($this->getId() == BlockIds::REPEATING_COMMAND_BLOCK){
-            return CommandBlockTile::REPEAT;
+            return CommandBlockTile::TYPE_REPEAT;
         }elseif($this->getId() == BlockIds::CHAIN_COMMAND_BLOCK){
-            return CommandBlockTile::CHAIN;
+            return CommandBlockTile::TYPE_CHAIN;
         }
-        return CommandBlockTile::IMPULSE;
+        return CommandBlockTile::TYPE_IMPULSE;
     }
 
     public static function asCommandBlockName(int $id): string{
@@ -63,9 +72,9 @@ class CommandBlock extends Block implements NonAutomaticCallItemTrait, NonCreati
     }
 
     public static function asCommandBlockFromMode(int $mode): int{
-        if($mode == CommandBlockTile::REPEAT){
+        if($mode == CommandBlockTile::TYPE_REPEAT){
             return BlockIds::REPEATING_COMMAND_BLOCK;
-        }elseif($mode == CommandBlockTile::CHAIN){
+        }elseif($mode == CommandBlockTile::TYPE_CHAIN){
             return BlockIds::CHAIN_COMMAND_BLOCK;
         }
         return BlockIds::COMMAND_BLOCK;

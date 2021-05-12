@@ -26,6 +26,9 @@ class NetworkInventoryActionX extends NetworkInventoryAction{
 
     public function createInventoryAction(Player $player): ?InventoryAction{
         /** Nukkit Transaction for Anvil */
+        $oldItem = $this->oldItem->getItemStack();
+        $newItem = $this->newItem->getItemStack();
+        
         switch($this->sourceType){
             case self::SOURCE_CONTAINER:
                 if($this->windowId === 124){
@@ -50,7 +53,7 @@ class NetworkInventoryActionX extends NetworkInventoryAction{
                     }
                 }
                 if(($window = $player->getWindow($this->windowId)) != null){
-                    return new SlotChangeAction($window, $this->inventorySlot, $this->oldItem->getItemStack(), $this->newItem->getItemStack());
+                    return new SlotChangeAction($window, $this->inventorySlot, $oldItem, $newItem);
                 }
                 break;
             case self::SOURCE_TODO:
@@ -66,9 +69,9 @@ class NetworkInventoryActionX extends NetworkInventoryAction{
                         case self::SOURCE_TYPE_ANVIL_INPUT:
                         case self::SOURCE_TYPE_ANVIL_MATERIAL:
                         case self::SOURCE_TYPE_ANVIL_RESULT:
-                            return new RepairItemAction($this->oldItem->getItemStack(), $this->newItem->getItemStack(), $this->windowId);
+                            return new RepairItemAction($oldItem, $newItem, $this->windowId);
                     }
-                    return new SlotChangeAction($window, $this->inventorySlot, $this->oldItem->getItemStack(), $this->newItem->getItemStack());
+                    return new SlotChangeAction($window, $this->inventorySlot, $oldItem, $newItem);
                 }elseif($this->windowId >= self::SOURCE_TYPE_ENCHANT_OUTPUT && $this->windowId <= self::SOURCE_TYPE_ENCHANT_INPUT){
                     //Enchantment Table
                     $window = $player->getWindow(WindowTypes::ENCHANTMENT);
@@ -80,9 +83,9 @@ class NetworkInventoryActionX extends NetworkInventoryAction{
                         case self::SOURCE_TYPE_ENCHANT_INPUT:
                         case self::SOURCE_TYPE_ENCHANT_MATERIAL:
                         case self::SOURCE_TYPE_ENCHANT_OUTPUT:
-                            return new EnchantItemAction($this->oldItem->getItemStack(), $this->newItem->getItemStack(), $this->windowId);
+                            return new EnchantItemAction($oldItem, $newItem, $this->windowId);
                     }
-                    return new SlotChangeAction($window, $this->inventorySlot, $this->oldItem->getItemStack(), $this->newItem->getItemStack());
+                    return new SlotChangeAction($window, $this->inventorySlot, $oldItem, $newItem);
                 }
                 break;
         }
