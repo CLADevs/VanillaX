@@ -6,6 +6,10 @@ use CLADevs\VanillaX\VanillaX;
 
 class Utils{
 
+    public static function getResourceFile(string $file): string{
+        return str_replace(["\\utils", "/utils"], DIRECTORY_SEPARATOR . "resources", __DIR__) . DIRECTORY_SEPARATOR . $file;
+    }
+
     public static function getVanillaXPath(): string{
         if(VanillaX::getInstance()->isPhar()){
             $path = self::removeLastDirectory(VanillaX::getInstance()->getDescription()->getMain());

@@ -48,7 +48,7 @@ class CommandBlock extends Block implements NonAutomaticCallItemTrait, NonCreati
             $pk->x = $tile->x;
             $pk->y = $tile->y;
             $pk->z = $tile->z;
-            $player->dataPacket($pk);;
+            $player->dataPacket($pk);
         }
         return true;
     }

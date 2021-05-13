@@ -8,6 +8,7 @@
 - Mob Spawner
 - Enchantment Table
 - Anvil
+- Brewing Stand
 
 #### WIP Blocks:
 - Hopper

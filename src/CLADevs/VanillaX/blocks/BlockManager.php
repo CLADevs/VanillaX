@@ -3,6 +3,7 @@
 namespace CLADevs\VanillaX\blocks;
 
 use CLADevs\VanillaX\blocks\tiles\BeaconTile;
+use CLADevs\VanillaX\blocks\tiles\BrewingStandTile;
 use CLADevs\VanillaX\blocks\tiles\CommandBlockTile;
 use CLADevs\VanillaX\blocks\tiles\DispenserTile;
 use CLADevs\VanillaX\blocks\tiles\DropperTile;
@@ -70,6 +71,7 @@ class BlockManager{
         self::registerTile(BeaconTile::class, [TileIdentifiers::BEACON, "minecraft:beacon"], BlockIds::BEACON);
         self::registerTile(DispenserTile::class, [TileIdentifiers::DISPENSER, "minecraft:dispenser"], BlockIds::DISPENSER);
         self::registerTile(DropperTile::class, [TileIdentifiers::DROPPER, "minecraft:dropper"], BlockIds::DROPPER);
+        self::registerTile(BrewingStandTile::class, [Tile::BREWING_STAND, "minecraft:brewing_stand"], BlockIds::BREWING_STAND_BLOCK);
         //TODO Tile::registerTile(StoneCutterTile::class, [TileIdentifiers::STONECUTTER, "minecraft:stonecutter"]);
     }
 
