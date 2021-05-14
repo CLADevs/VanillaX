@@ -2,10 +2,9 @@
 
 namespace CLADevs\VanillaX\blocks\tiles;
 
-use CLADevs\VanillaX\inventories\BrewingStandInventory;
+use CLADevs\VanillaX\inventories\types\BrewingStandInventory;
 use CLADevs\VanillaX\VanillaX;
 use pocketmine\item\Item;
-use pocketmine\item\ItemIds;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\network\mcpe\protocol\LevelSoundEventPacket;
 use pocketmine\tile\Container;
@@ -20,25 +19,6 @@ class BrewingStandTile extends Spawnable implements Container, Nameable{
     const TAG_BREW_TIME = "BrewTime";
     const TAG_FUEL_AMOUNT = "FuelAmount";
     const TAG_FUEL_TOTAL = "FuelTotal";
-
-    const INGREDIENTS = [
-        ItemIds::NETHER_WART,
-        ItemIds::GHAST_TEAR,
-        ItemIds::GLOWSTONE_DUST,
-        ItemIds::REDSTONE_DUST,
-        ItemIds::GUNPOWDER,
-        ItemIds::MAGMA_CREAM,
-        ItemIds::BLAZE_POWDER,
-        ItemIds::GOLDEN_CARROT,
-        ItemIds::SPIDER_EYE,
-        ItemIds::FERMENTED_SPIDER_EYE,
-        ItemIds::GLISTERING_MELON,
-        ItemIds::SUGAR,
-        ItemIds::RABBIT_FOOT,
-        ItemIds::PUFFERFISH,
-        ItemIds::PHANTOM_MEMBRANE,
-        ItemIds::DRAGON_BREATH
-    ];
 
     const MAX_BREW_TIME = 400; //20 seconds
 
@@ -113,10 +93,6 @@ class BrewingStandTile extends Spawnable implements Container, Nameable{
         }
     }
 
-    public function isIngredient(Item $item): bool{
-        return in_array($item->getId(), self::INGREDIENTS);
-    }
-
     public function checkBrewing(int $potionCount, Item $ingredient): void{
         if(!$this->isBrewing()){
             if($potionCount >= 1 && $this->isFueled() && !$ingredient->isNull()){
@@ -125,42 +101,50 @@ class BrewingStandTile extends Spawnable implements Container, Nameable{
             }
         }else{
             if($potionCount <= 0 || $ingredient->isNull()){
-                $this->setBrewTime(0);
-                $this->inventory->sendBrewTimeData(null, $this->getBrewTime());
+                $this->stopBrewing();
             }
         }
+    }
+
+    public function stopBrewing(): void{
+        $this->setBrewTime(0);
+        $this->inventory->sendBrewTimeData(null, $this->getBrewTime());
     }
 
     public function onUpdate(): bool{
         if($this->closed){
             return false;
         }
-        if($this->removeFuel && ($item = $this->inventory->getItem(BrewingStandInventory::FUEL_SLOT))->getId() === ItemIds::BLAZE_POWDER){
-            $item->count--;
-            $this->inventory->setItem(BrewingStandInventory::FUEL_SLOT, $item);
+        if($this->removeFuel && !$this->inventory->getFuel()->isNull()){
+            $this->inventory->decreaseFuel();
             $this->removeFuel = false;
         }
         if($this->isBrewing()){
             $this->brewTime--;
 
             if($this->brewTime <= 0){
+                $ingredient = $this->inventory->getIngredient();
+
                 for($i = BrewingStandInventory::FIRST_POTION_SLOT; $i <= BrewingStandInventory::THIRD_POTION_SLOT; $i++){
                     $potion = $this->inventory->getItem($i);
 
-                    if($this->inventory->isPotion($potion)){
-                        $output = VanillaX::getInstance()->getBrewingOutput($potion, $this->inventory->getItem(BrewingStandInventory::INGREDIENT_SLOT));
+                    if($this->inventory->isPotion($potion, $ingredient)){
+                        $inventoryManager = VanillaX::getInstance()->getInventoryManager();
 
+                        if(($output = $inventoryManager->getBrewingOutput($potion, $ingredient)) === null){
+                            $output = $inventoryManager->getBrewingContainerOutput($potion, $ingredient);
+                        }
                         if($output !== null){
                             $this->inventory->setItem($i, $output);
                         }
                     }
                 }
+                $this->inventory->decreaseIngredient();
                 $this->setFuelAmount($this->fuelAmount - 1, true);
                 $this->getLevel()->broadcastLevelSoundEvent($this, LevelSoundEventPacket::SOUND_POTION_BREWED);
 
-                if($this->fuelAmount <= 0 && ($item = $this->inventory->getItem(BrewingStandInventory::FUEL_SLOT))->getId() === ItemIds::BLAZE_POWDER){
-                    $item->count--;
-                    $this->inventory->setItem(BrewingStandInventory::FUEL_SLOT, $item);
+                if($this->fuelAmount <= 0 && !$this->inventory->getFuel()->isNull()){
+                    $this->inventory->decreaseFuel();
                     $this->resetFuel();
                 }
             }

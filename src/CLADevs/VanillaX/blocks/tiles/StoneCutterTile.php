@@ -2,7 +2,7 @@
 
 namespace CLADevs\VanillaX\blocks\tiles;
 
-use CLADevs\VanillaX\inventories\StoneCutterInventory;
+use CLADevs\VanillaX\inventories\types\StoneCutterInventory;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\tile\Container;
 use pocketmine\tile\ContainerTrait;

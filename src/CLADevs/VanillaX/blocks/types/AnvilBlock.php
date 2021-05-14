@@ -2,7 +2,7 @@
 
 namespace CLADevs\VanillaX\blocks\types;
 
-use CLADevs\VanillaX\inventories\AnvilInventory;
+use CLADevs\VanillaX\inventories\types\AnvilInventory;
 use pocketmine\block\Anvil;
 use pocketmine\block\Block;
 use pocketmine\item\Item;

@@ -2,7 +2,7 @@
 
 namespace CLADevs\VanillaX\blocks\tiles;
 
-use CLADevs\VanillaX\inventories\DropperInventory;
+use CLADevs\VanillaX\inventories\types\DropperInventory;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\tile\Container;
 use pocketmine\tile\ContainerTrait;

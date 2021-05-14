@@ -4,8 +4,8 @@ namespace CLADevs\VanillaX\network\protocol\types;
 
 use CLADevs\VanillaX\inventories\actions\EnchantItemAction;
 use CLADevs\VanillaX\inventories\actions\RepairItemAction;
-use CLADevs\VanillaX\inventories\AnvilInventory;
-use CLADevs\VanillaX\inventories\EnchantInventory;
+use CLADevs\VanillaX\inventories\types\AnvilInventory;
+use CLADevs\VanillaX\inventories\types\EnchantInventory;
 use pocketmine\inventory\transaction\action\InventoryAction;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
 use pocketmine\network\mcpe\protocol\types\inventory\UIInventorySlotOffset;

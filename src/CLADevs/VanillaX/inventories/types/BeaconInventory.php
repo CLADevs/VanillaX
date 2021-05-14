@@ -1,7 +1,8 @@
 <?php
 
-namespace CLADevs\VanillaX\inventories;
+namespace CLADevs\VanillaX\inventories\types;
 
+use CLADevs\VanillaX\inventories\FakeBlockInventory;
 use pocketmine\block\BlockIds;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\types\WindowTypes;

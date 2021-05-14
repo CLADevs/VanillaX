@@ -9,7 +9,7 @@ use CLADevs\VanillaX\entities\utils\EntityInteractResult;
 use CLADevs\VanillaX\entities\utils\trade\VillagerOffer;
 use CLADevs\VanillaX\entities\utils\trade\VillagerProfession;
 use CLADevs\VanillaX\entities\utils\trade\VillagerTradeNBTStream;
-use CLADevs\VanillaX\inventories\TradeInventory;
+use CLADevs\VanillaX\inventories\types\TradeInventory;
 use CLADevs\VanillaX\VanillaX;
 use pocketmine\item\ItemIds;
 use pocketmine\level\Level;

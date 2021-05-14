@@ -4,7 +4,7 @@ namespace CLADevs\VanillaX\blocks\types;
 
 use CLADevs\VanillaX\blocks\TileIdentifiers;
 use CLADevs\VanillaX\blocks\tiles\BeaconTile;
-use CLADevs\VanillaX\inventories\BeaconInventory;
+use CLADevs\VanillaX\inventories\types\BeaconInventory;
 use pocketmine\block\Block;
 use pocketmine\block\Transparent;
 use pocketmine\item\Item;

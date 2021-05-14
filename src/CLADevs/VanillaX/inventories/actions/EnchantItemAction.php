@@ -2,7 +2,7 @@
 
 namespace CLADevs\VanillaX\inventories\actions;
 
-use CLADevs\VanillaX\inventories\EnchantInventory;
+use CLADevs\VanillaX\inventories\types\EnchantInventory;
 use pocketmine\block\BlockIds;
 use pocketmine\inventory\transaction\action\InventoryAction;
 use pocketmine\item\Item;

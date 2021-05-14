@@ -2,7 +2,7 @@
 
 namespace CLADevs\VanillaX\blocks\types;
 
-use CLADevs\VanillaX\inventories\EnchantInventory;
+use CLADevs\VanillaX\inventories\types\EnchantInventory;
 use pocketmine\block\Block;
 use pocketmine\block\Transparent;
 use pocketmine\item\Item;

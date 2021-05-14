@@ -1,7 +1,8 @@
 <?php
 
-namespace CLADevs\VanillaX\inventories;
+namespace CLADevs\VanillaX\inventories\types;
 
+use CLADevs\VanillaX\inventories\FakeBlockInventory;
 use CLADevs\VanillaX\network\protocol\FilterTextPacketX;
 use pocketmine\block\BlockIds;
 use pocketmine\item\Item;
