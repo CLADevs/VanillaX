@@ -37,7 +37,8 @@ class InventoryManager{
         371 => ItemIds::REDSTONE_DUST,
         294 => ItemIds::NETHER_WART,
         328 => ItemIds::GUNPOWDER,
-        550 => ItemIds::DRAGON_BREATH
+        550 => ItemIds::DRAGON_BREATH,
+        414 => ItemIds::SUGAR
     ];
 
     /** @var PotionTypeRecipe[] */
@@ -102,7 +103,7 @@ class InventoryManager{
         $potion = $this->potionContainerRecipes[$input->getId() . ":" . $ingredient->getId()] ?? null;
 
         if($potion instanceof PotionContainerChangeRecipe){
-            return ItemFactory::get($potion->getOutputItemId(), 0, $input->getCount());
+            return ItemFactory::get($potion->getOutputItemId(), $input->getDamage(), $input->getCount());
         }
         return null;
     }

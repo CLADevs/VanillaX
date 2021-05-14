@@ -9,7 +9,7 @@ use CLADevs\VanillaX\entities\EntityManager;
 use CLADevs\VanillaX\inventories\InventoryManager;
 use CLADevs\VanillaX\items\ItemManager;
 use CLADevs\VanillaX\network\NetworkManager;
-use CLADevs\VanillaX\session\SessionManager;;
+use CLADevs\VanillaX\session\SessionManager;
 use pocketmine\block\BlockFactory;
 use pocketmine\plugin\PluginBase;
 use ReflectionException;
