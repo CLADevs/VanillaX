@@ -115,4 +115,8 @@ class VanillaX extends PluginBase{
     public function getInventoryManager(): InventoryManager{
         return $this->inventoryManager;
     }
+
+    public function getCommandManager(): CommandManager{
+        return $this->commandManager;
+    }
 }

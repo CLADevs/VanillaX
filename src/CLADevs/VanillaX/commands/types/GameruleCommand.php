@@ -3,6 +3,7 @@
 namespace CLADevs\VanillaX\commands\types;
 
 use CLADevs\VanillaX\commands\Command;
+use CLADevs\VanillaX\commands\CommandArgs;
 use CLADevs\VanillaX\network\GameRule;
 use pocketmine\command\CommandSender;
 use pocketmine\network\mcpe\protocol\GameRulesChangedPacket;
@@ -13,6 +14,18 @@ class GameruleCommand extends Command{
 
     public function __construct(){
         parent::__construct("gamerule", "Set or queries a game rule value.");
+        $this->commandArg = new CommandArgs(64, 1);
+        $key = $this->commandArg->addParameter(0, "rule", 3145760, false);
+        $this->commandArg->setEnum(0, $key, "BoolGameRule", ["commandblockoutput", "dodaylightcycle", "doentitydrops", "dofiretick", "domobloot", "domobspawning", "dotiledrops", "doweathercycle", "drowningdamage", "falldamage", "firedamage", "keepinventory", "mobgriefing", "pvp", "showcoordinates", "naturalregeneration", "tntexplodes", "sendcommandfeedback", "doinsomnia", "commandblocksenabled", "doimmediaterespawn", "showdeathmessages", "showtags"]);
+
+        $key = $this->commandArg->addParameter(0, "value", 3145733);
+        $this->commandArg->setEnum(0, $key, "Boolean", ["true", "false"]);
+
+        $key = $this->commandArg->addParameter(1, "rule", 3145761, false);
+        $this->commandArg->setEnum(1, $key, "IntGameRule", ["maxcommandchainlength", "randomtickspeed", "functioncommandlimit", "spawnradius"]);
+
+        $key = $this->commandArg->addParameter(1, "value", 1048577);
+        $this->commandArg->setEnum(1, $key, "int");
     }
 
     public function execute(CommandSender $sender, string $commandLabel, array $args): void{

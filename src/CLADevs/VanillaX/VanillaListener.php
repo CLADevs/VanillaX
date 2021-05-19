@@ -32,6 +32,7 @@ use pocketmine\event\player\PlayerToggleSneakEvent;
 use pocketmine\event\server\DataPacketReceiveEvent;
 use pocketmine\event\server\DataPacketSendEvent;
 use pocketmine\level\Position;
+use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
 use pocketmine\network\mcpe\protocol\CommandBlockUpdatePacket;
 use pocketmine\network\mcpe\protocol\ContainerClosePacket;
 use pocketmine\network\mcpe\protocol\InventoryTransactionPacket;
@@ -53,7 +54,20 @@ class VanillaListener implements Listener{
     public array $armorStandItemsQueue = [];
 
     public function handlePacketSend(DataPacketSendEvent $event): void{
-        //TODO command args
+        if(!$event->isCancelled()){
+            $packet = $event->getPacket();
+
+            if($packet instanceof AvailableCommandsPacket){
+                foreach(VanillaX::getInstance()->getCommandManager()->getCommands() as $key => $command){
+                    if(($arg = $command->getCommandArg()) !== null){
+                        $command = $packet->commandData[strtolower($key)];
+                        $command->flags = $arg->getFlags();
+                        $command->permission = $arg->getPermission();
+                        $command->overloads = $arg->getOverload();
+                    }
+                }
+            }
+        }
     }
 
     public function handlePacketReceive(DataPacketReceiveEvent $event): void{
