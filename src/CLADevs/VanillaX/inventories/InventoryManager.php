@@ -55,7 +55,7 @@ class InventoryManager{
         $reflection->setValue($craftingManager, $this->getCraftingDataPacket());
     }
 
-    private function getCraftingDataPacket(): ?BatchPacket{
+    private function getCraftingDataPacket(): BatchPacket{
         $batch = Server::getInstance()->getCraftingManager()->getCraftingDataPacket();
         $packet = null;
 

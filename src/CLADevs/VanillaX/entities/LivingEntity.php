@@ -3,6 +3,7 @@
 namespace CLADevs\VanillaX\entities;
 
 use CLADevs\VanillaX\entities\utils\EntityAgeable;
+use CLADevs\VanillaX\network\GameRule;
 use CLADevs\VanillaX\VanillaX;
 use pocketmine\entity\Entity;
 use pocketmine\entity\Living;
@@ -70,14 +71,14 @@ abstract class LivingEntity extends Living{
     public function getDrops(): array{
         $loot = [];
 
-        if($lootTable = VanillaX::getInstance()->getEntityManager()->getLootManager()->getLootTableFor($this->getLootName())){
-            foreach($lootTable->getPools() as $pool){
-                foreach($pool->getEntries() as $entry){
-                    $loot[] = $entry->apply($this->killer);
+        if(GameRule::getGameRuleValue(GameRule::DO_MOB_LOOT, $this->getLevel())){
+            if($lootTable = VanillaX::getInstance()->getEntityManager()->getLootManager()->getLootTableFor($this->getLootName())){
+                foreach($lootTable->getPools() as $pool){
+                    foreach($pool->getEntries() as $entry){
+                        $loot[] = $entry->apply($this->killer);
+                    }
                 }
             }
-        }else{
-           // var_dump("Unknown Loot table for: " . $this->getLootName());
         }
         return $loot;
     }
@@ -138,7 +139,7 @@ abstract class LivingEntity extends Living{
         $pk->position = $this->asVector3();
         $pk->motion = $this->getMotion();
         $pk->yaw = $this->yaw;
-        $pk->headYaw = $this->yaw; //TODO
+        $pk->headYaw = $this->yaw;
         $pk->pitch = $this->pitch;
         $pk->attributes = $this->attributeMap->getAll();
         $pk->metadata = $this->propertyManager->getAll();

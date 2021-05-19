@@ -5,6 +5,7 @@ namespace CLADevs\VanillaX\entities\object;
 use CLADevs\VanillaX\entities\utils\EntityInteractable;
 use CLADevs\VanillaX\entities\utils\EntityInteractResult;
 use CLADevs\VanillaX\items\ItemManager;
+use CLADevs\VanillaX\network\GameRule;
 use CLADevs\VanillaX\session\Session;
 use pocketmine\entity\Living;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
@@ -124,15 +125,18 @@ class ArmorStandEntity extends Living implements EntityInteractable{
     public function killArmorStand(): void{
         if(!$this->isFlaggedForDespawn()){
             $this->flagForDespawn();
-            $items = array_merge([ItemFactory::get(ItemIds::ARMOR_STAND)], $this->getArmorInventory()->getContents());
-            if(!$this->mainHand->isNull()){
-                $items[] = $this->mainHand;
-            }
-            if(!$this->offHand->isNull()){
-                $items[] = $this->offHand;
-            }
-            foreach($items as $item){
-                $this->getLevel()->dropItem($this->add(0.5, 0.5, 0.5), $item);
+
+            if(GameRule::getGameRuleValue(GameRule::DO_TILE_DROPS, $this->getLevel())){
+                $items = array_merge([ItemFactory::get(ItemIds::ARMOR_STAND)], $this->getArmorInventory()->getContents());
+                if(!$this->mainHand->isNull()){
+                    $items[] = $this->mainHand;
+                }
+                if(!$this->offHand->isNull()){
+                    $items[] = $this->offHand;
+                }
+                foreach($items as $item){
+                    $this->getLevel()->dropItem($this->add(0.5, 0.5, 0.5), $item);
+                }
             }
         }
     }

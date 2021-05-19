@@ -8,17 +8,25 @@ use CLADevs\VanillaX\entities\utils\EntityInteractable;
 use CLADevs\VanillaX\entities\utils\EntityInteractResult;
 use CLADevs\VanillaX\items\ItemManager;
 use CLADevs\VanillaX\items\types\ShieldItem;
+use CLADevs\VanillaX\network\GameRule;
 use CLADevs\VanillaX\session\Session;
 use pocketmine\block\BlockIds;
 use pocketmine\entity\Entity;
 use pocketmine\entity\Living;
 use pocketmine\entity\object\FallingBlock;
+use pocketmine\entity\object\PrimedTNT;
+use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\entity\EntityBlockChangeEvent;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
+use pocketmine\event\entity\EntityLevelChangeEvent;
+use pocketmine\event\entity\EntityRegainHealthEvent;
+use pocketmine\event\entity\EntitySpawnEvent;
 use pocketmine\event\inventory\InventoryTransactionEvent;
 use pocketmine\event\Listener;
+use pocketmine\event\player\PlayerDeathEvent;
 use pocketmine\event\player\PlayerInteractEvent;
+use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\event\player\PlayerToggleSneakEvent;
 use pocketmine\event\server\DataPacketReceiveEvent;
@@ -107,23 +115,45 @@ class VanillaListener implements Listener{
         $entity = $event->getEntity();
 
         VanillaX::getInstance()->getEnchantmentManager()->handleDamage($event);
-        if(!$event->isCancelled() && $event->getCause() === EntityDamageEvent::CAUSE_FALL){
-            if($entity instanceof Player){
-                $session = VanillaX::getInstance()->getSessionManager()->get($entity);
+        if(!$event->isCancelled()){
+            switch($event->getCause()){
+                case EntityDamageEvent::CAUSE_FALL:
+                    if(GameRule::getGameRuleValue(GameRule::FALL_DAMAGE, $entity->getLevel())){
+                        $event->setCancelled();
+                    }
+                    if($entity instanceof Player){
+                        $session = VanillaX::getInstance()->getSessionManager()->get($entity);
 
-                if($session->isGliding()){
-                    $event->setCancelled();
-                }else{
-                    if(($end = $session->getEndGlideTime()) !== null && ($start = $session->getStartGlideTime()) !== null){
-                        if(($end - $start) < 3){
+                        if($session->isGliding()){
                             $event->setCancelled();
+                        }else{
+                            if(($end = $session->getEndGlideTime()) !== null && ($start = $session->getStartGlideTime()) !== null){
+                                if(($end - $start) < 3){
+                                    $event->setCancelled();
+                                }
+                            }
                         }
                     }
-                }
+                    break;
+                case EntityDamageEvent::CAUSE_DROWNING:
+                    if(GameRule::getGameRuleValue(GameRule::DROWNING_DAMAGE, $entity->getLevel())){
+                        $event->setCancelled();
+                    }
+                    break;
+                case EntityDamageEvent::CAUSE_FIRE:
+                    if(GameRule::getGameRuleValue(GameRule::FIRE_DAMAGE, $entity->getLevel())){
+                        $event->setCancelled();
+                    }
+                    break;
             }
         }
         if(!$event->isCancelled() && $event instanceof EntityDamageByEntityEvent && $entity instanceof Player){
+            if(!GameRule::getGameRuleValue(GameRule::PVP, $entity->getLevel())){
+                $event->setCancelled();
+                return;
+            }
             $item = $entity->getInventory()->getItemInHand();
+
             if($item instanceof ShieldItem && $entity->isSneaking()){
                 $damager = $event->getDamager();
 
@@ -140,6 +170,10 @@ class VanillaListener implements Listener{
 
     public function onTransaction(InventoryTransactionEvent $event): void{
         VanillaX::getInstance()->getEnchantmentManager()->handleInventoryTransaction($event);
+    }
+
+    public function onJoin(PlayerJoinEvent $event): void{
+        GameRule::fixGameRule($event->getPlayer());
     }
 
     public function onQuit(PlayerQuitEvent $event): void{
@@ -193,6 +227,45 @@ class VanillaListener implements Listener{
                 $pk = Session::playSound($to->asVector3(), "random.anvil_land", 1, 1, true);
                 $to->getLevel()->broadcastPacketToViewers($to, $pk);
             }
+        }
+    }
+
+    public function onLevelChange(EntityLevelChangeEvent $event): void{
+        if(!$event->isCancelled()){
+            $entity = $event->getEntity();
+
+            if($entity instanceof Player){
+                GameRule::fixGameRule($entity, $event->getTarget());
+            }
+        }
+    }
+
+    public function onBreak(BlockBreakEvent $event): void{
+        if(!$event->isCancelled() && !GameRule::getGameRuleValue(GameRule::DO_TILE_DROPS, $event->getBlock()->getLevel())){
+            $event->setDrops([]);
+        }
+    }
+
+    public function onDeath(PlayerDeathEvent $event): void{
+        if(!GameRule::getGameRuleValue(GameRule::KEEP_INVENTORY, ($level = $event->getPlayer()->getLevel()))){
+            $event->setKeepInventory(true);
+        }
+        if(!GameRule::getGameRuleValue(GameRule::SHOW_DEATH_MESSAGES, $level)){
+            $event->setDeathMessage("");
+        }
+    }
+
+    public function onRegenerateHealth(EntityRegainHealthEvent $event): void{
+        if(!$event->isCancelled() && !GameRule::getGameRuleValue(GameRule::NATURAL_REGENERATION, $event->getEntity()->getLevel())){
+            $event->setCancelled();
+        }
+    }
+
+    public function onEntitySpawn(EntitySpawnEvent $event): void{
+        $entity = $event->getEntity();
+
+        if($entity instanceof PrimedTNT && !GameRule::getGameRuleValue(GameRule::TNT_EXPLODES, $entity->getLevel())){
+            $entity->flagForDespawn();
         }
     }
 }

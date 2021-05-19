@@ -3,7 +3,9 @@
 namespace CLADevs\VanillaX\entities;
 
 use CLADevs\VanillaX\entities\loot\LootManager;
+use CLADevs\VanillaX\entities\object\PaintingEntity;
 use CLADevs\VanillaX\entities\utils\trade\VillagerProfession;
+use CLADevs\VanillaX\items\utils\NonAutomaticCallItemTrait;
 use CLADevs\VanillaX\utils\Utils;
 use CLADevs\VanillaX\VanillaX;
 use pocketmine\entity\Entity;
@@ -24,15 +26,24 @@ class EntityManager{
             $this->initializeVillagerProfession();
             $this->lootManager->startup();
 
-            $disabledMobs = VanillaX::getInstance()->getConfig()->getNested("disabled.mobs", []);
             foreach(["object", "boss", "passive", "neutral", "monster", "projectile"] as $path){
-                Utils::callDirectory("entities" . DIRECTORY_SEPARATOR . $path, function (string $namespace)use($disabledMobs): void{
-                    if(!in_array($namespace::NETWORK_ID, $disabledMobs)){
-                        Entity::registerEntity($namespace, true);
+                Utils::callDirectory("entities" . DIRECTORY_SEPARATOR . $path, function (string $namespace): void{
+                    if(!isset(class_implements($namespace)[NonAutomaticCallItemTrait::class])){
+                        self::registerEntity($namespace);
                     }
                 });
             }
+            self::registerEntity(PaintingEntity::class, true, ['Painting', 'minecraft:painting']);
         }
+    }
+
+    public static function registerEntity(string $namespace, bool $force = true, array $saveNames = []): void{
+        $disabledMobs = VanillaX::getInstance()->getConfig()->getNested("disabled.mobs", []);
+
+        if(in_array($namespace::NETWORK_ID, $disabledMobs)){
+           return;
+        }
+        Entity::registerEntity($namespace, $force, $saveNames);
     }
 
     public function initializeVillagerProfession(): void{

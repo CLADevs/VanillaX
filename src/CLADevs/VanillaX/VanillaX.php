@@ -8,6 +8,7 @@ use CLADevs\VanillaX\enchantments\EnchantmentManager;
 use CLADevs\VanillaX\entities\EntityManager;
 use CLADevs\VanillaX\inventories\InventoryManager;
 use CLADevs\VanillaX\items\ItemManager;
+use CLADevs\VanillaX\network\GameRule;
 use CLADevs\VanillaX\network\NetworkManager;
 use CLADevs\VanillaX\session\SessionManager;
 use pocketmine\block\BlockFactory;
@@ -67,6 +68,12 @@ class VanillaX extends PluginBase{
         $this->networkManager->startup();
         $this->inventoryManager->startup();
         $this->getServer()->getPluginManager()->registerEvents(new VanillaListener(), $this);
+
+        foreach(GameRule::$gameRules as $rule){
+            foreach($this->getServer()->getLevels() as $level){
+                $rule->handleValue(GameRule::getGameRuleValue($rule->getName(), $level), $level);
+            }
+        }
     }
 
     public function getFile(): string{
