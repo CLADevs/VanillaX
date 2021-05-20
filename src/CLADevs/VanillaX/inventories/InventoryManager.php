@@ -8,7 +8,6 @@ use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
 use pocketmine\network\mcpe\protocol\BatchPacket;
 use pocketmine\network\mcpe\protocol\CraftingDataPacket;
-use pocketmine\network\mcpe\protocol\PacketPool;
 use pocketmine\network\mcpe\protocol\types\PotionContainerChangeRecipe;
 use pocketmine\network\mcpe\protocol\types\PotionTypeRecipe;
 use pocketmine\Server;
@@ -56,37 +55,44 @@ class InventoryManager{
     }
 
     private function getCraftingDataPacket(): BatchPacket{
-        $batch = Server::getInstance()->getCraftingManager()->getCraftingDataPacket();
-        $packet = null;
+        Timings::$craftingDataCacheRebuildTimer->startTiming();
+        $manager = Server::getInstance()->getCraftingManager();
+        $pk = new CraftingDataPacket();
+        $pk->cleanRecipes = true;
 
-        foreach($batch->getPackets() as $buff){
-            $pk = PacketPool::getPacket($buff);
-
-            if($pk instanceof CraftingDataPacket){
-                $packet = clone $pk;
-                break;
+        foreach($manager->getShapelessRecipes() as $list){
+            foreach($list as $recipe){
+                $pk->addShapelessRecipe($recipe);
             }
         }
-        if($packet instanceof CraftingDataPacket){
-            Timings::$craftingDataCacheRebuildTimer->startTiming();
-            foreach(json_decode(file_get_contents(Utils::getResourceFile("brewing_recipes.json")), true) as $key => $i){
-                $packet->potionTypeRecipes[] = new PotionTypeRecipe($i[0], $i[1], $i[2], $i[3], $i[4], $i[5]);
-                $potion = new PotionTypeRecipe(self::convertPotionId($i[0]), self::convertPotionId($i[1]), self::convertPotionId($i[2]), self::convertPotionId($i[3]), self::convertPotionId($i[4]), self::convertPotionId($i[5]));
-                $this->potionTypeRecipes[$potion->getInputItemId() . ":" . $potion->getInputItemMeta() . ":" . $potion->getIngredientItemId() . ":" . $potion->getIngredientItemMeta()] = clone $potion;
+        foreach($manager->getShapedRecipes() as $list){
+            foreach($list as $recipe){
+                $pk->addShapedRecipe($recipe);
             }
-            foreach([[424 ,328 ,551] ,[551 ,550 ,552]] as $key => $i){
-                $packet->potionContainerRecipes[] = new PotionContainerChangeRecipe($i[0], $i[1], $i[2]);
-                $potion = new PotionContainerChangeRecipe(self::convertPotionId($i[0]), self::convertPotionId($i[1]), self::convertPotionId($i[2]));
-                $this->potionContainerRecipes[$potion->getInputItemId() . ":" . $potion->getIngredientItemId()] = clone $potion;
-            }
-            $packet->encode();
-
-            $batch = new BatchPacket();
-            $batch->addPacket($packet);
-            $batch->setCompressionLevel(Server::getInstance()->networkCompressionLevel);
-            $batch->encode();
-            Timings::$craftingDataCacheRebuildTimer->stopTiming();
         }
+
+        foreach($manager->getFurnaceRecipes() as $recipe){
+            $pk->addFurnaceRecipe($recipe);
+        }
+
+        foreach(json_decode(file_get_contents(Utils::getResourceFile("brewing_recipes.json")), true) as $key => $i){
+            $pk->potionTypeRecipes[] = new PotionTypeRecipe($i[0], $i[1], $i[2], $i[3], $i[4], $i[5]);
+            $potion = new PotionTypeRecipe(self::convertPotionId($i[0]), self::convertPotionId($i[1]), self::convertPotionId($i[2]), self::convertPotionId($i[3]), self::convertPotionId($i[4]), self::convertPotionId($i[5]));
+            $this->potionTypeRecipes[$potion->getInputItemId() . ":" . $potion->getInputItemMeta() . ":" . $potion->getIngredientItemId() . ":" . $potion->getIngredientItemMeta()] = clone $potion;
+        }
+
+        foreach([[424 ,328 ,551] ,[551 ,550 ,552]] as $key => $i){
+            $pk->potionContainerRecipes[] = new PotionContainerChangeRecipe($i[0], $i[1], $i[2]);
+            $potion = new PotionContainerChangeRecipe(self::convertPotionId($i[0]), self::convertPotionId($i[1]), self::convertPotionId($i[2]));
+            $this->potionContainerRecipes[$potion->getInputItemId() . ":" . $potion->getIngredientItemId()] = clone $potion;
+        }
+        $pk->encode();
+
+        $batch = new BatchPacket();
+        $batch->addPacket($pk);
+        $batch->setCompressionLevel(Server::getInstance()->networkCompressionLevel);
+        $batch->encode();
+        Timings::$craftingDataCacheRebuildTimer->stopTiming();
         return $batch;
     }
 

@@ -46,6 +46,17 @@
 - Firework Rocket
 - Firework Star
 
+#### Features:
+- Weather
+
+#### TODO Features:
+- More Biomes in Normal World
+- Nether
+- Portal
+- End Portal
+- Farming System
+- Redstone System
+
 #### Installation
 -  [poggit](https://poggit.pmmp.io/ci/CLADevs/VanillaX) or [github](https://github.com/CLADevs/VanillaX)
 

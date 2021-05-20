@@ -31,7 +31,9 @@ class NetworkInventoryActionX extends NetworkInventoryAction{
         
         switch($this->sourceType){
             case self::SOURCE_CONTAINER:
+                $otherInventory = true;
                 if($this->windowId === 124){
+
                     if(array_key_exists($this->inventorySlot, UIInventorySlotOffset::ANVIL)){
                         //Anvil
                         $window = $player->getWindow(WindowTypes::ANVIL);
@@ -41,6 +43,7 @@ class NetworkInventoryActionX extends NetworkInventoryAction{
                         }
                         $this->windowId = WindowTypes::ANVIL;
                         $this->inventorySlot = UIInventorySlotOffset::ANVIL[$this->inventorySlot];
+                        $otherInventory = false;
                     }elseif(array_key_exists($this->inventorySlot, UIInventorySlotOffset::ENCHANTING_TABLE)){
                         //Enchantment Table
                         $window = $player->getWindow(WindowTypes::ENCHANTMENT);
@@ -50,9 +53,10 @@ class NetworkInventoryActionX extends NetworkInventoryAction{
                         }
                         $this->windowId = WindowTypes::ENCHANTMENT;
                         $this->inventorySlot = UIInventorySlotOffset::ENCHANTING_TABLE[$this->inventorySlot];
+                        $otherInventory = false;
                     }
                 }
-                if(($window = $player->getWindow($this->windowId)) != null){
+                if(!$otherInventory && ($window = $player->getWindow($this->windowId)) != null){
                     return new SlotChangeAction($window, $this->inventorySlot, $oldItem, $newItem);
                 }
                 break;
