@@ -2,7 +2,7 @@
 
 namespace CLADevs\VanillaX\blocks\types;
 
-use CLADevs\VanillaX\network\GameRule;
+use CLADevs\VanillaX\network\gamerules\GameRule;
 use pocketmine\block\Fire;
 
 class FireBlock extends Fire{

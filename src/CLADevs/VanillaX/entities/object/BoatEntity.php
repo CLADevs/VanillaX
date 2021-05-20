@@ -4,7 +4,7 @@ namespace CLADevs\VanillaX\entities\object;
 
 use CLADevs\VanillaX\entities\utils\EntityInteractable;
 use CLADevs\VanillaX\entities\utils\EntityInteractResult;
-use CLADevs\VanillaX\network\GameRule;
+use CLADevs\VanillaX\network\gamerules\GameRule;
 use pocketmine\entity\Entity;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;

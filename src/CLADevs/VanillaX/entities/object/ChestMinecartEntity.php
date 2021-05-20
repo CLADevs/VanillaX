@@ -6,7 +6,7 @@ use CLADevs\VanillaX\entities\utils\EntityContainer;
 use CLADevs\VanillaX\entities\utils\EntityInteractable;
 use CLADevs\VanillaX\entities\utils\EntityInteractResult;
 use CLADevs\VanillaX\inventories\FakeBlockInventory;
-use CLADevs\VanillaX\network\GameRule;
+use CLADevs\VanillaX\network\gamerules\GameRule;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;

@@ -3,7 +3,7 @@
 namespace CLADevs\VanillaX\entities;
 
 use CLADevs\VanillaX\entities\utils\EntityAgeable;
-use CLADevs\VanillaX\network\GameRule;
+use CLADevs\VanillaX\network\gamerules\GameRule;
 use CLADevs\VanillaX\VanillaX;
 use pocketmine\entity\Entity;
 use pocketmine\entity\Living;

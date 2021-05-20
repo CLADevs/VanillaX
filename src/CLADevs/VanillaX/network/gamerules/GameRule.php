@@ -1,8 +1,7 @@
 <?php
 
-namespace CLADevs\VanillaX\network;
+namespace CLADevs\VanillaX\network\gamerules;
 
-use CLADevs\VanillaX\network\gamerules\DoDayLightCycleRule;
 use pocketmine\level\format\io\BaseLevelProvider;
 use pocketmine\level\Level;
 use pocketmine\nbt\tag\ByteTag;
@@ -136,9 +135,10 @@ class GameRule{
     /**
      * @param string $name
      * @param Level $level
-     * @return bool|int|null
+     * @param bool $stringify
+     * @return bool|int|string|null
      */
-    public static function getGameRuleValue(string $name, Level $level){
+    public static function getGameRuleValue(string $name, Level $level, bool $stringify = false){
         $name = strtolower($name);
         $rule = self::$gameRules[$name] ?? null;
         $provider = $level->getProvider();
@@ -147,8 +147,14 @@ class GameRule{
             $tag = $provider->getLevelData()->getTag("GameRules")->getValue()[$rule->getName()] ?? null;
 
             if($tag instanceof NamedTag){
+                if($stringify && $tag instanceof ByteTag){
+                    return boolval($tag->getValue()) ? "true" : "false";
+                }
                 return $tag instanceof ByteTag ? boolval($tag->getValue()) : intval($tag->getValue());
             }
+        }
+        if($stringify && is_bool($rule->getValue())){
+            return $rule->getValue() ? "true" : "false";
         }
         return $rule === null ? null : $rule->getValue();
     }

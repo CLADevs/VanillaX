@@ -8,7 +8,7 @@ use CLADevs\VanillaX\entities\utils\EntityInteractable;
 use CLADevs\VanillaX\entities\utils\EntityInteractResult;
 use CLADevs\VanillaX\items\ItemManager;
 use CLADevs\VanillaX\items\types\ShieldItem;
-use CLADevs\VanillaX\network\GameRule;
+use CLADevs\VanillaX\network\gamerules\GameRule;
 use CLADevs\VanillaX\session\Session;
 use pocketmine\block\BlockIds;
 use pocketmine\entity\Entity;
@@ -23,6 +23,8 @@ use pocketmine\event\entity\EntityLevelChangeEvent;
 use pocketmine\event\entity\EntityRegainHealthEvent;
 use pocketmine\event\entity\EntitySpawnEvent;
 use pocketmine\event\inventory\InventoryTransactionEvent;
+use pocketmine\event\level\LevelLoadEvent;
+use pocketmine\event\level\LevelUnloadEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerDeathEvent;
 use pocketmine\event\player\PlayerInteractEvent;
@@ -187,7 +189,11 @@ class VanillaListener implements Listener{
     }
 
     public function onJoin(PlayerJoinEvent $event): void{
-        GameRule::fixGameRule($event->getPlayer());
+        $player = $event->getPlayer();
+        $weather = VanillaX::getInstance()->getWeatherManager();
+
+        GameRule::fixGameRule($player);
+        if($weather->isRaining($player->getLevel())) $weather->sendWeather($player, $weather->isThundering($player->getLevel()));
     }
 
     public function onQuit(PlayerQuitEvent $event): void{
@@ -247,10 +253,28 @@ class VanillaListener implements Listener{
     public function onLevelChange(EntityLevelChangeEvent $event): void{
         if(!$event->isCancelled()){
             $entity = $event->getEntity();
+            $previous = $event->getOrigin();
+            $target = $event->getTarget();
+            $weather = VanillaX::getInstance()->getWeatherManager();
+            $previousWeather = $weather->getWeather($previous);
+            $targetWeather = $weather->getWeather($target);
 
             if($entity instanceof Player){
-                GameRule::fixGameRule($entity, $event->getTarget());
+                GameRule::fixGameRule($entity, $target);
+                if($previousWeather->isRaining() && !$targetWeather->isRaining()){
+                    $weather->sendClear($entity);
+                }
             }
+        }
+    }
+
+    public function onLevelLoad(LevelLoadEvent $event): void{
+        VanillaX::getInstance()->getWeatherManager()->addWeather($event->getLevel());
+    }
+
+    public function onLevelUnload(LevelUnloadEvent $event): void{
+        if(!$event->isCancelled()){
+            VanillaX::getInstance()->getWeatherManager()->removeWeather($event->getLevel());
         }
     }
 

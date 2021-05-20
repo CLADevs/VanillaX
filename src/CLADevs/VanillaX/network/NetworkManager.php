@@ -2,6 +2,7 @@
 
 namespace CLADevs\VanillaX\network;
 
+use CLADevs\VanillaX\network\gamerules\GameRule;
 use CLADevs\VanillaX\network\protocol\ActorEventPacketX;
 use CLADevs\VanillaX\network\protocol\AnvilDamagePacketX;
 use CLADevs\VanillaX\network\protocol\CommandBlockUpdatePacketX;

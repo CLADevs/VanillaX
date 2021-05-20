@@ -8,9 +8,10 @@ use CLADevs\VanillaX\enchantments\EnchantmentManager;
 use CLADevs\VanillaX\entities\EntityManager;
 use CLADevs\VanillaX\inventories\InventoryManager;
 use CLADevs\VanillaX\items\ItemManager;
-use CLADevs\VanillaX\network\GameRule;
+use CLADevs\VanillaX\network\gamerules\GameRule;
 use CLADevs\VanillaX\network\NetworkManager;
 use CLADevs\VanillaX\session\SessionManager;
+use CLADevs\VanillaX\weather\WeatherManager;
 use pocketmine\block\BlockFactory;
 use pocketmine\plugin\PluginBase;
 use ReflectionException;
@@ -28,6 +29,7 @@ class VanillaX extends PluginBase{
     private CommandManager $commandManager;
     private NetworkManager $networkManager;
     private InventoryManager $inventoryManager;
+    private WeatherManager $weatherManager;
 
     public function onLoad(): void{
         $this->saveDefaultConfig();
@@ -40,6 +42,7 @@ class VanillaX extends PluginBase{
         $this->commandManager = new CommandManager();
         $this->networkManager = new NetworkManager();
         $this->inventoryManager = new InventoryManager();
+        $this->weatherManager = new WeatherManager();
     }
 
     /**
@@ -67,6 +70,7 @@ class VanillaX extends PluginBase{
         $this->commandManager->startup();
         $this->networkManager->startup();
         $this->inventoryManager->startup();
+        $this->weatherManager->startup();
         $this->getServer()->getPluginManager()->registerEvents(new VanillaListener(), $this);
 
         foreach(GameRule::$gameRules as $rule){
@@ -118,5 +122,9 @@ class VanillaX extends PluginBase{
 
     public function getCommandManager(): CommandManager{
         return $this->commandManager;
+    }
+
+    public function getWeatherManager(): WeatherManager{
+        return $this->weatherManager;
     }
 }

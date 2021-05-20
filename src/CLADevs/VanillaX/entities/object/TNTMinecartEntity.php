@@ -2,7 +2,7 @@
 
 namespace CLADevs\VanillaX\entities\object;
 
-use CLADevs\VanillaX\network\GameRule;
+use CLADevs\VanillaX\network\gamerules\GameRule;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
 

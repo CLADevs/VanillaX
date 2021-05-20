@@ -1,0 +1,142 @@
+<?php
+
+namespace CLADevs\VanillaX\weather;
+
+use CLADevs\VanillaX\entities\object\LightningBoltEntity;
+use CLADevs\VanillaX\VanillaX;
+use pocketmine\level\Level;
+use pocketmine\math\Vector3;
+use pocketmine\network\mcpe\protocol\LevelEventPacket;
+use pocketmine\Player;
+use pocketmine\scheduler\ClosureTask;
+use pocketmine\Server;
+
+class WeatherManager{
+
+    /** @var Weather[] */
+    private array $weathers = [];
+
+    public function startup(): void{
+        foreach(Server::getInstance()->getLevels() as $level) $this->addWeather($level);
+        VanillaX::getInstance()->getScheduler()->scheduleRepeatingTask(new ClosureTask(function(): void{
+            foreach($this->weathers as $weather){
+                if($weather->isRaining()){
+                    $weather->duration--;
+
+                    if($weather->duration < 1){
+                        $weather->stopStorm();
+                    }elseif($weather->isThundering() && mt_rand(1, 10) === 0){
+                        $players = Server::getInstance()->getOnlinePlayers();
+
+                        if(count($players) >= 1){
+                            $random = $players[array_rand($players)];
+                            $pos = $random->add(mt_rand(0, 15), mt_rand(0, 15));
+                            $entity = new LightningBoltEntity($weather->getLevel(), LightningBoltEntity::createBaseNBT($pos));
+                            $entity->spawnToAll();
+                        }
+                    }
+                }else{
+                    $weather->delayDuration--;
+
+                    if($weather->delayDuration < 1){
+                        $weather->startStorm();
+                    }
+                }
+                $weather->saveData();
+            }
+        }), 20);
+    }
+
+    public function addWeather(Level $level): void{
+        $this->weathers[strtolower($level->getFolderName())] = new Weather($level);
+    }
+
+    public function removeWeather(Level $level): void{
+        if(isset($this->weathers[strtolower($level->getFolderName())])){
+            unset($this->weathers[strtolower($level->getFolderName())]);
+        }
+    }
+
+    /**
+     * @param Level|string $level
+     * @return Weather|null
+     */
+    public function getWeather($level): ?Weather{
+        if($level instanceof Level){
+            $level = $level->getFolderName();
+        }
+        return $this->weathers[strtolower($level)];
+    }
+
+    public function isRaining(Level $level, bool $checkThunder = true): bool{
+        $weather = $this->weathers[strtolower($level->getFolderName())] ?? null;
+
+        if($weather !== null){
+            return $weather->isRaining() ? true : ($checkThunder ? $weather->isThundering() : false);
+        }
+        return false;
+    }
+
+    public function isThundering(Level $level): bool{
+        $weather = $this->weathers[strtolower($level->getFolderName())] ?? null;
+
+        if($weather !== null && $weather->isThundering()){
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @param Player[]|Player|null $player
+     * @param bool $thunder
+     */
+    public function sendClear($player = null, bool $thunder = false): void{
+        if($player === null){
+            $player = Server::getInstance()->getOnlinePlayers();
+        }elseif($player instanceof Player){
+            $player = [$player];
+        }
+        foreach($player as $p){
+            $pk = new LevelEventPacket();
+            $pk->evid = LevelEventPacket::EVENT_STOP_RAIN;
+            $pk->data = 0;
+            $pk->position = new Vector3(0, 0, 0);
+            $p->dataPacket($pk);
+
+            if($thunder){
+                $pk = new LevelEventPacket();
+                $pk->evid = LevelEventPacket::EVENT_STOP_THUNDER;
+                $pk->data = 0;
+                $pk->position = new Vector3(0, 0, 0);
+                $p->dataPacket($pk);
+            }
+        }
+    }
+
+    /**
+     * @param Player[]|Player|null $player
+     * @param bool $thunder
+     */
+    public function sendWeather($player = null, bool $thunder = false): void{
+        if($player === null){
+            $player = Server::getInstance()->getOnlinePlayers();
+        }elseif($player instanceof Player){
+            $player = [$player];
+        }
+        foreach($player as $p){
+            $pk = new LevelEventPacket();
+            $pk->evid = LevelEventPacket::EVENT_START_RAIN;
+            $pk->data = 65535;
+            $pk->position = new Vector3(0, 0, 0);
+            $p->dataPacket($pk);
+
+            if($thunder){
+                $pk = new LevelEventPacket();
+                $pk->evid = LevelEventPacket::EVENT_START_THUNDER;
+                $pk->data = 65535;
+                $pk->position = new Vector3(0, 0, 0);
+                $p->dataPacket($pk);
+            }
+        }
+    }
+}

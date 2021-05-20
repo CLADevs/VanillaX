@@ -3,7 +3,7 @@
 namespace CLADevs\VanillaX\entities\object;
 
 use CLADevs\VanillaX\items\utils\NonAutomaticCallItemTrait;
-use CLADevs\VanillaX\network\GameRule;
+use CLADevs\VanillaX\network\gamerules\GameRule;
 use pocketmine\block\Block;
 use pocketmine\block\BlockFactory;
 use pocketmine\entity\object\Painting;

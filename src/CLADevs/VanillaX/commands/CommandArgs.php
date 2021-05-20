@@ -58,6 +58,9 @@ class CommandArgs{
         return true;
     }
 
+    /**
+     * @return CommandParameter[]
+     */
     public function getOverload(): array{
         return $this->parameters;
     }

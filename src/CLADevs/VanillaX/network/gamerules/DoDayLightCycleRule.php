@@ -2,7 +2,6 @@
 
 namespace CLADevs\VanillaX\network\gamerules;
 
-use CLADevs\VanillaX\network\GameRule;
 use pocketmine\level\Level;
 
 class DoDayLightCycleRule extends GameRule{
