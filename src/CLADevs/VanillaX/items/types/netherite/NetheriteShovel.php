@@ -18,4 +18,8 @@ class NetheriteShovel extends Shovel{
     public function getMaxDurability(): int{
         return 2032;
     }
+
+    protected function getBaseMiningEfficiency(): float{
+        return 9;
+    }
 }

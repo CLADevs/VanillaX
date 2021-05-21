@@ -33,7 +33,6 @@ class NetworkInventoryActionX extends NetworkInventoryAction{
             case self::SOURCE_CONTAINER:
                 $otherInventory = true;
                 if($this->windowId === 124){
-
                     if(array_key_exists($this->inventorySlot, UIInventorySlotOffset::ANVIL)){
                         //Anvil
                         $window = $player->getWindow(WindowTypes::ANVIL);
