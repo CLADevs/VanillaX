@@ -11,6 +11,7 @@ use pocketmine\command\CommandSender;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
 use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
+use pocketmine\network\mcpe\protocol\types\PlayerPermissions;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
@@ -18,14 +19,11 @@ class ClearCommand extends Command{
 
     public function __construct(){
         parent::__construct("clear", "Clears items from player inventory.");
-        $this->commandArg = new CommandArgs(0, 1);
-        $this->commandArg->addParameter(0, "player", AvailableCommandsPacket::ARG_FLAG_VALID | AvailableCommandsPacket::ARG_TYPE_TARGET);
-
-        $key = $this->commandArg->addParameter(0, "itemName", 3145738);
-        $this->commandArg->setEnum(0, $key, "Item", json_decode(file_get_contents(Utils::getResourceFile("command_items.json"))));
-
-        $this->commandArg->addParameter(0, "data", 1048577);
-        $this->commandArg->addParameter(0, "maxCount", 1048577);
+        $this->commandArg = new CommandArgs(CommandArgs::FLAG_NORMAL, PlayerPermissions::MEMBER);
+        $this->commandArg->addParameter(0, "player", AvailableCommandsPacket::ARG_TYPE_TARGET);
+        $this->commandArg->addParameter(0, "itemName", AvailableCommandsPacket::ARG_FLAG_ENUM | 0x9, true, "Item", json_decode(file_get_contents(Utils::getResourceFile("command_items.json"))));
+        $this->commandArg->addParameter(0, "data", AvailableCommandsPacket::ARG_TYPE_INT);
+        $this->commandArg->addParameter(0, "maxCount", AvailableCommandsPacket::ARG_TYPE_INT);
     }
 
     public function execute(CommandSender $sender, string $commandLabel, array $args): void{

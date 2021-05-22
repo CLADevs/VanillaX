@@ -4,9 +4,10 @@ namespace CLADevs\VanillaX\commands\types;
 
 use CLADevs\VanillaX\commands\Command;
 use CLADevs\VanillaX\commands\CommandArgs;
-use CLADevs\VanillaX\entities\object\LightningBoltEntity;
 use CLADevs\VanillaX\VanillaX;
 use pocketmine\command\CommandSender;
+use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
+use pocketmine\network\mcpe\protocol\types\PlayerPermissions;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
@@ -14,15 +15,12 @@ class WeatherCommand extends Command{
 
     public function __construct(){
         parent::__construct("weather", "Sets the weather.");
-        $this->commandArg = new CommandArgs(0, 1);
-        $key = $this->commandArg->addParameter(0, "clear", 3145837, false);
-        $this->commandArg->setEnum(0, $key, "rain: thunder", ["clear", "rain", "thunder"]);
-
-        $key = $this->commandArg->addParameter(0, "duration", 1048577);
-        $this->commandArg->setEnum(0, $key, "int");
-
-        $key = $this->commandArg->addParameter(1, "query", 3145838, false);
-        $this->commandArg->setEnum(1, $key, "WeatherQuery", ["query"]);
+        $this->commandArg = new CommandArgs(CommandArgs::FLAG_NORMAL, PlayerPermissions::MEMBER);
+        /** First Column */
+        $this->commandArg->addParameter(0, "clear", AvailableCommandsPacket::ARG_FLAG_ENUM | 0x69 | 0x4, false, "rain: thunder", ["clear", "rain", "thunder"]);
+        $this->commandArg->addParameter(0, "duration", AvailableCommandsPacket::ARG_TYPE_INT);
+        /** Second Column */
+        $this->commandArg->addParameter(1, "query", AvailableCommandsPacket::ARG_FLAG_ENUM | 0x68 | 0x6, false, "WeatherQuery", ["query"]);
     }
 
     public function execute(CommandSender $sender, string $commandLabel, array $args): void{
@@ -66,7 +64,6 @@ class WeatherCommand extends Command{
                 return;
             default:
                 $this->sendSyntaxError($sender, $type, "/$commandLabel", $type);
-                return;
-        };
+        }
     }
 }
