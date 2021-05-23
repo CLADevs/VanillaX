@@ -32,7 +32,7 @@ features:
   #Disables weather including /weather
   weather: true
   #Disables gamerule and removes command /gamerule
-  gamerule: true
+  gamerule: false
 
 #if this is true and gamerule feature is off, it will delete previous game rule.
 gamerule-remove-cache: true

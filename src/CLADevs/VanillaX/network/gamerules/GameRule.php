@@ -109,6 +109,7 @@ class GameRule{
                             }elseif($rule->getType() === self::TYPE_INT && $tag instanceof IntTag){
                                 $nbt->removeTag($rule->getName());
                             }
+                            $provider->saveLevelData();
                         }
                     }
                 }
