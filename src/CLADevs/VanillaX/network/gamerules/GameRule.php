@@ -105,6 +105,7 @@ class GameRule{
         if($provider instanceof BaseLevelProvider){
             /** @var CompoundTag $nbt */
             $nbt = $provider->getLevelData()->getTag("GameRules");
+            if($nbt->hasTag($rule->getName())) $nbt->removeTag($rule->getName());
             if(is_bool($value)){
                 $nbt->setByte($rule->getName(), $value);
             }else{

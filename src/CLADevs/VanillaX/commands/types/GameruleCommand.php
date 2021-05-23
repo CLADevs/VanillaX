@@ -74,6 +74,6 @@ class GameruleCommand extends Command{
         }
         GameRule::setGameRule($sender->getLevel(), $gameRule, $value);
         $gameRule->handleValue($value, $sender->getLevel());
-        $sender->sendMessage("Game rule " . strtolower($gameRule->getName()) . " has been updated to " . $value);
+        $sender->sendMessage("Game rule " . strtolower($gameRule->getName()) . " has been updated to " . $args[1]);
     }
 }
