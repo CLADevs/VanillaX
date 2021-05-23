@@ -10,13 +10,50 @@
 - Anvil
 - Brewing Stand
 
-#### WIP Blocks:
+#### TODO Blocks:
 - Hopper
 - Command Block
+- Ancient Debris
+- Bamboo
+- Barrel
+- Barrier
+- Basalt
+- Bee Hive
+- Bee Nest
+- Bell
+- Bubble Coral
+- Bubble Coral Block
+- Bubble Coral Fan
+- Campfire (Soul Too)
+- Pumpkins
+- Chain
+- Chiseled Blocks (every)
+- Cracked Blocks (every)
+- Warped Blocks (every)
+- Crimson (every)
+- Kelp (every)
+- Blackstone (every)
+- Conduit
+- Crying Obsidian
+- Cartography
+- Fletching
+- Honey Blocks
+- Lantern (Soul Too)
+- Lectern
+- Smithing
+- Smoker
+- Nether Gold Ore
+- Nether Sprouts
+- Soul (Fire, Soil, Torch)
+- Stonecutter Block
+- Stripped Blocks (every)
+- Sweet Berry (every)
+- Turtle Egg
+- Twisting Vines
+- Shulker Box
 
 #### Entities:
 - All Minecraft Entities (Not functional)
-
 
 #### Items:
 - Elytra
@@ -56,6 +93,7 @@
 - End Portal
 - Farming System
 - Redstone System
+- Offhand
 
 #### Installation
 -  [poggit](https://poggit.pmmp.io/ci/CLADevs/VanillaX) or [github](https://github.com/CLADevs/VanillaX)

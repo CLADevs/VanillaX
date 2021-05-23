@@ -5,6 +5,7 @@ namespace CLADevs\VanillaX\commands\types;
 use CLADevs\VanillaX\commands\Command;
 use CLADevs\VanillaX\commands\CommandArgs;
 use CLADevs\VanillaX\network\gamerules\GameRule;
+use CLADevs\VanillaX\VanillaX;
 use pocketmine\command\CommandSender;
 use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
 use pocketmine\network\mcpe\protocol\GameRulesChangedPacket;
@@ -26,6 +27,10 @@ class GameruleCommand extends Command{
         /** Second Column */
         $this->commandArg->addParameter(1, "rule", AvailableCommandsPacket::ARG_FLAG_ENUM | 0x21, false, "IntGameRule", ["maxcommandchainlength", "randomtickspeed", "functioncommandlimit", "spawnradius"]);
         $this->commandArg->addParameter(1, "value", AvailableCommandsPacket::ARG_TYPE_INT);
+    }
+
+    public function canRegister(): bool{
+        return boolval(VanillaX::getInstance()->getConfig()->getNested("features.gamerule", true));
     }
 
     public function execute(CommandSender $sender, string $commandLabel, array $args): void{

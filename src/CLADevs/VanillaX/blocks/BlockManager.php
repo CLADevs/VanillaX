@@ -10,10 +10,12 @@ use CLADevs\VanillaX\blocks\tiles\DropperTile;
 use CLADevs\VanillaX\blocks\tiles\HopperTile;
 use CLADevs\VanillaX\blocks\tiles\JukeboxTile;
 use CLADevs\VanillaX\blocks\tiles\MobSpawnerTile;
+use CLADevs\VanillaX\blocks\tiles\ShulkerBoxTile;
 use CLADevs\VanillaX\blocks\types\CommandBlock;
 use CLADevs\VanillaX\blocks\types\redstone\RedstoneComparator;
 use CLADevs\VanillaX\blocks\types\redstone\RedstoneLamp;
 use CLADevs\VanillaX\blocks\types\redstone\RedstoneRepeater;
+use CLADevs\VanillaX\blocks\types\ShulkerBoxBlock;
 use CLADevs\VanillaX\items\utils\NonAutomaticCallItemTrait;
 use CLADevs\VanillaX\items\utils\NonCreativeItemTrait;
 use CLADevs\VanillaX\utils\Utils;
@@ -37,6 +39,9 @@ class BlockManager{
         $this->initializeTiles();
     }
 
+    /**
+     * @throws ReflectionException
+     */
     public function initializeBlocks(): void{
         Utils::callDirectory("blocks" . DIRECTORY_SEPARATOR . "types", function (string $namespace): void{
             if(!isset(class_implements($namespace)[NonAutomaticCallItemTrait::class])){
@@ -58,6 +63,8 @@ class BlockManager{
         foreach([BlockIds::COMMAND_BLOCK, BlockIds::REPEATING_COMMAND_BLOCK, BlockIds::CHAIN_COMMAND_BLOCK] as $block){
             self::registerBlock(new CommandBlock($block), true);
         }
+        self::registerBlock(new ShulkerBoxBlock(BlockIds::SHULKER_BOX));
+        self::registerBlock(new ShulkerBoxBlock(BlockIds::UNDYED_SHULKER_BOX, 0, "Shulker Box"));
     }
 
     /**
@@ -72,6 +79,7 @@ class BlockManager{
         self::registerTile(DispenserTile::class, [TileIdentifiers::DISPENSER, "minecraft:dispenser"], BlockIds::DISPENSER);
         self::registerTile(DropperTile::class, [TileIdentifiers::DROPPER, "minecraft:dropper"], BlockIds::DROPPER);
         self::registerTile(BrewingStandTile::class, [Tile::BREWING_STAND, "minecraft:brewing_stand"], BlockIds::BREWING_STAND_BLOCK);
+        self::registerTile(ShulkerBoxTile::class, [TileIdentifiers::SHULKER_BOX, "minecraft:shulker_box"], [BlockIds::SHULKER_BOX, BlockIds::UNDYED_SHULKER_BOX]);
         //TODO Tile::registerTile(StoneCutterTile::class, [TileIdentifiers::STONECUTTER, "minecraft:stonecutter"]);
     }
 

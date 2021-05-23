@@ -2,13 +2,16 @@
 
 namespace CLADevs\VanillaX\network\gamerules;
 
+use CLADevs\VanillaX\VanillaX;
 use pocketmine\level\format\io\BaseLevelProvider;
 use pocketmine\level\Level;
 use pocketmine\nbt\tag\ByteTag;
 use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\nbt\tag\IntTag;
 use pocketmine\nbt\tag\NamedTag;
 use pocketmine\network\mcpe\protocol\GameRulesChangedPacket;
 use pocketmine\Player;
+use pocketmine\Server;
 
 class GameRule{
 
@@ -88,6 +91,29 @@ class GameRule{
         self::register(new GameRule(self::SPAWN_RADIUS, 5, self::TYPE_INT)); //TODO
         self::register(new GameRule(self::TNT_EXPLODES, true));
         self::register(new GameRule(self::SHOW_TAGS, true)); //TODO
+
+        if(!self::isGameRuleAllow() && VanillaX::getInstance()->getConfig()->get("gamerule-remove-cache", true)){
+            foreach(Server::getInstance()->getLevels() as $level){
+                $provider = $level->getProvider();
+
+                if($provider instanceof BaseLevelProvider){
+                    /** @var CompoundTag $nbt */
+                    $nbt = $provider->getLevelData()->getTag("GameRules");
+
+                    foreach(self::$gameRules as $rule){
+                        if($nbt->hasTag($rule->getName())){
+                            $tag = $nbt->getTag($rule->getName());
+
+                            if($rule->getType() === self::TYPE_BOOL && $tag instanceof ByteTag){
+                                $nbt->removeTag($rule->getName());
+                            }elseif($rule->getType() === self::TYPE_INT && $tag instanceof IntTag){
+                                $nbt->removeTag($rule->getName());
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private static function register(GameRule $rule): void{
@@ -98,8 +124,12 @@ class GameRule{
      * @param Level $level
      * @param GameRule $rule
      * @param int|bool $value
+     * @param bool $force
      */
-    public static function setGameRule(Level $level, GameRule $rule, $value): void{
+    public static function setGameRule(Level $level, GameRule $rule, $value, bool $force = false): void{
+        if(!$force && !self::isGameRuleAllow()){
+            return;
+        }
         $provider = $level->getProvider();
 
         if($provider instanceof BaseLevelProvider){
@@ -116,6 +146,9 @@ class GameRule{
     }
 
     public static function fixGameRule(Player $player, Level $level = null): void{
+        if(!self::isGameRuleAllow()){
+            return;
+        }
         if($level === null){
             $level = $player->getLevel();
         }
@@ -144,6 +177,7 @@ class GameRule{
         $rule = self::$gameRules[$name] ?? null;
         $provider = $level->getProvider();
 
+        if($rule !== null && !self::isGameRuleAllow()) return $rule->getValue();
         if($rule !== null && $provider instanceof BaseLevelProvider){
             $tag = $provider->getLevelData()->getTag("GameRules")->getValue()[$rule->getName()] ?? null;
 
@@ -158,6 +192,10 @@ class GameRule{
             return $rule->getValue() ? "true" : "false";
         }
         return $rule === null ? null : $rule->getValue();
+    }
+
+    public static function isGameRuleAllow(): bool{
+        return boolval(VanillaX::getInstance()->getConfig()->getNested("features.gamerule", true));
     }
 
     public function getName(): string{

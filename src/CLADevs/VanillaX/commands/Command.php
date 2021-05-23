@@ -9,6 +9,10 @@ abstract class Command extends \pocketmine\command\Command{
 
     protected ?CommandArgs $commandArg = null;
 
+    public function canRegister(): bool{
+        return true;
+    }
+
     public function getCommandArg(): ?CommandArgs{
         return $this->commandArg;
     }

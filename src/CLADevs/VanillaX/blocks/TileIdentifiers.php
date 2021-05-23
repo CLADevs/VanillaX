@@ -11,4 +11,5 @@ interface TileIdentifiers{
     const DISPENSER = "Dispenser";
     const DROPPER = "Dropper";
     const STONECUTTER = "StoneCutter";
+    const SHULKER_BOX = "ShulkerBox";
 }

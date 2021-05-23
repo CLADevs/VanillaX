@@ -48,7 +48,6 @@ class DropperBlock extends Solid{
         return true;
     }
 
-
     public function getHardness(): float{
         return 3.5;
     }

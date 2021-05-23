@@ -2,6 +2,7 @@
 
 namespace CLADevs\VanillaX\commands;
 
+use CLADevs\VanillaX\items\utils\NonAutomaticCallItemTrait;
 use CLADevs\VanillaX\utils\Utils;
 use CLADevs\VanillaX\VanillaX;
 use pocketmine\Server;
@@ -13,13 +14,18 @@ class CommandManager{
 
     public function startup(): void{
         Utils::callDirectory("commands" . DIRECTORY_SEPARATOR . "types", function (string $namespace): void{
-            /** @var Command $class */
-            $class = new $namespace();
-            if(!in_array(strtolower($class->getName()), VanillaX::getInstance()->getConfig()->getNested("disabled.commands", []))){
-                Server::getInstance()->getCommandMap()->register("VanillaX", $class);
-                $this->commands[strtolower($class->getName())] = $class;
+            if(!isset(class_implements($namespace)[NonAutomaticCallItemTrait::class])){
+                $this->register(new $namespace());
             }
         });
+    }
+
+    public function register(Command $command): void{
+        if(in_array(strtolower($command->getName()), VanillaX::getInstance()->getConfig()->getNested("disabled.commands", [])) || !$command->canRegister()){
+            return;
+        }
+        Server::getInstance()->getCommandMap()->register("VanillaX", $command);
+        $this->commands[strtolower($command->getName())] = $command;
     }
 
     /**

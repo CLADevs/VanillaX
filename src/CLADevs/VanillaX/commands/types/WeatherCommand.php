@@ -23,6 +23,10 @@ class WeatherCommand extends Command{
         $this->commandArg->addParameter(1, "query", AvailableCommandsPacket::ARG_FLAG_ENUM | 0x68 | 0x6, false, "WeatherQuery", ["query"]);
     }
 
+    public function canRegister(): bool{
+        return boolval(VanillaX::getInstance()->getConfig()->getNested("features.weather", true));
+    }
+
     public function execute(CommandSender $sender, string $commandLabel, array $args): void{
         if(!$sender instanceof Player){
             $sender->sendMessage(TextFormat::RED . "This command is only available in game.");

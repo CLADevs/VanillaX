@@ -17,6 +17,9 @@ class WeatherManager{
     private array $weathers = [];
 
     public function startup(): void{
+        if(!VanillaX::getInstance()->getConfig()->getNested("features.weather", true)){
+            return;
+        }
         foreach(Server::getInstance()->getLevels() as $level) $this->addWeather($level);
         VanillaX::getInstance()->getScheduler()->scheduleRepeatingTask(new ClosureTask(function(): void{
             foreach($this->weathers as $weather){

@@ -26,4 +26,14 @@ mobs: true
 #  #Enchantments that wont be register
 #  enchantments:
 #    - 25 #ID of the Frost Walker Enchantment
+
+#Features you can disable
+features:
+  #Disables weather including /weather
+  weather: true
+  #Disables gamerule and removes command /gamerule
+  gamerule: true
+
+#if this is true and gamerule feature is off, it will delete previous game rule.
+gamerule-remove-cache: true
 ...
