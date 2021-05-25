@@ -19,6 +19,7 @@ class ClearCommand extends Command{
 
     public function __construct(){
         parent::__construct("clear", "Clears items from player inventory.");
+        $this->setPermission("clear.command");
         $this->commandArg = new CommandArgs(CommandArgs::FLAG_NORMAL, PlayerPermissions::MEMBER);
         $this->commandArg->addParameter(0, "player", AvailableCommandsPacket::ARG_TYPE_TARGET);
         $this->commandArg->addParameter(0, "itemName", AvailableCommandsPacket::ARG_FLAG_ENUM | 0x9, true, "Item", json_decode(file_get_contents(Utils::getResourceFile("command_items.json"))));
@@ -27,10 +28,7 @@ class ClearCommand extends Command{
     }
 
     public function execute(CommandSender $sender, string $commandLabel, array $args): void{
-        if(!$sender instanceof Player){
-            $sender->sendMessage(TextFormat::RED . "This command is only available in game.");
-            return;
-        }
+        if(!$this->testPermission($sender)) return;
         $player = [$sender];
         $itemName = null;
         $data = null;
@@ -64,6 +62,10 @@ class ClearCommand extends Command{
             }
         }
         foreach($player as $p){
+            if(!$p instanceof Player){
+                $sender->sendMessage(TextFormat::RED . "This command is only available in game.");
+                return;
+            }
             if(count($p->getInventory()->getContents()) < 1 && count($p->getArmorInventory()->getContents()) < 1){
                 $sender->sendMessage(TextFormat::RED . "Could not clear the inventory of " . $p->getName() . ", no items to remove");
                 return;

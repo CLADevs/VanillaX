@@ -37,19 +37,21 @@ class CommandArgs{
     }
 
     /**
-     * @param string $columnId, column id so you can use it in SetEnum function
+     * @param string $columnId , column id so you can use it in SetEnum function
      * @param string $name
      * @param int $type
      * @param bool $isOptional
      * @param string|null $enumName
      * @param array $enumValues
+     * @param bool $customType
      * @return int, returns the key in the column for this parameter
      */
-    public function addParameter(string $columnId, string $name, int $type = AvailableCommandsPacket::ARG_TYPE_RAWTEXT, bool $isOptional = true, string $enumName = null, array $enumValues = [], bool $customType = false): int{
+    public function addParameter(string $columnId, string $name, int $type = AvailableCommandsPacket::ARG_TYPE_RAWTEXT, bool $isOptional = true, string $enumName = null, array $enumValues = [], bool $customType = false, string $postfix = null): int{
         $param = new CommandParameter();
         $param->paramName = $name;
         $param->paramType = $customType? $type : AvailableCommandsPacket::ARG_FLAG_VALID | $type;
         $param->isOptional = $isOptional;
+        $param->postfix = $postfix;
         $this->parameters[$columnId][] = $param;
 
         $columnKey = count($this->parameters[$columnId]) - 1;

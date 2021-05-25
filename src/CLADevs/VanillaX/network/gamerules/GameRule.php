@@ -73,7 +73,7 @@ class GameRule{
         self::register(new GameRule(self::DO_MOB_LOOT, true));
         self::register(new GameRule(self::DO_MOB_SPAWNING, true)); //TODO
         self::register(new GameRule(self::DO_TILE_DROPS, true));
-        self::register(new GameRule(self::DO_WEATHER_CYCLE, true)); //TODO
+        self::register(new DoWeatherCycleRule());
         self::register(new GameRule(self::DROWNING_DAMAGE, true));
         self::register(new GameRule(self::FALL_DAMAGE, true));
         self::register(new GameRule(self::FIRE_DAMAGE, true));

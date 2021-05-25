@@ -26,6 +26,7 @@ use pocketmine\event\inventory\InventoryTransactionEvent;
 use pocketmine\event\level\LevelLoadEvent;
 use pocketmine\event\level\LevelUnloadEvent;
 use pocketmine\event\Listener;
+use pocketmine\event\player\PlayerBedLeaveEvent;
 use pocketmine\event\player\PlayerDeathEvent;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\event\player\PlayerJoinEvent;
@@ -33,6 +34,7 @@ use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\event\player\PlayerToggleSneakEvent;
 use pocketmine\event\server\DataPacketReceiveEvent;
 use pocketmine\event\server\DataPacketSendEvent;
+use pocketmine\level\Level;
 use pocketmine\level\Position;
 use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
 use pocketmine\network\mcpe\protocol\CommandBlockUpdatePacket;
@@ -304,6 +306,15 @@ class VanillaListener implements Listener{
 
         if($entity instanceof PrimedTNT && !GameRule::getGameRuleValue(GameRule::TNT_EXPLODES, $entity->getLevel())){
             $entity->flagForDespawn();
+        }
+    }
+
+    public function onBedLeave(PlayerBedLeaveEvent $event): void{
+        $player = $event->getPlayer();
+
+        if(count(Server::getInstance()->getOnlinePlayers()) === 1 && $player->getLevel()->getTime() === Level::TIME_FULL){
+            $weather = VanillaX::getInstance()->getWeatherManager()->getWeather($player->getLevel());
+            $weather->stopStorm();
         }
     }
 }

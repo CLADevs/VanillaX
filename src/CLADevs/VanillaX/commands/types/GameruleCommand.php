@@ -17,6 +17,7 @@ class GameruleCommand extends Command{
 
     public function __construct(){
         parent::__construct("gamerule", "Set or queries a game rule value.");
+        $this->setPermission("gamerule.command");
         $this->commandArg = new CommandArgs(CommandArgs::FLAG_NORMAL, PlayerPermissions::MEMBER);
         /** First Column */
         $key = $this->commandArg->addParameter(0, "rule", AvailableCommandsPacket::ARG_FLAG_ENUM | AvailableCommandsPacket::ARG_TYPE_STRING, false);
@@ -38,6 +39,7 @@ class GameruleCommand extends Command{
             $sender->sendMessage(TextFormat::RED . "This command is only available in game.");
             return;
         }
+        if(!$this->testPermission($sender)) return;
         $values = [];
         foreach(GameRule::$gameRules as $key => $rule){
             $values[] = $key . " = " . GameRule::getGameRuleValue($rule->getName(), $sender->getLevel(), true);

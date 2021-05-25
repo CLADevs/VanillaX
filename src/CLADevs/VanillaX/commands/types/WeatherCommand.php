@@ -15,6 +15,7 @@ class WeatherCommand extends Command{
 
     public function __construct(){
         parent::__construct("weather", "Sets the weather.");
+        $this->setPermission("weather.command");
         $this->commandArg = new CommandArgs(CommandArgs::FLAG_NORMAL, PlayerPermissions::MEMBER);
         /** First Column */
         $this->commandArg->addParameter(0, "clear", AvailableCommandsPacket::ARG_FLAG_ENUM | 0x69 | 0x4, false, "rain: thunder", ["clear", "rain", "thunder"]);
@@ -32,6 +33,7 @@ class WeatherCommand extends Command{
             $sender->sendMessage(TextFormat::RED . "This command is only available in game.");
             return;
         }
+        if(!$this->testPermission($sender)) return;
         if(!isset($args[0])){
             $this->sendSyntaxError($sender, "", "/$commandLabel");
             return;

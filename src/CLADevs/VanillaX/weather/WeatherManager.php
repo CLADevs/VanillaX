@@ -3,6 +3,7 @@
 namespace CLADevs\VanillaX\weather;
 
 use CLADevs\VanillaX\entities\object\LightningBoltEntity;
+use CLADevs\VanillaX\network\gamerules\GameRule;
 use CLADevs\VanillaX\VanillaX;
 use pocketmine\level\Level;
 use pocketmine\math\Vector3;
@@ -20,7 +21,12 @@ class WeatherManager{
         if(!VanillaX::getInstance()->getConfig()->getNested("features.weather", true)){
             return;
         }
-        foreach(Server::getInstance()->getLevels() as $level) $this->addWeather($level);
+        foreach(Server::getInstance()->getLevels() as $level){
+            if(!GameRule::getGameRuleValue(GameRule::DO_WEATHER_CYCLE, $level)){
+                continue;
+            }
+            $this->addWeather($level);
+        }
         VanillaX::getInstance()->getScheduler()->scheduleRepeatingTask(new ClosureTask(function(): void{
             foreach($this->weathers as $weather){
                 if($weather->isRaining()){

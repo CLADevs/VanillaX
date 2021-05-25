@@ -2,6 +2,7 @@
 
 namespace CLADevs\VanillaX\commands;
 
+use pocketmine\command\CommandSender;
 use pocketmine\entity\Entity;
 use pocketmine\level\Level;
 use pocketmine\Player;
@@ -11,20 +12,24 @@ use pocketmine\utils\TextFormat;
 class CommandTargetSelector{
 
     /**
-     * @param Player $player
+     * @param CommandSender $player
      * @param string $data
      * @param bool $message
      * @param bool $returnArray
      * @param bool $playerOnly
-     * @return Entity[]|Player|Player[]|null
+     * @return Entity[]|Player|Player[]|CommandSender[]|CommandSender|null
      */
-    public static function getFromString(Player $player, string $data, bool $message = true, bool $returnArray = true, bool $playerOnly = false){
+    public static function getFromString(CommandSender $player, string $data, bool $message = true, bool $returnArray = true, bool $playerOnly = false){
         switch($data){
             case "@a":
                 return self::getAllPlayers();
             case "@e":
                 if($playerOnly){
                     if($message) $player->sendMessage(TextFormat::RED . "Selector must be player-type");
+                    return null;
+                }
+                if(!$player instanceof Player){
+                    if($message) $player->sendMessage(TextFormat::RED . "You must be in a world");
                     return null;
                 }
                 return self::getAllEntities($player->getLevel());
