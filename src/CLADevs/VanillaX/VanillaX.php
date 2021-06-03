@@ -45,7 +45,6 @@ class VanillaX extends PluginBase{
         $this->networkManager = new NetworkManager();
         $this->inventoryManager = new InventoryManager();
         $this->weatherManager = new WeatherManager();
-        var_dump(RuntimeBlockMapping::toStaticRuntimeId(BlockIds::COMMAND_BLOCK, 1 + 8));
     }
 
     /**
