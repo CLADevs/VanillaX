@@ -36,6 +36,7 @@ class ShulkerBoxTile extends Spawnable{
 
     protected function writeSaveData(CompoundTag $nbt): void{
         $this->saveItems($nbt);
+        $nbt->setByte(self::TAG_FACING, $this->facing);
     }
 
     protected function addAdditionalSpawnData(CompoundTag $nbt): void{

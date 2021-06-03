@@ -10,10 +10,10 @@
 - Anvil
 - Brewing Stand
 - Shulker Box
+- Command Block (80% done)
 
 #### TODO Blocks:
 - Hopper
-- Command Block
 - Ancient Debris
 - Bamboo
 - Barrel
@@ -85,6 +85,7 @@
 
 #### Features:
 - Weather
+- GameRules
 
 #### TODO Features:
 - More Biomes in Normal World

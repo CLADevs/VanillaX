@@ -13,6 +13,8 @@ use CLADevs\VanillaX\network\NetworkManager;
 use CLADevs\VanillaX\session\SessionManager;
 use CLADevs\VanillaX\weather\WeatherManager;
 use pocketmine\block\BlockFactory;
+use pocketmine\block\BlockIds;
+use pocketmine\network\mcpe\convert\RuntimeBlockMapping;
 use pocketmine\plugin\PluginBase;
 use ReflectionException;
 use ReflectionProperty;
@@ -43,6 +45,7 @@ class VanillaX extends PluginBase{
         $this->networkManager = new NetworkManager();
         $this->inventoryManager = new InventoryManager();
         $this->weatherManager = new WeatherManager();
+        var_dump(RuntimeBlockMapping::toStaticRuntimeId(BlockIds::COMMAND_BLOCK, 1 + 8));
     }
 
     /**
