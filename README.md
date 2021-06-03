@@ -9,6 +9,7 @@
 - Enchantment Table
 - Anvil
 - Brewing Stand
+- Shulker Box
 
 #### TODO Blocks:
 - Hopper
@@ -50,7 +51,6 @@
 - Sweet Berry (every)
 - Turtle Egg
 - Twisting Vines
-- Shulker Box
 
 #### Entities:
 - All Minecraft Entities (Not functional)

@@ -90,6 +90,10 @@ class ItemManager{
                 }
             }
         }
+        for($i = 1; $i <= 15; $i++){
+            $item = ItemFactory::get(ItemIds::SHULKER_BOX, $i);
+            if(!Item::isCreativeItem($item)) Item::addCreativeItem($item);
+        }
     }
     
     public static function register(Item $item, bool $creative = false, bool $overwrite = true): bool{
