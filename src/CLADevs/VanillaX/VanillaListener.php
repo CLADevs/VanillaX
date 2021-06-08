@@ -63,8 +63,7 @@ class VanillaListener implements Listener{
 
             if($packet instanceof AvailableCommandsPacket){
                 foreach(VanillaX::getInstance()->getCommandManager()->getCommands() as $key => $command){
-                    if(($arg = $command->getCommandArg()) !== null){
-                        $command = $packet->commandData[strtolower($key)];
+                    if(($arg = $command->getCommandArg()) !== null && ($command = $packet->commandData[strtolower($key)] ?? null) !== null){
                         $command->flags = $arg->getFlags();
                         $command->permission = $arg->getPermission();
                         $command->overloads = $arg->getOverload();
