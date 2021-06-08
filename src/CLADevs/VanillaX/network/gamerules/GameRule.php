@@ -161,7 +161,7 @@ class GameRule{
 
             foreach($nbt->getValue() as $key => $tag){
                 $pk = new GameRulesChangedPacket();
-                $pk->gameRules = [$key => [$tag instanceof ByteTag ? 1 : 0, $tag->getValue()]];
+                $pk->gameRules = [$key => [$tag instanceof ByteTag ? 1 : 0, $tag->getValue(), false]];
                 $player->dataPacket($pk);
             }
         }

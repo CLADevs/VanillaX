@@ -9,6 +9,7 @@ use pocketmine\command\CommandSender;
 use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
 use pocketmine\network\mcpe\protocol\types\PlayerPermissions;
 use pocketmine\Player;
+use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 
 class WeatherCommand extends Command{
@@ -29,28 +30,32 @@ class WeatherCommand extends Command{
     }
 
     public function execute(CommandSender $sender, string $commandLabel, array $args): void{
-        if(!$sender instanceof Player){
-            $sender->sendMessage(TextFormat::RED . "This command is only available in game.");
-            return;
-        }
         if(!$this->testPermission($sender)) return;
         if(!isset($args[0])){
             $this->sendSyntaxError($sender, "", "/$commandLabel");
             return;
         }
         $duration = 6000;
-        $weather = VanillaX::getInstance()->getWeatherManager()->getWeather($sender->getLevel());
+        $weathers = [];
+        foreach(Server::getInstance()->getLevels() as $level){
+            $weathers[] = VanillaX::getInstance()->getWeatherManager()->getWeather($level);
+        }
 
         if(isset($args[1]) && is_numeric($args[1])){
             $duration = intval($args[1]);
         }
         switch($type = strtolower($args[0])){
             case "clear":
-                $weather->stopStorm();
+                foreach($weathers as $weather) $weather->stopStorm();
                 $sender->sendMessage("Changing to clear weather");
                 break;
             case "query":
+                if(!$sender instanceof Player){
+                    $sender->sendMessage(TextFormat::RED . "This command is only available in game.");
+                    return;
+                }
                 $state = "clear";
+                $weather = VanillaX::getInstance()->getWeatherManager()->getWeather($sender->getLevel());
                 if($weather->isRaining()){
                     if($weather->isThundering()){
                         $state = "thunder";
@@ -61,11 +66,11 @@ class WeatherCommand extends Command{
                 $sender->sendMessage("Weather state is: " . $state);
                 return;
             case "rain":
-                $weather->startStorm(false, $duration);
+                foreach($weathers as $weather) $weather->startStorm(false, $duration);
                 $sender->sendMessage("Changing to rainy weather");
                 return;
             case "thunder":
-                $weather->startStorm(true, $duration);
+                foreach($weathers as $weather) $weather->startStorm(true, $duration);
                 $sender->sendMessage("Changing to rain and thunder");
                 return;
             default:

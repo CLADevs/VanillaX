@@ -11,6 +11,7 @@ use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
 use pocketmine\network\mcpe\protocol\GameRulesChangedPacket;
 use pocketmine\network\mcpe\protocol\types\PlayerPermissions;
 use pocketmine\Player;
+use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 
 class GameruleCommand extends Command{
@@ -35,16 +36,16 @@ class GameruleCommand extends Command{
     }
 
     public function execute(CommandSender $sender, string $commandLabel, array $args): void{
-        if(!$sender instanceof Player){
-            $sender->sendMessage(TextFormat::RED . "This command is only available in game.");
+        if(!$this->testPermission($sender)) return;
+        if((!isset($args[0]) || !isset($args[1])) && !$sender instanceof Player){
+            $this->sendSyntaxError($sender, "", "/$commandLabel");
             return;
         }
-        if(!$this->testPermission($sender)) return;
-        $values = [];
-        foreach(GameRule::$gameRules as $key => $rule){
-            $values[] = $key . " = " . GameRule::getGameRuleValue($rule->getName(), $sender->getLevel(), true);
-        }
         if(!isset($args[0])){
+            $values = [];
+            foreach(GameRule::$gameRules as $key => $rule){
+                $values[] = $key . " = " . GameRule::getGameRuleValue($rule->getName(), $sender->getLevel(), true);
+            }
             $sender->sendMessage(implode(", ", $values));
             return;
         }
@@ -75,12 +76,14 @@ class GameruleCommand extends Command{
             }
             $value = strtolower($value) === "true";
         }
-        $pk->gameRules = [$gameRule->getName() => [is_bool($value) ? 1 : 0, $value]];
-        foreach($sender->getLevel()->getPlayers() as $player){
-            $player->dataPacket($pk);
+        $pk->gameRules = [$gameRule->getName() => [is_bool($value) ? 1 : 0, $value, false]];
+        foreach(Server::getInstance()->getLevels() as $level){
+            foreach($level->getPlayers() as $player){
+                $player->dataPacket($pk);
+            }
+            GameRule::setGameRule($level, $gameRule, $value);
+            $gameRule->handleValue($value, $level);
         }
-        GameRule::setGameRule($sender->getLevel(), $gameRule, $value);
-        $gameRule->handleValue($value, $sender->getLevel());
         $sender->sendMessage("Game rule " . strtolower($gameRule->getName()) . " has been updated to " . $args[1]);
     }
 }
