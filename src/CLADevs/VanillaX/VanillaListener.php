@@ -262,7 +262,7 @@ class VanillaListener implements Listener{
 
             if($entity instanceof Player){
                 GameRule::fixGameRule($entity, $target);
-                if($previousWeather->isRaining() && !$targetWeather->isRaining()){
+                if($previousWeather !== null && $targetWeather !== null && $previousWeather->isRaining() && !$targetWeather->isRaining()){
                     $weather->sendClear($entity);
                 }
             }
