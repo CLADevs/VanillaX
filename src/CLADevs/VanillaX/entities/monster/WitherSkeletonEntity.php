@@ -2,14 +2,20 @@
 
 namespace CLADevs\VanillaX\entities\monster;
 
-use CLADevs\VanillaX\entities\LivingEntity;
+use CLADevs\VanillaX\entities\VanillaEntity;
 
-class WitherSkeletonEntity extends LivingEntity{
+class WitherSkeletonEntity extends VanillaEntity{
+
+    const NETWORK_ID = self::WITHER_SKELETON;
 
     public $width = 0.72;
     public $height = 2.01;
 
-    const NETWORK_ID = self::WITHER_SKELETON;
+    protected function initEntity(): void{
+        parent::initEntity();
+        $this->setMaxHealth(20);
+        $this->setHealth(20);
+    }
 
     public function getName(): string{
         return "Wither Skeleton";

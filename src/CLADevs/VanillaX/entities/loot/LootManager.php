@@ -2,10 +2,7 @@
 
 namespace CLADevs\VanillaX\entities\loot;
 
-use CLADevs\VanillaX\scheduler\DownloadLootTableTask;
-use CLADevs\VanillaX\VanillaX;
-use pocketmine\Server;
-use pocketmine\utils\TextFormat;
+use CLADevs\VanillaX\utils\Utils;
 
 class LootManager{
 
@@ -13,12 +10,6 @@ class LootManager{
     private array $lootTables = [];
 
     public function startup(): void{
-        $path = VanillaX::getInstance()->getDataFolder() . "loot_tables";
-        if(!file_exists($path)){
-            VanillaX::getInstance()->getLogger()->notice(TextFormat::RED . "loot tables not found, downloading...");
-            Server::getInstance()->getAsyncPool()->submitTask(new DownloadLootTableTask(VanillaX::getInstance()->getDataFolder()));
-            return;
-        }
         $this->initializeLootTable("loot_tables");
     }
 
@@ -34,7 +25,7 @@ class LootManager{
     }
 
     public function initializeLootTable(string $directory): void{
-        $path = VanillaX::getInstance()->getDataFolder() . $directory;
+        $path = Utils::getMinecraftDataPath() . $directory;
 
         if(!file_exists($path)) return;
         foreach(array_diff(scandir($path), [".", ".."]) as $file){

@@ -28,6 +28,7 @@ use pocketmine\item\ItemFactory;
 use pocketmine\Server;
 use pocketmine\tile\Tile;
 use ReflectionException;
+use ReflectionProperty;
 
 class BlockManager{
 
@@ -35,14 +36,27 @@ class BlockManager{
      * @throws ReflectionException
      */
     public function startup(): void{
+        $this->initializeOverwrites();
         $this->initializeBlocks();
         $this->initializeTiles();
     }
 
-    /**
-     * @throws ReflectionException
-     */
-    public function initializeBlocks(): void{
+    private function initializeOverwrites(): void{
+        $reflection = new ReflectionProperty(BlockFactory::class, "fullList");
+        $reflection->setAccessible(true);
+        $value = $reflection->getValue();
+        $value->setSize(16384);
+        $reflection->setValue(null, $value);
+        BlockFactory::$light->setSize(16384);
+        BlockFactory::$lightFilter->setSize(16384);
+        BlockFactory::$solid->setSize(16384);
+        BlockFactory::$hardness->setSize(16384);
+        BlockFactory::$transparent->setSize(16384);
+        BlockFactory::$diffusesSkyLight->setSize(16384);
+        BlockFactory::$blastResistance->setSize(16384);
+    }
+
+    private function initializeBlocks(): void{
         Utils::callDirectory("blocks" . DIRECTORY_SEPARATOR . "types", function (string $namespace): void{
             if(!isset(class_implements($namespace)[NonAutomaticCallItemTrait::class])){
                 if(self::registerBlock(($class = new $namespace()), true, !$class instanceof NonCreativeItemTrait) && $class instanceof Block && $class->ticksRandomly()){
@@ -70,7 +84,7 @@ class BlockManager{
     /**
      * @throws ReflectionException
      */
-    public function initializeTiles(): void{
+    private function initializeTiles(): void{
         self::registerTile(MobSpawnerTile::class, [Tile::MOB_SPAWNER, "minecraft:mob_spawner"], BlockIds::MOB_SPAWNER);
         self::registerTile(CommandBlockTile::class, [TileIdentifiers::COMMAND_BLOCK, "minecraft:command_block"], [BlockIds::COMMAND_BLOCK, BlockIds::CHAIN_COMMAND_BLOCK, BlockIds::REPEATING_COMMAND_BLOCK]);
         self::registerTile(HopperTile::class, [TileIdentifiers::HOPPER, "minecraft:hopper"], BlockIds::HOPPER_BLOCK);

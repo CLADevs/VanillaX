@@ -2,21 +2,19 @@
 
 namespace CLADevs\VanillaX\entities\passive;
 
-use CLADevs\VanillaX\entities\LivingEntity;
-use CLADevs\VanillaX\entities\utils\EntityAgeable;
+use CLADevs\VanillaX\entities\VanillaEntity;
 
-class StriderEntity extends LivingEntity{
+class StriderEntity extends VanillaEntity{
+
+    const NETWORK_ID = self::STRIDER;
 
     public $width = 0.9;
     public $height = 1.7;
 
-    const NETWORK_ID = self::STRIDER;
-
     protected function initEntity(): void{
         parent::initEntity();
-        $this->ageable = new EntityAgeable($this, [0.45, 0.85], [0.9, 1.7]);
-        //TODO item Warped fungus
         $this->setMaxHealth(20);
+        $this->setHealth(20);
     }
 
     public function getName(): string{

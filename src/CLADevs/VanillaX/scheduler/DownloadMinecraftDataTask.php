@@ -9,7 +9,7 @@ use pocketmine\utils\TextFormat;
 use pocketmine\utils\Utils;
 use ZipArchive;
 
-class DownloadLootTableTask extends AsyncTask{
+class DownloadMinecraftDataTask extends AsyncTask{
 
     const FILE_NAME = "Minecraft_Loots.zip";
 
@@ -31,7 +31,15 @@ class DownloadLootTableTask extends AsyncTask{
             for($i = 0; $i < $zip->numFiles; $i++){
                 $fileName = $zip->getNameIndex($i);
 
-                if(strpos($fileName, "loot_tables") !== false){
+                foreach(["loot_tables", "trading"] as $folder){
+                    if(strpos($fileName, $folder) !== false){
+                        $passed = true;
+                    }else{
+                        $passed = false;
+                        break;
+                    }
+                }
+                if($passed){
                     $files[] = $fileName;
                 }
             }
@@ -46,8 +54,8 @@ class DownloadLootTableTask extends AsyncTask{
         $plugin = $server->getPluginManager()->getPlugin("VanillaX");
 
         if($plugin !== null){
-            $plugin->getEntityManager()->getLootManager()->initializeLootTable("loot_tables");
-            $plugin->getLogger()->notice(TextFormat::GREEN . "Successfully downloaded loot tables");
+            $plugin->getMinecraftDataManager()->handleDownloaded();
+            $plugin->getLogger()->notice(TextFormat::GREEN . "Successfully downloaded Minecraft data!");
         }
     }
 }

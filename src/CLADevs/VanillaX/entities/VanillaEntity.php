@@ -2,7 +2,6 @@
 
 namespace CLADevs\VanillaX\entities;
 
-use CLADevs\VanillaX\entities\utils\EntityAgeable;
 use CLADevs\VanillaX\network\gamerules\GameRule;
 use CLADevs\VanillaX\VanillaX;
 use pocketmine\entity\Entity;
@@ -13,7 +12,7 @@ use pocketmine\item\enchantment\Enchantment;
 use pocketmine\network\mcpe\protocol\AddActorPacket;
 use pocketmine\Player;
 
-abstract class LivingEntity extends Living{
+abstract class VanillaEntity extends Living{
 
     const RAVAGER = 59;
     const PILLAGER = 114;
@@ -25,6 +24,9 @@ abstract class LivingEntity extends Living{
     const STRIDER = 125;
     const ZOGLIN = 126;
     const PIGLIN_BRUTE = 127;
+    const GOAT = 128;
+    const GLOW_SQUID = 129;
+    const AXOLOTL = 130;
 
     const LEGACY_ID_MAP_BC = [
         self::RAVAGER => "minecraft:ravager",
@@ -37,6 +39,9 @@ abstract class LivingEntity extends Living{
         self::STRIDER => "minecraft:strider",
         self::ZOGLIN => "minecraft:zoglin",
         self::PIGLIN_BRUTE => "minecraft:piglin_brute",
+        self::GOAT => "minecraft:goat",
+        self::GLOW_SQUID => "minecraft:glow_squid",
+        self::AXOLOTL => "minecraft:axolotl"
     ];
 
     const ARTHROPODS = [
@@ -52,12 +57,15 @@ abstract class LivingEntity extends Living{
         self::ZOMBIE_PIGMAN
     ];
 
-    protected ?EntityAgeable $ageable = null;
     protected ?Entity $killer = null;
-    protected bool $initialHealth = false;
 
-    public function getAgeable(): ?EntityAgeable{
-        return $this->ageable;
+    /**
+     * @param int[] {min, max}
+     */
+    protected function setRangeHealth(array $rangeHealth): void{
+        $max = $rangeHealth[1];
+        $this->setMaxHealth($max);
+        $this->setHealth(mt_rand($rangeHealth[0], $max));
     }
 
     public function getLootName(): string{
@@ -83,7 +91,7 @@ abstract class LivingEntity extends Living{
         return $loot;
     }
 
-    public function getKillerEnchantment(Entity $killer, int $enchantment = Enchantment::LOOTING, bool $bypassMaxCheck = false): int{
+    public function getKillerEnchantment(Entity $killer, int $enchantment = Enchantment::LOOTING): int{
         if($killer instanceof Player){
             $held = $killer->getInventory()->getItemInHand();
 
@@ -93,18 +101,6 @@ abstract class LivingEntity extends Living{
             return $level;
         }
         return 0;
-    }
-
-    public function recalculateBoundingBox(): void{
-        parent::recalculateBoundingBox();
-    }
-
-    public function setMaxHealth(int $amount): void{
-        parent::setMaxHealth($amount);
-        if(!$this->initialHealth){
-            $this->initialHealth = true;
-            $this->setHealth($amount);
-        }
     }
 
     public function attack(EntityDamageEvent $source): void{
@@ -118,18 +114,6 @@ abstract class LivingEntity extends Living{
             parent::attack($source);
 
         }
-    }
-
-    public function entityBaseTick(int $tickDiff = 1): bool{
-        if($this->isClosed()){
-            return false;
-        }
-
-        $parent = parent::entityBaseTick($tickDiff);
-        if($this->ageable !== null){
-            $this->ageable->tick();
-        }
-        return $parent;
     }
 
     protected function sendSpawnPacket(Player $player): void{

@@ -63,8 +63,7 @@ class ClearCommand extends Command{
         }
         foreach($player as $p){
             if(!$p instanceof Player){
-                $sender->sendMessage(TextFormat::RED . "This command is only available in game.");
-                return;
+                continue;
             }
             if(count($p->getInventory()->getContents()) < 1 && count($p->getArmorInventory()->getContents()) < 1){
                 $sender->sendMessage(TextFormat::RED . "Could not clear the inventory of " . $p->getName() . ", no items to remove");

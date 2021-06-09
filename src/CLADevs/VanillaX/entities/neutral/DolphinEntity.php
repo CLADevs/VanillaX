@@ -2,23 +2,19 @@
 
 namespace CLADevs\VanillaX\entities\neutral;
 
-use CLADevs\VanillaX\entities\LivingEntity;
-use CLADevs\VanillaX\entities\utils\EntityAgeable;
-use pocketmine\item\ItemIds;
+use CLADevs\VanillaX\entities\VanillaEntity;
 
-class DolphinEntity extends LivingEntity{
+class DolphinEntity extends VanillaEntity{
+
+    const NETWORK_ID = self::DOLPHIN;
 
     public $width = 0.9;
     public $height = 0.6;
 
-    const NETWORK_ID = self::DOLPHIN;
-
     protected function initEntity(): void{
         parent::initEntity();
-        $this->ageable = new EntityAgeable($this, [0.585, 0.39], [0.9, 0.6]);
-        $this->ageable->setCanBeBredByPlayer(false);
-        $this->ageable->setGrowthItems([ItemIds::FISH, ItemIds::SALMON]);
         $this->setMaxHealth(10);
+        $this->setHealth(10);
     }
 
     public function getName(): string{

@@ -10,6 +10,10 @@ class Utils{
         return str_replace(["\\utils", "/utils"], DIRECTORY_SEPARATOR . "resources", __DIR__) . DIRECTORY_SEPARATOR . $file;
     }
 
+    public static function getMinecraftDataPath(): string{
+        return VanillaX::getInstance()->getDataFolder() . "data" . DIRECTORY_SEPARATOR;
+    }
+
     public static function getVanillaXPath(): string{
         if(VanillaX::getInstance()->isPhar()){
             $path = self::removeLastDirectory(VanillaX::getInstance()->getDescription()->getMain());

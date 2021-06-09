@@ -2,21 +2,22 @@
 
 namespace CLADevs\VanillaX\entities\monster;
 
-use CLADevs\VanillaX\entities\LivingEntity;
+use CLADevs\VanillaX\entities\VanillaEntity;
 
-class SilverFishEntity extends LivingEntity{
+class SilverfishEntity extends VanillaEntity{
+
+    const NETWORK_ID = self::SILVERFISH;
 
     public $width = 0.4;
     public $height = 0.3;
 
-    const NETWORK_ID = self::SILVERFISH;
-
     protected function initEntity(): void{
         parent::initEntity();
         $this->setMaxHealth(8);
+        $this->setHealth(8);
     }
 
     public function getName(): string{
-        return "SilverFish";
+        return "Silverfish";
     }
 }

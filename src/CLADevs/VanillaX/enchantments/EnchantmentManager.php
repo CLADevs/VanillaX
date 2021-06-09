@@ -2,7 +2,7 @@
 
 namespace CLADevs\VanillaX\enchantments;
 
-use CLADevs\VanillaX\entities\LivingEntity;
+use CLADevs\VanillaX\entities\VanillaEntity;
 use CLADevs\VanillaX\utils\Utils;
 use CLADevs\VanillaX\VanillaX;
 use pocketmine\entity\Effect;
@@ -161,11 +161,11 @@ class EnchantmentManager{
                 $entity = $event->getEntity();
                 $damager = $event->getDamager();
 
-                if($damager instanceof Player && $entity instanceof LivingEntity){
+                if($damager instanceof Player && $entity instanceof VanillaEntity){
                     $item = $damager->getInventory()->getItemInHand();
 
                     /** Bane of Arthropods  */
-                    if($item->hasEnchantment(Enchantment::BANE_OF_ARTHROPODS) && isset(LivingEntity::ARTHROPODS[$entity::NETWORK_ID])){
+                    if($item->hasEnchantment(Enchantment::BANE_OF_ARTHROPODS) && isset(VanillaEntity::ARTHROPODS[$entity::NETWORK_ID])){
                         $level = $item->getEnchantmentLevel(Enchantment::BANE_OF_ARTHROPODS);
                         $event->setBaseDamage($event->getBaseDamage() + ($level * 2.5));
 
@@ -175,7 +175,7 @@ class EnchantmentManager{
                     }
 
                     /** Smite  */
-                    if($item->hasEnchantment(Enchantment::SMITE) && isset(LivingEntity::UNDEAD[$entity::NETWORK_ID])){
+                    if($item->hasEnchantment(Enchantment::SMITE) && isset(VanillaEntity::UNDEAD[$entity::NETWORK_ID])){
                         $level = $item->getEnchantmentLevel(Enchantment::SMITE);
                         $event->setBaseDamage($event->getBaseDamage() + ($level * 2.5));
                     }

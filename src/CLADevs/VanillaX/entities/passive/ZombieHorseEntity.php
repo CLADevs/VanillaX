@@ -2,18 +2,19 @@
 
 namespace CLADevs\VanillaX\entities\passive;
 
-use CLADevs\VanillaX\entities\LivingEntity;
+use CLADevs\VanillaX\entities\VanillaEntity;
 
-class ZombieHorseEntity extends LivingEntity{
+class ZombieHorseEntity extends VanillaEntity{
+
+    const NETWORK_ID = self::ZOMBIE_HORSE;
 
     public $width = 1.4;
     public $height = 1.6;
 
-    const NETWORK_ID = self::ZOMBIE_HORSE;
-
     protected function initEntity(): void{
         parent::initEntity();
         $this->setMaxHealth(15);
+        $this->setHealth(15);
     }
 
     public function getName(): string{

@@ -2,21 +2,19 @@
 
 namespace CLADevs\VanillaX\entities\neutral;
 
-use CLADevs\VanillaX\entities\LivingEntity;
-use CLADevs\VanillaX\entities\utils\EntityAgeable;
+use CLADevs\VanillaX\entities\VanillaEntity;
 
-class PolarBearEntity extends LivingEntity{
+class PolarBearEntity extends VanillaEntity{
+
+    const NETWORK_ID = self::POLAR_BEAR;
 
     public $width = 1.3;
     public $height = 1.4;
 
-    const NETWORK_ID = self::POLAR_BEAR;
-
     protected function initEntity(): void{
         parent::initEntity();
-        $this->ageable = new EntityAgeable($this, [0.65, 0.7], [1.3, 1.4]);
-        $this->ageable->setCanBeBredByPlayer(false);
         $this->setMaxHealth(30);
+        $this->setHealth(30);
     }
 
     public function getName(): string{

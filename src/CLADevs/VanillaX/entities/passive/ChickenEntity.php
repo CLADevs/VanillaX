@@ -2,22 +2,19 @@
 
 namespace CLADevs\VanillaX\entities\passive;
 
-use CLADevs\VanillaX\entities\LivingEntity;
-use CLADevs\VanillaX\entities\utils\EntityAgeable;
-use pocketmine\item\ItemIds;
+use CLADevs\VanillaX\entities\VanillaEntity;
 
-class ChickenEntity extends LivingEntity{
+class ChickenEntity extends VanillaEntity{
+
+    const NETWORK_ID = self::CHICKEN;
 
     public $width = 0.6;
     public $height = 0.8;
 
-    const NETWORK_ID = self::CHICKEN;
-
     protected function initEntity(): void{
         parent::initEntity();
-        $this->ageable = new EntityAgeable($this, [0.3, 0.4], [0.6, 0.8]);
-        $this->ageable->setGrowthItems([ItemIds::WHEAT_SEEDS, ItemIds::BEETROOT_SEEDS, ItemIds::MELON_SEEDS, ItemIds::PUMPKIN_SEEDS]);
         $this->setMaxHealth(4);
+        $this->setHealth(4);
     }
 
     public function getName(): string{

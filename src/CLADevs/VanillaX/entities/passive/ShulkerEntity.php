@@ -2,18 +2,19 @@
 
 namespace CLADevs\VanillaX\entities\passive;
 
-use CLADevs\VanillaX\entities\LivingEntity;
+use CLADevs\VanillaX\entities\VanillaEntity;
 
-class ShulkerEntity extends LivingEntity{
-
-    public $width = 1;
-    public $height = 1;
+class ShulkerEntity extends VanillaEntity{
 
     const NETWORK_ID = self::SHULKER;
+
+    public $width = 0.6;
+    public $height = 1.9;
 
     protected function initEntity(): void{
         parent::initEntity();
         $this->setMaxHealth(30);
+        $this->setHealth(30);
     }
 
     public function getName(): string{

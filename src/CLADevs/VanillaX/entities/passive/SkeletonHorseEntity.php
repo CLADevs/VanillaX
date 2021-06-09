@@ -2,18 +2,19 @@
 
 namespace CLADevs\VanillaX\entities\passive;
 
-use CLADevs\VanillaX\entities\LivingEntity;
+use CLADevs\VanillaX\entities\VanillaEntity;
 
-class SkeletonHorseEntity extends LivingEntity{
-
-    public $width = 1.4;
-    public $height = 1.6;
+class SkeletonHorseEntity extends VanillaEntity{
 
     const NETWORK_ID = self::SKELETON_HORSE;
+
+    public $width = 0.6;
+    public $height = 1.9;
 
     protected function initEntity(): void{
         parent::initEntity();
         $this->setMaxHealth(15);
+        $this->setHealth(15);
     }
 
     public function getName(): string{

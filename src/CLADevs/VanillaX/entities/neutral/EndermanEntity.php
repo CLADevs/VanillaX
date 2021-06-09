@@ -2,18 +2,19 @@
 
 namespace CLADevs\VanillaX\entities\neutral;
 
-use CLADevs\VanillaX\entities\LivingEntity;
+use CLADevs\VanillaX\entities\VanillaEntity;
 
-class EndermanEntity extends LivingEntity{
+class EndermanEntity extends VanillaEntity{
+
+    const NETWORK_ID = self::ENDERMAN;
 
     public $width = 0.6;
     public $height = 2.9;
 
-    const NETWORK_ID = self::ENDERMAN;
-
     protected function initEntity(): void{
         parent::initEntity();
         $this->setMaxHealth(40);
+        $this->setHealth(40);
     }
 
     public function getName(): string{

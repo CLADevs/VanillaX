@@ -12,7 +12,6 @@ use pocketmine\network\mcpe\protocol\GameRulesChangedPacket;
 use pocketmine\network\mcpe\protocol\types\PlayerPermissions;
 use pocketmine\Player;
 use pocketmine\Server;
-use pocketmine\utils\TextFormat;
 
 class GameruleCommand extends Command{
 

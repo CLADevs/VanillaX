@@ -1,15 +1,15 @@
 <?php
 
-namespace CLADevs\VanillaX\entities\monster;
+namespace CLADevs\VanillaX\entities\passive;
 
 use CLADevs\VanillaX\entities\VanillaEntity;
 
-class GhastEntity extends VanillaEntity{
+class GlowSquidEntity extends VanillaEntity{
 
-    const NETWORK_ID = self::GHAST;
+    const NETWORK_ID = self::GLOW_SQUID;
 
-    public $width = 4;
-    public $height = 4;
+    public $width = 0.95;
+    public $height = 0.95;
 
     protected function initEntity(): void{
         parent::initEntity();
@@ -18,6 +18,6 @@ class GhastEntity extends VanillaEntity{
     }
 
     public function getName(): string{
-        return "Ghast";
+        return "Glow_Squid";
     }
 }

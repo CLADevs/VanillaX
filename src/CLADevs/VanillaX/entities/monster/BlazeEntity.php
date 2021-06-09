@@ -2,14 +2,20 @@
 
 namespace CLADevs\VanillaX\entities\monster;
 
-use CLADevs\VanillaX\entities\LivingEntity;
+use CLADevs\VanillaX\entities\VanillaEntity;
 
-class BlazeEntity extends LivingEntity{
+class BlazeEntity extends VanillaEntity{
+
+    const NETWORK_ID = self::BLAZE;
 
     public $width = 0.5;
     public $height = 1.8;
 
-    const NETWORK_ID = self::BLAZE;
+    protected function initEntity(): void{
+        parent::initEntity();
+        $this->setMaxHealth(20);
+        $this->setHealth(20);
+    }
 
     public function getName(): string{
         return "Blaze";

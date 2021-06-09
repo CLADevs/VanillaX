@@ -8,14 +8,13 @@ use CLADevs\VanillaX\enchantments\EnchantmentManager;
 use CLADevs\VanillaX\entities\EntityManager;
 use CLADevs\VanillaX\inventories\InventoryManager;
 use CLADevs\VanillaX\items\ItemManager;
+use CLADevs\VanillaX\minecraftData\MinecraftDataManager;
 use CLADevs\VanillaX\network\gamerules\GameRule;
 use CLADevs\VanillaX\network\NetworkManager;
 use CLADevs\VanillaX\session\SessionManager;
 use CLADevs\VanillaX\weather\WeatherManager;
-use pocketmine\block\BlockFactory;
 use pocketmine\plugin\PluginBase;
 use ReflectionException;
-use ReflectionProperty;
 
 class VanillaX extends PluginBase{
 
@@ -30,6 +29,7 @@ class VanillaX extends PluginBase{
     private NetworkManager $networkManager;
     private InventoryManager $inventoryManager;
     private WeatherManager $weatherManager;
+    private MinecraftDataManager $minecraftDataManager;
 
     public function onLoad(): void{
         $this->saveDefaultConfig();
@@ -43,26 +43,13 @@ class VanillaX extends PluginBase{
         $this->networkManager = new NetworkManager();
         $this->inventoryManager = new InventoryManager();
         $this->weatherManager = new WeatherManager();
+        $this->minecraftDataManager = new MinecraftDataManager();
     }
 
     /**
      * @throws ReflectionException
      */
     public function onEnable(): void{
-        /** 4.0 Blocks Size */
-        $reflection = new ReflectionProperty(BlockFactory::class, "fullList");
-        $reflection->setAccessible(true);
-        $value = $reflection->getValue();
-        $value->setSize(16384);
-        $reflection->setValue(null, $value);
-        BlockFactory::$light->setSize(16384);
-        BlockFactory::$lightFilter->setSize(16384);
-        BlockFactory::$solid->setSize(16384);
-        BlockFactory::$hardness->setSize(16384);
-        BlockFactory::$transparent->setSize(16384);
-        BlockFactory::$diffusesSkyLight->setSize(16384);
-        BlockFactory::$blastResistance->setSize(16384);
-
         $this->enchantmentManager->startup();
         $this->entityManager->startup();
         $this->blockManager->startup();
@@ -71,13 +58,9 @@ class VanillaX extends PluginBase{
         $this->networkManager->startup();
         $this->inventoryManager->startup();
         $this->weatherManager->startup();
+        $this->minecraftDataManager->startup();
+        GameRule::startup();
         $this->getServer()->getPluginManager()->registerEvents(new VanillaListener(), $this);
-
-        foreach(GameRule::$gameRules as $rule){
-            foreach($this->getServer()->getLevels() as $level){
-                $rule->handleValue(GameRule::getGameRuleValue($rule->getName(), $level), $level);
-            }
-        }
     }
 
     public function getFile(): string{
@@ -126,5 +109,9 @@ class VanillaX extends PluginBase{
 
     public function getWeatherManager(): WeatherManager{
         return $this->weatherManager;
+    }
+
+    public function getMinecraftDataManager(): MinecraftDataManager{
+        return $this->minecraftDataManager;
     }
 }

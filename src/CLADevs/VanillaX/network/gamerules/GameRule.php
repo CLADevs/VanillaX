@@ -62,6 +62,14 @@ class GameRule{
         $this->type = $type;
     }
 
+    public static function startup(): void{
+        foreach(GameRule::$gameRules as $rule){
+            foreach(Server::getInstance()->getLevels() as $level){
+                $rule->handleValue(self::getGameRuleValue($rule->getName(), $level), $level);
+            }
+        }
+    }
+
     public static function init(): void{
         self::register(new GameRule(self::COMMAND_BLOCKS_ENABLED, true)); //TODO
         self::register(new GameRule(self::COMMAND_BLOCK_OUTPUT, true)); //TODO

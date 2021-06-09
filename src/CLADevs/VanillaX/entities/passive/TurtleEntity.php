@@ -2,21 +2,19 @@
 
 namespace CLADevs\VanillaX\entities\passive;
 
-use CLADevs\VanillaX\entities\LivingEntity;
-use CLADevs\VanillaX\entities\utils\EntityAgeable;
+use CLADevs\VanillaX\entities\VanillaEntity;
 
-class TurtleEntity extends LivingEntity{
-
-    public $width = 1.2;
-    public $height = 0.4;
+class TurtleEntity extends VanillaEntity{
 
     const NETWORK_ID = self::TURTLE;
 
+    public $width = 0.6;
+    public $height = 1.9;
+
     protected function initEntity(): void{
         parent::initEntity();
-        $this->ageable = new EntityAgeable($this, [0.096, 0.032], [1.2, 0.4]);
-        //TODO item Seagrass
         $this->setMaxHealth(30);
+        $this->setHealth(30);
     }
 
     public function getName(): string{

@@ -2,22 +2,30 @@
 
 namespace CLADevs\VanillaX\entities\passive;
 
-use CLADevs\VanillaX\entities\LivingEntity;
-use CLADevs\VanillaX\entities\utils\EntityAgeable;
-use pocketmine\item\ItemIds;
+use CLADevs\VanillaX\entities\VanillaEntity;
 
-class CatEntity extends LivingEntity{
-
-    public $width = 0.6;
-    public $height = 0.7;
+class CatEntity extends VanillaEntity{
 
     const NETWORK_ID = self::CAT;
 
+    public $width = 0.6;
+    public $height = 0.7;
+    
+    public bool $isWild = true;
+
     protected function initEntity(): void{
         parent::initEntity();
-        $this->ageable = new EntityAgeable($this, [0.24, 0.28], [0.48, 0.56]);
-        $this->ageable->setGrowthItems([ItemIds::FISH, ItemIds::SALMON]);
-        $this->setMaxHealth(10);
+        $this->initializeHealth();
+    }
+
+    protected function initializeHealth(): void{
+        if($this->isWild){
+            $health = 10;
+        }else{
+            $health = 20;
+        }
+        $this->setMaxHealth($health);
+        $this->setHealth($health);
     }
 
     public function getName(): string{

@@ -2,21 +2,19 @@
 
 namespace CLADevs\VanillaX\entities\monster;
 
-use CLADevs\VanillaX\entities\LivingEntity;
-use CLADevs\VanillaX\entities\utils\EntityAgeable;
+use CLADevs\VanillaX\entities\VanillaEntity;
 
-class HoglinEntity extends LivingEntity{
-
-    public $width = 0.9;
-    public $height = 0.9;
+class HoglinEntity extends VanillaEntity{
 
     const NETWORK_ID = self::HOGLIN;
 
+    public $width = 0.6;
+    public $height = 1.9;
+
     protected function initEntity(): void{
         parent::initEntity();
-        $this->ageable = new EntityAgeable($this, [0.85, 0.86], [0.9, 0.9]);
-        //TODO add Crimson Fungus Item
         $this->setMaxHealth(40);
+        $this->setHealth(40);
     }
 
     public function getName(): string{

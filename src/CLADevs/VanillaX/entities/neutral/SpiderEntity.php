@@ -2,18 +2,19 @@
 
 namespace CLADevs\VanillaX\entities\neutral;
 
-use CLADevs\VanillaX\entities\LivingEntity;
+use CLADevs\VanillaX\entities\VanillaEntity;
 
-class SpiderEntity extends LivingEntity{
+class SpiderEntity extends VanillaEntity{
+
+    const NETWORK_ID = self::SPIDER;
 
     public $width = 1.4;
     public $height = 0.9;
 
-    const NETWORK_ID = self::SPIDER;
-
     protected function initEntity(): void{
         parent::initEntity();
         $this->setMaxHealth(16);
+        $this->setHealth(16);
     }
 
     public function getName(): string{

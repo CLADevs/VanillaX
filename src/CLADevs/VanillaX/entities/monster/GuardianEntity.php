@@ -2,18 +2,19 @@
 
 namespace CLADevs\VanillaX\entities\monster;
 
-use CLADevs\VanillaX\entities\LivingEntity;
+use CLADevs\VanillaX\entities\VanillaEntity;
 
-class GuardianEntity extends LivingEntity{
+class GuardianEntity extends VanillaEntity{
+
+    const NETWORK_ID = self::GUARDIAN;
 
     public $width = 0.85;
     public $height = 0.85;
 
-    const NETWORK_ID = self::GUARDIAN;
-
     protected function initEntity(): void{
         parent::initEntity();
         $this->setMaxHealth(30);
+        $this->setHealth(30);
     }
 
     public function getName(): string{
