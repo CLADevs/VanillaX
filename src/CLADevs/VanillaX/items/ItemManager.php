@@ -3,6 +3,7 @@
 namespace CLADevs\VanillaX\items;
 
 use CLADevs\VanillaX\enchantments\EnchantmentManager;
+use CLADevs\VanillaX\entities\VanillaEntity;
 use CLADevs\VanillaX\items\types\HorseArmorItem;
 use CLADevs\VanillaX\items\types\MapItem;
 use CLADevs\VanillaX\items\types\MinecartItem;
@@ -18,11 +19,16 @@ use pocketmine\item\enchantment\EnchantmentInstance;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
+use pocketmine\network\mcpe\convert\ItemTranslator;
 use pocketmine\network\mcpe\protocol\LevelSoundEventPacket;
+use ReflectionProperty;
+use const pocketmine\RESOURCE_PATH;
 
 class ItemManager{
 
     public function startup(): void{
+        $this->initializeOverwrite();
+        $this->initializeCreativeItems();
         Utils::callDirectory("items" . DIRECTORY_SEPARATOR . "types", function (string $namespace): void{
             if(!isset(class_implements($namespace)[NonAutomaticCallItemTrait::class])){
                 $class = new $namespace();
@@ -78,7 +84,10 @@ class ItemManager{
             }
             $startId++;
         }
+    }
 
+    private function initializeCreativeItems(): void{
+        /** Enchantment Books */
         foreach(EnchantmentManager::getAllEnchantments() as $enchantment){
             $enchant = Enchantment::getEnchantment($enchantment);
 
@@ -90,10 +99,42 @@ class ItemManager{
                 }
             }
         }
+        /** Shulker Box */
         for($i = 1; $i <= 15; $i++){
             $item = ItemFactory::get(ItemIds::SHULKER_BOX, $i);
             if(!Item::isCreativeItem($item)) Item::addCreativeItem($item);
         }
+        /** Spawn Egg */
+        foreach([VanillaEntity::GOAT, VanillaEntity::GLOW_SQUID, VanillaEntity::AXOLOTL] as $id){
+            $item = ItemFactory::get(ItemIds::SPAWN_EGG, $id);
+            if(!Item::isCreativeItem($item)) Item::addCreativeItem($item);
+        }
+    }
+
+    private function initializeOverwrite(): void{
+        $this->addComplexItem("minecraft:glow_squid_spawn_egg", "minecraft:spawn_egg", VanillaEntity::GLOW_SQUID);
+        $this->addComplexItem("minecraft:axolotl_spawn_egg", "minecraft:spawn_egg", VanillaEntity::AXOLOTL);
+    }
+
+    private function addComplexItem(string $newId, string $oldId, int $meta): void{
+        $runtimeIds = json_decode(file_get_contents(RESOURCE_PATH . '/vanilla/required_item_list.json'), true);
+        $legacyStringToIntMap = json_decode(file_get_contents(RESOURCE_PATH . '/vanilla/item_id_map.json'), true);
+        $id = $legacyStringToIntMap[$oldId];
+        $netId = $runtimeIds[$newId]["runtime_id"];
+
+        /** complexCoreToNetMapping */
+        $property = new ReflectionProperty(ItemTranslator::class, "complexCoreToNetMapping");
+        $property->setAccessible(true);
+        $value = $property->getValue(ItemTranslator::getInstance());
+        $value[$id][$meta] = $netId;
+        $property->setValue(ItemTranslator::getInstance(), $value);
+
+        /** complexNetToCoreMapping */
+        $property = new ReflectionProperty(ItemTranslator::class, "complexNetToCoreMapping");
+        $property->setAccessible(true);
+        $value = $property->getValue(ItemTranslator::getInstance());
+        $value[$netId] = [$id, $meta];
+        $property->setValue(ItemTranslator::getInstance(), $value);
     }
     
     public static function register(Item $item, bool $creative = false, bool $overwrite = true): bool{

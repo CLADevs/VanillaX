@@ -51,6 +51,7 @@
 - Sweet Berry (every)
 - Turtle Egg
 - Twisting Vines
+- 1.17 Blocks
 
 #### Entities:
 - All Minecraft Entities (Not functional)
@@ -69,6 +70,7 @@
 - Netherite Armor/Tools
 - ArmorStand
 - Shield
+- 1.17 Items
 
 #### TODO Items:
 - Crossbow
