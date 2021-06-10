@@ -37,7 +37,6 @@ class SlimeEntity extends VanillaEntity{
         $this->height = $size;
         $this->recalculateBoundingBox();
         $this->setMaxHealth($health);
-        $this->setHealth($health);
     }
 
     public function getName(): string{

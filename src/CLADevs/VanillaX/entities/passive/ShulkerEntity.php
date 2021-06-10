@@ -14,7 +14,6 @@ class ShulkerEntity extends VanillaEntity{
     protected function initEntity(): void{
         parent::initEntity();
         $this->setMaxHealth(30);
-        $this->setHealth(30);
     }
 
     public function getName(): string{

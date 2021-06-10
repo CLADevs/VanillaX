@@ -14,7 +14,6 @@ class CaveSpiderEntity extends VanillaEntity{
     protected function initEntity(): void{
         parent::initEntity();
         $this->setMaxHealth(12);
-        $this->setHealth(12);
     }
 
     public function getName(): string{

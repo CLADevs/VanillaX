@@ -14,7 +14,6 @@ class PiglinEntity extends VanillaEntity{
     protected function initEntity(): void{
         parent::initEntity();
         $this->setMaxHealth(16);
-        $this->setHealth(16);
     }
 
     public function getName(): string{

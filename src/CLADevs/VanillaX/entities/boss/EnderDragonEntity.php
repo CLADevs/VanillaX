@@ -14,7 +14,6 @@ class EnderDragonEntity extends VanillaEntity{
     protected function initEntity(): void{
         parent::initEntity();
         $this->setMaxHealth(200);
-        $this->setHealth(200);
     }
 
     public function getName(): string{

@@ -14,7 +14,6 @@ class RabbitEntity extends VanillaEntity{
     protected function initEntity(): void{
         parent::initEntity();
         $this->setMaxHealth(3);
-        $this->setHealth(3);
     }
 
     public function getName(): string{

@@ -14,7 +14,6 @@ class WitchEntity extends VanillaEntity{
     protected function initEntity(): void{
         parent::initEntity();
         $this->setMaxHealth(26);
-        $this->setHealth(26);
     }
 
     public function getName(): string{

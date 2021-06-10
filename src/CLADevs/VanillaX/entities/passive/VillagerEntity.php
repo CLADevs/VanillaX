@@ -47,7 +47,6 @@ class VillagerEntity extends VanillaEntity implements EntityInteractable{
     protected function initEntity(): void{
         parent::initEntity();
         $this->setMaxHealth(20);
-        $this->setHealth(20);
     }
 
     public function getName(): string{

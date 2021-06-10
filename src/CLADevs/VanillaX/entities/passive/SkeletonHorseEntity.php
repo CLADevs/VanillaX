@@ -14,7 +14,6 @@ class SkeletonHorseEntity extends VanillaEntity{
     protected function initEntity(): void{
         parent::initEntity();
         $this->setMaxHealth(15);
-        $this->setHealth(15);
     }
 
     public function getName(): string{

@@ -195,7 +195,6 @@ class ArmorStandEntity extends Living implements EntityInteractable{
                             $this->killArmorStand();
                         }else{
                             Session::playSound($damager, "mob.armor_stand.hit");
-                            $this->setHealth($newHealth);
                             $this->lastPunchTime = time();
                         }
                     }

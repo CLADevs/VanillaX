@@ -14,7 +14,6 @@ class EndermanEntity extends VanillaEntity{
     protected function initEntity(): void{
         parent::initEntity();
         $this->setMaxHealth(40);
-        $this->setHealth(40);
     }
 
     public function getName(): string{

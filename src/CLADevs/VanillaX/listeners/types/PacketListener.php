@@ -6,6 +6,8 @@ use CLADevs\VanillaX\blocks\tiles\CommandBlockTile;
 use CLADevs\VanillaX\entities\object\ArmorStandEntity;
 use CLADevs\VanillaX\entities\utils\EntityInteractable;
 use CLADevs\VanillaX\entities\utils\EntityInteractResult;
+use CLADevs\VanillaX\entities\utils\EntityMouseHover;
+use CLADevs\VanillaX\entities\utils\EntityRidable;
 use CLADevs\VanillaX\listeners\ListenerManager;
 use CLADevs\VanillaX\VanillaX;
 use pocketmine\event\inventory\InventoryTransactionEvent;
@@ -16,6 +18,7 @@ use pocketmine\level\Position;
 use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
 use pocketmine\network\mcpe\protocol\CommandBlockUpdatePacket;
 use pocketmine\network\mcpe\protocol\ContainerClosePacket;
+use pocketmine\network\mcpe\protocol\InteractPacket;
 use pocketmine\network\mcpe\protocol\InventoryTransactionPacket;
 use pocketmine\network\mcpe\protocol\PlayerActionPacket;
 use pocketmine\network\mcpe\protocol\ProtocolInfo;
@@ -89,6 +92,9 @@ class PacketListener implements Listener{
                         $player->dataPacket($packet);
                     }
                     break;
+                case ProtocolInfo::INTERACT_PACKET:
+                    if($packet instanceof InteractPacket) $this->handleInteract($player, $packet);
+                    break;
             }
         }
     }
@@ -143,6 +149,22 @@ class PacketListener implements Listener{
                 /** If a player interacts with entity with a item that has EntityInteractable trait */
                 $item->onInteract(new EntityInteractResult($player, null, $entity));
             }
+        }
+    }
+
+    /**
+     * @param Player $player
+     * @param InteractPacket $packet
+     * This handles button once you hover over entities
+     * or once you leave your ride
+     */
+    private function handleInteract(Player $player, InteractPacket $packet): void{
+        $entity = $player->getLevel()->getEntity($packet->target);
+
+        if($packet->action === InteractPacket::ACTION_MOUSEOVER && $entity instanceof EntityMouseHover){
+            $entity->onMouseHover($player);
+        }elseif($packet->action === InteractPacket::ACTION_LEAVE_VEHICLE && $entity instanceof EntityRidable){
+            $entity->onLeftRide($player);
         }
     }
 }

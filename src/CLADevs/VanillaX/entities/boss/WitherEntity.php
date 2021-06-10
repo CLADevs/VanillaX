@@ -14,7 +14,6 @@ class WitherEntity extends VanillaEntity{
     protected function initEntity(): void{
         parent::initEntity();
         $this->setMaxHealth(600);
-        $this->setHealth(600);
     }
 
     public function getName(): string{

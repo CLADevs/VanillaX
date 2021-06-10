@@ -14,7 +14,6 @@ class IronGolemEntity extends VanillaEntity{
     protected function initEntity(): void{
         parent::initEntity();
         $this->setMaxHealth(100);
-        $this->setHealth(100);
     }
 
     public function getName(): string{

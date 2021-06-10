@@ -65,7 +65,6 @@ abstract class VanillaEntity extends Living{
     protected function setRangeHealth(array $rangeHealth): void{
         $max = $rangeHealth[1];
         $this->setMaxHealth($max);
-        $this->setHealth(mt_rand($rangeHealth[0], $max));
     }
 
     public function getLootName(): string{

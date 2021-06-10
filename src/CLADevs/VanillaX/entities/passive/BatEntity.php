@@ -14,7 +14,6 @@ class BatEntity extends VanillaEntity{
     protected function initEntity(): void{
         parent::initEntity();
         $this->setMaxHealth(6);
-        $this->setHealth(6);
     }
 
     public function getName(): string{

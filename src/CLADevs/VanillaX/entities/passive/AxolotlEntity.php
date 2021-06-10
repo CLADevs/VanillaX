@@ -14,7 +14,6 @@ class AxolotlEntity extends VanillaEntity{
     protected function initEntity(): void{
         parent::initEntity();
         $this->setMaxHealth(14);
-        $this->setHealth(14);
     }
 
     public function getName(): string{

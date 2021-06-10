@@ -14,7 +14,6 @@ class PillagerEntity extends VanillaEntity{
     protected function initEntity(): void{
         parent::initEntity();
         $this->setMaxHealth(24);
-        $this->setHealth(24);
     }
 
     public function getName(): string{

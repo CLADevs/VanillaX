@@ -14,7 +14,6 @@ class PiglinBruteEntity extends VanillaEntity{
     protected function initEntity(): void{
         parent::initEntity();
         $this->setMaxHealth(50);
-        $this->setHealth(50);
     }
 
     public function getName(): string{

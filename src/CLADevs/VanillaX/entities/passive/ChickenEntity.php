@@ -14,7 +14,6 @@ class ChickenEntity extends VanillaEntity{
     protected function initEntity(): void{
         parent::initEntity();
         $this->setMaxHealth(4);
-        $this->setHealth(4);
     }
 
     public function getName(): string{

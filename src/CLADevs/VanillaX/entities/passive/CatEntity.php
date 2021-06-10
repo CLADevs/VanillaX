@@ -25,7 +25,6 @@ class CatEntity extends VanillaEntity{
             $health = 20;
         }
         $this->setMaxHealth($health);
-        $this->setHealth($health);
     }
 
     public function getName(): string{

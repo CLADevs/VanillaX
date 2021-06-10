@@ -14,7 +14,6 @@ class ElderGuardianEntity extends VanillaEntity{
     protected function initEntity(): void{
         parent::initEntity();
         $this->setMaxHealth(80);
-        $this->setHealth(80);
     }
 
     public function getName(): string{
