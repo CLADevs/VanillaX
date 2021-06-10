@@ -8,6 +8,7 @@ use CLADevs\VanillaX\enchantments\EnchantmentManager;
 use CLADevs\VanillaX\entities\EntityManager;
 use CLADevs\VanillaX\inventories\InventoryManager;
 use CLADevs\VanillaX\items\ItemManager;
+use CLADevs\VanillaX\listeners\ListenerManager;
 use CLADevs\VanillaX\minecraftData\MinecraftDataManager;
 use CLADevs\VanillaX\network\gamerules\GameRule;
 use CLADevs\VanillaX\network\NetworkManager;
@@ -30,6 +31,7 @@ class VanillaX extends PluginBase{
     private InventoryManager $inventoryManager;
     private WeatherManager $weatherManager;
     private MinecraftDataManager $minecraftDataManager;
+    private ListenerManager $listenerManager;
 
     public function onLoad(): void{
         $this->saveDefaultConfig();
@@ -44,6 +46,7 @@ class VanillaX extends PluginBase{
         $this->inventoryManager = new InventoryManager();
         $this->weatherManager = new WeatherManager();
         $this->minecraftDataManager = new MinecraftDataManager();
+        $this->listenerManager = new ListenerManager();
     }
 
     /**
@@ -59,8 +62,8 @@ class VanillaX extends PluginBase{
         $this->inventoryManager->startup();
         $this->weatherManager->startup();
         $this->minecraftDataManager->startup();
+        $this->listenerManager->startup();
         GameRule::startup();
-        $this->getServer()->getPluginManager()->registerEvents(new VanillaListener(), $this);
     }
 
     public function getFile(): string{

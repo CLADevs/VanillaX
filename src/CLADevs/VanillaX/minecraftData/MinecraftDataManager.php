@@ -20,7 +20,4 @@ class MinecraftDataManager{
             return;
         }
     }
-
-    public function handleDownloaded(): void{
-    }
 }

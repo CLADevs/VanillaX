@@ -54,7 +54,6 @@ class DownloadMinecraftDataTask extends AsyncTask{
         $plugin = $server->getPluginManager()->getPlugin("VanillaX");
 
         if($plugin !== null){
-            $plugin->getMinecraftDataManager()->handleDownloaded();
             $plugin->getLogger()->notice(TextFormat::GREEN . "Successfully downloaded Minecraft data!");
         }
     }

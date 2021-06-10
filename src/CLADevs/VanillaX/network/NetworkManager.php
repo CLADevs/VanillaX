@@ -15,6 +15,7 @@ class NetworkManager{
 
     public function startup(): void{
         GameRule::init();
+
         PacketPool::registerPacket(new InventoryTransactionPacketX());
         PacketPool::registerPacket(new FilterTextPacketX());
         PacketPool::registerPacket(new AnvilDamagePacketX());

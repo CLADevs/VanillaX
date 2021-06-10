@@ -2,7 +2,6 @@
 
 namespace CLADevs\VanillaX\items;
 
-use CLADevs\VanillaX\enchantments\EnchantmentManager;
 use CLADevs\VanillaX\entities\VanillaEntity;
 use CLADevs\VanillaX\items\types\HorseArmorItem;
 use CLADevs\VanillaX\items\types\MapItem;
@@ -14,8 +13,6 @@ use CLADevs\VanillaX\items\utils\NonOverwriteItemTrait;
 use CLADevs\VanillaX\utils\Utils;
 use CLADevs\VanillaX\VanillaX;
 use pocketmine\item\Armor;
-use pocketmine\item\enchantment\Enchantment;
-use pocketmine\item\enchantment\EnchantmentInstance;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
@@ -28,7 +25,6 @@ class ItemManager{
 
     public function startup(): void{
         $this->initializeOverwrite();
-        $this->initializeCreativeItems();
         Utils::callDirectory("items" . DIRECTORY_SEPARATOR . "types", function (string $namespace): void{
             if(!isset(class_implements($namespace)[NonAutomaticCallItemTrait::class])){
                 $class = new $namespace();
@@ -48,6 +44,7 @@ class ItemManager{
         self::register(new Item(Item::TURTLE_SHELL_PIECE, 0, "Turtle Shell")); //ITEM
         self::register(new Item(Item::PHANTOM_MEMBRANE, 0, "Phantom Membrane")); //ITEM
         self::register(new Item(Item::FIREWORKS_CHARGE, 0, "Fireworks Charge")); //ITEM
+        self::register(new Item(Item::ENCHANTED_BOOK, 0, "Enchanted Book")); //ITEM
         self::register(new MinecartItem(ItemIds::MINECART));
         self::register(new MinecartItem(ItemIds::MINECART_WITH_CHEST, 0, "Chest"));
         self::register(new MinecartItem(ItemIds::MINECART_WITH_TNT, 0, "TNT"));
@@ -55,7 +52,6 @@ class ItemManager{
         self::register(new MinecartItem(ItemIds::MINECART_WITH_COMMAND_BLOCK, 0, "Command Block"));
         self::register(new MapItem(MapItem::FILLED_MAP));
         self::register(new MapItem(MapItem::EMPTY_MAP), true);
-
         for($i = 416; $i <= 419; $i++){
             self::register(new HorseArmorItem($i), true);
         }
@@ -78,27 +74,17 @@ class ItemManager{
         $startId = 500;
         foreach($musicDics as $name => $soundId){
             if($startId === 512){
-                self::register(new MusicDiscItem(759, 0, "Lena Raine - " . $name, $soundId), true);
+                self::register(new MusicDiscItem(759, 0, "Lena Raine - " . $name, $soundId));
             }else{
-                self::register(new MusicDiscItem($startId, 0, "C418 - " . $name, $soundId), true);
+                self::register(new MusicDiscItem($startId, 0, "C418 - " . $name, $soundId));
             }
             $startId++;
         }
+        $this->initializeCreativeItems();
     }
 
     private function initializeCreativeItems(): void{
-        /** Enchantment Books */
-        foreach(EnchantmentManager::getAllEnchantments() as $enchantment){
-            $enchant = Enchantment::getEnchantment($enchantment);
-
-            if($enchant instanceof Enchantment){
-                for($i = 1; $i <= $enchant->getMaxLevel(); $i++){
-                    $item = ItemFactory::get(ItemIds::ENCHANTED_BOOK);
-                    $item->addEnchantment(new EnchantmentInstance($enchant, $i));
-                    if(!Item::isCreativeItem($item)) Item::addCreativeItem($item);
-                }
-            }
-        }
+        Item::initCreativeItems();
         /** Shulker Box */
         for($i = 1; $i <= 15; $i++){
             $item = ItemFactory::get(ItemIds::SHULKER_BOX, $i);

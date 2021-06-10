@@ -18,14 +18,18 @@ class FireworkRocketEntity extends Projectile{
 
     public function __construct(Level $level, CompoundTag $nbt, ?Entity $shootingEntity = null){
         parent::__construct($level, $nbt, $shootingEntity);
-        $this->age = 25 + mt_rand(0, 7);
+        $this->setDuration(1);
+    }
+
+    public function setDuration(int $duration): void{
+        $this->age = 20 + mt_rand(0, $duration);
     }
 
     public function entityBaseTick(int $tickDiff = 1): bool{
         $parent = parent::entityBaseTick($tickDiff);
         if($this->age > 0){
             $this->age--;
-            $this->motion->y += 0.1;
+            $this->motion->y += 0.05;
         }else{
             if(!$this->isClosed() && !$this->isFlaggedForDespawn()){
                 $this->flagForDespawn();
