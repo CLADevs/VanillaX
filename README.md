@@ -70,7 +70,7 @@
 - Netherite Armor/Tools
 - ArmorStand
 - Shield
-- 1.17 Items
+- Firework Rocket
 
 #### TODO Items:
 - Crossbow
@@ -82,8 +82,8 @@
 - Map
 - Painting 
 - Saddle
-- Firework Rocket
 - Firework Star
+- 1.17 Items
 
 #### Features:
 - Weather

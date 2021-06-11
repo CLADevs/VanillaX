@@ -7,6 +7,7 @@ use CLADevs\VanillaX\session\Session;
 use pocketmine\block\Block;
 use pocketmine\item\Item;
 use pocketmine\math\Vector3;
+use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\Player;
 
 class FireworkRocketItem extends Item{
@@ -28,6 +29,9 @@ class FireworkRocketItem extends Item{
     public function onItemUse(Player $player, Vector3 $pos = null): void{
         $pos = $pos ?? $player;
         $entity = new FireworkRocketEntity($player->getLevel(), FireworkRocketEntity::createBaseNBT($pos->subtract(0, 1)), $player);
+        if($this->getNamedTag()->hasTag("Fireworks", CompoundTag::class)){
+            $entity->getDataPropertyManager()->setCompoundTag(16, $this->getNamedTag());
+        }
         $entity->spawnToAll();
         Session::playSound($player, "firework.launch");
         if($player->isSurvival() || $player->isAdventure()) $this->pop();
