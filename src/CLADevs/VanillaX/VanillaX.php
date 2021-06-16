@@ -38,8 +38,8 @@ class VanillaX extends PluginBase{
         self::$instance = $this;
         $this->enchantmentManager = new EnchantmentManager();
         $this->entityManager = new EntityManager();
-        $this->blockManager = new BlockManager();
         $this->itemManager = new ItemManager();
+        $this->blockManager = new BlockManager();
         $this->sessionManager = new SessionManager();
         $this->commandManager = new CommandManager();
         $this->networkManager = new NetworkManager();
@@ -55,8 +55,8 @@ class VanillaX extends PluginBase{
     public function onEnable(): void{
         $this->enchantmentManager->startup();
         $this->entityManager->startup();
-        $this->blockManager->startup();
         $this->itemManager->startup();
+        $this->blockManager->startup();
         $this->commandManager->startup();
         $this->networkManager->startup();
         $this->inventoryManager->startup();

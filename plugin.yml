@@ -3,3 +3,5 @@ version: 1.0.3
 api: 3.0.0
 main: CLADevs\VanillaX\VanillaX
 author: CLADevs
+depend:
+  - ExtendedBlocks

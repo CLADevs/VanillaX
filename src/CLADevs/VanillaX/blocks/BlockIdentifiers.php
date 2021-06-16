@@ -6,4 +6,5 @@ interface BlockIdentifiers{
 
     const STRUCTURE_VOID = 217;
     const BUBBLE_COLUMN = 415;
+    const ANCIENT_DEBRIS = 526;
 }
