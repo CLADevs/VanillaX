@@ -2,6 +2,8 @@
 
 namespace CLADevs\VanillaX\items\types;
 
+use CLADevs\VanillaX\entities\object\FireworkRocketEntity;
+use CLADevs\VanillaX\VanillaX;
 use pocketmine\entity\Entity;
 use pocketmine\entity\projectile\Arrow as ArrowProjectile;
 use pocketmine\item\Arrow;
@@ -16,9 +18,6 @@ use pocketmine\Player;
 class CrossbowItem extends Tool{
 
     const TAG_CHARGED_ITEM = "chargedItem";
-
-    private bool $isLoadingStart = false;
-    private bool $isLoadingMiddle = false;
 
     public function __construct(int $meta = 0){
         parent::__construct(self::CROSSBOW, $meta, "Crossbow");
@@ -41,7 +40,9 @@ class CrossbowItem extends Tool{
         $duration = $player->getItemUseDuration();
 
         if($duration >= 24){
-            $this->setCharged($player, true);
+            $offhandItem = VanillaX::getInstance()->getSessionManager()->get($player)->getOffHandInventory()->getItem(0);
+            $itemId = $offhandItem->getId() === ItemIds::FIREWORKS ? ItemIds::FIREWORKS : ItemIds::ARROW;
+            $this->setCharged($player, true, $itemId);
             $player->getInventory()->setItemInHand($this);
             $player->getLevel()->broadcastLevelSoundEvent($player, LevelSoundEventPacket::SOUND_CROSSBOW_LOADING_MIDDLE);
         }elseif($duration < 12){
@@ -53,22 +54,25 @@ class CrossbowItem extends Tool{
 
     private function fireProjectile(Player $player): void{
         $projectile = $this->getChargedProjectile();
+        $nbt = Entity::createBaseNBT(
+            $player->add(0, $player->getEyeHeight(), 0),
+            $player->getDirectionVector()->multiply(2),
+            ($player->yaw > 180 ? 360 : 0) - $player->yaw,
+            -$player->pitch
+        );
+        $entity = null;
 
         if($projectile instanceof Arrow){
-            $nbt = Entity::createBaseNBT(
-                $player->add(0, $player->getEyeHeight(), 0),
-                $player->getDirectionVector()->multiply(2),
-                ($player->yaw > 180 ? 360 : 0) - $player->yaw,
-                -$player->pitch
-            );
             $entity = Entity::createEntity("Arrow", $player->getLevelNonNull(), $nbt, $player, true);
-
-            if($entity instanceof ArrowProjectile){
-                $entity->spawnToAll();
-                $this->setCharged($player, false);
-                $player->getInventory()->setItemInHand($this);
-                $player->getLevel()->broadcastLevelSoundEvent($player, LevelSoundEventPacket::SOUND_CROSSBOW_SHOOT);
-            }
+        }elseif($projectile instanceof FireworkRocketItem){
+            $entity = new FireworkRocketEntity($player->getLevelNonNull(), $nbt);
+            $entity->setStraight(false);
+        }
+        if($entity instanceof ArrowProjectile || $entity instanceof FireworkRocketEntity){
+            $entity->spawnToAll();
+            $this->setCharged($player, false);
+            $player->getInventory()->setItemInHand($this);
+            $player->getLevel()->broadcastLevelSoundEvent($player, LevelSoundEventPacket::SOUND_CROSSBOW_SHOOT);
         }
     }
 
@@ -98,6 +102,12 @@ class CrossbowItem extends Tool{
         if($itemId === ItemIds::ARROW){
             if($player->isSurvival() and $player->getInventory()->contains(ItemFactory::get(Item::ARROW, 0, 1))){
                 $player->getInventory()->removeItem(ItemFactory::get(Item::ARROW, 0, 1));
+            }
+        }elseif($itemId === ItemIds::FIREWORKS){
+            $offhand = VanillaX::getInstance()->getSessionManager()->get($player)->getOffHandInventory();
+
+            if($player->isSurvival() and $offhand->contains(ItemFactory::get(Item::FIREWORKS, 0, 1))){
+                $offhand->removeItem(ItemFactory::get(Item::FIREWORKS, 0, 1));
             }
         }
     }

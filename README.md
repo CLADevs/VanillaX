@@ -71,9 +71,9 @@
 - ArmorStand
 - Shield
 - Firework Rocket
+- Crossbow
 
 #### TODO Items:
-- Crossbow
 - Fishing Road
 - Boat
 - Banner Patterns
@@ -88,7 +88,8 @@
 #### Features:
 - Weather
 - GameRules
-- Enchantments (Except Crossbows enchantments)
+- Enchantments (TODO: Except Crossbows enchantments)
+- Offhand (BUG: Offhand item isnt shown once you relog, but it is there)
 
 #### TODO Features:
 - More Biomes in Normal World
@@ -97,7 +98,6 @@
 - End Portal
 - Farming System
 - Redstone System
-- Offhand
 
 #### Installation
 -  [poggit](https://poggit.pmmp.io/ci/CLADevs/VanillaX) or [github](https://github.com/CLADevs/VanillaX)

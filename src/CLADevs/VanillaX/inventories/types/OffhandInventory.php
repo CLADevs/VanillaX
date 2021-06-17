@@ -53,8 +53,7 @@ class OffhandInventory extends BaseInventory{
 
     public function onSlotChange(int $index, Item $before, bool $send): void{
         parent::onSlotChange($index, $before, $send);
-        foreach($this->player->getViewers() as $viewer) $this->sendEquipment($viewer);
-        $this->sendEquipment($this->player, true);
+        $this->sendEquipment($this->player->getViewers());
     }
 
     /**
@@ -77,16 +76,25 @@ class OffhandInventory extends BaseInventory{
         }
     }
 
-    public function sendEquipment(Player $player, bool $force = false): void{
-        if(!$force && strtolower($player->getName()) === strtolower($this->player->getName())){
-            return;
+    /**
+     * @param Player[]|Player $target
+     * @param bool $force
+     */
+    public function sendEquipment($target, bool $force = false): void{
+        if($target instanceof Player){
+            $target = [$target];
         }
-        $pk = new MobEquipmentPacket();
-        $pk->entityRuntimeId = $this->player->getId();
-        $pk->item = ItemStackWrapper::legacy($this->getItem(0));
-        $pk->inventorySlot = 1;
-        $pk->hotbarSlot = 0;
-        $pk->windowId = ContainerIds::OFFHAND;
-        $player->dataPacket($pk);
+        foreach($target as $player){
+            if(!$force && strtolower($player->getName()) === strtolower($this->player->getName())){
+                continue;
+            }
+            $pk = new MobEquipmentPacket();
+            $pk->entityRuntimeId = $this->player->getId();
+            $pk->item = ItemStackWrapper::legacy($this->getItem(0));
+            $pk->inventorySlot = 1;
+            $pk->hotbarSlot = 0;
+            $pk->windowId = ContainerIds::OFFHAND;
+            $player->dataPacket($pk);
+        }
     }
 }
