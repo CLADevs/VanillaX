@@ -14,6 +14,6 @@ class RedstoneOreBlock extends RedstoneOre{
      * @return Item[]
      */
     public function getDropsForCompatibleTool(Item $item): array{
-        return [ItemFactory::get(Item::REDSTONE_DUST, 0, min(8, mt_rand(4, 5) + $item->getEnchantment(Enchantment::FORTUNE)))];
+        return [ItemFactory::get(Item::REDSTONE_DUST, 0, min(8, mt_rand(4, 5) + $item->getEnchantment(Enchantment::FORTUNE)->getLevel()))];
     }
 }
