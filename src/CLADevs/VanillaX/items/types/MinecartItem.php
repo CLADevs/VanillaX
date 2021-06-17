@@ -8,7 +8,7 @@ use CLADevs\VanillaX\entities\object\CommandBlockMinecartEntity;
 use CLADevs\VanillaX\entities\object\HopperMinecartEntity;
 use CLADevs\VanillaX\entities\object\MinecartEntity;
 use CLADevs\VanillaX\entities\object\TNTMinecartEntity;
-use CLADevs\VanillaX\items\utils\NonAutomaticCallItemTrait;
+use CLADevs\VanillaX\utils\item\NonAutomaticCallItemTrait;
 use pocketmine\block\BaseRail;
 use pocketmine\block\Block;
 use pocketmine\item\Item;

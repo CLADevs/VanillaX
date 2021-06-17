@@ -3,6 +3,10 @@
 namespace CLADevs\VanillaX\entities\monster;
 
 use CLADevs\VanillaX\entities\VanillaEntity;
+use CLADevs\VanillaX\entities\utils\ItemHelper;
+use pocketmine\item\Item;
+use pocketmine\item\ItemFactory;
+use pocketmine\item\ItemIds;
 
 class GhastEntity extends VanillaEntity{
 
@@ -18,5 +22,23 @@ class GhastEntity extends VanillaEntity{
 
     public function getName(): string{
         return "Ghast";
+    }
+ 
+    /**
+     * @return Item[]
+     */
+    public function getDrops(): array{
+        $ghast_tear = ItemFactory::get(ItemIds::GHAST_TEAR, 0, 1);
+        ItemHelper::applySetCount($ghast_tear, 0, 1);
+        ItemHelper::applyLootingEnchant($this, $ghast_tear);
+         
+        $gunpowder = ItemFactory::get(ItemIds::GUNPOWDER, 0, 1);
+        ItemHelper::applySetCount($gunpowder, 0, 2);
+        ItemHelper::applyLootingEnchant($this, $gunpowder);
+        return [$ghast_tear, $gunpowder];
+    }
+    
+    public function getXpDropAmount(): int{
+        return $this->getLastHitByPlayer() ? 5 + (count($this->getArmorInventory()->getContents()) * mt_rand(1,3)) : 0;
     }
 }

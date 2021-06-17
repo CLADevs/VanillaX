@@ -19,4 +19,10 @@ class PiglinBruteEntity extends VanillaEntity{
     public function getName(): string{
         return "Piglin Brute";
     }
+
+    //TODO drops
+    
+    public function getXpDropAmount(): int{
+        return $this->getLastHitByPlayer() ? 20 : 0;
+    }
 }

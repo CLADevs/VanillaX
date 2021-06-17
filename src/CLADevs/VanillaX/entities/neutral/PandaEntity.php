@@ -3,6 +3,7 @@
 namespace CLADevs\VanillaX\entities\neutral;
 
 use CLADevs\VanillaX\entities\VanillaEntity;
+use pocketmine\item\Item;
 
 class PandaEntity extends VanillaEntity{
 
@@ -18,5 +19,20 @@ class PandaEntity extends VanillaEntity{
 
     public function getName(): string{
         return "Panda";
+    }
+ 
+    /**
+     * @return Item[]
+     */
+    public function getDrops(): array{
+        //TODO bamboo
+//        $bamboo = ItemFactory::get(ItemIds::AIR, 0, 1);
+//        ItemHelper::applySetCount($bamboo, 0, 2);
+//        ItemHelper::applyLootingEnchant($this, $bamboo);
+        return [];
+    }
+    
+    public function getXpDropAmount(): int{
+        return $this->getLastHitByPlayer() ? mt_rand(1,3) : 0;
     }
 }

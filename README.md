@@ -88,6 +88,7 @@
 #### Features:
 - Weather
 - GameRules
+- Enchantments (Except Crossbows enchantments)
 
 #### TODO Features:
 - More Biomes in Normal World

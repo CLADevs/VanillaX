@@ -2,8 +2,8 @@
 
 namespace CLADevs\VanillaX\entities\object;
 
-use CLADevs\VanillaX\entities\utils\EntityInteractable;
 use CLADevs\VanillaX\entities\utils\EntityInteractResult;
+use CLADevs\VanillaX\entities\utils\interferces\EntityInteractable;
 use CLADevs\VanillaX\network\gamerules\GameRule;
 use pocketmine\entity\Entity;
 use pocketmine\item\ItemFactory;
@@ -19,7 +19,7 @@ class BoatEntity extends Entity implements EntityInteractable{
 
     public function kill(): void{
         if(GameRule::getGameRuleValue(GameRule::DO_ENTITY_DROPS, $this->getLevel())){
-            $this->getLevel()->dropItem($this, ItemFactory::get(ItemIds::BOAT)); //TODO boat types
+            $this->getLevel()->dropItem($this, ItemFactory::get(ItemIds::BOAT)); //TODO boat block
         }
         parent::kill();
     }

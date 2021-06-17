@@ -3,7 +3,7 @@
 namespace CLADevs\VanillaX\commands\types;
 
 use CLADevs\VanillaX\commands\Command;
-use CLADevs\VanillaX\commands\CommandArgs;
+use CLADevs\VanillaX\commands\utils\CommandArgs;
 use CLADevs\VanillaX\network\gamerules\GameRule;
 use CLADevs\VanillaX\VanillaX;
 use pocketmine\command\CommandSender;

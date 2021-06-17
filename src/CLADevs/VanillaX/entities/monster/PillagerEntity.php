@@ -2,7 +2,12 @@
 
 namespace CLADevs\VanillaX\entities\monster;
 
+use CLADevs\VanillaX\entities\utils\interferces\EntityClassification;
 use CLADevs\VanillaX\entities\VanillaEntity;
+use CLADevs\VanillaX\entities\utils\ItemHelper;
+use pocketmine\item\Item;
+use pocketmine\item\ItemFactory;
+use pocketmine\item\ItemIds;
 
 class PillagerEntity extends VanillaEntity{
 
@@ -18,5 +23,23 @@ class PillagerEntity extends VanillaEntity{
 
     public function getName(): string{
         return "Pillager";
+    }
+ 
+    /**
+     * @return Item[]
+     */
+    public function getDrops(): array{
+        $arrow = ItemFactory::get(ItemIds::ARROW, 0, 1);
+        ItemHelper::applySetCount($arrow, 0, 2);
+        ItemHelper::applyLootingEnchant($this, $arrow);
+        return [$arrow];
+    }
+    
+    public function getXpDropAmount(): int{
+        return $this->getLastHitByPlayer() ? ($this->isBaby() ? 12 : 5) + (mt_rand(1,3)) : 0;
+    }
+
+    public function getClassification(): int{
+        return EntityClassification::ILLAGERS;
     }
 }

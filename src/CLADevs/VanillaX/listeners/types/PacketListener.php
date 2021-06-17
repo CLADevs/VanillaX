@@ -2,12 +2,12 @@
 
 namespace CLADevs\VanillaX\listeners\types;
 
-use CLADevs\VanillaX\blocks\tiles\CommandBlockTile;
+use CLADevs\VanillaX\blocks\tile\CommandBlockTile;
 use CLADevs\VanillaX\entities\object\ArmorStandEntity;
-use CLADevs\VanillaX\entities\utils\EntityInteractable;
 use CLADevs\VanillaX\entities\utils\EntityInteractResult;
-use CLADevs\VanillaX\entities\utils\EntityMouseHover;
-use CLADevs\VanillaX\entities\utils\EntityRidable;
+use CLADevs\VanillaX\entities\utils\interferces\EntityInteractable;
+use CLADevs\VanillaX\entities\utils\interferces\EntityMouseHover;
+use CLADevs\VanillaX\entities\utils\interferces\EntityRidable;
 use CLADevs\VanillaX\listeners\ListenerManager;
 use CLADevs\VanillaX\VanillaX;
 use pocketmine\event\inventory\InventoryTransactionEvent;
@@ -44,8 +44,12 @@ class PacketListener implements Listener{
     public function onDataPacketSend(DataPacketSendEvent $event): void{
         $packet = $event->getPacket();
 
-        if(!$event->isCancelled() && $packet instanceof AvailableCommandsPacket){
-            $this->handleCommandEnum($packet);
+        if(!!$event->isCancelled()){
+            switch($packet::NETWORK_ID){
+                case ProtocolInfo::AVAILABLE_COMMANDS_PACKET:
+                    if($packet instanceof AvailableCommandsPacket) $this->handleCommandEnum($packet);
+                    break;
+            }
         }
     }
 
@@ -53,9 +57,10 @@ class PacketListener implements Listener{
         if(!$event->isCancelled()){
             $packet = $event->getPacket();
             $player = $event->getPlayer();
-            $session = VanillaX::getInstance()->getSessionManager()->get($player);
+            $sessionManager = VanillaX::getInstance()->getSessionManager();
+            $session = $sessionManager->has($player) ? $sessionManager->get($player) : null;
 
-            if(($window = $session->getCurrentWindow()) !== null) $window->handlePacket($player, $packet);
+            if($session !== null && ($window = $session->getCurrentWindow()) !== null) $window->handlePacket($player, $packet);
             switch($packet::NETWORK_ID){
                 case ProtocolInfo::COMMAND_BLOCK_UPDATE_PACKET:
                     if($packet instanceof CommandBlockUpdatePacket) $this->handleCommandBlock($player, $packet);
@@ -117,7 +122,7 @@ class PacketListener implements Listener{
     /**
      * @param Player $player
      * @param CommandBlockUpdatePacket $packet
-     * Changes server sided command block tiles data
+     * Changes server sided command block tile data
      */
     private function handleCommandBlock(Player $player, CommandBlockUpdatePacket $packet): void{
         $position = new Position($packet->x, $packet->y, $packet->z, $player->getLevel());

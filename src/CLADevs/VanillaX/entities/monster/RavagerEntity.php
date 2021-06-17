@@ -2,7 +2,11 @@
 
 namespace CLADevs\VanillaX\entities\monster;
 
+use CLADevs\VanillaX\entities\utils\interferces\EntityClassification;
 use CLADevs\VanillaX\entities\VanillaEntity;
+use pocketmine\item\Item;
+use pocketmine\item\ItemFactory;
+use pocketmine\item\ItemIds;
 
 class RavagerEntity extends VanillaEntity{
 
@@ -18,5 +22,20 @@ class RavagerEntity extends VanillaEntity{
 
     public function getName(): string{
         return "Ravager";
+    }
+
+    /**
+     * @return Item[]
+     */
+    public function getDrops(): array{
+        return [ItemFactory::get(ItemIds::SADDLE, 0, 1)];
+    }
+    
+    public function getXpDropAmount(): int{
+        return $this->getLastHitByPlayer() ? 20 : 0;
+    }
+
+    public function getClassification(): int{
+        return EntityClassification::ILLAGERS;
     }
 }

@@ -9,13 +9,21 @@ class SessionManager{
     /** @var Session[] */
     private array $sessions = [];
 
-    public function has(Player $player): bool{
-        return isset($this->sessions[$player->getName()]);
+    /**
+     * @param string|Player $player
+     * @return bool
+     */
+    public function has($player): bool{
+        return isset($this->sessions[$player instanceof Player ? $player->getName() : $player]);
     }
 
-    public function get(Player $player): Session{
-        $this->add($player);
-        return $this->sessions[$player->getName()];
+    /**
+     * @param Player|string $player
+     * @return Session
+     */
+    public function get($player): Session{
+        if($player instanceof Player) $this->add($player);
+        return $this->sessions[$player instanceof Player ? $player->getName() : $player];
     }
 
     public function add(Player $player): void{
@@ -24,9 +32,12 @@ class SessionManager{
         }
     }
 
-    public function remove(Player $player): void{
+    /**
+     * @param string|Player $player
+     */
+    public function remove($player): void{
         if($this->has($player)){
-            unset($this->sessions[$player->getName()]);
+            unset($this->sessions[$player instanceof Player ? $player->getName() : $player]);
         }
     }
 }

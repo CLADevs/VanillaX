@@ -2,6 +2,7 @@
 
 namespace CLADevs\VanillaX\entities\passive;
 
+use CLADevs\VanillaX\entities\utils\interferces\EntityClassification;
 use CLADevs\VanillaX\entities\VanillaEntity;
 
 class AxolotlEntity extends VanillaEntity{
@@ -18,5 +19,13 @@ class AxolotlEntity extends VanillaEntity{
 
     public function getName(): string{
         return "Axolotl";
+    }
+    
+    public function getXpDropAmount(): int{
+        return $this->getLastHitByPlayer() ? mt_rand(1,3) : 0;
+    }
+
+    public function getClassification(): int{
+        return EntityClassification::AQUATIC;
     }
 }

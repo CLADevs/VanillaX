@@ -2,13 +2,11 @@
 
 namespace CLADevs\VanillaX\entities;
 
+use CLADevs\VanillaX\entities\utils\interferces\EntityClassification;
 use CLADevs\VanillaX\network\gamerules\GameRule;
-use CLADevs\VanillaX\VanillaX;
-use pocketmine\entity\Entity;
 use pocketmine\entity\Living;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
-use pocketmine\event\entity\EntityDamageEvent;
-use pocketmine\item\enchantment\Enchantment;
+use pocketmine\event\entity\EntityDeathEvent;
 use pocketmine\network\mcpe\protocol\AddActorPacket;
 use pocketmine\Player;
 
@@ -44,21 +42,6 @@ abstract class VanillaEntity extends Living{
         self::AXOLOTL => "minecraft:axolotl"
     ];
 
-    const ARTHROPODS = [
-        self::BEE, self::CAVE_SPIDER, self::ENDERMITE,
-        self::SILVERFISH, self::SPIDER
-    ];
-
-    const UNDEAD = [
-        self::DROWNED, self::HUSK, self::PHANTOM,
-        self::SKELETON, self::SKELETON_HORSE, self::STRAY,
-        self::WITHER, self::WITHER_SKELETON, self::ZOGLIN,
-        self::ZOMBIE, self::ZOMBIE_HORSE, self::ZOMBIE_VILLAGER,
-        self::ZOMBIE_PIGMAN
-    ];
-
-    protected ?Entity $killer = null;
-
     /**
      * @param int[] {min, max}
      */
@@ -71,47 +54,27 @@ abstract class VanillaEntity extends Living{
         return strtolower(str_replace(" ", "_", $this->getName()));
     }
 
-    public function getXpDropAmount(): int{
-        return 0; //TODO
+    public function isBaby(): bool{
+        return $this->getGenericFlag(self::DATA_FLAG_BABY);
     }
 
-    public function getDrops(): array{
-        $loot = [];
+    public function getClassification(): int{
+        return EntityClassification::NONE;
+    }
 
+    public function getLastHitByPlayer(): bool{
+        $cause = $this->getLastDamageCause();
+        return $cause instanceof EntityDamageByEntityEvent && $cause->getDamager() instanceof Player;
+    }
+
+    protected function onDeath(): void{
+        $ev = new EntityDeathEvent($this, $this->getDrops(), $this->getXpDropAmount());
+        $ev->call();
         if(GameRule::getGameRuleValue(GameRule::DO_MOB_LOOT, $this->getLevel())){
-            if($lootTable = VanillaX::getInstance()->getEntityManager()->getLootManager()->getLootTableFor($this->getLootName())){
-                foreach($lootTable->getPools() as $pool){
-                    foreach($pool->getEntries() as $entry){
-                        $loot[] = $entry->apply($this->killer);
-                    }
-                }
+            foreach($ev->getDrops() as $item){
+                $this->getLevelNonNull()->dropItem($this, $item);
             }
-        }
-        return $loot;
-    }
-
-    public function getKillerEnchantment(Entity $killer, int $enchantment = Enchantment::LOOTING): int{
-        if($killer instanceof Player){
-            $held = $killer->getInventory()->getItemInHand();
-
-            if(($level = $held->getEnchantmentLevel($enchantment)) > ($maxLevel = Enchantment::getEnchantment($enchantment)->getMaxLevel())){
-                return $maxLevel;
-            }
-            return $level;
-        }
-        return 0;
-    }
-
-    public function attack(EntityDamageEvent $source): void{
-        if($this->isClosed()) return;
-        if(!$source->isCancelled()){
-            if(($source->getEntity()->getHealth() - $source->getFinalDamage()) <= 0){
-                if($this->killer === null && $source instanceof EntityDamageByEntityEvent){
-                    $this->killer = $source->getDamager();
-                }
-            }
-            parent::attack($source);
-
+            $this->level->dropExperience($this, $ev->getXpDropAmount());
         }
     }
 

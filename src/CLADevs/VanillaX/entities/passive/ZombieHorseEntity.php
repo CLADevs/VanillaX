@@ -2,7 +2,12 @@
 
 namespace CLADevs\VanillaX\entities\passive;
 
+use CLADevs\VanillaX\entities\utils\interferces\EntityClassification;
 use CLADevs\VanillaX\entities\VanillaEntity;
+use CLADevs\VanillaX\entities\utils\ItemHelper;
+use pocketmine\item\Item;
+use pocketmine\item\ItemFactory;
+use pocketmine\item\ItemIds;
 
 class ZombieHorseEntity extends VanillaEntity{
 
@@ -18,5 +23,23 @@ class ZombieHorseEntity extends VanillaEntity{
 
     public function getName(): string{
         return "Zombie Horse";
+    }
+ 
+    /**
+     * @return Item[]
+     */
+    public function getDrops(): array{
+        $rotten_flesh = ItemFactory::get(ItemIds::ROTTEN_FLESH, 0, 1);
+        ItemHelper::applySetCount($rotten_flesh, 0, 2);
+        ItemHelper::applyLootingEnchant($this, $rotten_flesh);
+        return [$rotten_flesh];
+    }
+    
+    public function getXpDropAmount(): int{
+        return $this->getLastHitByPlayer() ? mt_rand(1,3) : 0;
+    }
+
+    public function getClassification(): int{
+        return EntityClassification::UNDEAD;
     }
 }

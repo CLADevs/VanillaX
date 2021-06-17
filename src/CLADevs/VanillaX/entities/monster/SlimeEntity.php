@@ -3,6 +3,10 @@
 namespace CLADevs\VanillaX\entities\monster;
 
 use CLADevs\VanillaX\entities\VanillaEntity;
+use CLADevs\VanillaX\entities\utils\ItemHelper;
+use pocketmine\item\Item;
+use pocketmine\item\ItemFactory;
+use pocketmine\item\ItemIds;
 
 class SlimeEntity extends VanillaEntity{
 
@@ -41,5 +45,29 @@ class SlimeEntity extends VanillaEntity{
 
     public function getName(): string{
         return "Slime";
+    }
+ 
+    /**
+     * @return Item[]
+     */
+    public function getDrops(): array{
+        $slime_ball = ItemFactory::get(ItemIds::SLIME_BALL, 0, 1);
+        ItemHelper::applySetCount($slime_ball, 0, 2);
+        ItemHelper::applyLootingEnchant($this, $slime_ball);
+        return [$slime_ball];
+    }
+    
+    public function getXpDropAmount(): int{
+        if($this->getLastHitByPlayer()){
+            switch($this->type){
+                case self::TYPE_LARGE:
+                    return 4;
+                case self::TYPE_MEDIUM:
+                    return 2;
+                case self::TYPE_SMALL:
+                    return 1;
+            }
+        }
+        return 0;
     }
 }

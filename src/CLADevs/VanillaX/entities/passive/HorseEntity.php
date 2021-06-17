@@ -2,7 +2,11 @@
 
 namespace CLADevs\VanillaX\entities\passive;
 
+use CLADevs\VanillaX\entities\utils\ItemHelper;
 use CLADevs\VanillaX\entities\VanillaEntity;
+use pocketmine\item\Item;
+use pocketmine\item\ItemFactory;
+use pocketmine\item\ItemIds;
 
 class HorseEntity extends VanillaEntity{
 
@@ -18,5 +22,19 @@ class HorseEntity extends VanillaEntity{
 
     public function getName(): string{
         return "Horse";
+    }
+
+    /**
+     * @return Item[]
+     */
+    public function getDrops(): array{
+        $leather = ItemFactory::get(ItemIds::LEATHER, 0, 1);
+        ItemHelper::applySetCount($leather, 0, 2);
+        ItemHelper::applyLootingEnchant($this, $leather);
+        return [$leather];
+    }
+    
+    public function getXpDropAmount(): int{
+        return $this->getLastHitByPlayer() ? mt_rand(1,3) : 0;
     }
 }

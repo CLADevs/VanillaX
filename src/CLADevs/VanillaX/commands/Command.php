@@ -2,6 +2,7 @@
 
 namespace CLADevs\VanillaX\commands;
 
+use CLADevs\VanillaX\commands\utils\CommandArgs;
 use pocketmine\command\CommandSender;
 use pocketmine\utils\TextFormat;
 

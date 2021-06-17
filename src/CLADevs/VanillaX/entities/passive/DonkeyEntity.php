@@ -19,4 +19,8 @@ class DonkeyEntity extends VanillaEntity{
     public function getName(): string{
         return "Donkey";
     }
+    
+    public function getXpDropAmount(): int{
+        return $this->getLastHitByPlayer() ? mt_rand(1,3) : 0;
+    }
 }

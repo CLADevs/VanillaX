@@ -2,7 +2,7 @@
 
 namespace CLADevs\VanillaX\items\types;
 
-use CLADevs\VanillaX\items\utils\NonAutomaticCallItemTrait;
+use CLADevs\VanillaX\utils\item\NonAutomaticCallItemTrait;
 use pocketmine\item\Item;
 
 class HorseArmorItem extends Item implements NonAutomaticCallItemTrait{

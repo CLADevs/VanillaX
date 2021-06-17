@@ -2,11 +2,14 @@
 
 namespace CLADevs\VanillaX\entities\passive;
 
-use CLADevs\VanillaX\entities\utils\EntityInteractable;
 use CLADevs\VanillaX\entities\utils\EntityInteractResult;
-use CLADevs\VanillaX\entities\utils\EntityMouseHover;
-use CLADevs\VanillaX\entities\utils\EntityRidable;
+use CLADevs\VanillaX\entities\utils\interferces\EntityInteractable;
+use CLADevs\VanillaX\entities\utils\interferces\EntityMouseHover;
+use CLADevs\VanillaX\entities\utils\interferces\EntityRidable;
 use CLADevs\VanillaX\entities\VanillaEntity;
+use CLADevs\VanillaX\entities\utils\ItemHelper;
+use pocketmine\item\Item;
+use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\tag\ByteTag;
@@ -89,5 +92,18 @@ class StriderEntity extends VanillaEntity implements EntityInteractable, EntityM
         Server::getInstance()->broadcastPacket($this->getViewers(), $pk);
 
         $this->hasRider = false;
+    }
+ 
+    /**
+     * @return Item[]
+     */
+    public function getDrops(): array{
+        $string = ItemFactory::get(ItemIds::STRING, 0, 1);
+        ItemHelper::applySetCount($string, 2, 5);
+        return [$string];
+    }
+    
+    public function getXpDropAmount(): int{
+        return $this->getLastHitByPlayer() ? mt_rand(1,3) : 0;
     }
 }

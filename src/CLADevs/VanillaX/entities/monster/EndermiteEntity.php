@@ -2,6 +2,7 @@
 
 namespace CLADevs\VanillaX\entities\monster;
 
+use CLADevs\VanillaX\entities\utils\interferces\EntityClassification;
 use CLADevs\VanillaX\entities\VanillaEntity;
 
 class EndermiteEntity extends VanillaEntity{
@@ -18,5 +19,13 @@ class EndermiteEntity extends VanillaEntity{
 
     public function getName(): string{
         return "Endermite";
+    }
+    
+    public function getXpDropAmount(): int{
+        return $this->getLastHitByPlayer() ? 3 : 0;
+    }
+
+    public function getClassification(): int{
+        return EntityClassification::ARTHROPODS;
     }
 }

@@ -14,9 +14,9 @@ class SaddleItem extends Item{
     }
 
     public function onInteractWithEntity(Player $player, Entity $entity): void{
-        if(in_array($entity->getId(), [EntityIds::HORSE, EntityIds::PIG, EntityIds::DONKEY, EntityIds::MULE])){
-            //TODO
-        }
+//        if(in_array($entity->getId(), [EntityIds::HORSE, EntityIds::PIG, EntityIds::DONKEY, EntityIds::MULE])){
+//            //TODO
+//        }
     }
 
     public function getMaxStackSize(): int{

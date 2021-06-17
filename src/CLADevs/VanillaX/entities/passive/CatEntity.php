@@ -3,6 +3,10 @@
 namespace CLADevs\VanillaX\entities\passive;
 
 use CLADevs\VanillaX\entities\VanillaEntity;
+use CLADevs\VanillaX\entities\utils\ItemHelper;
+use pocketmine\item\Item;
+use pocketmine\item\ItemFactory;
+use pocketmine\item\ItemIds;
 
 class CatEntity extends VanillaEntity{
 
@@ -29,5 +33,18 @@ class CatEntity extends VanillaEntity{
 
     public function getName(): string{
         return "Cat";
+    }
+ 
+    /**
+     * @return Item[]
+     */
+    public function getDrops(): array{
+        $string = ItemFactory::get(ItemIds::STRING, 0, 1);
+        ItemHelper::applySetCount($string, 0, 2);
+        return [$string];
+    }
+    
+    public function getXpDropAmount(): int{
+        return $this->getLastHitByPlayer() ? mt_rand(1,3) : 0;
     }
 }

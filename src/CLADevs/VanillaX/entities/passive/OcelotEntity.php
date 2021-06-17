@@ -19,4 +19,8 @@ class OcelotEntity extends VanillaEntity{
     public function getName(): string{
         return "Ocelot";
     }
+    
+    public function getXpDropAmount(): int{
+        return $this->getLastHitByPlayer() ? mt_rand(1,3) : 0;
+    }
 }

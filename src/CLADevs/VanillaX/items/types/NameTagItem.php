@@ -2,8 +2,8 @@
 
 namespace CLADevs\VanillaX\items\types;
 
-use CLADevs\VanillaX\entities\utils\EntityInteractable;
 use CLADevs\VanillaX\entities\utils\EntityInteractResult;
+use CLADevs\VanillaX\entities\utils\interferces\EntityInteractable;
 use pocketmine\item\Item;
 
 class NameTagItem extends Item implements EntityInteractable{

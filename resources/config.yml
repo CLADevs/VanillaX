@@ -4,7 +4,7 @@ mobs: true
 
 #Anything listed here, would not be registered from this plugin.
 #If you would like all of these to be registered, delete the disabled section from the config.yml
-#file. or you would want enchantments to be registered, but other to not be registered,
+#item. or you would want enchantments to be registered, but other to not be registered,
 #simpily delete the enchantments section and you should be set.
 #disabled:
 #  #Mobs includes armor stand, zombies, etc.

@@ -2,6 +2,7 @@
 
 namespace CLADevs\VanillaX\entities\monster;
 
+use CLADevs\VanillaX\entities\utils\interferces\EntityClassification;
 use CLADevs\VanillaX\entities\VanillaEntity;
 
 class SilverfishEntity extends VanillaEntity{
@@ -18,5 +19,9 @@ class SilverfishEntity extends VanillaEntity{
 
     public function getName(): string{
         return "Silverfish";
+    }
+
+    public function getClassification(): int{
+        return EntityClassification::ARTHROPODS;
     }
 }

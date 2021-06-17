@@ -2,6 +2,7 @@
 
 namespace CLADevs\VanillaX\entities\passive;
 
+use CLADevs\VanillaX\entities\utils\interferces\EntityClassification;
 use CLADevs\VanillaX\entities\VanillaEntity;
 
 class TurtleEntity extends VanillaEntity{
@@ -18,5 +19,13 @@ class TurtleEntity extends VanillaEntity{
 
     public function getName(): string{
         return "Turtle";
+    }
+    
+    public function getXpDropAmount(): int{
+        return $this->getLastHitByPlayer() ? mt_rand(1,3) : 0;
+    }
+
+    public function getClassification(): int{
+        return EntityClassification::AQUATIC;
     }
 }

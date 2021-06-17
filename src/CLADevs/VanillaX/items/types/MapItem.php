@@ -2,7 +2,7 @@
 
 namespace CLADevs\VanillaX\items\types;
 
-use CLADevs\VanillaX\items\utils\NonAutomaticCallItemTrait;
+use CLADevs\VanillaX\utils\item\NonAutomaticCallItemTrait;
 use pocketmine\item\Item;
 use pocketmine\item\ItemIds;
 use pocketmine\math\Vector3;

@@ -4,6 +4,7 @@ namespace CLADevs\VanillaX\session;
 
 use CLADevs\VanillaX\entities\projectile\TridentEntity;
 use CLADevs\VanillaX\inventories\FakeBlockInventory;
+use CLADevs\VanillaX\inventories\types\OffhandInventory;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\DataPacket;
 use pocketmine\network\mcpe\protocol\PlaySoundPacket;
@@ -23,9 +24,19 @@ class Session{
     private array $thrownTridents = [];
 
     private ?FakeBlockInventory $currentWindow = null;
+    private OffhandInventory $offHandInventory;
 
     public function __construct(Player $player){
         $this->player = $player;
+        $this->offHandInventory = new OffhandInventory($player);
+    }
+
+    public function getPlayer(): Player{
+        return $this->player;
+    }
+
+    public function getOffHandInventory(): OffhandInventory{
+        return $this->offHandInventory;
     }
 
     public function isGliding(): bool{

@@ -2,7 +2,7 @@
 
 namespace CLADevs\VanillaX\commands;
 
-use CLADevs\VanillaX\items\utils\NonAutomaticCallItemTrait;
+use CLADevs\VanillaX\utils\item\NonAutomaticCallItemTrait;
 use CLADevs\VanillaX\utils\Utils;
 use CLADevs\VanillaX\VanillaX;
 use pocketmine\Server;

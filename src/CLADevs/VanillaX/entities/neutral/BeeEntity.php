@@ -2,6 +2,7 @@
 
 namespace CLADevs\VanillaX\entities\neutral;
 
+use CLADevs\VanillaX\entities\utils\interferces\EntityClassification;
 use CLADevs\VanillaX\entities\VanillaEntity;
 
 class BeeEntity extends VanillaEntity{
@@ -18,5 +19,13 @@ class BeeEntity extends VanillaEntity{
 
     public function getName(): string{
         return "Bee";
+    }
+    
+    public function getXpDropAmount(): int{
+        return $this->getLastHitByPlayer() ? mt_rand(1,3) : 0;
+    }
+
+    public function getClassification(): int{
+        return EntityClassification::ARTHROPODS;
     }
 }

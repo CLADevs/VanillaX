@@ -3,6 +3,10 @@
 namespace CLADevs\VanillaX\entities\neutral;
 
 use CLADevs\VanillaX\entities\VanillaEntity;
+use CLADevs\VanillaX\entities\utils\ItemHelper;
+use pocketmine\item\Item;
+use pocketmine\item\ItemFactory;
+use pocketmine\item\ItemIds;
 
 class EndermanEntity extends VanillaEntity{
 
@@ -18,5 +22,19 @@ class EndermanEntity extends VanillaEntity{
 
     public function getName(): string{
         return "Enderman";
+    }
+ 
+    /**
+     * @return Item[]
+     */
+    public function getDrops(): array{
+        $ender_pearl = ItemFactory::get(ItemIds::ENDER_PEARL, 0, 1);
+        ItemHelper::applySetCount($ender_pearl, 0, 1);
+        ItemHelper::applyLootingEnchant($this, $ender_pearl);
+        return [$ender_pearl];
+    }
+    
+    public function getXpDropAmount(): int{
+        return $this->getLastHitByPlayer() ? 5 : 0;
     }
 }

@@ -19,4 +19,10 @@ class PiglinEntity extends VanillaEntity{
     public function getName(): string{
         return "Piglin";
     }
+
+    //TODO drops
+    
+    public function getXpDropAmount(): int{
+        return $this->getLastHitByPlayer() ? 5 + (count($this->getArmorInventory()->getContents()) * mt_rand(1,3)) : 0;
+    }
 }

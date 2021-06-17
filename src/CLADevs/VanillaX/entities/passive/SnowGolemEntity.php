@@ -2,7 +2,11 @@
 
 namespace CLADevs\VanillaX\entities\passive;
 
+use CLADevs\VanillaX\entities\utils\ItemHelper;
 use CLADevs\VanillaX\entities\VanillaEntity;
+use pocketmine\item\Item;
+use pocketmine\item\ItemFactory;
+use pocketmine\item\ItemIds;
 
 class SnowGolemEntity extends VanillaEntity{
 
@@ -18,5 +22,14 @@ class SnowGolemEntity extends VanillaEntity{
 
     public function getName(): string{
         return "Snow Golem";
+    }
+
+    /**
+     * @return Item[]
+     */
+    public function getDrops(): array{
+        $snowball = ItemFactory::get(ItemIds::SNOWBALL, 0, 1);
+        ItemHelper::applySetCount($snowball, 0, 15);
+        return [$snowball];
     }
 }

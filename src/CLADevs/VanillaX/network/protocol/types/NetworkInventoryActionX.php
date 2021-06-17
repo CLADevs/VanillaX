@@ -6,8 +6,10 @@ use CLADevs\VanillaX\inventories\actions\EnchantItemAction;
 use CLADevs\VanillaX\inventories\actions\RepairItemAction;
 use CLADevs\VanillaX\inventories\types\AnvilInventory;
 use CLADevs\VanillaX\inventories\types\EnchantInventory;
+use CLADevs\VanillaX\VanillaX;
 use pocketmine\inventory\transaction\action\InventoryAction;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
+use pocketmine\network\mcpe\protocol\types\ContainerIds;
 use pocketmine\network\mcpe\protocol\types\inventory\UIInventorySlotOffset;
 use pocketmine\network\mcpe\protocol\types\NetworkInventoryAction;
 use pocketmine\network\mcpe\protocol\types\WindowTypes;
@@ -28,11 +30,12 @@ class NetworkInventoryActionX extends NetworkInventoryAction{
         /** Nukkit Transaction for Anvil */
         $oldItem = $this->oldItem->getItemStack();
         $newItem = $this->newItem->getItemStack();
-        
+
         switch($this->sourceType){
             case self::SOURCE_CONTAINER:
+
                 $otherInventory = true;
-                if($this->windowId === 124){
+                if($this->windowId === ContainerIds::UI){
                     if(array_key_exists($this->inventorySlot, UIInventorySlotOffset::ANVIL)){
                         //Anvil
                         $window = $player->getWindow(WindowTypes::ANVIL);
@@ -54,6 +57,10 @@ class NetworkInventoryActionX extends NetworkInventoryAction{
                         $this->inventorySlot = UIInventorySlotOffset::ENCHANTING_TABLE[$this->inventorySlot];
                         $otherInventory = false;
                     }
+                }elseif($this->windowId === ContainerIds::OFFHAND){
+                    //OFF HAND
+                    $offHand = VanillaX::getInstance()->getSessionManager()->get($player)->getOffHandInventory();
+                    return new SlotChangeAction($offHand, $this->inventorySlot, $oldItem, $newItem);
                 }
                 if(!$otherInventory && ($window = $player->getWindow($this->windowId)) != null){
                     return new SlotChangeAction($window, $this->inventorySlot, $oldItem, $newItem);

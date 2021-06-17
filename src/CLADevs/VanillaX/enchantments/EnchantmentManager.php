@@ -2,6 +2,8 @@
 
 namespace CLADevs\VanillaX\enchantments;
 
+use CLADevs\VanillaX\enchantments\utils\EnchantmentTrait;
+use CLADevs\VanillaX\entities\utils\interferces\EntityClassification;
 use CLADevs\VanillaX\entities\VanillaEntity;
 use CLADevs\VanillaX\utils\Utils;
 use CLADevs\VanillaX\VanillaX;
@@ -25,69 +27,145 @@ use pocketmine\Player;
 
 class EnchantmentManager{
 
-    public static array $treasure = [Enchantment::FROST_WALKER, Enchantment::BINDING, Enchantment::SOUL_SPEED, Enchantment::MENDING, Enchantment::VANISHING];
-    public static array $global = [Enchantment::VANISHING, Enchantment::UNBREAKING, Enchantment::MENDING];
-    public static array $weapon = [Enchantment::BANE_OF_ARTHROPODS, Enchantment::SHARPNESS, Enchantment::SMITE];
-    public static array $tools = [Enchantment::EFFICIENCY, Enchantment::FORTUNE, Enchantment::SILK_TOUCH];
-    public static array $armors = [Enchantment::PROTECTION, Enchantment::BLAST_PROTECTION, Enchantment::FIRE_PROTECTION, Enchantment::PROJECTILE_PROTECTION];
-    public static array $helmet = [Enchantment::AQUA_AFFINITY, Enchantment::RESPIRATION];
-    public static array $boots = [Enchantment::DEPTH_STRIDER, Enchantment::FEATHER_FALLING, Enchantment::FROST_WALKER, Enchantment::SOUL_SPEED];
-    public static array $sword = [Enchantment::FIRE_ASPECT, Enchantment::KNOCKBACK, Enchantment::LOOTING];
-    public static array $elytra = [Enchantment::BINDING];
-    public static array $bow = [Enchantment::FLAME, Enchantment::INFINITY, Enchantment::PUNCH];
-    public static array $crossbow = [Enchantment::MULTISHOT, Enchantment::PIERCING, Enchantment::QUICK_CHARGE];
-    public static array $trident = [Enchantment::CHANNELING, Enchantment::IMPALING, Enchantment::LOYALTY, Enchantment::RIPTIDE];
-    public static array $fishingRod = [Enchantment::LUCK_OF_THE_SEA, Enchantment::LURE];
+    /** @var Enchantment[] */
+    private array $enchantments = [];
 
     public function startup(): void{
-        self::registerEnchantment(new Enchantment(Enchantment::AQUA_AFFINITY, "Aqua Affinity", Enchantment::RARITY_RARE, Enchantment::SLOT_HEAD, Enchantment::SLOT_NONE, 1));
-        self::registerEnchantment(new Enchantment(Enchantment::BANE_OF_ARTHROPODS, "Bane of Arthropods", Enchantment::RARITY_RARE, Enchantment::SLOT_SWORD, Enchantment::SLOT_AXE, 5));
-        self::registerEnchantment(new Enchantment(Enchantment::SMITE, "Smite", Enchantment::RARITY_RARE, Enchantment::SLOT_SWORD, Enchantment::SLOT_AXE, 5));
-        self::registerEnchantment(new Enchantment(Enchantment::BINDING, "Curse of Binding", Enchantment::RARITY_RARE, Enchantment::SLOT_ARMOR, Enchantment::SLOT_ELYTRA, 1));
-        self::registerEnchantment(new Enchantment(Enchantment::CHANNELING, "Channeling", Enchantment::RARITY_RARE, Enchantment::SLOT_TRIDENT, Enchantment::SLOT_NONE, 1));
-        self::registerEnchantment(new Enchantment(Enchantment::RIPTIDE, "Riptide", Enchantment::RARITY_RARE, Enchantment::SLOT_TRIDENT, Enchantment::SLOT_NONE, 3));
-        self::registerEnchantment(new Enchantment(Enchantment::LOYALTY, "Loyalty", Enchantment::RARITY_RARE, Enchantment::SLOT_TRIDENT, Enchantment::SLOT_NONE, 3));
-        self::registerEnchantment(new Enchantment(Enchantment::IMPALING, "Impaling", Enchantment::RARITY_RARE, Enchantment::SLOT_TRIDENT, Enchantment::SLOT_NONE, 5));
-        self::registerEnchantment(new Enchantment(Enchantment::DEPTH_STRIDER, "Depth Strider", Enchantment::RARITY_RARE, Enchantment::SLOT_FEET, Enchantment::SLOT_NONE, 3));
-        Utils::callDirectory("enchantments" . DIRECTORY_SEPARATOR . "types", function (string $namespace): void{
-            self::registerEnchantment(new $namespace());
+        Utils::callDirectory("enchantments", function (string $namespace): void{
+            if(in_array(EnchantmentTrait::class, class_uses($namespace), true)){
+                self::registerEnchantment(new $namespace());
+            }
         });
         //TODO Crossbow enchantment
     }
 
     public function registerEnchantment(Enchantment $enchantment): void{
+        $this->enchantments[$enchantment->getId()] = $enchantment;
         if(!in_array($enchantment->getId(), VanillaX::getInstance()->getConfig()->getNested("disabled.enchantments", []))){
             Enchantment::registerEnchantment($enchantment);
         }
     }
 
     /**
-     * @param bool $treasure
      * @return int[]
      */
-    public static function getAllEnchantments(bool $treasure = false): array{
-        $treasure = $treasure ? self::$treasure : [];
-        return array_merge(self::$global, self::$weapon, self::$tools, self::$armors, self::$helmet, self::$boots, self::$sword, self::$elytra, self::$bow, self::$crossbow, self::$trident, self::$fishingRod, $treasure);
+    public function getTreasureEnchantsId(): array{
+        return [Enchantment::FROST_WALKER, Enchantment::BINDING, Enchantment::SOUL_SPEED, Enchantment::MENDING, Enchantment::VANISHING];
     }
 
-    public static function getEnchantmentForItem(Item $item, bool $includeGlobal = true, bool $includeTreasures = true): ?array{
-        $enchantments = null;
+    /**
+     * @return int[]
+     */
+    public function getGlobalEnchantsId(): array{
+        return [Enchantment::VANISHING, Enchantment::UNBREAKING, Enchantment::MENDING];
+    }
+
+    /**
+     * @return int[]
+     */
+    public function getWeaponEnchantsId(): array{
+        return [Enchantment::BANE_OF_ARTHROPODS, Enchantment::SHARPNESS, Enchantment::SMITE];
+    }
+
+    /**
+     * @return int[]
+     */
+    public function getToolEnchantsId(): array{
+        return [Enchantment::EFFICIENCY, Enchantment::FORTUNE, Enchantment::SILK_TOUCH];
+    }
+
+    /**
+     * @return int[]
+     */
+    public function getArmorEnchantsId(): array{
+        return [Enchantment::PROTECTION, Enchantment::BLAST_PROTECTION, Enchantment::FIRE_PROTECTION, Enchantment::PROJECTILE_PROTECTION];
+    }
+
+    /**
+     * @return int[]
+     */
+    public function getHelmetEnchantsId(): array{
+        return [Enchantment::AQUA_AFFINITY, Enchantment::RESPIRATION];
+    }
+
+    /**
+     * @return int[]
+     */
+    public function getBootEnchantsId(): array{
+        return [Enchantment::DEPTH_STRIDER, Enchantment::FEATHER_FALLING, Enchantment::FROST_WALKER, Enchantment::SOUL_SPEED];
+    }
+
+    /**
+     * @return int[]
+     */
+    public function getSwordEncantsId(): array{
+        return [Enchantment::FIRE_ASPECT, Enchantment::KNOCKBACK, Enchantment::LOOTING];
+    }
+
+    /**
+     * @return int[]
+     */
+    public function getElytraEnchantsId(): array{
+        return [Enchantment::BINDING];
+    }
+
+    /**
+     * @return int[]
+     */
+    public function getBowEnchantsId(): array{
+        return [Enchantment::FLAME, Enchantment::INFINITY, Enchantment::PUNCH];
+    }
+    /**
+     * @return int[]
+     */
+    public function getCrossbowEnchantsId(): array{
+        return [Enchantment::MULTISHOT, Enchantment::PIERCING, Enchantment::QUICK_CHARGE];
+    }
+
+    /**
+     * @return int[]
+     */
+    public function getTridentEnchantsId(): array{
+        return [Enchantment::CHANNELING, Enchantment::IMPALING, Enchantment::LOYALTY, Enchantment::RIPTIDE];
+    }
+
+    /**
+     * @return int[]
+     */
+    public function getFishingRodEnchantsId(): array{
+        return [Enchantment::LUCK_OF_THE_SEA, Enchantment::LURE];
+    }
+
+    /**
+     * @return Enchantment[]
+     */
+    public function getEnchantments(): array{
+        return $this->enchantments;
+    }
+
+    public function getAllEnchantments(bool $treasure = false): array{
+        $treasure = $treasure ? $this->getTreasureEnchantsId() : [];
+        return array_merge($this->getGlobalEnchantsId(), $this->getWeaponEnchantsId(), $this->getToolEnchantsId(), $this->getArmorEnchantsId(), $this->getHelmetEnchantsId(), $this->getBootEnchantsId(), $this->getSwordEncantsId(), $this->getElytraEnchantsId(), $this->getBowEnchantsId(), $this->getCrossbowEnchantsId(), $this->getTridentEnchantsId(), $this->getFishingRodEnchantsId(), $treasure);
+    }
+
+    public function getEnchantmentForItem(Item $item, bool $includeGlobal = true, bool $includeTreasures = true): ?array{
+        $enchantments = VanillaX::getInstance()->getEnchantmentManager()->getEnchantments();
 
         /** Armor */
         if($item instanceof Armor){
-            $enchantments = self::$armors;
+            $enchantments = $this->getArmorEnchantsId();
         }
         /** Sword or Axe */
         if($enchantments === null && ($item instanceof Sword || $item instanceof Axe)){
-            $enchantments = self::$weapon;
+            $enchantments = $this->getWeaponEnchantsId();
 
             if($item instanceof Sword){
-                $enchantments = array_merge($enchantments, self::$sword);
+                $enchantments = array_merge($enchantments, $this->getSwordEncantsId());
             }
         }
         /** Pickaxe, Axe or Shove */
         if($enchantments === null && ($item instanceof Pickaxe || $item instanceof Axe || $item instanceof Shovel)){
-            $enchantments = self::$tools;
+            $enchantments = $this->getToolEnchantsId();
         }
         /** Helmet, Boots, Elytra, Bow, Crossbow, Trident and FishingRod */
         switch($item->getId()){
@@ -96,31 +174,31 @@ class EnchantmentManager{
             case ItemIds::GOLD_HELMET:
             case ItemIds::IRON_HELMET:
             case ItemIds::DIAMOND_HELMET:
-                $enchantments = array_merge($enchantments, self::$helmet);
+                $enchantments = array_merge($enchantments, $this->getHelmetEnchantsId());
                 break;
             case ItemIds::LEATHER_BOOTS:
             case ItemIds::CHAIN_BOOTS:
             case ItemIds::GOLD_BOOTS:
             case ItemIds::IRON_BOOTS:
             case ItemIds::DIAMOND_BOOTS:
-                $enchantments = array_merge($enchantments, self::$boots);
+                $enchantments = array_merge($enchantments, $this->getBootEnchantsId());
                 break;
             case ItemIds::ELYTRA:
                 if($includeTreasures){
-                    $enchantments = array_merge($enchantments, self::$elytra);
+                    $enchantments = array_merge($enchantments, $this->getElytraEnchantsId());
                 }
                 break;
             case ItemIds::BOW:
-                $enchantments = self::$bow;
+                $enchantments = $this->getBowEnchantsId();
                 break;
             case ItemIds::CROSSBOW:
-                $enchantments = self::$crossbow;
+                $enchantments = $this->getCrossbowEnchantsId();
                 break;
             case ItemIds::TRIDENT:
-                $enchantments = self::$trident;
+                $enchantments = $this->getTridentEnchantsId();
                 break;
             case ItemIds::FISHING_ROD:
-                $enchantments = self::$fishingRod;
+                $enchantments = $this->getFishingRodEnchantsId();
                 if(!$includeTreasures){
                     unset($enchantments[Enchantment::FROST_WALKER]);
                     unset($enchantments[Enchantment::SOUL_SPEED]);
@@ -129,7 +207,7 @@ class EnchantmentManager{
         }
         if($enchantments === null) return null;
         if($includeGlobal){
-            $global = self::$global;
+            $global = $this->getGlobalEnchantsId();
             unset($global[Enchantment::MENDING]);
             unset($global[Enchantment::VANISHING]);
             return array_merge($global, $enchantments);
@@ -165,17 +243,17 @@ class EnchantmentManager{
                     $item = $damager->getInventory()->getItemInHand();
 
                     /** Bane of Arthropods  */
-                    if($item->hasEnchantment(Enchantment::BANE_OF_ARTHROPODS) && isset(VanillaEntity::ARTHROPODS[$entity::NETWORK_ID])){
+                    if($item->hasEnchantment(Enchantment::BANE_OF_ARTHROPODS) && $entity->getClassification() === EntityClassification::ARTHROPODS){
                         $level = $item->getEnchantmentLevel(Enchantment::BANE_OF_ARTHROPODS);
                         $event->setBaseDamage($event->getBaseDamage() + ($level * 2.5));
 
-                        $duration = mt_rand(10, 15) / 10; //this just gets 1 to 1.5
+                        $duration = mt_rand(10, 15) / 10;
                         $duration += $level > 1 ? (0.5 * $level) : 0;
                         $entity->addEffect(new EffectInstance(Effect::getEffect(Effect::SLOWNESS), 20 * $duration, 4));
                     }
 
                     /** Smite  */
-                    if($item->hasEnchantment(Enchantment::SMITE) && isset(VanillaEntity::UNDEAD[$entity::NETWORK_ID])){
+                    if($item->hasEnchantment(Enchantment::SMITE) && $entity->getClassification() === EntityClassification::UNDEAD){
                         $level = $item->getEnchantmentLevel(Enchantment::SMITE);
                         $event->setBaseDamage($event->getBaseDamage() + ($level * 2.5));
                     }

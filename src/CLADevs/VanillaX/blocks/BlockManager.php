@@ -2,22 +2,14 @@
 
 namespace CLADevs\VanillaX\blocks;
 
-use CLADevs\VanillaX\blocks\tiles\BeaconTile;
-use CLADevs\VanillaX\blocks\tiles\BrewingStandTile;
-use CLADevs\VanillaX\blocks\tiles\CommandBlockTile;
-use CLADevs\VanillaX\blocks\tiles\DispenserTile;
-use CLADevs\VanillaX\blocks\tiles\DropperTile;
-use CLADevs\VanillaX\blocks\tiles\HopperTile;
-use CLADevs\VanillaX\blocks\tiles\JukeboxTile;
-use CLADevs\VanillaX\blocks\tiles\MobSpawnerTile;
-use CLADevs\VanillaX\blocks\tiles\ShulkerBoxTile;
-use CLADevs\VanillaX\blocks\types\CommandBlock;
-use CLADevs\VanillaX\blocks\types\redstone\RedstoneComparator;
-use CLADevs\VanillaX\blocks\types\redstone\RedstoneLamp;
-use CLADevs\VanillaX\blocks\types\redstone\RedstoneRepeater;
-use CLADevs\VanillaX\blocks\types\ShulkerBoxBlock;
-use CLADevs\VanillaX\items\utils\NonAutomaticCallItemTrait;
-use CLADevs\VanillaX\items\utils\NonCreativeItemTrait;
+use CLADevs\VanillaX\blocks\block\CommandBlock;
+use CLADevs\VanillaX\blocks\block\redstone\RedstoneComparator;
+use CLADevs\VanillaX\blocks\block\redstone\RedstoneLamp;
+use CLADevs\VanillaX\blocks\block\redstone\RedstoneRepeater;
+use CLADevs\VanillaX\blocks\block\ShulkerBoxBlock;
+use CLADevs\VanillaX\blocks\utils\TileVanilla;
+use CLADevs\VanillaX\utils\item\NonAutomaticCallItemTrait;
+use CLADevs\VanillaX\utils\item\NonCreativeItemTrait;
 use CLADevs\VanillaX\utils\Utils;
 use CLADevs\VanillaX\VanillaX;
 use pocketmine\block\Block;
@@ -27,6 +19,7 @@ use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\Server;
 use pocketmine\tile\Tile;
+use ReflectionClass;
 use ReflectionException;
 use ReflectionProperty;
 
@@ -47,6 +40,7 @@ class BlockManager{
         $value = $reflection->getValue();
         $value->setSize(16384);
         $reflection->setValue(null, $value);
+
         BlockFactory::$light->setSize(16384);
         BlockFactory::$lightFilter->setSize(16384);
         BlockFactory::$solid->setSize(16384);
@@ -57,7 +51,7 @@ class BlockManager{
     }
 
     private function initializeBlocks(): void{
-        Utils::callDirectory("blocks" . DIRECTORY_SEPARATOR . "types", function (string $namespace): void{
+        Utils::callDirectory("blocks" . DIRECTORY_SEPARATOR . "block", function (string $namespace): void{
             if(!isset(class_implements($namespace)[NonAutomaticCallItemTrait::class])){
                 if(self::registerBlock(($class = new $namespace()), true, !$class instanceof NonCreativeItemTrait) && $class instanceof Block && $class->ticksRandomly()){
                     foreach(Server::getInstance()->getLevels() as $level){
@@ -85,16 +79,30 @@ class BlockManager{
      * @throws ReflectionException
      */
     private function initializeTiles(): void{
-        self::registerTile(MobSpawnerTile::class, [Tile::MOB_SPAWNER, "minecraft:mob_spawner"], BlockIds::MOB_SPAWNER);
-        self::registerTile(CommandBlockTile::class, [TileIdentifiers::COMMAND_BLOCK, "minecraft:command_block"], [BlockIds::COMMAND_BLOCK, BlockIds::CHAIN_COMMAND_BLOCK, BlockIds::REPEATING_COMMAND_BLOCK]);
-        self::registerTile(HopperTile::class, [TileIdentifiers::HOPPER, "minecraft:hopper"], BlockIds::HOPPER_BLOCK);
-        self::registerTile(JukeboxTile::class, [TileIdentifiers::JUKEBOX, "minecraft:jukebox"], BlockIds::JUKEBOX);
-        self::registerTile(BeaconTile::class, [TileIdentifiers::BEACON, "minecraft:beacon"], BlockIds::BEACON);
-        self::registerTile(DispenserTile::class, [TileIdentifiers::DISPENSER, "minecraft:dispenser"], BlockIds::DISPENSER);
-        self::registerTile(DropperTile::class, [TileIdentifiers::DROPPER, "minecraft:dropper"], BlockIds::DROPPER);
-        self::registerTile(BrewingStandTile::class, [Tile::BREWING_STAND, "minecraft:brewing_stand"], BlockIds::BREWING_STAND_BLOCK);
-        self::registerTile(ShulkerBoxTile::class, [TileIdentifiers::SHULKER_BOX, "minecraft:shulker_box"], [BlockIds::SHULKER_BOX, BlockIds::UNDYED_SHULKER_BOX]);
-        //TODO Tile::registerTile(StoneCutterTile::class, [TileIdentifiers::STONECUTTER, "minecraft:stonecutter"]);
+        $tileConst = [];
+        foreach((new ReflectionClass(TileVanilla::class))->getConstants() as $id => $value){
+            $tileConst[$value] = $id;
+        }
+
+        Utils::callDirectory("blocks" . DIRECTORY_SEPARATOR . "tile", function (string $namespace)use($tileConst): void{
+            if(!isset(class_implements($namespace)[NonAutomaticCallItemTrait::class])){
+                $rc = new ReflectionClass($namespace);
+                $tileID = $rc->getConstant("TILE_ID");
+                $tileBlock = $rc->getConstant("TILE_BLOCK");
+
+                if($tileID !== false){
+                    $saveNames = [$tileID];
+                    $constID = $tileConst[$tileID] ?? null;
+
+                    if($constID !== null){
+                        $saveNames[] = "minecraft:" . strtolower($constID);
+                    }
+                    self::registerTile($namespace, $saveNames, $tileBlock === false ? BlockIds::AIR : $tileBlock);
+                }else{
+                    VanillaX::getInstance()->getLogger()->error("Tile ID could not be found for '$namespace'");
+                }
+            }
+        });
     }
 
     public function registerBlock(Block $block, bool $override = false, bool $creativeItem = false): bool{
