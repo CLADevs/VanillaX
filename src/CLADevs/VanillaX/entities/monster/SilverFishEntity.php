@@ -5,7 +5,7 @@ namespace CLADevs\VanillaX\entities\monster;
 use CLADevs\VanillaX\entities\utils\interferces\EntityClassification;
 use CLADevs\VanillaX\entities\VanillaEntity;
 
-class SilverfishEntity extends VanillaEntity{
+class SilverFishEntity extends VanillaEntity{
 
     const NETWORK_ID = self::SILVERFISH;
 
