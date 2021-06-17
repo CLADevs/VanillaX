@@ -14,6 +14,6 @@ class SeaLanternBlock extends SeaLantern{
      * @return Item[]
      */
     public function getDropsForCompatibleTool(Item $item): array{
-        return [ItemFactory::get(Item::PRISMARINE_CRYSTALS, 0, min(5, mt_rand(2, 3) + $item->getEnchantment(Enchantment::FORTUNE)))];
+        return [ItemFactory::get(Item::PRISMARINE_CRYSTALS, 0, min(5, mt_rand(2, 3) + $item->getEnchantment(Enchantment::FORTUNE)->getLevel()))];
     }
 }
