@@ -17,23 +17,13 @@ class FireworkRocketItem extends Item{
     }
 
     public function onActivate(Player $player, Block $blockReplace, Block $blockClicked, int $face, Vector3 $clickVector): bool{
-       $this->onItemUse($player, $blockReplace->add(0, 1));
-       return true;
-    }
-
-    public function onClickAir(Player $player, Vector3 $directionVector): bool{
-        $this->onItemUse($player);
-        return true;
-    }
-
-    public function onItemUse(Player $player, Vector3 $pos = null): void{
-        $pos = $pos ?? $player;
-        $entity = new FireworkRocketEntity($player->getLevel(), FireworkRocketEntity::createBaseNBT($pos->subtract(0, 1)), $player);
+        $entity = new FireworkRocketEntity($player->getLevel(), FireworkRocketEntity::createBaseNBT($blockReplace->add(0.5, 0, 0.5)), $player);
         if($this->getNamedTag()->hasTag("Fireworks", CompoundTag::class)){
             $entity->getDataPropertyManager()->setCompoundTag(16, $this->getNamedTag());
         }
         $entity->spawnToAll();
         Session::playSound($player, "firework.launch");
         if($player->isSurvival() || $player->isAdventure()) $this->pop();
+       return true;
     }
 }

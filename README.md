@@ -71,7 +71,7 @@
 - ArmorStand
 - Shield
 - Firework Rocket
-- Crossbow
+- Crossbow (TODO: Fireworks functionality)
 
 #### TODO Items:
 - Fishing Road
@@ -82,14 +82,14 @@
 - Map
 - Painting 
 - Saddle
-- Firework Star
+- Fireworks
 - 1.17 Items
 
 #### Features:
 - Weather
 - GameRules
 - Enchantments (TODO: Except Crossbows enchantments)
-- Offhand (BUG: Offhand item isnt shown once you relog, but it is there)
+- Offhand
 
 #### TODO Features:
 - More Biomes in Normal World

@@ -15,6 +15,7 @@ use pocketmine\event\Listener;
 use pocketmine\event\server\DataPacketReceiveEvent;
 use pocketmine\event\server\DataPacketSendEvent;
 use pocketmine\level\Position;
+use pocketmine\network\mcpe\protocol\AddPlayerPacket;
 use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
 use pocketmine\network\mcpe\protocol\CommandBlockUpdatePacket;
 use pocketmine\network\mcpe\protocol\ContainerClosePacket;
@@ -44,10 +45,22 @@ class PacketListener implements Listener{
     public function onDataPacketSend(DataPacketSendEvent $event): void{
         $packet = $event->getPacket();
 
-        if(!!$event->isCancelled()){
+        if(!$event->isCancelled()){
+            $player = $event->getPlayer();
+
             switch($packet::NETWORK_ID){
                 case ProtocolInfo::AVAILABLE_COMMANDS_PACKET:
                     if($packet instanceof AvailableCommandsPacket) $this->handleCommandEnum($packet);
+                    break;
+                case ProtocolInfo::ADD_PLAYER_PACKET:
+                    if($packet instanceof AddPlayerPacket){
+                        $p = Server::getInstance()->getPlayer($packet->username);
+
+                        if($p !== null){
+                            VanillaX::getInstance()->getSessionManager()->get($player)->getOffHandInventory()->sendContents();
+                            VanillaX::getInstance()->getSessionManager()->get($p)->getOffHandInventory()->sendContents();
+                        }
+                    }
                     break;
             }
         }

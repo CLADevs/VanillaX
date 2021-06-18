@@ -8,6 +8,7 @@ use CLADevs\VanillaX\network\protocol\AnvilDamagePacketX;
 use CLADevs\VanillaX\network\protocol\CommandBlockUpdatePacketX;
 use CLADevs\VanillaX\network\protocol\FilterTextPacketX;
 use CLADevs\VanillaX\network\protocol\InventoryTransactionPacketX;
+use CLADevs\VanillaX\network\protocol\MobEquipmentPacketX;
 use CLADevs\VanillaX\network\protocol\PlayerActionPacketX;
 use CLADevs\VanillaX\network\protocol\PlayerInputPacketX;
 use pocketmine\network\mcpe\protocol\PacketPool;
@@ -24,5 +25,6 @@ class NetworkManager{
         PacketPool::registerPacket(new PlayerActionPacketX());
         PacketPool::registerPacket(new CommandBlockUpdatePacketX());
         PacketPool::registerPacket(new PlayerInputPacketX());
+        PacketPool::registerPacket(new MobEquipmentPacketX());
     }
 }

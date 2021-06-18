@@ -2,7 +2,6 @@
 
 namespace CLADevs\VanillaX\listeners\types;
 
-use CLADevs\VanillaX\inventories\types\OffhandInventory;
 use CLADevs\VanillaX\items\ItemManager;
 use CLADevs\VanillaX\items\types\ShieldItem;
 use CLADevs\VanillaX\listeners\ListenerManager;
@@ -14,7 +13,6 @@ use pocketmine\block\StillWater;
 use pocketmine\entity\Entity;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerBedLeaveEvent;
-use pocketmine\event\player\PlayerDataSaveEvent;
 use pocketmine\event\player\PlayerDeathEvent;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\event\player\PlayerJoinEvent;
@@ -53,6 +51,8 @@ class PlayerListener implements Listener{
                 $entity->onCollideWithPlayer($player);
             }
         }
+        $session->getOffHandInventory()->saveContents();
+        $manager->remove($player);
     }
 
     public function onInteract(PlayerInteractEvent $event): void{
@@ -139,17 +139,5 @@ class PlayerListener implements Listener{
                 }
             }
         }
-    }
-
-    public function onSave(PlayerDataSaveEvent $event): void{
-        $playerName = $event->getPlayerName();
-
-        if(!$event->isCancelled()){
-            $offhand = VanillaX::getInstance()->getSessionManager()->get($playerName)->getOffHandInventory();
-            $nbt = $event->getSaveData();
-            $nbt->setTag($offhand->getItem(0)->nbtSerialize(-1, OffhandInventory::TAG_OFF_HAND_ITEM));
-            $event->setSaveData($nbt);
-        }
-        VanillaX::getInstance()->getSessionManager()->remove($playerName);
     }
 }

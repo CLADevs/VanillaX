@@ -6,7 +6,6 @@ use CLADevs\VanillaX\inventories\actions\EnchantItemAction;
 use CLADevs\VanillaX\inventories\actions\RepairItemAction;
 use CLADevs\VanillaX\inventories\types\AnvilInventory;
 use CLADevs\VanillaX\inventories\types\EnchantInventory;
-use CLADevs\VanillaX\VanillaX;
 use pocketmine\inventory\transaction\action\InventoryAction;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
 use pocketmine\network\mcpe\protocol\types\ContainerIds;
@@ -57,10 +56,6 @@ class NetworkInventoryActionX extends NetworkInventoryAction{
                         $this->inventorySlot = UIInventorySlotOffset::ENCHANTING_TABLE[$this->inventorySlot];
                         $otherInventory = false;
                     }
-                }elseif($this->windowId === ContainerIds::OFFHAND){
-                    //OFF HAND
-                    $offHand = VanillaX::getInstance()->getSessionManager()->get($player)->getOffHandInventory();
-                    return new SlotChangeAction($offHand, $this->inventorySlot, $oldItem, $newItem);
                 }
                 if(!$otherInventory && ($window = $player->getWindow($this->windowId)) != null){
                     return new SlotChangeAction($window, $this->inventorySlot, $oldItem, $newItem);

@@ -19,17 +19,18 @@ class SessionManager{
 
     /**
      * @param Player|string $player
-     * @return Session
+     * @return null|Session
      */
-    public function get($player): Session{
+    public function get($player): ?Session{
         if($player instanceof Player) $this->add($player);
-        return $this->sessions[$player instanceof Player ? $player->getName() : $player];
+        return $this->sessions[$player instanceof Player ? $player->getName() : $player] ?? null;
     }
 
-    public function add(Player $player): void{
+    public function add(Player $player): Session{
         if(!$this->has($player)){
             $this->sessions[$player->getName()] = new Session($player);
         }
+        return $this->sessions[$player->getName()];
     }
 
     /**
