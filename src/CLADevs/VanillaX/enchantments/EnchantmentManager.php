@@ -26,7 +26,6 @@ use pocketmine\item\Sword;
 use pocketmine\Player;
 
 class EnchantmentManager{
-    use EnchantmentTrait;
 
     /** @var Enchantment[] */
     private array $enchantments = [];
