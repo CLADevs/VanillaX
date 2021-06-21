@@ -12,7 +12,6 @@ use pocketmine\network\mcpe\protocol\GameRulesChangedPacket;
 use pocketmine\network\mcpe\protocol\types\PlayerPermissions;
 use pocketmine\Player;
 use pocketmine\Server;
-use pocketmine\utils\TextFormat;
 
 class GameruleCommand extends Command{
 
@@ -37,11 +36,7 @@ class GameruleCommand extends Command{
 
     public function execute(CommandSender $sender, string $commandLabel, array $args): void{
         if(!$this->testPermission($sender)) return;
-        if(!$sender instanceof Player){
-            $sender->sendMessage(TextFormat::RED . "This command is only available in game.");
-            return;
-        }
-        if(!isset($args[0]) || !isset($args[1])){
+        if(!isset($args[0]) || !isset($args[1]) && !$sender instanceof Player){
             $this->sendSyntaxError($sender, "", "/$commandLabel");
             return;
         }
