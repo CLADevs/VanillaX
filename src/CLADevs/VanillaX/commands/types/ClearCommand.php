@@ -4,6 +4,7 @@ namespace CLADevs\VanillaX\commands\types;
 
 use CLADevs\VanillaX\commands\Command;
 use CLADevs\VanillaX\commands\utils\CommandArgs;
+use CLADevs\VanillaX\commands\utils\CommandTargetSelector
 use CLADevs\VanillaX\utils\Utils;
 use Exception;
 use pocketmine\command\CommandSender;
