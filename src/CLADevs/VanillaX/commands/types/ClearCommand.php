@@ -33,7 +33,11 @@ class ClearCommand extends Command{
         $itemName = null;
         $data = null;
         $maxCount = null;
-
+        
+        if(!isset($args[0])){
+            $this->sendSyntaxError($sender, "", "/$commandLabel");
+            return;
+        }
         if(isset($args[0])){
             if(!$player = CommandTargetSelector::getFromString($sender, $args[0], true, true, true)) return;
             if(isset($args[1])){
