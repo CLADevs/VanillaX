@@ -3,7 +3,7 @@
 namespace CLADevs\VanillaX\entities\object;
 
 use CLADevs\VanillaX\entities\utils\EntityInteractResult;
-use CLADevs\VanillaX\entities\utils\interferces\EntityInteractable;
+use CLADevs\VanillaX\entities\utils\interfaces\EntityInteractable;
 use CLADevs\VanillaX\network\gamerules\GameRule;
 use pocketmine\entity\Entity;
 use pocketmine\item\ItemFactory;

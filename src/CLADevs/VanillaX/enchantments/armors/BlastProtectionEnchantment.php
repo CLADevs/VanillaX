@@ -4,7 +4,9 @@ namespace CLADevs\VanillaX\enchantments\armors;
 
 use CLADevs\VanillaX\enchantments\utils\EnchantmentTrait;
 use pocketmine\event\entity\EntityDamageEvent;
+use pocketmine\item\Armor;
 use pocketmine\item\enchantment\ProtectionEnchantment;
+use pocketmine\item\Item;
 
 class BlastProtectionEnchantment extends ProtectionEnchantment{
     use EnchantmentTrait;
@@ -18,5 +20,9 @@ class BlastProtectionEnchantment extends ProtectionEnchantment{
 
     public function getIncompatibles(): array{
         return [self::FIRE_PROTECTION, self::PROJECTILE_PROTECTION, self::PROTECTION];
+    }
+
+    public function isItemCompatible(Item $item): bool{
+        return $item instanceof Armor;
     }
 }

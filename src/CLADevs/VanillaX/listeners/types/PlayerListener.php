@@ -2,6 +2,7 @@
 
 namespace CLADevs\VanillaX\listeners\types;
 
+use CLADevs\VanillaX\entities\utils\interfaces\EntityRidingHeldItemChange;
 use CLADevs\VanillaX\items\ItemManager;
 use CLADevs\VanillaX\items\types\ShieldItem;
 use CLADevs\VanillaX\listeners\ListenerManager;
@@ -16,6 +17,7 @@ use pocketmine\event\player\PlayerBedLeaveEvent;
 use pocketmine\event\player\PlayerBlockPickEvent;
 use pocketmine\event\player\PlayerDeathEvent;
 use pocketmine\event\player\PlayerInteractEvent;
+use pocketmine\event\player\PlayerItemHeldEvent;
 use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\player\PlayerMoveEvent;
 use pocketmine\event\player\PlayerQuitEvent;
@@ -62,15 +64,6 @@ class PlayerListener implements Listener{
             $item = $event->getItem();
 
             if(($slot = ItemManager::getArmorSlot($item, true)) !== null && $player->getArmorInventory()->getItem($slot)->isNull()){
-                if(isset($this->armorStandItemsQueue[$player->getName()])){
-                    $slot = $this->manager->armorStandItemsQueue[$player->getName()];
-
-                    if($item->equalsExact($player->getInventory()->getHotbarSlotItem($slot))){
-                        unset($this->manager->armorStandItemsQueue[$player->getName()]);
-                        $event->setCancelled();
-                        return;
-                    }
-                }
                 $player->getArmorInventory()->setItem($slot, $item);
                 $item->pop();
                 $player->getInventory()->setItemInHand($item);
@@ -78,45 +71,29 @@ class PlayerListener implements Listener{
         }
     }
 
-    public function onPlayerPickBlock(PlayerBlockPickEvent $event): void{
-        $event->setCancelled();
-        $player = $event->getPlayer();
-        $inventory = $player->getInventory();
-        $resultItem = $event->getResultItem();
-        $hatbarSize = $inventory->getHotbarSize();
+    public function onBlockPick(PlayerBlockPickEvent $event): void{
+        if(!$event->isCancelled()){
+            $player = $event->getPlayer();
+            $inventory = $player->getInventory();
+            $result = $event->getResultItem();
+            $freeIndex = null;
+            $existIndex = null;
 
-        $originSlot = -1;
-        foreach($inventory->getContents() as $i => $item){ 
-            if($resultItem->equals($item, true, true)){
-                $resultItem = $item;
-                $originSlot = $i;
-                break;
-            }
-        }
-        if($originSlot >= 0 && $originSlot < $hatbarSize){ 
-            $inventory->setHeldItemIndex($originSlot);
-            return;
-        }
-        $targetItem = $inventory->getItemInHand();
-        $targetSlot = $inventory->getHeldItemIndex();
-        if(!$targetItem->isNull()){
-            for($i = 0; $i < $hatbarSize; ++$i){ 
-                $item = $inventory->getItem($i);
-                if($item->isNull()){
-                    $targetItem = $item;
-                    $targetSlot = $i;
-                    $inventory->setHeldItemIndex($targetSlot);
+            for($i = 0; $i <= 8; $i++){
+                if($inventory->isSlotEmpty($i) && $freeIndex === null){
+                    $freeIndex = $i;
+                }elseif($inventory->getItem($i)->equals($result)){
+                    $existIndex = $i;
                     break;
                 }
             }
-        }
-        if($originSlot !== -1){ 
-            $inventory->setItem($targetSlot, $resultItem);
-            $inventory->setItem($originSlot, $targetItem);
-        }elseif($player->isCreative()){ 
-            $inventory->setItem($targetSlot, $resultItem);
-            if(!$targetItem->isNull()){ 
-                $inventory->addItem($targetItem);
+            if($existIndex !== null){
+                $inventory->setHeldItemIndex($existIndex);
+                return;
+            }
+            if(!$inventory->getItemInHand()->isNull() && $freeIndex !== null){
+                $event->setCancelled();
+                $inventory->setItem($freeIndex, $event->getResultItem());
             }
         }
     }
@@ -181,6 +158,18 @@ class PlayerListener implements Listener{
                         }
                     }
                 }
+            }
+        }
+    }
+
+    public function onChangeSlot(PlayerItemHeldEvent $event): void{
+        if(!$event->isCancelled()){
+            $player = $event->getPlayer();
+            $session = VanillaX::getInstance()->getSessionManager()->get($player);
+            $entity = $session->getRidingEntity();
+
+            if($entity instanceof EntityRidingHeldItemChange){
+                $entity->onSlotChange($player, $player->getInventory()->getItemInHand(), $event->getItem());
             }
         }
     }

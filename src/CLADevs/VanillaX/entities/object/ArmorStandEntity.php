@@ -2,8 +2,8 @@
 
 namespace CLADevs\VanillaX\entities\object;
 
-use CLADevs\VanillaX\entities\utils\EntityInteractResult;
-use CLADevs\VanillaX\entities\utils\interferces\EntityInteractable;
+use CLADevs\VanillaX\entities\utils\EntityButtonResult;
+use CLADevs\VanillaX\entities\utils\interfaces\EntityInteractButton;
 use CLADevs\VanillaX\items\ItemManager;
 use CLADevs\VanillaX\network\gamerules\GameRule;
 use CLADevs\VanillaX\session\Session;
@@ -22,16 +22,18 @@ use pocketmine\network\mcpe\protocol\types\inventory\ItemStackWrapper;
 use pocketmine\Player;
 use pocketmine\Server;
 
-class ArmorStandEntity extends Living implements EntityInteractable{
+class ArmorStandEntity extends Living implements EntityInteractButton{
+
+    const BUTTON_EQUIP = "Equip";
+    const BUTTON_POSE = "Pose";
 
     const NETWORK_ID = self::ARMOR_STAND;
 
     const EQUIPMENT_MAINHAND = 0;
-    const EQUIPMENT_OFFHAND = 1;
-    const EQUIPMENT_HEAD = 2;
-    const EQUIPMENT_CHEST = 3;
-    const EQUIPMENT_LEGS = 4;
-    const EQUIPMENT_FEETS = 5;
+    const EQUIPMENT_HEAD = 1;
+    const EQUIPMENT_CHEST = 2;
+    const EQUIPMENT_LEGS = 3;
+    const EQUIPMENT_FEETS = 4;
 
     const POSE_DEFAULT = 0;
     const POSE_NO = 1;
@@ -56,22 +58,16 @@ class ArmorStandEntity extends Living implements EntityInteractable{
     protected $gravity = 0.5;
 
     private Item $mainHand;
-    private Item $offHand;
 
     private float $lastPunchTime = 0.0;
 
     protected function initEntity(): void{
         parent::initEntity();
-        /** Hands */
+        /** Main Hand */
         if($this->namedtag->hasTag(self::TAG_MAINHAND, CompoundTag::class)){
             $this->setMainHand(Item::nbtDeserialize($this->namedtag->getCompoundTag(self::TAG_MAINHAND)));
         }else{
             $this->mainHand = ItemFactory::get(ItemIds::AIR);
-        }
-        if($this->namedtag->hasTag(self::TAG_OFFHAND, CompoundTag::class)){
-            $this->setOffHand(Item::nbtDeserialize($this->namedtag->getCompoundTag(self::TAG_OFFHAND)));
-        }else{
-            $this->offHand = ItemFactory::get(ItemIds::AIR);
         }
 
         /** Armor */
@@ -92,66 +88,6 @@ class ArmorStandEntity extends Living implements EntityInteractable{
         return "ArmorStand";
     }
 
-    public function getMainHand(): Item{
-        return $this->mainHand;
-    }
-
-    public function setMainHand(Item $mainHand): void{
-        $this->mainHand = $mainHand;
-        Server::getInstance()->broadcastPacket(Server::getInstance()->getOnlinePlayers(), $this->getHandPacket());
-    }
-
-    public function getOffHand(): Item{
-        return $this->offHand;
-    }
-
-    public function setOffHand(Item $offHand): void{
-        $this->offHand = $offHand;
-        Server::getInstance()->broadcastPacket(Server::getInstance()->getOnlinePlayers(), $this->getHandPacket(null, true));
-    }
-
-    public function getHandPacket(Item $item = null, bool $offhand = false): MobEquipmentPacket{
-        if($item === null){
-            $item = $offhand ? $this->offHand : $this->mainHand;
-        }
-        $pk = new MobEquipmentPacket();
-        $pk->entityRuntimeId = $this->id;
-        $pk->item = ItemStackWrapper::legacy($item);
-        $pk->inventorySlot = $offhand ? 1 : 0;
-        $pk->hotbarSlot = $pk->inventorySlot;
-        return $pk;
-    }
-
-    public function killArmorStand(): void{
-        if(!$this->isFlaggedForDespawn()){
-            $this->flagForDespawn();
-
-            if(GameRule::getGameRuleValue(GameRule::DO_TILE_DROPS, $this->getLevel())){
-                $items = array_merge([ItemFactory::get(ItemIds::ARMOR_STAND)], $this->getArmorInventory()->getContents());
-                if(!$this->mainHand->isNull()){
-                    $items[] = $this->mainHand;
-                }
-                if(!$this->offHand->isNull()){
-                    $items[] = $this->offHand;
-                }
-                foreach($items as $item){
-                    $this->getLevel()->dropItem($this->add(0.5, 0.5, 0.5), $item);
-                }
-            }
-        }
-    }
-
-    public function getPose(): int{
-        return $this->getDataPropertyManager()->getInt(self::DATA_ARMOR_STAND_POSE_INDEX) ?? self::POSE_DEFAULT;
-    }
-
-    public function setPose(int $pose, bool $strict = true): void{
-        if($strict && ($pose > self::POSE_CANCAN_B || $pose < self::POSE_DEFAULT)){
-            $pose = self::POSE_DEFAULT;
-        }
-        $this->getDataPropertyManager()->setInt(self::DATA_ARMOR_STAND_POSE_INDEX, $pose);
-    }
-
     public function saveNBT(): void{
         /** Armor */
         $inventoryTag = new ListTag(self::TAG_ARMOR, [], NBT::TAG_Compound);
@@ -163,16 +99,14 @@ class ArmorStandEntity extends Living implements EntityInteractable{
             }
         }
 
-        /** Hands */
+        /** Main Hand */
         $this->namedtag->setTag($this->mainHand->nbtSerialize(-1, self::TAG_MAINHAND));
-        $this->namedtag->setTag($this->offHand->nbtSerialize(-1, self::TAG_OFFHAND));
         parent::saveNBT();
     }
 
     protected function sendSpawnPacket(Player $player): void{
         parent::sendSpawnPacket($player);
-        $player->dataPacket($this->getHandPacket());
-        $player->dataPacket($this->getHandPacket(null, true));
+        $player->dataPacket($this->getMainHandPacket());
     }
 
     public function attack(EntityDamageEvent $source): void{
@@ -204,97 +138,144 @@ class ArmorStandEntity extends Living implements EntityInteractable{
         }
     }
 
-    public function onInteract(EntityInteractResult $result): void{
-        $player = $result->getPlayer();
-        $item = $result->getItem();
-        $CacheAddItem = null;
-        $CacheRemoveItem = null;
-        $takeItem = true;
+    public function killArmorStand(): void{
+        if(!$this->isFlaggedForDespawn()){
+            $this->flagForDespawn();
 
-        if($player->isSneaking()){
-            $this->setPose($this->getPose() + 1);
-           return;
-        }
-        if($item instanceof Armor){
-            $slot = ItemManager::getArmorSlot($item);
-
-            if($slot !== null){
-                $slotItem = $this->getArmorInventory()->getItem($slot);
-
-                if(!$slotItem->isNull()){
-                    if($slotItem->equals($item)) return;
-                    $CacheAddItem = $slotItem;
-                }
-                $CacheRemoveItem = $item;
-                $this->getArmorInventory()->setItem($slot, $item);
-                $takeItem = false;
-            }
-        }else{
-            if($item->getId() !== ItemIds::ARMOR_STAND && !$item->isNull() && !$this->mainHand->equals($item)){
+            if(GameRule::getGameRuleValue(GameRule::DO_TILE_DROPS, $this->getLevel())){
+                $items = array_merge([ItemFactory::get(ItemIds::ARMOR_STAND)], $this->getArmorInventory()->getContents());
                 if(!$this->mainHand->isNull()){
-                    $CacheAddItem = $this->mainHand;
+                    $items[] = $this->mainHand;
                 }
-                $CacheRemoveItem = $item;
-                $this->setMainHand($item);
-                $takeItem = false;
-            }
-        }
-        if($CacheRemoveItem instanceof Item){
-            if($CacheAddItem instanceof Item){
-                $player->getInventory()->addItem($CacheAddItem);
-            }
-            $item = $player->getInventory()->getItemInHand();
-            if(!$item->isNull()){
-                $item->pop();
-                $player->getInventory()->setItemInHand($item);
-            }
-        }
-        if($takeItem){
-            $addItem = null;
-            $slot = $this->getClickedPosSlot($result->getClickPos()->y - $this->y);
-
-            switch($slot){
-                case self::EQUIPMENT_MAINHAND:
-                    if(!$this->mainHand->isNull()){
-                        $addItem = $this->getMainHand();
-                        $this->setMainHand(ItemFactory::get(ItemIds::AIR));
-                    }
-                    break;
-                case self::EQUIPMENT_OFFHAND:
-                    if(!$this->offHand->isNull()){
-                        $addItem = $this->getOffHand();
-                        $this->setOffHand(ItemFactory::get(ItemIds::AIR));
-                    }
-                    break;
-                case self::EQUIPMENT_HEAD:
-                    $addItem = $this->armorInventory->getHelmet();
-                    $this->armorInventory->setHelmet(ItemFactory::get(ItemIds::AIR));
-                    break;
-                case self::EQUIPMENT_CHEST:
-                    $addItem = $this->armorInventory->getChestplate();
-                    $this->armorInventory->setChestplate(ItemFactory::get(ItemIds::AIR));
-                    break;
-                case self::EQUIPMENT_LEGS:
-                    $addItem = $this->armorInventory->getLeggings();
-                    $this->armorInventory->setLeggings(ItemFactory::get(ItemIds::AIR));
-                    break;
-                case self::EQUIPMENT_FEETS:
-                    $addItem = $this->armorInventory->getBoots();
-                    $this->armorInventory->setBoots(ItemFactory::get(ItemIds::AIR));
-                    break;
-            }
-            if($addItem !== null && !$addItem->isNull()){
-                if($player->getInventory()->canAddItem($addItem)){
-                    $player->getInventory()->addItem($addItem);
-                }else{
-                    $player->getLevel()->dropItem($player, $addItem);
+                foreach($items as $item){
+                    $this->getLevel()->dropItem($this->add(0.5, 0.5, 0.5), $item);
                 }
             }
         }
     }
 
+    public function onMouseHover(Player $player): void{
+        $player->getDataPropertyManager()->setString(self::DATA_INTERACTIVE_TAG, $player->isSneaking() ? self::BUTTON_POSE : self::BUTTON_EQUIP);
+    }
+
+    public function onButtonPressed(EntityButtonResult $result): void{
+        $result->setInteractQueue(false);
+        $player = $result->getPlayer();
+        $item = $result->getItem();
+        $button = $result->getButton();
+
+        if($button !== null && strlen($button) < 1){
+            $button = $player->isSneaking() ? self::BUTTON_POSE : self::BUTTON_EQUIP;
+        }
+        switch($button){
+            case self::BUTTON_EQUIP:
+                if(($clickpos = $result->getClickPos()) !== null){
+                    $slot = $this->getClickedPosSlot($clickpos->y - $this->y);
+                }else{
+                    $slot = $item instanceof Armor ? ItemManager::getArmorSlot($item, true) + 1 : self::EQUIPMENT_MAINHAND;
+                }
+
+                /** Remove Item From Armor Stand */
+                $slotItem = $slot === self::EQUIPMENT_MAINHAND ? $this->getMainHand() : $this->getArmorInventory()->getItem($slot - 1);
+
+                if($slotItem->isNull()){
+                    $takeSlot = null;
+
+                    /**
+                     * @var int $key
+                     * @var Item $value */
+                    foreach(array_merge($this->getArmorInventory()->getContents(true), [5 => $this->getMainHand()]) as $key => $value){
+                        if(!$value->isNull()){
+                            $slot = $key === 5 ? self::EQUIPMENT_MAINHAND : $key + 1;
+                            $slotItem = $slot === self::EQUIPMENT_MAINHAND ? $this->getMainHand() : $this->getArmorInventory()->getItem($slot - 1);
+                            break;
+                        }
+                    }
+                }
+                if($item->getId() === ItemIds::AIR && !$slotItem->isNull()){
+                    if($slot === self::EQUIPMENT_MAINHAND){
+                        $this->handleMainHandItem($player, $slotItem, $item);
+                    }else{
+                        $this->handleArmorItem($player, $slotItem, $item, $slot - 1);
+                    }
+                    return;
+                }
+
+                /** Add Item to Armor Stand */
+                if($item instanceof Armor){
+                    $slot = ItemManager::getArmorSlot($item, true);
+                    $this->handleArmorItem($player, $this->getArmorInventory()->getItem($slot), $item, $slot);
+                }elseif($item->getId() !== ItemIds::AIR){
+                    $this->handleMainHandItem($player, $this->getMainHand(), $item);
+                }
+                $this->onMouseHover($player);
+                break;
+            case self::BUTTON_POSE:
+                if($player->isSneaking()){
+                    $this->setPose($this->getPose() + 1);
+                    return;
+                }
+                $this->onMouseHover($player);
+                break;
+        }
+    }
+
+    public function handleMainHandItem(Player $player, Item $old, Item $new): void{
+        if($new->getId() === ItemIds::ARMOR_STAND){
+            return;
+        }
+        if(!$old->isNull()){
+            $player->getInventory()->setItemInHand($old);
+        }else{
+            $player->getInventory()->setItemInHand(ItemFactory::get(ItemIds::AIR));
+        }
+        $this->setMainHand($new);
+        Session::playSound($player, "mob.armor_stand.place");
+    }
+
+    public function handleArmorItem(Player $player, Item $old, Item $new, int $slot): void{
+        if(!$old->isNull()){
+            $player->getInventory()->setItemInHand($old);
+        }else{
+            $player->getInventory()->setItemInHand(ItemFactory::get(ItemIds::AIR));
+        }
+        $this->getArmorInventory()->setItem($slot, $new);
+        Session::playSound($player, "mob.armor_stand.place");
+    }
+
+    public function getPose(): int{
+        return $this->getDataPropertyManager()->getInt(self::DATA_ARMOR_STAND_POSE_INDEX) ?? self::POSE_DEFAULT;
+    }
+
+    public function setPose(int $pose, bool $strict = true): void{
+        if($strict && ($pose > self::POSE_CANCAN_B || $pose < self::POSE_DEFAULT)){
+            $pose = self::POSE_DEFAULT;
+        }
+        $this->getDataPropertyManager()->setInt(self::DATA_ARMOR_STAND_POSE_INDEX, $pose);
+    }
+
+    public function getMainHand(): Item{
+        return $this->mainHand;
+    }
+
+    public function setMainHand(Item $mainHand): void{
+        $this->mainHand = $mainHand;
+        Server::getInstance()->broadcastPacket($this->getViewers(), $this->getMainHandPacket());
+    }
+
+    public function getMainHandPacket(Item $item = null): MobEquipmentPacket{
+        if($item === null){
+            $item = $this->mainHand;
+        }
+        $pk = new MobEquipmentPacket();
+        $pk->entityRuntimeId = $this->id;
+        $pk->item = ItemStackWrapper::legacy($item);
+        $pk->inventorySlot = 0;
+        $pk->hotbarSlot = $pk->inventorySlot;
+        return $pk;
+    }
+
     public function getClickedPosSlot(float $i): int{
-        //TODO Offhand, i havent seen armorstand do offhand in vanilla
         if($i >= 1.6 && !$this->armorInventory->getHelmet()->isNull()){
             return self::EQUIPMENT_HEAD;
         }elseif(($i >= 0.4 && $i < 1.2) && !$this->armorInventory->getChestplate()->isNull()){

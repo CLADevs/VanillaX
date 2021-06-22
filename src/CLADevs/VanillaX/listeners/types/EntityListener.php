@@ -15,7 +15,6 @@ use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\entity\EntityRegainHealthEvent;
 use pocketmine\event\entity\EntitySpawnEvent;
 use pocketmine\event\Listener;
-use pocketmine\item\Item;
 use pocketmine\item\ItemIds;
 use pocketmine\network\mcpe\protocol\ActorEventPacket;
 use pocketmine\network\mcpe\protocol\LevelEventPacket;
@@ -107,15 +106,13 @@ class EntityListener implements Listener{
         }
     }
 
-    private function handleShieldDamage(Entity $damager, Entity $entity, Item &$item): bool{
+    private function handleShieldDamage(Entity $damager, Player $entity, ShieldItem $item): bool{
         if($damager instanceof Living && $damager->getDirection() !== $entity->getDirection()){
-            if($entity instanceof Player && $item instanceof ShieldItem){
-               $item->applyDamage(1);
-               $entity->getInventory()->setItemInHand($item);
-               $entity->getLevel()->broadcastLevelSoundEvent($entity, LevelSoundEventPacket::SOUND_ITEM_SHIELD_BLOCK);
-               $damager->knockBack($entity, 0, $damager->x - $entity->x, $damager->z - $entity->z, 0.5);
-               return true;
-            }
+            $item->applyDamage(1);
+            $entity->getInventory()->setItemInHand($item);
+            $entity->getLevel()->broadcastLevelSoundEvent($entity, LevelSoundEventPacket::SOUND_ITEM_SHIELD_BLOCK);
+            $damager->knockBack($entity, 0, $damager->x - $entity->x, $damager->z - $entity->z, 0.5);
+            return true;
         }
         return false;
     }
@@ -130,7 +127,7 @@ class EntityListener implements Listener{
 
         /** Elytra */
         if($entity instanceof Player){
-            $session = VanillaX::getInstance()->getSessionManager()->get($entity);
+            $session = VanillaX::getInstance()->getSessionManager()->get($entity)->getGliding();
 
             if($session->isGliding()){
                 $value = true;

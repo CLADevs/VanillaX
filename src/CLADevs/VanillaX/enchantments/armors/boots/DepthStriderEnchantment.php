@@ -3,7 +3,9 @@
 namespace CLADevs\VanillaX\enchantments\armors\boots;
 
 use CLADevs\VanillaX\enchantments\utils\EnchantmentTrait;
+use CLADevs\VanillaX\items\ItemManager;
 use pocketmine\item\enchantment\Enchantment;
+use pocketmine\item\Item;
 
 class DepthStriderEnchantment extends Enchantment{
     use EnchantmentTrait;
@@ -14,5 +16,9 @@ class DepthStriderEnchantment extends Enchantment{
 
     public function getIncompatibles(): array{
         return [self::FROST_WALKER];
+    }
+
+    public function isItemCompatible(Item $item): bool{
+        return in_array($item->getId(), ItemManager::getBootsList());
     }
 }

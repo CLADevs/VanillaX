@@ -4,6 +4,8 @@ namespace CLADevs\VanillaX\enchantments\trident;
 
 use CLADevs\VanillaX\enchantments\utils\EnchantmentTrait;
 use pocketmine\item\enchantment\Enchantment;
+use pocketmine\item\Item;
+use pocketmine\item\ItemIds;
 
 class RiptideEnchantment extends Enchantment{
     use EnchantmentTrait;
@@ -14,5 +16,9 @@ class RiptideEnchantment extends Enchantment{
 
     public function getIncompatibles(): array{
         return [self::LOYALTY, self::CHANNELING];
+    }
+
+    public function isItemCompatible(Item $item): bool{
+        return $item->getId() === ItemIds::TRIDENT;
     }
 }

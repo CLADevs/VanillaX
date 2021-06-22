@@ -3,7 +3,9 @@
 namespace CLADevs\VanillaX\enchantments\armors\boots;
 
 use CLADevs\VanillaX\enchantments\utils\EnchantmentTrait;
+use CLADevs\VanillaX\items\ItemManager;
 use pocketmine\item\enchantment\Enchantment;
+use pocketmine\item\Item;
 
 class FrostWalkerEnchantment extends Enchantment{
     use EnchantmentTrait;
@@ -18,5 +20,9 @@ class FrostWalkerEnchantment extends Enchantment{
 
     public function getIncompatibles(): array{
         return [self::DEPTH_STRIDER];
+    }
+
+    public function isItemCompatible(Item $item): bool{
+        return in_array($item->getId(), ItemManager::getBootsList());
     }
 }

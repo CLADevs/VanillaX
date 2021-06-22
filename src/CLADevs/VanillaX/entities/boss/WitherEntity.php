@@ -2,7 +2,7 @@
 
 namespace CLADevs\VanillaX\entities\boss;
 
-use CLADevs\VanillaX\entities\utils\interferces\EntityClassification;
+use CLADevs\VanillaX\entities\utils\interfaces\EntityClassification;
 use CLADevs\VanillaX\entities\VanillaEntity;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;

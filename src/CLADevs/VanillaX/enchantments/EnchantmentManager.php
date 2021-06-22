@@ -3,7 +3,7 @@
 namespace CLADevs\VanillaX\enchantments;
 
 use CLADevs\VanillaX\enchantments\utils\EnchantmentTrait;
-use CLADevs\VanillaX\entities\utils\interferces\EntityClassification;
+use CLADevs\VanillaX\entities\utils\interfaces\EntityClassification;
 use CLADevs\VanillaX\entities\VanillaEntity;
 use CLADevs\VanillaX\utils\Utils;
 use CLADevs\VanillaX\VanillaX;
@@ -149,14 +149,14 @@ class EnchantmentManager{
     }
 
     public function getEnchantmentForItem(Item $item, bool $includeGlobal = true, bool $includeTreasures = true): ?array{
-        $enchantments = VanillaX::getInstance()->getEnchantmentManager()->getEnchantments();
+        $enchantments = [];
 
         /** Armor */
         if($item instanceof Armor){
             $enchantments = $this->getArmorEnchantsId();
         }
         /** Sword or Axe */
-        if($enchantments === null && ($item instanceof Sword || $item instanceof Axe)){
+        if($item instanceof Sword || $item instanceof Axe){
             $enchantments = $this->getWeaponEnchantsId();
 
             if($item instanceof Sword){
@@ -164,7 +164,7 @@ class EnchantmentManager{
             }
         }
         /** Pickaxe, Axe or Shove */
-        if($enchantments === null && ($item instanceof Pickaxe || $item instanceof Axe || $item instanceof Shovel)){
+        if($item instanceof Pickaxe || $item instanceof Axe || $item instanceof Shovel){
             $enchantments = $this->getToolEnchantsId();
         }
         /** Helmet, Boots, Elytra, Bow, Crossbow, Trident and FishingRod */
@@ -205,7 +205,7 @@ class EnchantmentManager{
                 }
                 break;
         }
-        if($enchantments === null) return null;
+        if(count($enchantments) < 1) return null;
         if($includeGlobal){
             $global = $this->getGlobalEnchantsId();
             unset($global[Enchantment::MENDING]);

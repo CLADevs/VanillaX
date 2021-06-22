@@ -3,7 +3,7 @@
 namespace CLADevs\VanillaX\entities\passive;
 
 use CLADevs\VanillaX\entities\utils\EntityInteractResult;
-use CLADevs\VanillaX\entities\utils\interferces\EntityInteractable;
+use CLADevs\VanillaX\entities\utils\interfaces\EntityInteractable;
 use CLADevs\VanillaX\entities\utils\villager\VillagerOffer;
 use CLADevs\VanillaX\entities\utils\villager\VillagerTradeNBTStream;
 use CLADevs\VanillaX\entities\VanillaEntity;

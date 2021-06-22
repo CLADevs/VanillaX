@@ -13,12 +13,14 @@ class EntityInteractResult{
     private ?Item $item;
     private ?Entity $entity;
     private ?Vector3 $clickPos;
+    private ?string $pressedButton;
 
-    public function __construct(Player $player, ?Item $item = null, ?Entity $entity = null, ?Vector3 $clickPos = null){
+    public function __construct(Player $player, ?Item $item = null, ?Entity $entity = null, ?Vector3 $clickPos = null, ?string $pressedButton = null){
         $this->player = $player;
         $this->item = $item;
         $this->entity = $entity;
         $this->clickPos = $clickPos;
+        $this->pressedButton = $pressedButton;
     }
 
     public function getPlayer(): Player{
@@ -51,5 +53,9 @@ class EntityInteractResult{
 
     public function canUseEntity(): bool{
         return $this->entity !== null;
+    }
+
+    public function getPressedButton(): ?string{
+        return $this->pressedButton;
     }
 }

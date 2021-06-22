@@ -2,108 +2,129 @@
 
 namespace CLADevs\VanillaX\entities\passive;
 
+use CLADevs\VanillaX\entities\utils\EntityButtonResult;
 use CLADevs\VanillaX\entities\utils\EntityInteractResult;
-use CLADevs\VanillaX\entities\utils\interferces\EntityInteractable;
-use CLADevs\VanillaX\entities\utils\interferces\EntityMouseHover;
-use CLADevs\VanillaX\entities\utils\interferces\EntityRidable;
+use CLADevs\VanillaX\entities\utils\interfaces\EntityInteractable;
+use CLADevs\VanillaX\entities\utils\interfaces\EntityInteractButton;
+use CLADevs\VanillaX\entities\utils\interfaces\EntityRidable;
+use CLADevs\VanillaX\entities\utils\interfaces\EntityRidingHeldItemChange;
+use CLADevs\VanillaX\entities\utils\traits\EntityRidableTrait;
 use CLADevs\VanillaX\entities\VanillaEntity;
 use CLADevs\VanillaX\entities\utils\ItemHelper;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
 use pocketmine\math\Vector3;
-use pocketmine\nbt\tag\ByteTag;
 use pocketmine\network\mcpe\protocol\LevelSoundEventPacket;
-use pocketmine\network\mcpe\protocol\SetActorLinkPacket;
-use pocketmine\network\mcpe\protocol\types\EntityLink;
 use pocketmine\Player;
-use pocketmine\Server;
 
-class StriderEntity extends VanillaEntity implements EntityInteractable, EntityMouseHover, EntityRidable{
+class StriderEntity extends VanillaEntity implements EntityInteractable, EntityInteractButton, EntityRidable, EntityRidingHeldItemChange{
+    use EntityRidableTrait;
 
-    const TAG_SADDLED = "Saddled";
+    const BUTTON_SADDLE = "Saddle";
+    const BUTTON_RIDE = "Ride";
+    const BUTTON_BOOST = "Boost";
 
     const NETWORK_ID = self::STRIDER;
 
     public $width = 0.9;
     public $height = 1.7;
 
-    public bool $isSaddled = false;
-    public bool $hasRider = false;
-
     protected function initEntity(): void{
         parent::initEntity();
         $this->setMaxHealth(20);
-        if($this->namedtag->hasTag(self::TAG_SADDLED, ByteTag::class)){
-            $this->isSaddled = boolval($this->namedtag->getByte(self::TAG_SADDLED));
-            $this->setGenericFlag(self::DATA_FLAG_SADDLED, $this->isSaddled);
-        }
+        $this->readSaddle();
     }
 
     public function getName(): string{
         return "Strider";
     }
 
-    public function saveNBT(): void{
-        $this->namedtag->setByte(self::TAG_SADDLED, intval($this->isSaddled));
-        parent::saveNBT();
-    }
-
-    public function onInteract(EntityInteractResult $result): void{
-        $player = $result->getPlayer();
-        $item = $result->getItem();
-
-        if(!$this->isSaddled && $item->getId() === ItemIds::SADDLE){
-            $this->isSaddled = true;
-            $item->count--;
-            $player->getInventory()->setItemInHand($item);
-            $this->getLevel()->broadcastLevelSoundEvent($this, LevelSoundEventPacket::SOUND_SADDLE);
-            $this->setGenericFlag(self::DATA_FLAG_SADDLED, true);
-        }elseif($this->isSaddled && !$this->hasRider){
-            $this->onEnterRide($player);
-        }
-    }
-
-    public function onMouseHover(Player $player): void{
-        if(!$this->isSaddled && $player->getInventory()->getItemInHand()->getId() === ItemIds::SADDLE){
-            $player->getDataPropertyManager()->setString(self::DATA_INTERACTIVE_TAG, "Saddle");
-        }elseif($this->isSaddled && !$this->hasRider){
-            $player->getDataPropertyManager()->setString(self::DATA_INTERACTIVE_TAG, "Ride");
-        }
-    }
-
-    public function onEnterRide(Player $player): void{
-        $player->setGenericFlag(self::DATA_FLAG_RIDING, true);
-        $player->getDataPropertyManager()->setVector3(self::DATA_RIDER_SEAT_POSITION, new Vector3(0, 2.8));
-
-        $pk = new SetActorLinkPacket();
-        $pk->link = new EntityLink($this->getId(), $player->getId(), EntityLink::TYPE_RIDER, true, true);
-        Server::getInstance()->broadcastPacket($this->getViewers(), $pk);
-
-        $this->hasRider = true;
-    }
-
-    public function onLeftRide(Player $player): void{
-        $player->setGenericFlag(self::DATA_FLAG_RIDING, false);
-        $player->getDataPropertyManager()->setVector3(self::DATA_RIDER_SEAT_POSITION, new Vector3());
-
-        $pk = new SetActorLinkPacket();
-        $pk->link = new EntityLink($this->getId(), $player->getId(), EntityLink::TYPE_REMOVE, true, true);
-        Server::getInstance()->broadcastPacket($this->getViewers(), $pk);
-
-        $this->hasRider = false;
-    }
- 
     /**
      * @return Item[]
      */
     public function getDrops(): array{
         $string = ItemFactory::get(ItemIds::STRING, 0, 1);
         ItemHelper::applySetCount($string, 2, 5);
-        return [$string];
+        return array_merge([$string], $this->getSaddleDrops());
     }
-    
+
     public function getXpDropAmount(): int{
         return $this->getLastHitByPlayer() ? mt_rand(1,3) : 0;
+    }
+
+    public function saveNBT(): void{
+        $this->writeSaddle();
+        parent::saveNBT();
+    }
+
+    public function onInteract(EntityInteractResult $result): void{
+        $player = $result->getPlayer();
+        $this->onButtonPressed(new EntityButtonResult($player, $result->getItem(), $player->getDataPropertyManager()->getString(self::DATA_INTERACTIVE_TAG)));
+    }
+
+    public function onMouseHover(Player $player): void{
+        $this->recalculateButton($player, $player->getInventory()->getItemInHand());
+    }
+
+    public function onSlotChange(Player $player, Item $old, Item $new): void{
+        if($old->getId() !== $new->getId()){
+            $this->recalculateButton($player, $new);
+        }
+    }
+
+    public function onEnterRide(Player $player): void{
+        $this->linkRider($player, new Vector3(0, 2.8, -0.2));
+        $this->recalculateButton($player, $player->getInventory()->getItemInHand());
+    }
+
+    public function onLeftRide(Player $player): void{
+        $this->unlinkRider($player);
+        $player->getDataPropertyManager()->setString(self::DATA_INTERACTIVE_TAG, "");
+    }
+
+    public function onButtonPressed(EntityButtonResult $result): void{
+        if(($name = $result->getButton()) === null){
+            return;
+        }
+        $player = $result->getPlayer();
+        $item = $result->getItem();
+
+        switch($name){
+            case self::BUTTON_SADDLE:
+                if(!$this->isSaddled && $item->getId() === ItemIds::SADDLE){
+                    $this->isSaddled = true;
+                    if(!$player->isCreative()){
+                        $item->count--;
+                        $player->getInventory()->setItemInHand($item);
+                    }
+                    $this->getLevel()->broadcastLevelSoundEvent($this, LevelSoundEventPacket::SOUND_SADDLE);
+                    $this->setGenericFlag(self::DATA_FLAG_SADDLED, true);
+                }
+                break;
+            case self::BUTTON_RIDE:
+                if($this->isSaddled && $this->rider === null){
+                    $this->onEnterRide($player);
+                }
+                break;
+            case self::BUTTON_BOOST:
+                if($this->isSaddled && $this->rider === $player && $item->getId() === ItemIds::CARROT_ON_A_STICK){
+                    //TODO boost
+                }
+                break;
+        }
+    }
+
+    public function recalculateButton(Player $player, Item $item): void{
+        $tag = "";
+
+        if(!$this->isSaddled && $item->getId() === ItemIds::SADDLE){
+            $tag = self::BUTTON_SADDLE;
+        }elseif($this->isSaddled && $this->rider === null){
+            $tag = self::BUTTON_RIDE;
+        }elseif($this->isSaddled && $this->rider === $player && $item->getId() === ItemIds::CARROT_ON_A_STICK){
+            $tag = self::BUTTON_BOOST;
+        }
+        $player->getDataPropertyManager()->setString(self::DATA_INTERACTIVE_TAG, $tag);
     }
 }

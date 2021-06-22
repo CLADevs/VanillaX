@@ -2,7 +2,7 @@
 
 namespace CLADevs\VanillaX\entities\passive;
 
-use CLADevs\VanillaX\entities\utils\interferces\EntityClassification;
+use CLADevs\VanillaX\entities\utils\interfaces\EntityClassification;
 use CLADevs\VanillaX\entities\VanillaEntity;
 use pocketmine\item\Item;
 
@@ -19,7 +19,7 @@ class GlowSquidEntity extends VanillaEntity{
     }
 
     public function getName(): string{
-        return "Glow_Squid";
+        return "Glow Squid";
     }
  
     /**

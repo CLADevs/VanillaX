@@ -2,7 +2,7 @@
 
 namespace CLADevs\VanillaX\entities;
 
-use CLADevs\VanillaX\entities\utils\interferces\EntityClassification;
+use CLADevs\VanillaX\entities\utils\interfaces\EntityClassification;
 use CLADevs\VanillaX\network\gamerules\GameRule;
 use pocketmine\entity\Living;
 use pocketmine\event\entity\EntityDamageByEntityEvent;

@@ -4,6 +4,8 @@ namespace CLADevs\VanillaX\enchantments\bow;
 
 use CLADevs\VanillaX\enchantments\utils\EnchantmentTrait;
 use pocketmine\item\enchantment\Enchantment;
+use pocketmine\item\Item;
+use pocketmine\item\ItemIds;
 
 class InfinityEnchantment extends Enchantment{
     use EnchantmentTrait;
@@ -14,5 +16,9 @@ class InfinityEnchantment extends Enchantment{
 
     public function getIncompatibles(): array{
         return [self::MENDING];
+    }
+
+    public function isItemCompatible(Item $item): bool{
+        return $item->getId() === ItemIds::BOW;
     }
 }

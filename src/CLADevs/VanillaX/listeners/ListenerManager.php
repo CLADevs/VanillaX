@@ -8,8 +8,6 @@ use pocketmine\Server;
 
 class ListenerManager{
 
-    public array $armorStandItemsQueue = [];
-
     public function startup(): void{
         Utils::callDirectory("listeners" . DIRECTORY_SEPARATOR . "types", function (string $namespace): void{
             if(strpos($namespace, "PacketListener") !== false || strpos($namespace, "PlayerListener") !== false){

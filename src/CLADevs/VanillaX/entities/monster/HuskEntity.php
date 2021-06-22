@@ -2,7 +2,7 @@
 
 namespace CLADevs\VanillaX\entities\monster;
 
-use CLADevs\VanillaX\entities\utils\interferces\EntityClassification;
+use CLADevs\VanillaX\entities\utils\interfaces\EntityClassification;
 use CLADevs\VanillaX\entities\VanillaEntity;
 
 class HuskEntity extends VanillaEntity{

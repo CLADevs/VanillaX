@@ -36,11 +36,11 @@ class GameruleCommand extends Command{
 
     public function execute(CommandSender $sender, string $commandLabel, array $args): void{
         if(!$this->testPermission($sender)) return;
-        if(!isset($args[0]) || !isset($args[1]) && !$sender instanceof Player){
+        if((!isset($args[0]) || !isset($args[1])) && !$sender instanceof Player){
             $this->sendSyntaxError($sender, "", "/$commandLabel");
             return;
         }
-        if(!isset($args[0])){
+        if(!isset($args[0]) && $sender instanceof Player){
             $values = [];
             foreach(GameRule::$gameRules as $key => $rule){
                 $values[] = $key . " = " . GameRule::getGameRuleValue($rule->getName(), $sender->getLevel(), true);
@@ -55,7 +55,7 @@ class GameruleCommand extends Command{
             $this->sendSyntaxError($sender, $args[0], "/$commandLabel", $args[0], $errorArg);
             return;
         }
-        if(!isset($args[1])){
+        if(!isset($args[1]) && $sender instanceof Player){
             $sender->sendMessage(strtolower($gameRule->getName()) . " = " . GameRule::getGameRuleValue($gameRule->getName(), $sender->getLevel(), true));
             return;
         }

@@ -20,7 +20,7 @@ class MobEquipmentPacketX extends MobEquipmentPacket{
      * @throws ReflectionException
      */
     public function handle(NetworkSession $handler): bool{
-        if($handler instanceof PlayerNetworkSessionAdapter){
+        if($handler instanceof PlayerNetworkSessionAdapter && $this->windowId === ContainerIds::OFFHAND){
             //VERY hacky way
             $rc = new ReflectionClass(PlayerNetworkSessionAdapter::class);
             $var = $rc->getProperty("player");
@@ -31,12 +31,7 @@ class MobEquipmentPacketX extends MobEquipmentPacket{
                 if(!$player->spawned || !$player->isAlive()){
                     return true;
                 }
-                if($this->windowId === ContainerIds::OFFHAND){
-                    $inventory = VanillaX::getInstance()->getSessionManager()->get($player)->getOffHandInventory();
-                }else{
-                    $inventory = $player->getInventory();
-                }
-
+                $inventory = VanillaX::getInstance()->getSessionManager()->get($player)->getOffHandInventory();
                 $item = $inventory->getItem($this->hotbarSlot);
 
                 if(!$item->equals($this->item->getItemStack())){
@@ -50,7 +45,6 @@ class MobEquipmentPacketX extends MobEquipmentPacket{
                 return true;
             }
         }
-        $parent = parent::handle($handler);
-        return $this->windowId === ContainerIds::OFFHAND ? true : $parent; //ignores debug
+        return parent::handle($handler);
     }
 }

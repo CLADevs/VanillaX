@@ -3,8 +3,11 @@
 namespace CLADevs\VanillaX\session;
 
 use CLADevs\VanillaX\entities\projectile\TridentEntity;
+use CLADevs\VanillaX\entities\utils\interfaces\EntityRidable;
+use CLADevs\VanillaX\entities\VanillaEntity;
 use CLADevs\VanillaX\inventories\FakeBlockInventory;
 use CLADevs\VanillaX\inventories\types\OffhandInventory;
+use CLADevs\VanillaX\session\data\SessionGliding;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\DataPacket;
 use pocketmine\network\mcpe\protocol\PlaySoundPacket;
@@ -12,23 +15,26 @@ use pocketmine\Player;
 
 class Session{
 
-    private Player $player;
-
-    private bool $gliding = false;
-    private ?int $startGlideTime = null;
-    private ?int $endGlideTime = null;
-
-    private bool $inBoat = false;
-
     /** @var TridentEntity[] */
     private array $thrownTridents = [];
 
-    private ?FakeBlockInventory $currentWindow = null;
+    private Player $player;
     private OffhandInventory $offHandInventory;
+    private SessionGliding $gliding;
+    private ?FakeBlockInventory $currentWindow = null;
+    private ?VanillaEntity $ridingEntity = null;
+
+    private int $entityId;
 
     public function __construct(Player $player){
         $this->player = $player;
         $this->offHandInventory = new OffhandInventory($player);
+        $this->gliding = new SessionGliding();
+        $this->entityId = $player->getId();
+    }
+
+    public function getEntityId(): int{
+        return $this->entityId;
     }
 
     public function getPlayer(): Player{
@@ -39,33 +45,27 @@ class Session{
         return $this->offHandInventory;
     }
 
-    public function isGliding(): bool{
-        return $this->gliding;
+    public function getRidingEntity(): ?VanillaEntity{
+        return $this->ridingEntity;
     }
 
-    public function setGliding(bool $value = true): void{
-        $this->gliding = $value;
-        if($value){
-            $this->startGlideTime = time();
-        }else{
-            $this->endGlideTime = time();
+    public function setRidingEntity(?VanillaEntity $ridingEntity): void{
+        if($ridingEntity !== null && $this->ridingEntity instanceof EntityRidable){
+            $this->ridingEntity->onLeftRide($this->player);
         }
+        $this->ridingEntity = $ridingEntity;
     }
 
-    public function getStartGlideTime(): ?int{
-        return $this->startGlideTime;
+    public function getCurrentWindow(): ?FakeBlockInventory{
+        return $this->currentWindow;
     }
 
-    public function getEndGlideTime(): ?int{
-        return $this->endGlideTime;
+    public function setCurrentWindow(?FakeBlockInventory $currentWindow): void{
+        $this->currentWindow = $currentWindow;
     }
 
-    public function isInBoat(): bool{
-        return $this->inBoat;
-    }
-
-    public function setInBoat(bool $inBoat): void{
-        $this->inBoat = $inBoat;
+    public function getGliding(): SessionGliding{
+        return $this->gliding;
     }
 
     /**
@@ -81,14 +81,6 @@ class Session{
 
     public function removeTrident(TridentEntity $entity): void{
         if(isset($this->thrownTridents[$entity->getId()])) unset($this->thrownTridents[$entity->getId()]);
-    }
-
-    public function getCurrentWindow(): ?FakeBlockInventory{
-        return $this->currentWindow;
-    }
-
-    public function setCurrentWindow(?FakeBlockInventory $currentWindow): void{
-        $this->currentWindow = $currentWindow;
     }
 
     /**

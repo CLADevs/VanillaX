@@ -4,6 +4,8 @@ namespace CLADevs\VanillaX\enchantments\tools;
 
 use CLADevs\VanillaX\enchantments\utils\EnchantmentTrait;
 use pocketmine\item\enchantment\Enchantment;
+use pocketmine\item\Item;
+use pocketmine\item\Tool;
 
 class FortuneEnchantment extends Enchantment{
     use EnchantmentTrait;
@@ -14,5 +16,9 @@ class FortuneEnchantment extends Enchantment{
 
     public function getIncompatibles(): array{
         return [self::SILK_TOUCH];
+    }
+
+    public function isItemCompatible(Item $item): bool{
+        return $item instanceof Tool;
     }
 }

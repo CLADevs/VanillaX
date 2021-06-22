@@ -3,7 +3,7 @@
 namespace CLADevs\VanillaX\items\types;
 
 use CLADevs\VanillaX\entities\utils\EntityInteractResult;
-use CLADevs\VanillaX\entities\utils\interferces\EntityInteractable;
+use CLADevs\VanillaX\entities\utils\interfaces\EntityInteractable;
 use pocketmine\item\Item;
 
 class LeadItem extends Item implements EntityInteractable{

@@ -4,6 +4,7 @@ namespace CLADevs\VanillaX\network;
 
 use CLADevs\VanillaX\network\gamerules\GameRule;
 use CLADevs\VanillaX\network\protocol\ActorEventPacketX;
+use CLADevs\VanillaX\network\protocol\ActorPickupRequestPacketX;
 use CLADevs\VanillaX\network\protocol\AnvilDamagePacketX;
 use CLADevs\VanillaX\network\protocol\CommandBlockUpdatePacketX;
 use CLADevs\VanillaX\network\protocol\FilterTextPacketX;
@@ -26,5 +27,6 @@ class NetworkManager{
         PacketPool::registerPacket(new CommandBlockUpdatePacketX());
         PacketPool::registerPacket(new PlayerInputPacketX());
         PacketPool::registerPacket(new MobEquipmentPacketX());
+        PacketPool::registerPacket(new ActorPickupRequestPacketX());
     }
 }

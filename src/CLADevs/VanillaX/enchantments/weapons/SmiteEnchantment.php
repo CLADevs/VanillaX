@@ -3,7 +3,10 @@
 namespace CLADevs\VanillaX\enchantments\weapons;
 
 use CLADevs\VanillaX\enchantments\utils\EnchantmentTrait;
+use pocketmine\item\Axe;
 use pocketmine\item\enchantment\Enchantment;
+use pocketmine\item\Item;
+use pocketmine\item\Sword;
 
 class SmiteEnchantment extends Enchantment{
     use EnchantmentTrait;
@@ -14,5 +17,9 @@ class SmiteEnchantment extends Enchantment{
 
     public function getIncompatibles(): array{
         return [self::BANE_OF_ARTHROPODS, self::SHARPNESS];
+    }
+
+    public function isItemCompatible(Item $item): bool{
+        return $item instanceof Sword || $item instanceof Axe;
     }
 }
