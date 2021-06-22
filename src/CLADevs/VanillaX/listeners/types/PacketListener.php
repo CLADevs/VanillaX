@@ -66,8 +66,8 @@ class PacketListener implements Listener{
                         $p = Server::getInstance()->getPlayer($packet->username);
 
                         if($p !== null){
-                            VanillaX::getInstance()->getSessionManager()->get($player)->getOffHandInventory()->sendContents();
-                            VanillaX::getInstance()->getSessionManager()->get($p)->getOffHandInventory()->sendContents();
+                            VanillaX::getInstance()->getSessionManager()->get($player)->getOffHandInventory()->sendContents($p);
+                            VanillaX::getInstance()->getSessionManager()->get($p)->getOffHandInventory()->sendContents($player);
                         }
                     }
                     break;

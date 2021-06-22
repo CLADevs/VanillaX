@@ -21,8 +21,9 @@ class OffhandInventory extends BaseInventory{
         $player->addWindow($this, ContainerIds::OFFHAND, true);
         $this->player = $player;
         if($player->namedtag->hasTag(self::TAG_OFF_HAND_ITEM)){
-            $this->setItem(0, Item::nbtDeserialize($player->namedtag->getCompoundTag(self::TAG_OFF_HAND_ITEM)), true);
+            $this->setItem(0, $it = Item::nbtDeserialize($player->namedtag->getCompoundTag(self::TAG_OFF_HAND_ITEM)), true);
         }
+        $this->sendContents($player);
     }
 
     public function getName(): string{

@@ -32,20 +32,18 @@ class ItemManager{
             }
         });
 
-        self::register(new Item(ItemIds::CARROT_ON_A_STICK), true); //ITEM
-        self::register(new Item(ItemIds::ENCHANTED_BOOK)); //ITEM
         self::register(new Item(ItemIdentifiers::NETHERITE_INGOT)); //ITEM
         self::register(new Item(ItemIdentifiers::NETHERITE_SCRAP)); //ITEM
         self::register(new Item(ItemIdentifiers::HONEYCOMB, 0, "Honeycomb")); //ITEM
-        self::register(new Item(Item::KELP, 0, "Kelp")); //ITEM
-        self::register(new Item(Item::DRIED_KELP, 0, "Dried Kelp")); //ITEM
-        self::register(new Item(Item::NETHER_WART, 0, "Nether Wart")); //ITEM
-        self::register(new Item(Item::TOTEM, 0, "Totem of Undying")); //ITEM
-        self::register(new Item(Item::TURTLE_SHELL_PIECE, 0, "Turtle Shell")); //ITEM
-        self::register(new Item(Item::PHANTOM_MEMBRANE, 0, "Phantom Membrane")); //ITEM
-        self::register(new Item(Item::FIREWORKS_CHARGE, 0, "Fireworks Charge")); //ITEM
-        self::register(new Item(Item::ENCHANTED_BOOK, 0, "Enchanted Book")); //ITEM
-        self::register(new Item(Item::CARROT_ON_A_STICK, 0, "Carrot on a Stick")); //ITEM
+        self::register(new Item(ItemIds::KELP, 0, "Kelp")); //ITEM
+        self::register(new Item(ItemIds::DRIED_KELP, 0, "Dried Kelp")); //ITEM
+        self::register(new Item(ItemIds::NETHER_WART, 0, "Nether Wart")); //ITEM
+        self::register(new Item(ItemIds::TOTEM, 0, "Totem of Undying")); //ITEM
+        self::register(new Item(ItemIds::TURTLE_SHELL_PIECE, 0, "Turtle Shell")); //ITEM
+        self::register(new Item(ItemIds::PHANTOM_MEMBRANE, 0, "Phantom Membrane")); //ITEM
+        self::register(new Item(ItemIds::FIREWORKS_CHARGE, 0, "Fireworks Charge")); //ITEM
+        self::register(new Item(ItemIds::ENCHANTED_BOOK, 0, "Enchanted Book")); //ITEM
+        self::register(new Item(ItemIds::CARROT_ON_A_STICK, 0, "Carrot on a Stick")); //ITEM
         self::register(new MinecartItem(ItemIds::MINECART));
         self::register(new MinecartItem(ItemIds::MINECART_WITH_CHEST, 0, "Chest"));
         self::register(new MinecartItem(ItemIds::MINECART_WITH_TNT, 0, "TNT"));
@@ -85,7 +83,16 @@ class ItemManager{
     }
 
     private function initializeCreativeItems(): void{
-        Item::initCreativeItems();
+        $creativeItems = json_decode(file_get_contents(RESOURCE_PATH . "vanilla" . DIRECTORY_SEPARATOR . "creativeitems.json"), true);
+
+        foreach($creativeItems as $data){
+            $item = Item::jsonDeserialize($data);
+            if($item->getName() === "Unknown" || Item::isCreativeItem($item)){
+                continue;
+            }
+            Item::addCreativeItem($item);
+        }
+
         /** Shulker Box */
         for($i = 1; $i <= 15; $i++){
             $item = ItemFactory::get(ItemIds::SHULKER_BOX, $i);

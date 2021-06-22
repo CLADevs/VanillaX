@@ -25,6 +25,7 @@ use pocketmine\event\player\PlayerToggleSneakEvent;
 use pocketmine\item\enchantment\Enchantment;
 use pocketmine\level\Level;
 use pocketmine\math\Vector3;
+use pocketmine\scheduler\ClosureTask;
 use pocketmine\Server;
 
 class PlayerListener implements Listener{
@@ -100,9 +101,12 @@ class PlayerListener implements Listener{
 
     public function onSneak(PlayerToggleSneakEvent $event): void{
         $player = $event->getPlayer();
+        $offhandItem = VanillaX::getInstance()->getSessionManager()->get($player)->getOffHandInventory()->getItem(0);
 
-        if($player->getInventory()->getItemInHand() instanceof ShieldItem){
-            $player->setGenericFlag(Entity::DATA_FLAG_BLOCKING, $event->isSneaking());
+        if($player->getInventory()->getItemInHand() instanceof ShieldItem || $offhandItem instanceof ShieldItem){
+            VanillaX::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function ()use($player): void{
+                if($player->isOnline()) $player->setGenericFlag(Entity::DATA_FLAG_BLOCKING, $player->isSneaking());
+            }), 5);
         }
     }
 

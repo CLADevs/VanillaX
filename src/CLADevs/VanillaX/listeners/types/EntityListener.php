@@ -108,8 +108,17 @@ class EntityListener implements Listener{
 
     private function handleShieldDamage(Entity $damager, Player $entity, ShieldItem $item): bool{
         if($damager instanceof Living && $damager->getDirection() !== $entity->getDirection()){
+            $offhand = VanillaX::getInstance()->getSessionManager()->get($entity)->getOffHandInventory();
+
+            if(($offhandItem = $offhand->getItem(0)) instanceof ShieldItem){
+                $item = $offhandItem;
+            }
             $item->applyDamage(1);
-            $entity->getInventory()->setItemInHand($item);
+            if($offhandItem instanceof ShieldItem){
+                $offhand->setItem(0, $item);
+            }else{
+                $entity->getInventory()->setItemInHand($item);
+            }
             $entity->getLevel()->broadcastLevelSoundEvent($entity, LevelSoundEventPacket::SOUND_ITEM_SHIELD_BLOCK);
             $damager->knockBack($entity, 0, $damager->x - $entity->x, $damager->z - $entity->z, 0.5);
             return true;
