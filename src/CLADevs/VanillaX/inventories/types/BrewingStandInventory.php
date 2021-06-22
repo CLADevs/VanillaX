@@ -3,6 +3,7 @@
 namespace CLADevs\VanillaX\inventories\types;
 
 use CLADevs\VanillaX\blocks\tile\BrewingStandTile;
+use CLADevs\VanillaX\blocks\block\BrewingStandBlock;
 use CLADevs\VanillaX\inventories\FakeBlockInventory;
 use CLADevs\VanillaX\VanillaX;
 use pocketmine\block\BlockIds;

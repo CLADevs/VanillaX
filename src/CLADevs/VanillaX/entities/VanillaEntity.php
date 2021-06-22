@@ -43,7 +43,7 @@ abstract class VanillaEntity extends Living{
     ];
 
     /**
-     * @param int[] {min, max}
+     * @param int[] 
      */
     protected function setRangeHealth(array $rangeHealth): void{
         $max = $rangeHealth[1];

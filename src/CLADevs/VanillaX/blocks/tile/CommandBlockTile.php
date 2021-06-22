@@ -4,7 +4,7 @@ namespace CLADevs\VanillaX\blocks\tile;
 
 use CLADevs\VanillaX\blocks\block\CommandBlock;
 use CLADevs\VanillaX\blocks\utils\TileVanilla;
-use CLADevs\VanillaX\commands\CommandBlockSender;
+use CLADevs\VanillaX\commands\sender\CommandBlockSender;
 use pocketmine\block\BlockFactory;
 use pocketmine\block\BlockIds;
 use pocketmine\nbt\tag\CompoundTag;
