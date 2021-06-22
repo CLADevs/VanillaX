@@ -156,7 +156,7 @@ class EnchantmentManager{
             $enchantments = $this->getArmorEnchantsId();
         }
         /** Sword or Axe */
-        if(is_null($enchantments) && ($item instanceof Sword || $item instanceof Axe)){
+        if((is_null($enchantments)) && ($item instanceof Sword || $item instanceof Axe)){
             $enchantments = $this->getWeaponEnchantsId();
 
             if($item instanceof Sword){
@@ -164,7 +164,7 @@ class EnchantmentManager{
             }
         }
         /** Pickaxe, Axe or Shove */
-        if(is_null($enchantments) && ($item instanceof Pickaxe || $item instanceof Axe || $item instanceof Shovel)){
+        if((is_null($enchantments)) && ($item instanceof Pickaxe || $item instanceof Axe || $item instanceof Shovel)){
             $enchantments = $this->getToolEnchantsId();
         }
         /** Helmet, Boots, Elytra, Bow, Crossbow, Trident and FishingRod */
@@ -205,7 +205,7 @@ class EnchantmentManager{
                 }
                 break;
         }
-        if(is_null($enchantments)) return;
+        if((is_null($enchantments))) return;
         if($includeGlobal){
             $global = $this->getGlobalEnchantsId();
             unset($global[Enchantment::MENDING]);
