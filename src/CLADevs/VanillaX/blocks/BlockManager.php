@@ -17,7 +17,6 @@ use pocketmine\block\BlockFactory;
 use pocketmine\block\BlockIds;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
-use pocketmine\item\ItemIds;
 use pocketmine\Server;
 use pocketmine\tile\Tile;
 use ReflectionClass;
