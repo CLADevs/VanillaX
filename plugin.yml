@@ -1,5 +1,5 @@
 name: VanillaX
-version: 2.0.0
-api: 3.0.0
 main: CLADevs\VanillaX\VanillaX
+version: 2.0.1
+api: 3.19.0
 author: CLADevs
