@@ -3,12 +3,12 @@
 namespace CLADevs\VanillaX\listeners\types;
 
 use CLADevs\VanillaX\blocks\tile\CommandBlockTile;
-use CLADevs\VanillaX\entities\utils\EntityButtonResult;
 use CLADevs\VanillaX\entities\utils\EntityInteractResult;
 use CLADevs\VanillaX\entities\utils\interfaces\EntityInteractable;
-use CLADevs\VanillaX\entities\utils\interfaces\EntityInteractButton;
 use CLADevs\VanillaX\entities\utils\interfaces\EntityRidable;
 use CLADevs\VanillaX\listeners\ListenerManager;
+use CLADevs\VanillaX\utils\instances\InteractButtonResult;
+use CLADevs\VanillaX\utils\item\InteractButtonItemTrait;
 use CLADevs\VanillaX\VanillaX;
 use pocketmine\block\BlockFactory;
 use pocketmine\block\BlockIds;
@@ -27,6 +27,7 @@ use pocketmine\network\mcpe\protocol\AddPlayerPacket;
 use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
 use pocketmine\network\mcpe\protocol\CommandBlockUpdatePacket;
 use pocketmine\network\mcpe\protocol\ContainerClosePacket;
+use pocketmine\network\mcpe\protocol\EmotePacket;
 use pocketmine\network\mcpe\protocol\InteractPacket;
 use pocketmine\network\mcpe\protocol\InventoryTransactionPacket;
 use pocketmine\network\mcpe\protocol\PlayerActionPacket;
@@ -66,8 +67,8 @@ class PacketListener implements Listener{
                         $p = Server::getInstance()->getPlayer($packet->username);
 
                         if($p !== null){
-                            VanillaX::getInstance()->getSessionManager()->get($player)->getOffHandInventory()->sendContents($p);
-                            VanillaX::getInstance()->getSessionManager()->get($p)->getOffHandInventory()->sendContents($player);
+                            VanillaX::getInstance()->getSessionManager()->get($player)->getOffHandInventory()->sendContents();
+                            VanillaX::getInstance()->getSessionManager()->get($p)->getOffHandInventory()->sendContents();
                         }
                     }
                     break;
@@ -125,6 +126,9 @@ class PacketListener implements Listener{
                 case ProtocolInfo::ACTOR_PICK_REQUEST_PACKET:
                     if($packet instanceof ActorPickRequestPacket) $this->handleActorPickRequest($player, $packet);
                     break;
+                case ProtocolInfo::EMOTE_PACKET:
+                    if($packet instanceof EmotePacket) $this->handleEmote($player, $packet);
+                    break;
             }
         }
     }
@@ -171,9 +175,15 @@ class PacketListener implements Listener{
             $clickPos = $packet->trData->getClickPos();
             $button = null;
 
-            if(is_string($currentButton) && $entity instanceof EntityInteractButton && count($packet->trData->getActions()) < 1){
-                /** Whenever a player interacts with interactable button */
-                $entity->onButtonPressed($button = new EntityButtonResult($player, $item, $currentButton, $clickPos));
+            if(is_string($currentButton) && count($packet->trData->getActions()) < 1){
+                if($entity instanceof InteractButtonItemTrait){
+                    /** Whenever a player interacts with interactable button for entity */
+                    $entity->onButtonPressed($button = new InteractButtonResult($player, $item, $currentButton, $clickPos));
+                }
+                if($item instanceof InteractButtonItemTrait){
+                    /** Whenever a player interacts with interactable button for item */
+                    $item->onButtonPressed($button = new InteractButtonResult($player, $item, $currentButton, $clickPos));
+                }
             }
 
             if($entity instanceof EntityInteractable){
@@ -191,9 +201,15 @@ class PacketListener implements Listener{
             $item = $packet->trData->getItemInHand()->getItemStack();
             $currentButton = $player->getDataPropertyManager()->getString(Entity::DATA_INTERACTIVE_TAG);
 
-            if(is_string($currentButton) && $entity instanceof EntityInteractButton && count($packet->trData->getActions()) < 1){
-                /** Whenever a player interacts with interactable button */
-                $entity->onButtonPressed(new EntityButtonResult($player, $item, $currentButton));
+            if(is_string($currentButton) && count($packet->trData->getActions()) < 1){
+                if($entity instanceof InteractButtonItemTrait){
+                    /** Whenever a player interacts with interactable button for entity */
+                    $entity->onButtonPressed($button = new InteractButtonResult($player, $item, $currentButton));
+                }
+                if($item instanceof InteractButtonItemTrait){
+                    /** Whenever a player interacts with interactable button for item */
+                    $item->onButtonPressed($button = new InteractButtonResult($player, $item, $currentButton));
+                }
             }
         }
     }
@@ -215,7 +231,7 @@ class PacketListener implements Listener{
                 if($entity === null){
                     $player->getDataPropertyManager()->setString(Entity::DATA_INTERACTIVE_TAG, "");
                 }
-            }elseif($entity instanceof EntityInteractButton){
+            }elseif($entity instanceof InteractButtonItemTrait){
                 $entity->onMouseHover($player);
             }
         }elseif($packet->action === InteractPacket::ACTION_LEAVE_VEHICLE && $entity instanceof EntityRidable){
@@ -237,13 +253,23 @@ class PacketListener implements Listener{
 
         if($entity instanceof Entity && !$entity instanceof Human){
             $result = ItemFactory::get(ItemIds::SPAWN_EGG, $entity::NETWORK_ID);
-
             $ev = new PlayerBlockPickEvent($player, BlockFactory::get(BlockIds::AIR), $result);
-            $ev->call(); //This will call vanillax PlayerBlockPickEvent event and calculates slot
+            $ev->call();
 
             if(!$ev->isCancelled()){
                 $player->getInventory()->setItemInHand($ev->getResultItem());
             }
+        }
+    }
+
+    /**
+     * @param Player $player
+     * @param EmotePacket $packet
+     * This is called whenever player emotes
+     */
+    private function handleEmote(Player $player, EmotePacket $packet): void{
+        foreach($player->getViewers() as $viewer){
+            $viewer->dataPacket($packet);
         }
     }
 }

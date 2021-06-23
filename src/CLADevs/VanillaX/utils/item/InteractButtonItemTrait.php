@@ -1,11 +1,11 @@
 <?php
 
-namespace CLADevs\VanillaX\entities\utils\interfaces;
+namespace CLADevs\VanillaX\utils\item;
 
-use CLADevs\VanillaX\entities\utils\EntityButtonResult;
+use CLADevs\VanillaX\utils\instances\InteractButtonResult;
 use pocketmine\Player;
 
-interface EntityInteractButton{
+interface InteractButtonItemTrait{
 
     /**
      * Whenever you hover over an entity this function would be called
@@ -15,7 +15,7 @@ interface EntityInteractButton{
 
     /**
      * This is whenever a button is pressed
-     * @param EntityButtonResult $result
+     * @param InteractButtonResult $result
      */
-    public function onButtonPressed(EntityButtonResult $result): void;
+    public function onButtonPressed(InteractButtonResult $result): void;
 }

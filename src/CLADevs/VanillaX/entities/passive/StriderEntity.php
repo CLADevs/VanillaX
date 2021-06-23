@@ -2,15 +2,15 @@
 
 namespace CLADevs\VanillaX\entities\passive;
 
-use CLADevs\VanillaX\entities\utils\EntityButtonResult;
 use CLADevs\VanillaX\entities\utils\EntityInteractResult;
 use CLADevs\VanillaX\entities\utils\interfaces\EntityInteractable;
-use CLADevs\VanillaX\entities\utils\interfaces\EntityInteractButton;
 use CLADevs\VanillaX\entities\utils\interfaces\EntityRidable;
-use CLADevs\VanillaX\entities\utils\interfaces\EntityRidingHeldItemChange;
 use CLADevs\VanillaX\entities\utils\traits\EntityRidableTrait;
 use CLADevs\VanillaX\entities\VanillaEntity;
 use CLADevs\VanillaX\entities\utils\ItemHelper;
+use CLADevs\VanillaX\utils\instances\InteractButtonResult;
+use CLADevs\VanillaX\utils\item\HeldItemChangeTrait;
+use CLADevs\VanillaX\utils\item\InteractButtonItemTrait;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
@@ -18,7 +18,7 @@ use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\LevelSoundEventPacket;
 use pocketmine\Player;
 
-class StriderEntity extends VanillaEntity implements EntityInteractable, EntityInteractButton, EntityRidable, EntityRidingHeldItemChange{
+class StriderEntity extends VanillaEntity implements EntityInteractable, InteractButtonItemTrait, EntityRidable, HeldItemChangeTrait{
     use EntityRidableTrait;
 
     const BUTTON_SADDLE = "Saddle";
@@ -60,7 +60,7 @@ class StriderEntity extends VanillaEntity implements EntityInteractable, EntityI
 
     public function onInteract(EntityInteractResult $result): void{
         $player = $result->getPlayer();
-        $this->onButtonPressed(new EntityButtonResult($player, $result->getItem(), $player->getDataPropertyManager()->getString(self::DATA_INTERACTIVE_TAG)));
+        $this->onButtonPressed(new InteractButtonResult($player, $result->getItem(), $player->getDataPropertyManager()->getString(self::DATA_INTERACTIVE_TAG)));
     }
 
     public function onMouseHover(Player $player): void{
@@ -83,7 +83,7 @@ class StriderEntity extends VanillaEntity implements EntityInteractable, EntityI
         $player->getDataPropertyManager()->setString(self::DATA_INTERACTIVE_TAG, "");
     }
 
-    public function onButtonPressed(EntityButtonResult $result): void{
+    public function onButtonPressed(InteractButtonResult $result): void{
         if(($name = $result->getButton()) === null){
             return;
         }

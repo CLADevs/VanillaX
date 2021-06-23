@@ -2,11 +2,11 @@
 
 namespace CLADevs\VanillaX\listeners\types;
 
-use CLADevs\VanillaX\entities\utils\interfaces\EntityRidingHeldItemChange;
 use CLADevs\VanillaX\items\ItemManager;
 use CLADevs\VanillaX\items\types\ShieldItem;
 use CLADevs\VanillaX\listeners\ListenerManager;
 use CLADevs\VanillaX\network\gamerules\GameRule;
+use CLADevs\VanillaX\utils\item\HeldItemChangeTrait;
 use CLADevs\VanillaX\VanillaX;
 use pocketmine\block\BlockFactory;
 use pocketmine\block\BlockIds;
@@ -171,9 +171,14 @@ class PlayerListener implements Listener{
             $player = $event->getPlayer();
             $session = VanillaX::getInstance()->getSessionManager()->get($player);
             $entity = $session->getRidingEntity();
+            $oldItem = $player->getInventory()->getItemInHand();
+            $newItem = $event->getItem();
 
-            if($entity instanceof EntityRidingHeldItemChange){
-                $entity->onSlotChange($player, $player->getInventory()->getItemInHand(), $event->getItem());
+            if($entity instanceof HeldItemChangeTrait){
+                $entity->onSlotChange($player, $oldItem, $newItem);
+            }
+            if($newItem instanceof HeldItemChangeTrait){
+                $newItem->onSlotChange($player, $oldItem, $newItem);
             }
         }
     }

@@ -2,6 +2,7 @@
 
 namespace CLADevs\VanillaX\inventories\types;
 
+use pocketmine\entity\Entity;
 use pocketmine\inventory\BaseInventory;
 use pocketmine\item\Item;
 use pocketmine\network\mcpe\protocol\InventoryContentPacket;
@@ -12,12 +13,22 @@ use pocketmine\Player;
 
 class OffhandInventory extends BaseInventory{
 
+    const COLOR_BLACK = -1;
+    const COLOR_NORMAL = 0;
+    const COLOR_BROWN = 1;
+    const COLOR_PURPLE = 2;
+    const COLOR_GREEN = 3;
+    const COLOR_YELLOW = 4;
+    const COLOR_DARK_GREEN = 5;
+    const COLOR_DARKISH = 6;
+
     const TAG_OFF_HAND_ITEM = "OffHandItem";
 
     private Player $player;
 
     public function __construct(Player $player){
         parent::__construct();
+        $player->getDataPropertyManager()->setByte(Entity::DATA_COLOR, self::COLOR_NORMAL);
         $player->addWindow($this, ContainerIds::OFFHAND, true);
         $this->player = $player;
         if($player->namedtag->hasTag(self::TAG_OFF_HAND_ITEM)){

@@ -2,14 +2,12 @@
 
 namespace CLADevs\VanillaX\entities\object;
 
-use CLADevs\VanillaX\entities\utils\EntityInteractResult;
-use CLADevs\VanillaX\entities\utils\interfaces\EntityInteractable;
 use CLADevs\VanillaX\network\gamerules\GameRule;
 use pocketmine\entity\Entity;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
 
-class BoatEntity extends Entity implements EntityInteractable{
+class BoatEntity extends Entity{
 
     public $width = 1.4;
     public $height = 0.455;
@@ -22,9 +20,5 @@ class BoatEntity extends Entity implements EntityInteractable{
             $this->getLevel()->dropItem($this, ItemFactory::get(ItemIds::BOAT)); //TODO boat block
         }
         parent::kill();
-    }
-
-    public function onInteract(EntityInteractResult $result): void{
-        //TODO
     }
 }

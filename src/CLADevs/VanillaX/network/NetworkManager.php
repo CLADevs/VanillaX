@@ -8,6 +8,7 @@ use CLADevs\VanillaX\network\protocol\ActorPickupRequestPacketX;
 use CLADevs\VanillaX\network\protocol\AnvilDamagePacketX;
 use CLADevs\VanillaX\network\protocol\CommandBlockUpdatePacketX;
 use CLADevs\VanillaX\network\protocol\FilterTextPacketX;
+use CLADevs\VanillaX\network\protocol\InteractPacketX;
 use CLADevs\VanillaX\network\protocol\InventoryTransactionPacketX;
 use CLADevs\VanillaX\network\protocol\MobEquipmentPacketX;
 use CLADevs\VanillaX\network\protocol\PlayerActionPacketX;
@@ -28,5 +29,6 @@ class NetworkManager{
         PacketPool::registerPacket(new PlayerInputPacketX());
         PacketPool::registerPacket(new MobEquipmentPacketX());
         PacketPool::registerPacket(new ActorPickupRequestPacketX());
+        PacketPool::registerPacket(new InteractPacketX());
     }
 }

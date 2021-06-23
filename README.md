@@ -74,22 +74,19 @@
 - Crossbow (TODO: Fireworks functionality)
 
 #### TODO Items:
-- Fishing Road
+- Fishing Rod
 - Boat
-- Banner Patterns
 - Lead
 - Lingering Potion
 - Map
-- Painting 
-- Saddle
-- Fireworks
 - 1.17 Items
 
 #### Features:
 - Weather
 - GameRules
-- Enchantments (TODO: Except Crossbows enchantments)
+- Enchantments
 - Offhand
+- Emotes
 
 #### TODO Features:
 - More Biomes in Normal World

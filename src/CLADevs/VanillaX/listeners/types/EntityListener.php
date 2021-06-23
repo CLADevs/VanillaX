@@ -15,6 +15,7 @@ use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\entity\EntityRegainHealthEvent;
 use pocketmine\event\entity\EntitySpawnEvent;
 use pocketmine\event\Listener;
+use pocketmine\item\Item;
 use pocketmine\item\ItemIds;
 use pocketmine\network\mcpe\protocol\ActorEventPacket;
 use pocketmine\network\mcpe\protocol\LevelEventPacket;
@@ -52,7 +53,8 @@ class EntityListener implements Listener{
                             return;
                         }
                         $item = $entity->getInventory()->getItemInHand();
-                        if($item instanceof ShieldItem && $entity->isSneaking() && $this->handleShieldDamage($event->getDamager(), $entity, $item)){
+                        if($entity->isSneaking() && $this->handleShieldDamage($event->getDamager(), $entity, $item)){
+                        //if($this->handleShieldDamage($event->getDamager(), $entity, $item)){
                             $event->setCancelled();
                         }
                     }
@@ -106,22 +108,35 @@ class EntityListener implements Listener{
         }
     }
 
-    private function handleShieldDamage(Entity $damager, Player $entity, ShieldItem $item): bool{
-        if($damager instanceof Living && $damager->getDirection() !== $entity->getDirection()){
+    private function handleShieldDamage(Entity $damager, Player $entity, Item $item): bool{
+        if($damager instanceof Living){
             $offhand = VanillaX::getInstance()->getSessionManager()->get($entity)->getOffHandInventory();
+            $minYaw = $entity->yaw - 90;
+            $maxYaw = $entity->yaw + 90;
+            $xDist = $damager->x - $entity->x;
+            $zDist = $damager->z - $entity->z;
+            $yaw = atan2($zDist, $xDist) / M_PI * 180 - 90;
+
+            if($yaw < 0){
+                $yaw += 360.0;
+            }
 
             if(($offhandItem = $offhand->getItem(0)) instanceof ShieldItem){
                 $item = $offhandItem;
+            }elseif(!$item instanceof ShieldItem){
+                return false;
             }
-            $item->applyDamage(1);
-            if($offhandItem instanceof ShieldItem){
-                $offhand->setItem(0, $item);
-            }else{
-                $entity->getInventory()->setItemInHand($item);
+            if($yaw >= $minYaw && $yaw <= $maxYaw){
+                $item->applyDamage(1);
+                if($offhandItem instanceof ShieldItem){
+                    $offhand->setItem(0, $item);
+                }else{
+                    $entity->getInventory()->setItemInHand($item);
+                }
+                $entity->getLevel()->broadcastLevelSoundEvent($entity, LevelSoundEventPacket::SOUND_ITEM_SHIELD_BLOCK);
+                $damager->knockBack($entity, 0, $damager->x - $entity->x, $damager->z - $entity->z, 0.5);
+                return true;
             }
-            $entity->getLevel()->broadcastLevelSoundEvent($entity, LevelSoundEventPacket::SOUND_ITEM_SHIELD_BLOCK);
-            $damager->knockBack($entity, 0, $damager->x - $entity->x, $damager->z - $entity->z, 0.5);
-            return true;
         }
         return false;
     }

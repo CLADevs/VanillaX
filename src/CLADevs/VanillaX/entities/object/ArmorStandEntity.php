@@ -2,11 +2,11 @@
 
 namespace CLADevs\VanillaX\entities\object;
 
-use CLADevs\VanillaX\entities\utils\EntityButtonResult;
-use CLADevs\VanillaX\entities\utils\interfaces\EntityInteractButton;
 use CLADevs\VanillaX\items\ItemManager;
 use CLADevs\VanillaX\network\gamerules\GameRule;
 use CLADevs\VanillaX\session\Session;
+use CLADevs\VanillaX\utils\instances\InteractButtonResult;
+use CLADevs\VanillaX\utils\item\InteractButtonItemTrait;
 use pocketmine\entity\Living;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
@@ -22,7 +22,7 @@ use pocketmine\network\mcpe\protocol\types\inventory\ItemStackWrapper;
 use pocketmine\Player;
 use pocketmine\Server;
 
-class ArmorStandEntity extends Living implements EntityInteractButton{
+class ArmorStandEntity extends Living implements InteractButtonItemTrait{
 
     const BUTTON_EQUIP = "Equip";
     const BUTTON_POSE = "Pose";
@@ -158,7 +158,7 @@ class ArmorStandEntity extends Living implements EntityInteractButton{
         $player->getDataPropertyManager()->setString(self::DATA_INTERACTIVE_TAG, $player->isSneaking() ? self::BUTTON_POSE : self::BUTTON_EQUIP);
     }
 
-    public function onButtonPressed(EntityButtonResult $result): void{
+    public function onButtonPressed(InteractButtonResult $result): void{
         $result->setInteractQueue(false);
         $player = $result->getPlayer();
         $item = $result->getItem();
