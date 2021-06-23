@@ -86,11 +86,11 @@ class PacketListener implements Listener{
             if($session !== null && ($window = $session->getCurrentWindow()) !== null) $window->handlePacket($player, $packet);
             switch($packet::NETWORK_ID){
                 case ProtocolInfo::COMMAND_BLOCK_UPDATE_PACKET:
-                    if($packet instanceof CommandBlockUpdatePacket) $this->handleCommandBlock($player, $packet);
+                    if($packet instanceof CommandBlockUpdatePacket && $player->isOp()) $this->handleCommandBlock($player, $packet);
                     break;
                 case ProtocolInfo::PLAYER_ACTION_PACKET:
                     if($packet instanceof PlayerActionPacket && in_array($packet->action, [PlayerActionPacket::ACTION_START_GLIDE, PlayerActionPacket::ACTION_STOP_GLIDE])){
-                        $session->getGliding()->setGliding($packet->action === PlayerActionPacket::ACTION_START_GLIDE);
+                        $session->setGliding($packet->action === PlayerActionPacket::ACTION_START_GLIDE);
                     }
                     break;
                 case ProtocolInfo::INVENTORY_TRANSACTION_PACKET:

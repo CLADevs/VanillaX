@@ -17,11 +17,28 @@ class LingeringPotionItem extends ProjectileItem{
     }
 
     public function getProjectileEntityType(): string{
-        return "LingeringPotion"; //TODO
+        return "";
     }
 
-    public function onClickAir(Player $player, Vector3 $directionVector): bool{
-        //TODO cancels spawning lingering potion projectile
+    public function onClickAir(Player $player, Vector3 $directionVector) : bool{
+//        $nbt = Entity::createBaseNBT($player->add(0, $player->getEyeHeight(), 0), $directionVector, $player->yaw, $player->pitch);
+//        $nbt->setShort("PotionId", $this->meta);
+//
+//        $projectile = new LingeringPotionEntity($player->getLevelNonNull(), $nbt, $player);
+//        $projectile->setMotion($projectile->getMotion()->multiply($this->getThrowForce()));
+//
+//        $this->pop();
+//
+//        $projectileEv = new ProjectileLaunchEvent($projectile);
+//        $projectileEv->call();
+//        if($projectileEv->isCancelled()){
+//            $projectile->flagForDespawn();
+//        }else{
+//            $projectile->spawnToAll();
+//
+//            $player->getLevelNonNull()->broadcastLevelSoundEvent($player, LevelSoundEventPacket::SOUND_THROW, 0, EntityIds::PLAYER);
+//        }
+//        $projectile->spawnToAll();
         return true;
     }
 }

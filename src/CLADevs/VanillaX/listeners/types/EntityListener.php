@@ -54,7 +54,6 @@ class EntityListener implements Listener{
                         }
                         $item = $entity->getInventory()->getItemInHand();
                         if($entity->isSneaking() && $this->handleShieldDamage($event->getDamager(), $entity, $item)){
-                        //if($this->handleShieldDamage($event->getDamager(), $entity, $item)){
                             $event->setCancelled();
                         }
                     }
@@ -151,16 +150,10 @@ class EntityListener implements Listener{
 
         /** Elytra */
         if($entity instanceof Player){
-            $session = VanillaX::getInstance()->getSessionManager()->get($entity)->getGliding();
+            $session = VanillaX::getInstance()->getSessionManager()->get($entity);
 
-            if($session->isGliding()){
+            if($session->isGliding() && $entity->pitch >= -11 && $entity->pitch <= 0){
                 $value = true;
-            }else{
-                if(($end = $session->getEndGlideTime()) !== null && ($start = $session->getStartGlideTime()) !== null){
-                    if(($end - $start) < 3){
-                        $value = true;
-                    }
-                }
             }
         }
         return $value;

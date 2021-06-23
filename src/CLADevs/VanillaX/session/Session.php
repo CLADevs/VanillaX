@@ -7,7 +7,6 @@ use CLADevs\VanillaX\entities\utils\interfaces\EntityRidable;
 use CLADevs\VanillaX\entities\VanillaEntity;
 use CLADevs\VanillaX\inventories\FakeBlockInventory;
 use CLADevs\VanillaX\inventories\types\OffhandInventory;
-use CLADevs\VanillaX\session\data\SessionGliding;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\DataPacket;
 use pocketmine\network\mcpe\protocol\PlaySoundPacket;
@@ -18,18 +17,18 @@ class Session{
     /** @var TridentEntity[] */
     private array $thrownTridents = [];
 
+    private int $entityId;
+
+    private bool $gliding = false;
+
     private Player $player;
     private OffhandInventory $offHandInventory;
-    private SessionGliding $gliding;
     private ?FakeBlockInventory $currentWindow = null;
     private ?VanillaEntity $ridingEntity = null;
-
-    private int $entityId;
 
     public function __construct(Player $player){
         $this->player = $player;
         $this->offHandInventory = new OffhandInventory($player);
-        $this->gliding = new SessionGliding();
         $this->entityId = $player->getId();
     }
 
@@ -64,8 +63,12 @@ class Session{
         $this->currentWindow = $currentWindow;
     }
 
-    public function getGliding(): SessionGliding{
+    public function isGliding(): bool{
         return $this->gliding;
+    }
+
+    public function setGliding(bool $gliding): void{
+        $this->gliding = $gliding;
     }
 
     /**

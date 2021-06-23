@@ -66,7 +66,7 @@ class CommandBlock extends Block implements NonAutomaticCallItemTrait, NonCreati
     }
 
     public function onActivate(Item $item, Player $player = null): bool{
-        if($player !== null){
+        if($player !== null && $player->isOp()){
             $tile = $this->getLevel()->getTile($this);
 
             if(!$tile instanceof CommandBlockTile){
