@@ -2,6 +2,7 @@
 
 namespace CLADevs\VanillaX\session;
 
+use CLADevs\VanillaX\entities\passive\VillagerEntity;
 use CLADevs\VanillaX\entities\projectile\TridentEntity;
 use CLADevs\VanillaX\entities\utils\interfaces\EntityRidable;
 use CLADevs\VanillaX\entities\VanillaEntity;
@@ -23,8 +24,10 @@ class Session{
 
     private Player $player;
     private OffhandInventory $offHandInventory;
+    
     private ?FakeBlockInventory $currentWindow = null;
     private ?VanillaEntity $ridingEntity = null;
+    private ?VillagerEntity $tradingEntity = null;
 
     public function __construct(Player $player){
         $this->player = $player;
@@ -53,6 +56,17 @@ class Session{
             $this->ridingEntity->onLeftRide($this->player);
         }
         $this->ridingEntity = $ridingEntity;
+    }
+    
+    public function getTradingEntity(): ?VillagerEntity{
+        return $this->tradingEntity;
+    }
+
+    public function setTradingEntity(?VillagerEntity $tradingEntity, bool $onQuit = false): void{
+        if($onQuit && $this->tradingEntity !== null && $tradingEntity === null){
+            $this->tradingEntity->setCustomer(null);
+        }
+        $this->tradingEntity = $tradingEntity;
     }
 
     public function getCurrentWindow(): ?FakeBlockInventory{

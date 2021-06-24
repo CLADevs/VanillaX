@@ -14,6 +14,7 @@ abstract class VanillaEntity extends Living{
 
     const RAVAGER = 59;
     const PILLAGER = 114;
+    const VILLAGER_V2 = 115;
     const WANDERING_TRADER = 118;
     const FOX = 121;
     const BEE = 122;
@@ -39,7 +40,8 @@ abstract class VanillaEntity extends Living{
         self::PIGLIN_BRUTE => "minecraft:piglin_brute",
         self::GOAT => "minecraft:goat",
         self::GLOW_SQUID => "minecraft:glow_squid",
-        self::AXOLOTL => "minecraft:axolotl"
+        self::AXOLOTL => "minecraft:axolotl",
+        self::VILLAGER_V2 => "minecraft:villager_v2",
     ];
 
     /**

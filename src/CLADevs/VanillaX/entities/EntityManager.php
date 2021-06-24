@@ -3,6 +3,7 @@
 namespace CLADevs\VanillaX\entities;
 
 use CLADevs\VanillaX\entities\object\PaintingEntity;
+use CLADevs\VanillaX\entities\utils\villager\VillagerProfession;
 use CLADevs\VanillaX\utils\item\NonAutomaticCallItemTrait;
 use CLADevs\VanillaX\utils\Utils;
 use CLADevs\VanillaX\VanillaX;
@@ -11,6 +12,7 @@ use pocketmine\entity\Entity;
 class EntityManager{
 
     public function startup(): void{
+        VillagerProfession::init();
         if(VanillaX::getInstance()->getConfig()->get("mobs", true)){
             foreach(["object", "boss", "passive", "neutral", "monster", "projectile"] as $path){
                 Utils::callDirectory("entities" . DIRECTORY_SEPARATOR . $path, function (string $namespace): void{

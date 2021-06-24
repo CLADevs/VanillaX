@@ -2,19 +2,22 @@
 
 namespace CLADevs\VanillaX\inventories\types;
 
+use CLADevs\VanillaX\entities\passive\VillagerEntity;
 use CLADevs\VanillaX\inventories\FakeBlockInventory;
+use CLADevs\VanillaX\VanillaX;
 use pocketmine\block\BlockIds;
-use pocketmine\math\Vector3;
-use pocketmine\network\mcpe\protocol\DataPacket;
-use pocketmine\network\mcpe\protocol\InventoryTransactionPacket;
-use pocketmine\network\mcpe\protocol\types\inventory\UIInventorySlotOffset;
+use pocketmine\network\mcpe\protocol\ContainerClosePacket;
 use pocketmine\network\mcpe\protocol\types\WindowTypes;
+use pocketmine\network\mcpe\protocol\UpdateTradePacket;
 use pocketmine\Player;
 
 class TradeInventory extends FakeBlockInventory{
 
-    public function __construct(Vector3 $holder){
-        parent::__construct($holder, 3, BlockIds::AIR, WindowTypes::TRADING);
+    private VillagerEntity $villager;
+
+    public function __construct(VillagerEntity $holder){
+        parent::__construct($holder, 2, BlockIds::AIR, WindowTypes::TRADING);
+        $this->villager = $holder;
     }
 
     public function getName(): string{
@@ -22,34 +25,42 @@ class TradeInventory extends FakeBlockInventory{
     }
 
     public function getDefaultSize(): int{
-        return 3;
+        return 2;
     }
 
     public function getNetworkType(): int{
         return WindowTypes::TRADING;
     }
 
-    public function handlePacket(Player $player, DataPacket $packet): bool{
-        if($packet instanceof InventoryTransactionPacket){
-            $actions = $packet->trData->getActions();
-
-            if(count($actions) < 1){
-                //var_dump("Null actions");
-                return true;
-            }
-            foreach($actions as $key => $action){
-                $slot = $action->inventorySlot;
-                $inv = $this;
-                if($action->windowId === WindowTypes::CONTAINER){
-                    $inv = $player->getInventory();
-                }else{
-                    if(array_key_exists($slot, UIInventorySlotOffset::TRADE2_INGREDIENT)){
-                        $slot = UIInventorySlotOffset::TRADE2_INGREDIENT[$slot];
-                    }
-                }
-                $inv->setItem($slot, $action->newItem->getItemStack());
-            }
+    public function onClose(Player $who): void{
+        foreach($this->getContents() as $item){
+            $who->dropItem($item);
         }
-        return true;
+        $this->clearAll();
+        VanillaX::getInstance()->getSessionManager()->get($who)->setRidingEntity(null);
+        $this->villager->setCustomer(null);
+
+        $pk = new ContainerClosePacket();
+        $pk->windowId = 255;
+        $pk->server = false;
+        $who->dataPacket($pk);
+        unset($this->viewers[spl_object_hash($who)]);
     }
+
+    public function onOpen(Player $who): void{
+        parent::onOpen($who);
+        $pk = new UpdateTradePacket();
+        $pk->windowId = $who->getWindowId($this);
+        $pk->windowType = WindowTypes::TRADING;
+        $pk->windowSlotCount = 0;
+        $pk->tradeTier = 0;
+        $pk->traderEid = $this->villager->getId();
+        $pk->playerEid = $who->getId();
+        $pk->displayName = $this->villager->getProfession()->getName();
+        $pk->isV2Trading = true;
+        $pk->isWilling = false;
+        $pk->offers = $this->villager->getOfferBuffer();
+        $who->dataPacket($pk);
+    }
+
 }

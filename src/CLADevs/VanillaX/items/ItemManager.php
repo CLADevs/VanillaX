@@ -35,6 +35,10 @@ class ItemManager{
         self::register(new Item(ItemIdentifiers::NETHERITE_INGOT)); //ITEM
         self::register(new Item(ItemIdentifiers::NETHERITE_SCRAP)); //ITEM
         self::register(new Item(ItemIdentifiers::HONEYCOMB, 0, "Honeycomb")); //ITEM
+        self::register(new Item(ItemIdentifiers::BELL, 0, "Bell")); //ITEM
+        self::register(new Item(ItemIdentifiers::LANTERN, 0, "Lantern")); //ITEM
+        self::register(new Item(ItemIdentifiers::CAMPFIRE, 0, "Campfire")); //ITEM
+        self::register(new Item(ItemIdentifiers::DRIED_KELP_BLOCK, 0, "Dried kelp")); //ITEM
         self::register(new Item(ItemIds::KELP, 0, "Kelp")); //ITEM
         self::register(new Item(ItemIds::DRIED_KELP, 0, "Dried Kelp")); //ITEM
         self::register(new Item(ItemIds::NETHER_WART, 0, "Nether Wart")); //ITEM

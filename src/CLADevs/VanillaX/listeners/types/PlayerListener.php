@@ -56,6 +56,7 @@ class PlayerListener implements Listener{
             }
         }
         $session->getOffHandInventory()->saveContents();
+        $session->setTradingEntity(null, true);
         $manager->remove($player);
     }
 

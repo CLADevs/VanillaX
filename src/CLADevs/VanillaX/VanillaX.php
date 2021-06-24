@@ -9,7 +9,6 @@ use CLADevs\VanillaX\entities\EntityManager;
 use CLADevs\VanillaX\inventories\InventoryManager;
 use CLADevs\VanillaX\items\ItemManager;
 use CLADevs\VanillaX\listeners\ListenerManager;
-use CLADevs\VanillaX\network\gamerules\GameRule;
 use CLADevs\VanillaX\network\NetworkManager;
 use CLADevs\VanillaX\session\SessionManager;
 use CLADevs\VanillaX\weather\WeatherManager;
@@ -20,10 +19,10 @@ class VanillaX extends PluginBase{
 
     private static VanillaX $instance;
 
+    private ItemManager $itemManager;
     private EnchantmentManager $enchantmentManager;
     private EntityManager $entityManager;
     private BlockManager $blockManager;
-    private ItemManager $itemManager;
     private SessionManager $sessionManager;
     private CommandManager $commandManager;
     private NetworkManager $networkManager;
@@ -34,10 +33,10 @@ class VanillaX extends PluginBase{
     public function onLoad(): void{
         $this->saveDefaultConfig();
         self::$instance = $this;
+        $this->itemManager = new ItemManager();
         $this->enchantmentManager = new EnchantmentManager();
         $this->entityManager = new EntityManager();
         $this->blockManager = new BlockManager();
-        $this->itemManager = new ItemManager();
         $this->sessionManager = new SessionManager();
         $this->commandManager = new CommandManager();
         $this->networkManager = new NetworkManager();
@@ -59,7 +58,6 @@ class VanillaX extends PluginBase{
         $this->inventoryManager->startup();
         $this->weatherManager->startup();
         $this->listenerManager->startup();
-        GameRule::startup();
     }
 
     public function getFile(): string{
@@ -74,16 +72,16 @@ class VanillaX extends PluginBase{
         return self::$instance;
     }
 
+    public function getItemManager(): ItemManager{
+        return $this->itemManager;
+    }
+
     public function getEnchantmentManager(): EnchantmentManager{
         return $this->enchantmentManager;
     }
 
     public function getSessionManager(): SessionManager{
         return $this->sessionManager;
-    }
-
-    public function getItemManager(): ItemManager{
-        return $this->itemManager;
     }
 
     public function getBlockManager(): BlockManager{

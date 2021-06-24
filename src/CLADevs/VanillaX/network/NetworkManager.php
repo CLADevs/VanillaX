@@ -7,6 +7,7 @@ use CLADevs\VanillaX\network\protocol\ActorEventPacketX;
 use CLADevs\VanillaX\network\protocol\ActorPickupRequestPacketX;
 use CLADevs\VanillaX\network\protocol\AnvilDamagePacketX;
 use CLADevs\VanillaX\network\protocol\CommandBlockUpdatePacketX;
+use CLADevs\VanillaX\network\protocol\ContainerClosePacketX;
 use CLADevs\VanillaX\network\protocol\FilterTextPacketX;
 use CLADevs\VanillaX\network\protocol\InteractPacketX;
 use CLADevs\VanillaX\network\protocol\InventoryTransactionPacketX;
@@ -19,6 +20,7 @@ class NetworkManager{
 
     public function startup(): void{
         GameRule::init();
+        GameRule::startup();
 
         PacketPool::registerPacket(new InventoryTransactionPacketX());
         PacketPool::registerPacket(new FilterTextPacketX());
@@ -30,5 +32,6 @@ class NetworkManager{
         PacketPool::registerPacket(new MobEquipmentPacketX());
         PacketPool::registerPacket(new ActorPickupRequestPacketX());
         PacketPool::registerPacket(new InteractPacketX());
+        PacketPool::registerPacket(new ContainerClosePacketX());
     }
 }

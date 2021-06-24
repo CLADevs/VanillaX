@@ -5,6 +5,7 @@ namespace CLADevs\VanillaX\entities\utils\villager;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\nbt\tag\FloatTag;
 use pocketmine\nbt\tag\IntTag;
 
 class VillagerOffer{
@@ -12,10 +13,13 @@ class VillagerOffer{
     const TAG_USES = "uses";
     const TAG_MAX_USES = "maxUses";
     const TAG_REWARD_EXP = "rewardExp";
-    const TAG_PRICE_MULTIPLIER = "priceMultiplier";
+    const TAG_TRADER_EXP = "traderExp";
+    const TAG_PRICE_MULTIPLIER_A = "priceMultiplierA";
+    const TAG_PRICE_MULTIPLIER_B = "priceMultiplierB";
     const TAG_SELL = "sell";
     const TAG_BUY_A = "buyA";
     const TAG_BUY_B = "buyB";
+    const TAG_TIER = "tier";
 
     private ?Item $input;
     private ?Item $input2;
@@ -24,22 +28,28 @@ class VillagerOffer{
 
     private int $uses;
     private int $maxUses;
-    private int $rewardExp;
-    private int $priceMultiplier;
+    private bool $rewardExp;
+    private int $traderExp;
+    private float $priceMultiplierA;
+    private float $priceMultiplierB;
 
     /**
      * VillagerOffer constructor.
-     * @param int $rewardExp
-     * @param int $priceMultiplier
-     * @param int $maxUses
-     * @param int $uses
      * @param Item|int|null $input
      * @param Item|int|null $input2
      * @param Item|int|null $result
+     * @param int $traderExp
+     * @param bool $rewardExp
+     * @param float $priceMultiplierA
+     * @param float $priceMultiplierB
+     * @param int $maxUses
+     * @param int $uses
      */
-    public function __construct(int $rewardExp = 0, int $priceMultiplier = 1, int $maxUses = 100, int $uses = 0, $input = null, $input2 = null, $result = null){
+    public function __construct($input = null, $input2 = null, $result = null, int $traderExp = 0, bool $rewardExp = false, float $priceMultiplierA = 0, float $priceMultiplierB = 0, int $maxUses = 100, int $uses = 0){
+        $this->traderExp = $traderExp;
         $this->rewardExp = $rewardExp;
-        $this->priceMultiplier = $priceMultiplier;
+        $this->priceMultiplierA = $priceMultiplierA;
+        $this->priceMultiplierB = $priceMultiplierB;
         $this->maxUses = $maxUses;
         $this->uses = $uses;
         $this->setInput($input, $input2);
@@ -52,7 +62,9 @@ class VillagerOffer{
             new IntTag(self::TAG_USES, $this->uses),
             new IntTag(self::TAG_MAX_USES, $this->maxUses),
             new IntTag(self::TAG_REWARD_EXP, $this->rewardExp),
-            new IntTag(self::TAG_PRICE_MULTIPLIER, $this->priceMultiplier),
+            new IntTag(self::TAG_TRADER_EXP, $this->traderExp),
+            new FloatTag(self::TAG_PRICE_MULTIPLIER_A, $this->priceMultiplierA),
+            new FloatTag(self::TAG_PRICE_MULTIPLIER_B, $this->priceMultiplierB),
         ]);
     }
 
@@ -91,20 +103,20 @@ class VillagerOffer{
         $this->initializeNBT();
     }
 
-    public function getRewardExp(): int{
-        return $this->rewardExp;
-    }
-
-    public function setRewardExp(int $rewardExp): void{
-        $this->rewardExp = $rewardExp;
-    }
-
     public function getInput(): ?Item{
         return $this->input;
     }
 
     public function getInput2(): ?Item{
         return $this->input2;
+    }
+
+    public function isRewardExp(): bool{
+        return $this->rewardExp;
+    }
+
+    public function setRewardExp(bool $rewardExp): void{
+        $this->rewardExp = $rewardExp;
     }
 
     /**

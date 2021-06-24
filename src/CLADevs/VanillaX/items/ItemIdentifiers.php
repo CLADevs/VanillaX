@@ -16,10 +16,14 @@ interface ItemIdentifiers{
     const NETHERITE_BOOTS = 751;
     const NETHERITE_SCRAP = 752;
 
+    const CAMPFIRE = 720;
     const KELP = 335;
     const SUSPICIOUS_STEW = 734;
     const HONEYCOMB = 736;
     const HONEY_BOTTLE = 737;
+    const BELL = -206;
+    const LANTERN = -208;
+    const DRIED_KELP_BLOCK = -139;
 
     const TIER_NETHERITE = 6;
 }

@@ -37,6 +37,7 @@ use pocketmine\network\mcpe\protocol\SetDifficultyPacket;
 use pocketmine\network\mcpe\protocol\SetPlayerGameTypePacket;
 use pocketmine\network\mcpe\protocol\types\inventory\UseItemOnEntityTransactionData;
 use pocketmine\network\mcpe\protocol\types\inventory\UseItemTransactionData;
+use pocketmine\network\mcpe\protocol\types\WindowTypes;
 use pocketmine\Player;
 use pocketmine\Server;
 
@@ -117,7 +118,7 @@ class PacketListener implements Listener{
                 case ProtocolInfo::CONTAINER_CLOSE_PACKET:
                     /** Fixes Trading GUI issue */
                     if($packet instanceof ContainerClosePacket && $packet->windowId === 255){
-                        $player->dataPacket($packet);
+                        $player->removeWindow($player->getWindow(WindowTypes::TRADING));
                     }
                     break;
                 case ProtocolInfo::INTERACT_PACKET:

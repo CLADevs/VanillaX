@@ -4,8 +4,10 @@ namespace CLADevs\VanillaX\network\protocol\types;
 
 use CLADevs\VanillaX\inventories\actions\EnchantItemAction;
 use CLADevs\VanillaX\inventories\actions\RepairItemAction;
+use CLADevs\VanillaX\inventories\actions\TradeItemAction;
 use CLADevs\VanillaX\inventories\types\AnvilInventory;
 use CLADevs\VanillaX\inventories\types\EnchantInventory;
+use CLADevs\VanillaX\inventories\types\TradeInventory;
 use pocketmine\inventory\transaction\action\InventoryAction;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
 use pocketmine\network\mcpe\protocol\types\ContainerIds;
@@ -24,6 +26,9 @@ class NetworkInventoryActionX extends NetworkInventoryAction{
 
     public const SOURCE_TYPE_ENCHANT_INPUT = -15;
     public const SOURCE_TYPE_ENCHANT_MATERIAL = -16;
+
+    public const SOURCE_TYPE_TRADE_INPUT = -31;
+    public const SOURCE_TYPE_TRADE_OUTPUT = -30;
 
     public function createInventoryAction(Player $player): ?InventoryAction{
         /** Nukkit Transaction for Anvil */
@@ -54,6 +59,16 @@ class NetworkInventoryActionX extends NetworkInventoryAction{
                         }
                         $this->windowId = WindowTypes::ENCHANTMENT;
                         $this->inventorySlot = UIInventorySlotOffset::ENCHANTING_TABLE[$this->inventorySlot];
+                        $otherInventory = false;
+                    }elseif(array_key_exists($this->inventorySlot, UIInventorySlotOffset::TRADE2_INGREDIENT)){
+                        //Trade
+                        $window = $player->getWindow(WindowTypes::TRADING);
+
+                        if(!$window instanceof TradeInventory){
+                            throw new UnexpectedValueException("Player " . $player->getName() . " has no open trade window");
+                        }
+                        $this->windowId = WindowTypes::TRADING;
+                        $this->inventorySlot = UIInventorySlotOffset::TRADE2_INGREDIENT[$this->inventorySlot];
                         $otherInventory = false;
                     }
                 }
@@ -91,6 +106,16 @@ class NetworkInventoryActionX extends NetworkInventoryAction{
                             return new EnchantItemAction($oldItem, $newItem, $this->windowId);
                     }
                     return new SlotChangeAction($window, $this->inventorySlot, $oldItem, $newItem);
+                }elseif($this->windowId === self::SOURCE_TYPE_TRADE_OUTPUT || $this->windowId === self::SOURCE_TYPE_TRADE_INPUT){
+                    //Trade
+                    $window = $player->getWindow(WindowTypes::TRADING);
+
+                    if(!$window instanceof TradeInventory){
+                        throw new UnexpectedValueException("Player " . $player->getName() . " has no open trade window");
+                    }
+                    $this->inventorySlot = $this->windowId === self::SOURCE_TYPE_TRADE_OUTPUT ? 1 : 0;
+                    $this->windowId = WindowTypes::TRADING;
+                    return new TradeItemAction($oldItem, $newItem);
                 }
                 break;
         }
