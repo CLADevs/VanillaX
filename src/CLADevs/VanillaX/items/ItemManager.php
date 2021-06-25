@@ -87,11 +87,12 @@ class ItemManager{
     }
 
     private function initializeCreativeItems(): void{
+        Item::clearCreativeItems();
         $creativeItems = json_decode(file_get_contents(RESOURCE_PATH . "vanilla" . DIRECTORY_SEPARATOR . "creativeitems.json"), true);
 
         foreach($creativeItems as $data){
             $item = Item::jsonDeserialize($data);
-            if($item->getName() === "Unknown" || Item::isCreativeItem($item)){
+            if($item->getName() === "Unknown"){
                 continue;
             }
             Item::addCreativeItem($item);
