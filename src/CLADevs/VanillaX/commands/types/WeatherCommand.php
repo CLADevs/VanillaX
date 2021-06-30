@@ -38,7 +38,9 @@ class WeatherCommand extends Command{
         $duration = 6000;
         $weathers = [];
         foreach(Server::getInstance()->getLevels() as $level){
-            $weathers[] = VanillaX::getInstance()->getWeatherManager()->getWeather($level);
+            if(($weather = VanillaX::getInstance()->getWeatherManager()->getWeather($level)) !== null){
+                $weathers[] = $weather;
+            }
         }
 
         if(isset($args[1]) && is_numeric($args[1])){

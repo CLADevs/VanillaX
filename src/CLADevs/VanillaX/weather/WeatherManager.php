@@ -71,10 +71,16 @@ class WeatherManager{
      * @return Weather|null
      */
     public function getWeather($level): ?Weather{
+        $levelName = $level;
+
         if($level instanceof Level){
-            $level = $level->getFolderName();
+            $levelName = $level->getFolderName();
+
+            if(!isset($this->weathers[strtolower($levelName)])){
+                $this->addWeather($level);
+            }
         }
-        return $this->weathers[strtolower($level)] ?? null;
+        return $this->weathers[strtolower($levelName)] ?? null;
     }
 
     public function isRaining(Level $level, bool $checkThunder = true): bool{
