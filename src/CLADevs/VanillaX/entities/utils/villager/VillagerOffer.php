@@ -4,6 +4,7 @@ namespace CLADevs\VanillaX\entities\utils\villager;
 
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
+use pocketmine\nbt\tag\ByteTag;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\FloatTag;
 use pocketmine\nbt\tag\IntTag;
@@ -61,10 +62,10 @@ class VillagerOffer{
         $this->namedtag = new CompoundTag("", [
             new IntTag(self::TAG_USES, $this->uses),
             new IntTag(self::TAG_MAX_USES, $this->maxUses),
-            new IntTag(self::TAG_REWARD_EXP, $this->rewardExp),
             new IntTag(self::TAG_TRADER_EXP, $this->traderExp),
             new FloatTag(self::TAG_PRICE_MULTIPLIER_A, $this->priceMultiplierA),
             new FloatTag(self::TAG_PRICE_MULTIPLIER_B, $this->priceMultiplierB),
+            new ByteTag(self::TAG_REWARD_EXP, $this->rewardExp),
         ]);
     }
 

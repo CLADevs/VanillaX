@@ -48,7 +48,7 @@ abstract class VillagerProfession{
 
     private int $id;
     private string $name;
-    private Block $block;
+    private int $block;
 
     /** @var string[] */
     protected array $data = [];
@@ -64,13 +64,14 @@ abstract class VillagerProfession{
     public function __construct(int $id, string $name, $block = BlockIds::AIR){
         $this->id = $id;
         $this->name = $name;
-        if(is_int($block)){
-            try{
-                $block = BlockFactory::get($block);
-            }catch (Exception $e){
-                $block = BlockFactory::get(BlockIds::AIR);
-            }
-        }
+        //TODO uncomment this on 4.0
+//        if(is_int($block)){
+//            try{
+//                $block = BlockFactory::get($block);
+//            }catch (Exception $e){
+//                $block = BlockFactory::get(BlockIds::AIR);
+//            }
+//        }
         $this->block = $block;
         if($this->hasTrades()){
             $this->data = json_decode(file_get_contents(Utils::getResourceFile("trades" . DIRECTORY_SEPARATOR . strtolower(str_replace(" ", "_", $name)) . "_trades.json")), true);
@@ -83,7 +84,6 @@ abstract class VillagerProfession{
         Utils::callDirectory($path, function (string $namespace): void{
             self::registerProfession(new $namespace());
         });
-        self::registerProfession(new ArmorerProfession());
     }
 
     public static function registerProfession(VillagerProfession $profession): void{
@@ -102,7 +102,7 @@ abstract class VillagerProfession{
         return $this->name;
     }
 
-    public function getBlock(): Block{
+    public function getBlock(): int{
         return $this->block;
     }
 
