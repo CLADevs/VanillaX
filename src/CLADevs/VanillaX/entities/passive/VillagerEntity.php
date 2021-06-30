@@ -63,7 +63,6 @@ class VillagerEntity extends VanillaEntity implements EntityInteractable{
         $this->setProfession($this->profession, VillagerProfession::BIOME_PLAINS, $hasOfferBuffer);
         $this->setTier($this->tier);
         $this->setExperience($this->experience);
-        var_dump($this->experience);
         $this->propertyManager->setInt(self::DATA_MAX_TRADE_TIER, VillagerProfession::TIER_MASTER);
     }
 
