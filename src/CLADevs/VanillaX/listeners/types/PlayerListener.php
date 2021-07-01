@@ -55,7 +55,6 @@ class PlayerListener implements Listener{
                 $entity->onCollideWithPlayer($player);
             }
         }
-        $session->getOffHandInventory()->saveContents();
         $session->setTradingEntity(null, true);
         $manager->remove($player);
     }

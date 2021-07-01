@@ -18,7 +18,7 @@ use pocketmine\Player;
 use pocketmine\tile\Container;
 
 class ShulkerBoxBlock extends Transparent implements NonAutomaticCallItemTrait{
-
+    
     public function getHardness(): float{
         return 2;
     }

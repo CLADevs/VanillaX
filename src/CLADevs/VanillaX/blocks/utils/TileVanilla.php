@@ -17,4 +17,5 @@ interface TileVanilla{
     const ENCHANT_TABLE = "EnchantTable";
     const ENDER_CHEST = "EnderChest";
     const MOB_SPAWNER = "MobSpawner";
+    const CAULDRON = "Cauldron";
 }

@@ -17,7 +17,7 @@ use ReflectionProperty;
 
 class InventoryManager{
 
-    private const BREW_CONVERSATION = [
+    const BREW_CONVERSATION = [
         424 => ItemIds::POTION,
         392 => ItemIds::GLOWSTONE_DUST,
         551 => ItemIds::SPLASH_POTION,

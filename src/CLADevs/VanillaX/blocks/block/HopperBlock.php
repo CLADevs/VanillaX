@@ -18,6 +18,14 @@ class HopperBlock extends Transparent{
     }
 
     public function place(Item $item, Block $blockReplace, Block $blockClicked, int $face, Vector3 $clickVector, Player $player = null): bool{
+        $faces = [
+            Vector3::SIDE_DOWN => 0,
+            Vector3::SIDE_UP => 0,
+            Vector3::SIDE_NORTH => 3,
+            Vector3::SIDE_SOUTH => 2,
+            Vector3::SIDE_WEST => 5,
+            Vector3::SIDE_EAST => 4
+        ];
         $this->meta = $faces[$face] ?? $face;
         parent::place($item, $blockReplace, $blockClicked, $face, $clickVector, $player);
         TileUtils::generateTile($this, TileVanilla::HOPPER, HopperTile::class);

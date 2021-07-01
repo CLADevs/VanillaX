@@ -10,10 +10,10 @@
 - Anvil
 - Brewing Stand
 - Shulker Box
+- Hopper
 - Command Block (80% done)
 
 #### TODO Blocks:
-- Hopper
 - Ancient Debris
 - Bamboo
 - Barrel
