@@ -70,12 +70,13 @@ class ClearCommand extends Command{
             if(!$p instanceof Player){
                 continue;
             }
-            if(count($p->getInventory()->getContents()) < 1 && count($p->getArmorInventory()->getContents()) < 1){
+            $offhand = VanillaX::getInstance()->getSessionManager()->get($p)->getOffHandInventory();
+            $offhandItem = $offhand->getItem(0);
+            
+            if(count($p->getInventory()->getContents()) < 1 && count($p->getArmorInventory()->getContents()) < 1 && count($offhand->getContents()) < 1){
                 $sender->sendMessage(TextFormat::RED . "Could not clear the inventory of " . $p->getName() . ", no items to remove");
                 return;
             }
-            $offhand = VanillaX::getInstance()->getSessionManager()->get($p)->getOffHandInventory();
-            $offhandItem = $offhand->getItem(0);
             $itemsCount = 0;
             if($itemName === null){
                 foreach(array_merge($p->getInventory()->getContents(), $p->getArmorInventory()->getContents(), $offhand->getContents()) as $item){
