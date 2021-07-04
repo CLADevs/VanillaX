@@ -8,6 +8,7 @@ use CLADevs\VanillaX\entities\utils\interfaces\EntityRidable;
 use CLADevs\VanillaX\entities\VanillaEntity;
 use CLADevs\VanillaX\inventories\FakeBlockInventory;
 use CLADevs\VanillaX\inventories\types\OffhandInventory;
+use pocketmine\entity\Entity;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\DataPacket;
 use pocketmine\network\mcpe\protocol\PlaySoundPacket;
@@ -82,6 +83,7 @@ class Session{
     }
 
     public function setGliding(bool $gliding): void{
+        $this->player->setGenericFlag(Entity::DATA_FLAG_GLIDING, $gliding);
         $this->gliding = $gliding;
     }
 

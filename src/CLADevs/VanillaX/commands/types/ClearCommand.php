@@ -6,6 +6,7 @@ use CLADevs\VanillaX\commands\Command;
 use CLADevs\VanillaX\commands\utils\CommandArgs;
 use CLADevs\VanillaX\commands\utils\CommandTargetSelector;
 use CLADevs\VanillaX\utils\Utils;
+use CLADevs\VanillaX\VanillaX;
 use Exception;
 use pocketmine\command\CommandSender;
 use pocketmine\item\ItemFactory;
@@ -29,6 +30,10 @@ class ClearCommand extends Command{
 
     public function execute(CommandSender $sender, string $commandLabel, array $args): void{
         if(!$this->testPermission($sender)) return;
+        if((!isset($args[0]) || !isset($args[1])) && !$sender instanceof Player){
+            $this->sendSyntaxError($sender, "", "/$commandLabel");
+            return;
+        }
         $player = [$sender];
         $itemName = null;
         $data = null;
@@ -69,13 +74,16 @@ class ClearCommand extends Command{
                 $sender->sendMessage(TextFormat::RED . "Could not clear the inventory of " . $p->getName() . ", no items to remove");
                 return;
             }
+            $offhand = VanillaX::getInstance()->getSessionManager()->get($p)->getOffHandInventory();
+            $offhandItem = $offhand->getItem(0);
             $itemsCount = 0;
             if($itemName === null){
-                foreach(array_merge($p->getInventory()->getContents(), $p->getArmorInventory()->getContents()) as $item){
+                foreach(array_merge($p->getInventory()->getContents(), $p->getArmorInventory()->getContents(), $offhand->getContents()) as $item){
                     $itemsCount += $item->getCount();
                 }
                 $p->getInventory()->clearAll();
                 $p->getArmorInventory()->clearAll();
+                $offhand->clearAll();
             }else{
                 foreach($p->getInventory()->getContents() as $slot => $item){
                     if($item->equals($itemName)){
@@ -93,6 +101,17 @@ class ClearCommand extends Command{
                         }
                         $itemsCount++;
                         $p->getArmorInventory()->setItem($slot, ItemFactory::get(ItemIds::AIR));
+                    }
+                }
+                if($offhandItem->equals($itemName)){
+                    $passed = true;
+
+                    if($maxCount !== null && $offhandItem->getCount() > $maxCount){
+                        $passed = false;
+                    }
+                    if($passed){
+                        $itemsCount++;
+                        $offhand->setItem(0, ItemFactory::get(ItemIds::AIR));
                     }
                 }
                 if($itemsCount < 1){

@@ -147,15 +147,6 @@ class EntityListener implements Listener{
         if(!GameRule::getGameRuleValue(GameRule::FALL_DAMAGE, $entity->getLevel())){
             $value = true;
         }
-
-        /** Elytra */
-        if($entity instanceof Player){
-            $session = VanillaX::getInstance()->getSessionManager()->get($entity);
-
-            if($session->isGliding() && $entity->pitch >= -11 && $entity->pitch <= 0){
-                $value = true;
-            }
-        }
         return $value;
     }
 }

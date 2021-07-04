@@ -3,6 +3,7 @@
 namespace CLADevs\VanillaX\listeners\types;
 
 use CLADevs\VanillaX\items\ItemManager;
+use CLADevs\VanillaX\items\types\ElytraItem;
 use CLADevs\VanillaX\items\types\ShieldItem;
 use CLADevs\VanillaX\listeners\ListenerManager;
 use CLADevs\VanillaX\network\gamerules\GameRule;
@@ -138,9 +139,10 @@ class PlayerListener implements Listener{
             $player = $event->getPlayer();
             $from = $event->getFrom();
             $to = $event->getTo();
-            $item = $player->getArmorInventory()->getBoots();
-            
-            if($item->hasEnchantment(Enchantment::FROST_WALKER) && !$player->isOnGround() && (intval($to->x) !== intval($from->x) || intval($to->y) !== intval($from->y) || intval($to->z) !== intval($from->z))){
+            $chestplate = $player->getArmorInventory()->getChestplate();
+            $boots = $player->getArmorInventory()->getBoots();
+
+            if($boots->hasEnchantment(Enchantment::FROST_WALKER) && !$player->isOnGround() && (intval($to->x) !== intval($from->x) || intval($to->y) !== intval($from->y) || intval($to->z) !== intval($from->z))){
                 $block = $player->getLevel()->getBlock($player);
                 $aboveBlock = $player->getLevel()->getBlock($player->add(0, 1));
 
@@ -148,7 +150,7 @@ class PlayerListener implements Listener{
                     $belowBlock = $player->getLevel()->getBlock($player->subtract(0, 1));
 
                     if($belowBlock instanceof StillWater){
-                        $size = 2 + min($item->getEnchantmentLevel(Enchantment::FROST_WALKER), 2);
+                        $size = 2 + min($boots->getEnchantmentLevel(Enchantment::FROST_WALKER), 2);
                         $ice = BlockFactory::get(BlockIds::FROSTED_ICE, 0);
 
                         for($x = intval($player->x) - $size; $x <= intval($player->x) + $size; $x++){
@@ -160,6 +162,19 @@ class PlayerListener implements Listener{
                                 }
                             }
                         }
+                    }
+                }
+            }
+            if($chestplate instanceof ElytraItem){
+                $session = VanillaX::getInstance()->getSessionManager()->get($player);
+
+                if($session->isGliding()){
+                    if(Server::getInstance()->getTick() % 20 == 0){
+                        $chestplate->applyDamage(1);
+                        $player->getArmorInventory()->setChestplate($chestplate);
+                    }
+                    if($player->pitch >= -40 && $player->pitch <= 30){
+                        $player->resetFallDistance();
                     }
                 }
             }
