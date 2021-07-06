@@ -20,9 +20,16 @@ class CommandTargetSelector{
      * @return Entity[]|Player|Player[]|CommandSender[]|CommandSender|null
      */
     public static function getFromString(CommandSender $player, string $data, bool $message = true, bool $returnArray = true, bool $playerOnly = false){
+        $noSelectorMessage = TextFormat::RED . "No targets matched selector";
         switch($data){
             case "@a":
-                return self::getAllPlayers();
+                $players = self::getAllPlayers();
+
+                if($players === null || (is_array($players && count($players) < 1))){
+                    if($message) $player->sendMessage($noSelectorMessage);
+                    return null;
+                }
+                return $players;
             case "@e":
                 if($playerOnly){
                     if($message) $player->sendMessage(TextFormat::RED . "Selector must be player-type");
@@ -32,17 +39,29 @@ class CommandTargetSelector{
                     if($message) $player->sendMessage(TextFormat::RED . "You must be in a world");
                     return null;
                 }
-                return self::getAllEntities($player->getLevel());
+                $entities = self::getAllEntities($player->getLevel());
+
+                if($entities === null || (is_array($entities && count($entities) < 1))){
+                    if($message) $player->sendMessage($noSelectorMessage);
+                    return null;
+                }
+                return $entities;
             case "@r":
                 $p = self::getRandomPlayer();
-                return $p === null ? null : ($returnArray ? [$p] : $p);
+                $chosen = $p === null ? null : ($returnArray ? [$p] : $p);
+
+                if($chosen === null || (is_array($chosen && count($chosen) < 1))){
+                    if($message) $player->sendMessage($noSelectorMessage);
+                    return null;
+                }
+                return $chosen;
             case "@s":
                 return $returnArray? [$player] : $player;
             default:
                 if($p = Server::getInstance()->getPlayer($data)){
-                    return $p;
+                    return [$p];
                 }
-                if($message) $player->sendMessage(TextFormat::RED . "No targets matched selector");
+                if($message) $player->sendMessage($noSelectorMessage);
                 break;
         }
         return null;

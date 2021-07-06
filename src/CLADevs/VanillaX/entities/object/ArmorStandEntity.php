@@ -10,6 +10,7 @@ use CLADevs\VanillaX\utils\item\InteractButtonItemTrait;
 use pocketmine\entity\Living;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
+use pocketmine\inventory\ArmorInventory;
 use pocketmine\item\Armor;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
@@ -159,6 +160,9 @@ class ArmorStandEntity extends Living implements InteractButtonItemTrait{
     }
 
     public function onButtonPressed(InteractButtonResult $result): void{
+        if(!$this->getArmorInventory() instanceof ArmorInventory){
+            return;
+        }
         $result->setInteractQueue(false);
         $player = $result->getPlayer();
         $item = $result->getItem();

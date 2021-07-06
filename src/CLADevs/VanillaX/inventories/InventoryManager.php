@@ -117,4 +117,54 @@ class InventoryManager{
     private static function convertPotionId(int $value): int{
         return self::BREW_CONVERSATION[$value] ?? $value;
     }
+
+    public static function getExpForFurnace(Item $ingredient): float{
+        switch($ingredient->getId()){
+            case ItemIds::DIAMOND_ORE:
+            case ItemIds::GOLD_ORE:
+                case ItemIds::EMERALD_ORE;
+                return 1;
+            case ItemIds::IRON_ORE:
+                return 0.7;
+            case ItemIds::RAW_PORKCHOP:
+            case ItemIds::RAW_BEEF:
+            case ItemIds::RAW_CHICKEN:
+            case ItemIds::RAW_FISH:
+            case ItemIds::RAW_SALMON:
+            case ItemIds::POTATO:
+            case ItemIds::RAW_MUTTON:
+            case ItemIds::RAW_RABBIT:
+            case ItemIds::CLAY_BLOCK:
+                return 0.35;
+            case ItemIds::REDSTONE_ORE:
+                return 0.3;
+            case ItemIds::LAPIS_ORE:
+            case ItemIds::NETHER_QUARTZ_ORE:
+            case ItemIds::CLAY_BALL:
+            case ItemIds::CACTUS:
+                return 0.2;
+            case ItemIds::LOG:
+            case ItemIds::LOG2:
+            case ItemIds::SPONGE:
+                if($ingredient === ItemIds::SPONGE && $ingredient->getDamage() !== 1){
+                    break;
+                }
+                return 0.15;
+            case ItemIds::KELP:
+            case ItemIds::COAL_ORE:
+            case ItemIds::SAND:
+            case ItemIds::SANDSTONE:
+            case ItemIds::RED_SANDSTONE:
+            case ItemIds::COBBLESTONE:
+            case ItemIds::STONE:
+            case ItemIds::QUARTZ_BLOCK:
+            case ItemIds::NETHERRACK:
+            case ItemIds::NETHER_BRICK:
+            case ItemIds::STONE_BRICK:
+            case ItemIds::TERRACOTTA:
+            case ItemIds::CHORUS_FRUIT:
+                return 0.1;
+        }
+        return 0;
+    }
 }

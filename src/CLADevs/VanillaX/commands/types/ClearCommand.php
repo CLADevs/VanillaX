@@ -72,7 +72,7 @@ class ClearCommand extends Command{
             }
             $offhand = VanillaX::getInstance()->getSessionManager()->get($p)->getOffHandInventory();
             $offhandItem = $offhand->getItem(0);
-            
+
             if(count($p->getInventory()->getContents()) < 1 && count($p->getArmorInventory()->getContents()) < 1 && count($offhand->getContents()) < 1){
                 $sender->sendMessage(TextFormat::RED . "Could not clear the inventory of " . $p->getName() . ", no items to remove");
                 return;

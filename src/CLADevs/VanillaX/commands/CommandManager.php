@@ -24,7 +24,11 @@ class CommandManager{
         if(in_array(strtolower($command->getName()), VanillaX::getInstance()->getConfig()->getNested("disabled.commands", [])) || !$command->canRegister()){
             return;
         }
-        Server::getInstance()->getCommandMap()->register("VanillaX", $command);
+        $map = Server::getInstance()->getCommandMap();
+        if(($cmd = $map->getCommand($command->getName())) !== null){
+            $map->unregister($cmd);
+        }
+       $map->register("VanillaX", $command);
         $this->commands[strtolower($command->getName())] = $command;
     }
 
