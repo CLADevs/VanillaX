@@ -59,7 +59,7 @@ class EntityListener implements Listener{
                     }
                     break;
             }
-            if($entity instanceof Player && !$event->isCancelled()){
+            if($entity instanceof Player && ($entity->getHealth() - $event->getFinalDamage()) <= 0 && !$event->isCancelled()){
                 $inventory = $entity->getInventory();
                 $itemIndex = 0;
                 $hasTotem = true;
