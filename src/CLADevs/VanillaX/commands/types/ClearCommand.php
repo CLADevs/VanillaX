@@ -30,7 +30,7 @@ class ClearCommand extends Command{
 
     public function execute(CommandSender $sender, string $commandLabel, array $args): void{
         if(!$this->testPermission($sender)) return;
-        if((!isset($args[0]) || !isset($args[1])) && !$sender instanceof Player){
+        if(!isset($args[0]) || strtolower($args[0]) === "@s"){
             $this->sendSyntaxError($sender, "", "/$commandLabel");
             return;
         }

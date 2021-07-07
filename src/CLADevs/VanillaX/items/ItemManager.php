@@ -87,6 +87,7 @@ class ItemManager{
     }
 
     private function initializeCreativeItems(): void{
+        $oldCreativeItems = Item::getCreativeItems();
         Item::clearCreativeItems();
         $creativeItems = json_decode(file_get_contents(RESOURCE_PATH . "vanilla" . DIRECTORY_SEPARATOR . "creativeitems.json"), true);
 
@@ -96,6 +97,9 @@ class ItemManager{
                 continue;
             }
             Item::addCreativeItem($item);
+        }
+        foreach($oldCreativeItems as $item){
+            if(!Item::isCreativeItem($item)) Item::addCreativeItem($item);
         }
 
         /** Shulker Box */
