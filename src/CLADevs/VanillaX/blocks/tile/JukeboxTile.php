@@ -21,8 +21,14 @@ class JukeboxTile extends Tile{
     const TILE_BLOCK = BlockIds::JUKEBOX;
 
     const TAG_RECORD_ITEM = "RecordItem";
+    const TAG_RECORD_DURATION = "RecordDuration";
 
     private ?Item $recordItem = null;
+
+    private bool $finishedPlaying = false;
+
+    private int $recordDuration = 0;
+    private int $recordMaxDuration = -1;
 
     public function getRecordItem(): ?Item{
         return $this->recordItem;
@@ -33,6 +39,8 @@ class JukeboxTile extends Tile{
     }
 
     public function insertTrack(Player $inserter, MusicDiscItem $disc): void{
+        $this->recordDuration = 0;
+        $this->finishedPlaying = false;
         $this->removeTrack();
         $this->recordItem = clone $disc;
         $disc->pop();
@@ -42,15 +50,33 @@ class JukeboxTile extends Tile{
 
     public function removeTrack(): void{
         if($this->recordItem !== null){
+            $this->recordDuration = 0;
             $this->getLevel()->broadcastLevelSoundEvent($this, LevelSoundEventPacket::SOUND_STOP_RECORD);
             $this->getLevel()->dropItem($this->add(0, 1), $this->recordItem);
             $this->recordItem = null;
         }
     }
 
+    public function validateDuration(): void{
+        if($this->recordDuration >= $this->recordMaxDuration){
+            $this->finishedPlaying = true;
+        }
+    }
+
     public function onUpdate(): bool{
-        if($this->recordItem !== null && Server::getInstance()->getTick() % 30 === 0){
-            $this->getLevel()->addParticle(new GenericParticle($this->add(0.5, 1.25, 0.5), Particle::TYPE_CARROT));
+        if($this->recordItem !== null && !$this->finishedPlaying){
+            if($this->recordMaxDuration === -1){
+                $this->recordMaxDuration = MusicDiscItem::getRecordLength($this->recordItem->getId()) * 20;
+            }
+            $this->recordDuration++;
+            $this->validateDuration();
+
+            if($this->finishedPlaying){
+                return true;
+            }
+            if(Server::getInstance()->getTick() % 30 === 0){
+                $this->getLevel()->addParticle(new GenericParticle($this->add(0.5, 1.25, 0.5), Particle::TYPE_NOTE));
+            }
         }
         return true;
     }
@@ -64,6 +90,10 @@ class JukeboxTile extends Tile{
         if($nbt->hasTag(self::TAG_RECORD_ITEM)){
             $this->recordItem = Item::nbtDeserialize($nbt->getCompoundTag(self::TAG_RECORD_ITEM));
         }
+        if($nbt->hasTag(self::TAG_RECORD_DURATION)){
+            $this->recordDuration = $nbt->getInt(self::TAG_RECORD_DURATION);
+        }
+        $this->validateDuration();
         $this->scheduleUpdate();
     }
 
@@ -71,5 +101,6 @@ class JukeboxTile extends Tile{
         if($this->recordItem !== null){
             $nbt->setTag($this->recordItem->nbtSerialize(-1, self::TAG_RECORD_ITEM));
         }
+        $nbt->setInt(self::TAG_RECORD_DURATION, $this->recordDuration);
     }
 }

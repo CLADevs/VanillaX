@@ -26,11 +26,7 @@ class BlockListener implements Listener{
             $tile = $block->getLevel()->getTile($block);
 
             if($tile instanceof FurnaceTile){
-                $xpHolder = $tile->getXpHolder();
-
-                if($xpHolder >= 0.1){
-                    $block->getLevel()->dropExperience($block, $xpHolder * 10);
-                }
+                $tile->dropXpHolder($block);
             }
         }
     }

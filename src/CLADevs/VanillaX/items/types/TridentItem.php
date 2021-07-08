@@ -4,7 +4,6 @@ namespace CLADevs\VanillaX\items\types;
 
 use CLADevs\VanillaX\entities\projectile\TridentEntity;
 use CLADevs\VanillaX\session\Session;
-use pocketmine\block\Water;
 use pocketmine\entity\Entity;
 use pocketmine\item\Durable;
 use pocketmine\item\enchantment\Enchantment;
@@ -17,11 +16,7 @@ class TridentItem extends Durable{
     }
 
     public function onReleaseUsing(Player $player): bool{
-        if($this->hasEnchantment(Enchantment::RIPTIDE)){
-            if($player->getLevel()->getBlock($player->add(0, 1)) instanceof Water){
-                $this->spawnTride($player);
-            }
-        }else{
+        if(!$this->hasEnchantment(Enchantment::RIPTIDE)){
             $this->spawnTride($player);
         }
         return true;

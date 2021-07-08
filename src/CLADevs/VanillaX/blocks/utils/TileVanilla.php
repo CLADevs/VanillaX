@@ -18,4 +18,5 @@ interface TileVanilla{
     const ENDER_CHEST = "EnderChest";
     const MOB_SPAWNER = "MobSpawner";
     const CAULDRON = "Cauldron";
+    const STRUCTURE_BLOCK = "StructureBlock";
 }

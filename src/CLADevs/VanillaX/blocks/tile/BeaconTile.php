@@ -9,6 +9,9 @@ use pocketmine\tile\Spawnable;
 
 class BeaconTile extends Spawnable{
 
+    const TAG_PRIMARY = "primary";
+    const TAG_SECONDARY = "secondary";
+
     const TILE_ID = TileVanilla::BEACON;
     const TILE_BLOCK = BlockIds::BEACON;
 
