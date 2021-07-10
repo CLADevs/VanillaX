@@ -18,7 +18,7 @@ class TileUtils{
      * @param NamedTag[] $NBTEntries
      * @return Tile|null
      */
-    public static function generateTile(Position $position, string $id, string $class, array $NBTEntries = []): ?Tile{
+    public static function  generateTile(Position $position, string $id, string $class, array $NBTEntries = []): ?Tile{
         $NBTEntries = array_merge($NBTEntries, [
             new StringTag(Tile::TAG_ID, $id),
             new IntTag(Tile::TAG_X, $position->x),

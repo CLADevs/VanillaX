@@ -18,26 +18,26 @@ use ReflectionProperty;
 class InventoryManager{
 
     const BREW_CONVERSATION = [
-        424 => ItemIds::POTION,
-        392 => ItemIds::GLOWSTONE_DUST,
-        551 => ItemIds::SPLASH_POTION,
-        552 => ItemIds::LINGERING_POTION,
-        426 => ItemIds::FERMENTED_SPIDER_EYE,
-        427 => ItemIds::BLAZE_POWDER,
-        422 => ItemIds::GHAST_TEAR,
+        426 => ItemIds::POTION,
+        394 => ItemIds::GLOWSTONE_DUST,
+        561 => ItemIds::SPLASH_POTION,
+        562 => ItemIds::LINGERING_POTION,
+        428 => ItemIds::FERMENTED_SPIDER_EYE,
+        429 => ItemIds::BLAZE_POWDER,
+        424 => ItemIds::GHAST_TEAR,
         283 => ItemIds::GOLDEN_CARROT,
-        428 => ItemIds::MAGMA_CREAM,
-        564 => ItemIds::PHANTOM_MEMBRANE,
+        430 => ItemIds::MAGMA_CREAM,
+        574 => ItemIds::PHANTOM_MEMBRANE,
         267 => ItemIds::PUFFERFISH,
-        518 => ItemIds::RABBIT_FOOT,
-        432 => ItemIds::REDSTONE_DUST,
+        528 => ItemIds::RABBIT_FOOT,
+        434 => ItemIds::REDSTONE_DUST,
         278 => ItemIds::GLISTERING_MELON,
-        563 => ItemIds::TURTLE_HELMET,
-        371 => ItemIds::REDSTONE_DUST,
+        573 => ItemIds::TURTLE_HELMET,
+        373 => ItemIds::REDSTONE_DUST,
         294 => ItemIds::NETHER_WART,
         328 => ItemIds::GUNPOWDER,
-        550 => ItemIds::DRAGON_BREATH,
-        414 => ItemIds::SUGAR
+        560 => ItemIds::DRAGON_BREATH,
+        416 => ItemIds::SUGAR
     ];
 
     /** @var PotionTypeRecipe[] */
@@ -81,7 +81,7 @@ class InventoryManager{
             $this->potionTypeRecipes[$potion->getInputItemId() . ":" . $potion->getInputItemMeta() . ":" . $potion->getIngredientItemId() . ":" . $potion->getIngredientItemMeta()] = clone $potion;
         }
 
-        foreach([[424 ,328 ,551] ,[551 ,550 ,552]] as $key => $i){
+        foreach([[426, 328, 561], [561, 560, 562]] as $key => $i){
             $pk->potionContainerRecipes[] = new PotionContainerChangeRecipe($i[0], $i[1], $i[2]);
             $potion = new PotionContainerChangeRecipe(self::convertPotionId($i[0]), self::convertPotionId($i[1]), self::convertPotionId($i[2]));
             $this->potionContainerRecipes[$potion->getInputItemId() . ":" . $potion->getIngredientItemId()] = clone $potion;
