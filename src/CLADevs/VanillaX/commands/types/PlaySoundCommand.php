@@ -16,6 +16,7 @@ class PlaySoundCommand extends Command{
 
     public function __construct(){
         parent::__construct("playsound", "Plays a sound.");
+        $this->setPermission("playsound.command");
         $this->commandArg = new CommandArgs(CommandArgs::FLAG_NORMAL, PlayerPermissions::MEMBER);
         $this->commandArg->addParameter(0, "sound", AvailableCommandsPacket::ARG_TYPE_STRING, false);
         $this->commandArg->addParameter(0, "player", AvailableCommandsPacket::ARG_TYPE_TARGET);
@@ -78,10 +79,10 @@ class PlaySoundCommand extends Command{
                 $pk->soundName = $sound;
                 $pk->volume = $volume > $minimumVolume ? $minimumVolume : $volume;
                 $pk->pitch = $pitch;
-                $pk->x = $pos->x;
-                $pk->y = $pos->y;
-                $pk->z = $pos->z;
-                $player->dataPacket($pk);
+                $pk->x = $pos->getPosition()->x;
+                $pk->y = $pos->getPosition()->y;
+                $pk->z = $pos->getPosition()->z;
+                $player->getNetworkSession()->sendDataPacket($pk);
                 $sender->sendMessage("Played sound '$sound' to " . $player->getName());
             }
         }

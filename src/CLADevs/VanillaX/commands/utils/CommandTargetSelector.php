@@ -4,10 +4,10 @@ namespace CLADevs\VanillaX\commands\utils;
 
 use pocketmine\command\CommandSender;
 use pocketmine\entity\Entity;
-use pocketmine\level\Level;
 use pocketmine\player\Player;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
+use pocketmine\world\World;
 
 class CommandTargetSelector{
 
@@ -39,7 +39,7 @@ class CommandTargetSelector{
                     if($message) $player->sendMessage(TextFormat::RED . "You must be in a world");
                     return null;
                 }
-                $entities = self::getAllEntities($player->getLevel());
+                $entities = self::getAllEntities($player->getWorld());
 
                 if($entities === null || (is_array($entities && count($entities) < 1))){
                     if($message) $player->sendMessage($noSelectorMessage);
@@ -58,7 +58,7 @@ class CommandTargetSelector{
             case "@s":
                 return $returnArray? [$player] : $player;
             default:
-                if($p = Server::getInstance()->getPlayer($data)){
+                if($p = Server::getInstance()->getPlayerByPrefix($data)){
                     return [$p];
                 }
                 if($message) $player->sendMessage($noSelectorMessage);
@@ -76,17 +76,17 @@ class CommandTargetSelector{
     }
 
     /**
-     * @param null|Level $level
+     * @param null|World $world
      * @return null|Entity[]
      */
-    public static function getAllEntities(?Level $level = null): ?array{
-        if($level === null){
-            $level = Server::getInstance()->getLevels();
+    public static function getAllEntities(?World $world = null): ?array{
+        if($world === null){
+            $world = Server::getInstance()->getWorldManager()->getWorlds();
         }else{
-            $level = [$level];
+            $world = [$world];
         }
         $entities = [];
-        foreach($level as $lvl){
+        foreach($world as $lvl){
             $entities = array_merge($entities, $lvl->getEntities());
         }
         return count($entities) < 1 ? null : $entities;

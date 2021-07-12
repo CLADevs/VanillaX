@@ -108,7 +108,7 @@ class EntityListener implements Listener{
         $value = false;
 
         /** If gamerule 'fallDamage' is not on then cancel it */
-        if(!GameRule::getGameRuleValue(GameRule::FALL_DAMAGE, $entity->getWorld()())){
+        if(!GameRule::getGameRuleValue(GameRule::FALL_DAMAGE, $entity->getWorld())){
             $value = true;
         }
         return $value;

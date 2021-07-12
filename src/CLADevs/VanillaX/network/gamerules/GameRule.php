@@ -8,6 +8,8 @@ use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\IntTag;
 use pocketmine\nbt\tag\Tag;
 use pocketmine\network\mcpe\protocol\GameRulesChangedPacket;
+use pocketmine\network\mcpe\protocol\types\BoolGameRule;
+use pocketmine\network\mcpe\protocol\types\IntGameRule;
 use pocketmine\player\Player;
 use pocketmine\Server;
 use pocketmine\world\format\io\BaseWorldProvider;
@@ -181,8 +183,13 @@ class GameRule{
                 $nbt = $data->getCompoundTag()->getTag("GameRules");
 
                 foreach($nbt->getValue() as $key => $tag){
+                    if($tag instanceof ByteTag){
+                        $value = new BoolGameRule(boolval($tag->getValue()), false);
+                    }else{
+                        $value = new IntGameRule(intval($tag->getValue()), false);
+                    }
                     $pk = new GameRulesChangedPacket();
-                    $pk->gameRules = [$key => [$tag instanceof ByteTag ? 1 : 0, $tag->getValue(), false]];
+                    $pk->gameRules = [$key => $value];
                     $player->getNetworkSession()->sendDataPacket($pk);
                 }
             }

@@ -9,6 +9,8 @@ use CLADevs\VanillaX\VanillaX;
 use pocketmine\command\CommandSender;
 use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
 use pocketmine\network\mcpe\protocol\GameRulesChangedPacket;
+use pocketmine\network\mcpe\protocol\types\BoolGameRule;
+use pocketmine\network\mcpe\protocol\types\IntGameRule;
 use pocketmine\network\mcpe\protocol\types\PlayerPermissions;
 use pocketmine\player\Player;
 use pocketmine\Server;
@@ -43,7 +45,7 @@ class GameruleCommand extends Command{
         if(!isset($args[0]) && $sender instanceof Player){
             $values = [];
             foreach(GameRule::$gameRules as $key => $rule){
-                $values[] = $key . " = " . GameRule::getGameRuleValue($rule->getName(), $sender->getLevel(), true);
+                $values[] = $key . " = " . GameRule::getGameRuleValue($rule->getName(), $sender->getWorld(), true);
             }
             $sender->sendMessage(implode(", ", $values));
             return;
@@ -56,11 +58,12 @@ class GameruleCommand extends Command{
             return;
         }
         if(!isset($args[1]) && $sender instanceof Player){
-            $sender->sendMessage(strtolower($gameRule->getName()) . " = " . GameRule::getGameRuleValue($gameRule->getName(), $sender->getLevel(), true));
+            $sender->sendMessage(strtolower($gameRule->getName()) . " = " . GameRule::getGameRuleValue($gameRule->getName(), $sender->getWorld(), true));
             return;
         }
         $pk = new GameRulesChangedPacket();
         $value = $args[1];
+        $gameruleClass = null;
 
         if($gameRule->getType() === GameRule::TYPE_INT){
             if(!is_numeric($value)){
@@ -68,20 +71,22 @@ class GameruleCommand extends Command{
                 return;
             }
             $value = intval($value);
+            $gameruleClass = new IntGameRule($value, false);
         }else{
             if(!in_array(strtolower($value), ["true", "false"])){
                 $this->sendSyntaxError($sender, $value, $args[0], $value);
                 return;
             }
             $value = strtolower($value) === "true";
+            $gameruleClass = new BoolGameRule($value, false);
         }
-        $pk->gameRules = [$gameRule->getName() => [is_bool($value) ? 1 : 0, $value, false]];
-        foreach(Server::getInstance()->getLevels() as $level){
-            foreach($level->getPlayers() as $player){
-                $player->dataPacket($pk);
+        $pk->gameRules = [$gameRule->getName() => $gameruleClass];
+        foreach(Server::getInstance()->getWorldManager()->getWorlds() as $world){
+            foreach($world->getPlayers() as $player){
+                $player->getNetworkSession()->sendDataPacket($pk);
             }
-            GameRule::setGameRule($level, $gameRule, $value);
-            $gameRule->handleValue($value, $level);
+            GameRule::setGameRule($world, $gameRule, $value);
+            $gameRule->handleValue($value, $world);
         }
         $sender->sendMessage("Game rule " . strtolower($gameRule->getName()) . " has been updated to " . $args[1]);
     }

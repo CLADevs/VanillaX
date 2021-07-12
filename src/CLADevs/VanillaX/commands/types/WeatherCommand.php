@@ -37,8 +37,8 @@ class WeatherCommand extends Command{
         }
         $duration = 6000;
         $weathers = [];
-        foreach(Server::getInstance()->getLevels() as $level){
-            if(($weather = VanillaX::getInstance()->getWeatherManager()->getWeather($level)) !== null){
+        foreach(Server::getInstance()->getWorldManager()->getWorlds() as $world){
+            if(($weather = VanillaX::getInstance()->getWeatherManager()->getWeather($world)) !== null){
                 $weathers[] = $weather;
             }
         }
@@ -57,7 +57,7 @@ class WeatherCommand extends Command{
                     return;
                 }
                 $state = "clear";
-                $weather = VanillaX::getInstance()->getWeatherManager()->getWeather($sender->getLevel());
+                $weather = VanillaX::getInstance()->getWeatherManager()->getWeather($sender->getWorld());
                 if($weather->isRaining()){
                     if($weather->isThundering()){
                         $state = "thunder";

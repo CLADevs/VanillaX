@@ -11,7 +11,9 @@ use CLADevs\VanillaX\utils\item\HeldItemChangeTrait;
 use CLADevs\VanillaX\VanillaX;
 use pocketmine\block\BlockFactory;
 use pocketmine\block\BlockLegacyIds;
-use pocketmine\entity\Entity;
+use pocketmine\block\Water;
+use pocketmine\data\bedrock\EnchantmentIdMap;
+use pocketmine\data\bedrock\EnchantmentIds;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerBedLeaveEvent;
 use pocketmine\event\player\PlayerBlockPickEvent;
@@ -23,8 +25,10 @@ use pocketmine\event\player\PlayerMoveEvent;
 use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\event\player\PlayerToggleSneakEvent;
 use pocketmine\math\Vector3;
+use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataFlags;
 use pocketmine\scheduler\ClosureTask;
 use pocketmine\Server;
+use pocketmine\world\World;
 
 class PlayerListener implements Listener{
 
@@ -39,7 +43,7 @@ class PlayerListener implements Listener{
         $weather = VanillaX::getInstance()->getWeatherManager();
 
         GameRule::fixGameRule($player);
-        if($weather->isRaining($player->getLevel())) $weather->sendWeather($player, $weather->isThundering($player->getLevel()));
+        if($weather->isRaining($player->getWorld())) $weather->sendWeather($player, $weather->isThundering($player->getWorld()));
         VanillaX::getInstance()->getSessionManager()->add($player);
     }
 
@@ -91,7 +95,7 @@ class PlayerListener implements Listener{
                 return;
             }
             if(!$inventory->getItemInHand()->isNull() && $freeIndex !== null){
-                $event->setCancelled();
+                $event->cancel();
                 $inventory->setItem($freeIndex, $event->getResultItem());
             }
         }
@@ -99,11 +103,11 @@ class PlayerListener implements Listener{
 
     public function onSneak(PlayerToggleSneakEvent $event): void{
         $player = $event->getPlayer();
-        $offhandItem = VanillaX::getInstance()->getSessionManager()->get($player)->getOffHandInventory()->getItem(0);
+        $offhandItem = $player->getOffHandInventory()->getItem(0);
 
         if($player->getInventory()->getItemInHand() instanceof ShieldItem || $offhandItem instanceof ShieldItem){
             VanillaX::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function ()use($player): void{
-                if($player->isOnline()) $player->setGenericFlag(Entity::DATA_FLAG_BLOCKING, $player->isSneaking());
+                if($player->isOnline()) $player->getNetworkProperties()->setGenericFlag(EntityMetadataFlags::BLOCKED_USING_SHIELD, $player->isSneaking());
             }), 5);
         }
     }
@@ -111,11 +115,8 @@ class PlayerListener implements Listener{
     public function onDeath(PlayerDeathEvent $event): void{
         $player = $event->getPlayer();
 
-        if(!GameRule::getGameRuleValue(GameRule::KEEP_INVENTORY, ($level = $player->getLevel()))){
+        if(!GameRule::getGameRuleValue(GameRule::KEEP_INVENTORY, ($level = $player->getWorld()))){
             $event->setKeepInventory(true);
-        }else{
-            $offhand = VanillaX::getInstance()->getSessionManager()->get($player)->getOffHandInventory();
-            $event->setDrops(array_merge($event->getDrops(), [$offhand->getContents()]));
         }
         if(!GameRule::getGameRuleValue(GameRule::SHOW_DEATH_MESSAGES, $level)){
             $event->setDeathMessage("");
@@ -125,8 +126,8 @@ class PlayerListener implements Listener{
     public function onBedLeave(PlayerBedLeaveEvent $event): void{
         $player = $event->getPlayer();
 
-        if(count(Server::getInstance()->getOnlinePlayers()) === 1 && $player->getLevel()->getTime() === Level::TIME_FULL){
-            $weather = VanillaX::getInstance()->getWeatherManager()->getWeather($player->getLevel());
+        if(count(Server::getInstance()->getOnlinePlayers()) === 1 && $player->getWorld()->getTime() === World::TIME_FULL){
+            $weather = VanillaX::getInstance()->getWeatherManager()->getWeather($player->getWorld());
             $weather->stopStorm();
         }
     }
@@ -139,23 +140,23 @@ class PlayerListener implements Listener{
             $chestplate = $player->getArmorInventory()->getChestplate();
             $boots = $player->getArmorInventory()->getBoots();
 
-            if($boots->hasEnchantment(Enchantment::FROST_WALKER) && !$player->isOnGround() && (intval($to->x) !== intval($from->x) || intval($to->y) !== intval($from->y) || intval($to->z) !== intval($from->z))){
-                $block = $player->getLevel()->getBlock($player);
-                $aboveBlock = $player->getLevel()->getBlock($player->add(0, 1));
+            if($boots->hasEnchantment($enchantment = EnchantmentIdMap::getInstance()->fromId(EnchantmentIds::FROST_WALKER)) && !$player->isOnGround() && (intval($to->x) !== intval($from->x) || intval($to->y) !== intval($from->y) || intval($to->z) !== intval($from->z))){
+                $block = $player->getWorld()->getBlock($player->getPosition());
+                $aboveBlock = $player->getWorld()->getBlock($player->getPosition()->add(0, 1, 0));
 
                 if($block->getId() === BlockLegacyIds::AIR && $aboveBlock->getId() === BlockLegacyIds::AIR){
-                    $belowBlock = $player->getLevel()->getBlock($player->subtract(0, 1));
+                    $belowBlock = $player->getWorld()->getBlock($player->getPosition()->subtract(0, 1, 0));
 
-                    if($belowBlock instanceof StillWater){
-                        $size = 2 + min($boots->getEnchantmentLevel(Enchantment::FROST_WALKER), 2);
-                        $ice = BlockFactory::get(BlockLegacyIds::FROSTED_ICE, 0);
+                    if($belowBlock instanceof Water){
+                        $size = 2 + min($boots->getEnchantmentLevel($enchantment), 2);
+                        $ice = BlockFactory::getInstance()->get(BlockLegacyIds::FROSTED_ICE, 0);
 
-                        for($x = intval($player->x) - $size; $x <= intval($player->x) + $size; $x++){
-                            for($z = intval($player->z) - $size; $z <= intval($player->z) + $size; $z++){
-                                $pos = new Vector3($x, intval($player->y - 1), $z);
+                        for($x = intval($player->getPosition()->x) - $size; $x <= intval($player->getPosition()->x) + $size; $x++){
+                            for($z = intval($player->getPosition()->z) - $size; $z <= intval($player->getPosition()->z) + $size; $z++){
+                                $pos = new Vector3($x, intval($player->getPosition()->y - 1), $z);
 
-                                if(in_array($player->getLevel()->getBlock($pos)->getId(), [BlockLegacyIds::AIR, BlockLegacyIds::STILL_WATER, BlockLegacyIds::FROSTED_ICE])){
-                                    $player->getLevel()->setBlock($pos, $ice, true);
+                                if(in_array($player->getWorld()->getBlock($pos)->getId(), [BlockLegacyIds::AIR, BlockLegacyIds::STILL_WATER, BlockLegacyIds::FROSTED_ICE])){
+                                    $player->getWorld()->setBlock($pos, $ice, true);
                                 }
                             }
                         }
@@ -170,7 +171,7 @@ class PlayerListener implements Listener{
                         $chestplate->applyDamage(1);
                         $player->getArmorInventory()->setChestplate($chestplate);
                     }
-                    if($player->pitch >= -40 && $player->pitch <= 30){
+                    if($player->getLocation()->pitch >= -40 && $player->getLocation()->pitch <= 30){
                         $player->resetFallDistance();
                     }
                 }

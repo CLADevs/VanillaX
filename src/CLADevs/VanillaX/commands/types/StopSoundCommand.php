@@ -10,10 +10,12 @@ use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
 use pocketmine\network\mcpe\protocol\StopSoundPacket;
 use pocketmine\network\mcpe\protocol\types\PlayerPermissions;
 use pocketmine\player\Player;
+
 class StopSoundCommand extends Command{
 
     public function __construct(){
         parent::__construct("stopsound", "Stops a sound.");
+        $this->setPermission("stopsound.command");
         $this->commandArg = new CommandArgs(CommandArgs::FLAG_NORMAL, PlayerPermissions::MEMBER);
         $this->commandArg->addParameter(0, "player", AvailableCommandsPacket::ARG_TYPE_TARGET);
         $this->commandArg->addParameter(0, "sound", AvailableCommandsPacket::ARG_TYPE_STRING, false);
@@ -35,7 +37,7 @@ class StopSoundCommand extends Command{
                 $pk = new StopSoundPacket();
                 $pk->soundName = $sound;
                 $pk->stopAll = false;
-                $player->dataPacket($pk);
+                $player->getNetworkSession()->sendDataPacket($pk);
                 $sender->sendMessage("Stopped sound '$sound' for " . $player->getName());
             }
         }

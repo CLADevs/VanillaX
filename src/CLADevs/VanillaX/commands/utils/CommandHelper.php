@@ -22,9 +22,9 @@ class CommandHelper{
             foreach([$x, $y, $z] as $coord){
                 if(!is_numeric($coord)){
                     if($sender instanceof Player && $coord === "~"){
-                        $x = $sender->x;
-                        $y = $sender->y;
-                        $z = $sender->z;
+                        $x = $sender->getPosition()->x;
+                        $y = $sender->getPosition()->y;
+                        $z = $sender->getPosition()->z;
                         continue;
                     }
                     $command->sendSyntaxError($sender, $coord, implode(" ", $args), $coord);

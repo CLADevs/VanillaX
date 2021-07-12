@@ -8,7 +8,7 @@ use CLADevs\VanillaX\commands\utils\CommandTargetSelector;
 use CLADevs\VanillaX\utils\Utils;
 use Exception;
 use pocketmine\command\CommandSender;
-use pocketmine\item\ItemFactory;
+use pocketmine\item\LegacyStringToItemParser;
 use pocketmine\nbt\JsonNbtParser;
 use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
 use pocketmine\network\mcpe\protocol\types\PlayerPermissions;
@@ -40,7 +40,7 @@ class GiveCommand extends Command{
             if(!$player = CommandTargetSelector::getFromString($sender, $args[0], true, true, true)) return;
             if(isset($args[1])){
                 try{
-                    $itemName = ItemFactory::fromStringSingle($args[1]);
+                    $itemName = LegacyStringToItemParser::getInstance()->parse($args[1]);
                 }catch (Exception $e){
                     $this->sendSyntaxError($sender, $args[1], "/$commandLabel", $args[1]);
                     return;

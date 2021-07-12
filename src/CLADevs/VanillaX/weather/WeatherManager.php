@@ -118,14 +118,14 @@ class WeatherManager{
             $pk->evid = LevelEventPacket::EVENT_STOP_RAIN;
             $pk->data = 0;
             $pk->position = new Vector3(0, 0, 0);
-            $p->dataPacket($pk);
+            $p->getNetworkSession()->sendDataPacket($pk);
 
             if($thunder){
                 $pk = new LevelEventPacket();
                 $pk->evid = LevelEventPacket::EVENT_STOP_THUNDER;
                 $pk->data = 0;
                 $pk->position = new Vector3(0, 0, 0);
-                $p->dataPacket($pk);
+                $p->getNetworkSession()->sendDataPacket($pk);
             }
         }
     }
@@ -145,14 +145,14 @@ class WeatherManager{
             $pk->evid = LevelEventPacket::EVENT_START_RAIN;
             $pk->data = 65535;
             $pk->position = new Vector3(0, 0, 0);
-            $p->dataPacket($pk);
+            $p->getNetworkSession()->sendDataPacket($pk);
 
             if($thunder){
                 $pk = new LevelEventPacket();
                 $pk->evid = LevelEventPacket::EVENT_START_THUNDER;
                 $pk->data = 65535;
                 $pk->position = new Vector3(0, 0, 0);
-                $p->dataPacket($pk);
+                $p->getNetworkSession()->sendDataPacket($pk);
             }
         }
     }

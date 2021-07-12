@@ -13,12 +13,13 @@ class ToggleDownFallCommand extends Command{
 
     public function __construct(){
         parent::__construct("toggledownfall", "Toggles the weather.");
+        $this->setPermission("toggledownfall.command");
         $this->commandArg = new CommandArgs(CommandArgs::FLAG_NORMAL, PlayerPermissions::MEMBER);
     }
 
     public function execute(CommandSender $sender, string $commandLabel, array $args): void{
-        foreach(Server::getInstance()->getLevels() as $level){
-            if(($weather = VanillaX::getInstance()->getWeatherManager()->getWeather($level)) !== null){
+        foreach(Server::getInstance()->getWorldManager()->getWorlds() as $world){
+            if(($weather = VanillaX::getInstance()->getWeatherManager()->getWeather($world)) !== null){
                 if($weather->isRaining()){
                     $weather->stopStorm();
                 }else{
