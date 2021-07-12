@@ -11,8 +11,8 @@ use pocketmine\item\Item;
 use pocketmine\item\ItemIds;
 use pocketmine\network\mcpe\convert\TypeConverter;
 use pocketmine\network\mcpe\protocol\ContainerSetDataPacket;
-use pocketmine\network\mcpe\protocol\DataPacket;
 use pocketmine\network\mcpe\protocol\InventoryTransactionPacket;
+use pocketmine\network\mcpe\protocol\ServerboundPacket;
 use pocketmine\network\mcpe\protocol\types\inventory\NetworkInventoryAction;
 use pocketmine\network\mcpe\protocol\types\inventory\WindowTypes;
 use pocketmine\player\Player;
@@ -58,7 +58,7 @@ class BrewingStandInventory extends FakeBlockInventory{
 
     public function decreaseFuel(): void{
         $item = $this->getFuel();
-        $item->setCount($item->getCount() - 1);
+        $item->setCount($count = $item->getCount() - 1);
         $this->setFuel($item);
     }
 
@@ -84,12 +84,14 @@ class BrewingStandInventory extends FakeBlockInventory{
         $this->sendFuelTotal($who, $this->tile->getFuelTotal());
     }
 
-    public function handlePacket(Player $player, DataPacket $packet): bool{
+    public function handlePacket(Player $player, ServerboundPacket $packet): bool{
         if($packet instanceof InventoryTransactionPacket){
             foreach($packet->trData->getActions() as $action){
-                if($action->sourceType === NetworkInventoryAction::SOURCE_CONTAINER && $action->windowId === WindowTypes::BREWING_STAND){
+                $window = $player->getNetworkSession()->getInvManager()->getWindow($action->windowId);
+
+                if($action->sourceType === NetworkInventoryAction::SOURCE_CONTAINER && $window instanceof BrewingStandInventory){
                     $ingredient = $this->getIngredient();
-                    $newItem = $action->newItem->getItemStack();
+                    $newItem = TypeConverter::getInstance()->netItemStackToCore($action->newItem->getItemStack());
 
                     switch($action->inventorySlot){
                         case self::FIRST_POTION_SLOT:
@@ -115,7 +117,7 @@ class BrewingStandInventory extends FakeBlockInventory{
                                 //$block->setDamage($damage);
                                 //TODO facing
                             }
-                            $player->getWorld()->setBlock($block, $block);
+                            //$player->getWorld()->setBlock($block, $block); Facing related
                             break;
                         case self::FUEL_SLOT:
                             if(!$this->tile->isFueled() && $newItem->getId() === ItemIds::BLAZE_POWDER){
@@ -125,7 +127,7 @@ class BrewingStandInventory extends FakeBlockInventory{
                         case self::INGREDIENT_SLOT:
                             $ingredient = $newItem;
 
-                            if(!$action->oldItem->getItemStack()->equals($newItem) && $this->tile->isBrewing()){
+                            if(!$action->oldItem->getItemStack()->equals(TypeConverter::getInstance()->coreItemStackToNet($newItem)) && $this->tile->isBrewing()){
                                 $this->tile->stopBrewing();
                             }
                             break;
@@ -133,7 +135,6 @@ class BrewingStandInventory extends FakeBlockInventory{
                     $potionCount = 0;
 
                     for($i = self::FIRST_POTION_SLOT; $i <= self::THIRD_POTION_SLOT; $i++){
-                        $newItem = TypeConverter::getInstance()->netItemStackToCore($newItem);
                         if($this->isPotion($this->getItem($i), $ingredient)){
                             $potionCount++;
                             if($action->inventorySlot === $i && !$this->isPotion($newItem, $ingredient)){
@@ -153,7 +154,6 @@ class BrewingStandInventory extends FakeBlockInventory{
     private function sendContainerSetDataPacket(?Player $player, int $start, int $end, int $amount, ?callable $callable = null): void{
         for($i = $start; $i <= $end; $i++){
             $pk = new ContainerSetDataPacket();
-            $pk->windowId = WindowTypes::BREWING_STAND;
             $pk->property = $i;
             if($callable === null){
                 $pk->value = $amount;
@@ -161,12 +161,9 @@ class BrewingStandInventory extends FakeBlockInventory{
                 $callable($pk, $amount, $i);
             }
 
-            if($player === null){
-                foreach($this->getViewers() as $p){
-                    $p->getNetworkSession()->sendDataPacket($pk);
-                }
-            }else{
-                $player->getNetworkSession()->sendDataPacket($pk);
+            foreach(($player === null ? $this->getViewers() : [$player]) as $p){
+                $pk->windowId = $p->getNetworkSession()->getInvManager()->getCurrentWindowId();
+                $p->getNetworkSession()->sendDataPacket($pk);
             }
         }
     }

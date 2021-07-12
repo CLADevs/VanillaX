@@ -11,13 +11,15 @@ use pocketmine\block\BlockToolType;
 use pocketmine\block\Opaque;
 use pocketmine\item\Item;
 use pocketmine\math\Vector3;
+use pocketmine\network\mcpe\protocol\LevelEventPacket;
+use pocketmine\network\mcpe\protocol\types\ParticleIds;
 use pocketmine\player\Player;
+use pocketmine\Server;
 
 class JukeboxBlock extends Opaque{
-    //TODO tile
 
     public function __construct(){
-        parent::__construct(new BlockIdentifier(BlockLegacyIds::JUKEBOX, 0), "Jukebox", new BlockBreakInfo(2, BlockToolType::AXE, 0, 6));
+        parent::__construct(new BlockIdentifier(BlockLegacyIds::JUKEBOX, 0, null, JukeboxTile::class), "Jukebox", new BlockBreakInfo(2, BlockToolType::AXE, 0, 6));
     }
 
     public function getFlameEncouragement(): int{
@@ -39,5 +41,31 @@ class JukeboxBlock extends Opaque{
             }
         }
         return true;
+    }
+    
+    public function onScheduledUpdate(): void{
+        $tile = $this->pos->getWorld()->getTile($this->pos);
+
+        if($tile->isClosed() || !$tile instanceof JukeboxTile){
+            return;
+        }
+        if($tile->getRecordItem() !== null && !$tile->isFinishedPlaying()){
+            if($tile->getRecordMaxDuration() === -1){
+                $tile->setRecordMaxDuration(MusicDiscItem::getRecordLength($tile->getRecordItem()->getId()) * 20);
+            }
+            $tile->increaseRecordDuration();
+            $tile->validateDuration();
+
+            if(!$tile->isFinishedPlaying()){
+                if(Server::getInstance()->getTick() % 30 === 0){
+                    $pk = new LevelEventPacket();
+                    $pk->evid = LevelEventPacket::EVENT_ADD_PARTICLE_MASK | ParticleIds::NOTE;
+                    $pk->position = $this->pos->add(0.5, 1.25, 0.5);
+                    $pk->data = 0;
+                    $this->pos->getWorld()->broadcastPacketToViewers($pk->position, $pk);
+                }
+            }
+        }
+        $this->pos->getWorld()->scheduleDelayedBlockUpdate($this->pos, 1);
     }
 }

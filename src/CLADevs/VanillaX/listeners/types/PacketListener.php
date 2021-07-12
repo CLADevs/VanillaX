@@ -6,10 +6,13 @@ use CLADevs\VanillaX\blocks\tile\CommandBlockTile;
 use CLADevs\VanillaX\entities\utils\EntityInteractResult;
 use CLADevs\VanillaX\entities\utils\interfaces\EntityInteractable;
 use CLADevs\VanillaX\entities\utils\interfaces\EntityRidable;
+use CLADevs\VanillaX\inventories\FakeBlockInventory;
+use CLADevs\VanillaX\inventories\InventoryManager;
 use CLADevs\VanillaX\inventories\types\TradeInventory;
 use CLADevs\VanillaX\listeners\ListenerManager;
 use CLADevs\VanillaX\utils\instances\InteractButtonResult;
 use CLADevs\VanillaX\utils\item\InteractButtonItemTrait;
+use CLADevs\VanillaX\utils\Utils;
 use CLADevs\VanillaX\VanillaX;
 use pocketmine\block\VanillaBlocks;
 use pocketmine\entity\Entity;
@@ -26,6 +29,7 @@ use pocketmine\network\mcpe\protocol\ActorPickRequestPacket;
 use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
 use pocketmine\network\mcpe\protocol\CommandBlockUpdatePacket;
 use pocketmine\network\mcpe\protocol\ContainerClosePacket;
+use pocketmine\network\mcpe\protocol\CraftingDataPacket;
 use pocketmine\network\mcpe\protocol\EmotePacket;
 use pocketmine\network\mcpe\protocol\InteractPacket;
 use pocketmine\network\mcpe\protocol\InventoryTransactionPacket;
@@ -38,6 +42,8 @@ use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataProperties;
 use pocketmine\network\mcpe\protocol\types\entity\StringMetadataProperty;
 use pocketmine\network\mcpe\protocol\types\inventory\UseItemOnEntityTransactionData;
 use pocketmine\network\mcpe\protocol\types\inventory\UseItemTransactionData;
+use pocketmine\network\mcpe\protocol\types\recipe\PotionContainerChangeRecipe;
+use pocketmine\network\mcpe\protocol\types\recipe\PotionTypeRecipe;
 use pocketmine\permission\DefaultPermissions;
 use pocketmine\player\GameMode;
 use pocketmine\player\Player;
@@ -63,19 +69,22 @@ class PacketListener implements Listener{
                     case ProtocolInfo::AVAILABLE_COMMANDS_PACKET:
                         if($packet instanceof AvailableCommandsPacket) $this->handleCommandEnum($packet);
                         break;
+                    case ProtocolInfo::CRAFTING_DATA_PACKET:
+                        if($packet instanceof CraftingDataPacket) $this->handleCraftingData($packet);
+                        break;
                 }
             }
         }
     }
 
     public function onDataPacketReceive(DataPacketReceiveEvent $event): void{
-        if(!$event->isCancelled()){
+        if(!$event->isCancelled() && ($player = $event->getOrigin()->getPlayer()) !== null){
             $packet = $event->getPacket();
-            $player = $event->getOrigin()->getPlayer();
             $sessionManager = VanillaX::getInstance()->getSessionManager();
             $session = $sessionManager->has($player) ? $sessionManager->get($player) : null;
+            $window = $player->getCurrentWindow();
 
-            if($session !== null && ($window = $session->getCurrentWindow()) !== null) $window->handlePacket($player, $packet);
+            if($window instanceof FakeBlockInventory) $window->handlePacket($player, $packet);
             switch($packet::NETWORK_ID){
                 case ProtocolInfo::COMMAND_BLOCK_UPDATE_PACKET:
                     if($packet instanceof CommandBlockUpdatePacket && $player->hasPermission(DefaultPermissions::ROOT_OPERATOR)) $this->handleCommandBlock($player, $packet);
@@ -275,5 +284,27 @@ class PacketListener implements Listener{
         foreach($player->getViewers() as $viewer){
             $viewer->getNetworkSession()->sendDataPacket($packet);
         }
+    }
+
+    /**
+     * @param CraftingDataPacket $packet
+     * called whenever player joins to send recipes for brewing, crafting, etc
+     */
+    private function handleCraftingData(CraftingDataPacket $packet): void{
+        $potionTypeRecipes = [];
+        foreach(json_decode(file_get_contents(Utils::getResourceFile("brewing_recipes.json")), true) as $key => $i){
+            $packet->potionTypeRecipes[] = new PotionTypeRecipe($i[0], $i[1], $i[2], $i[3], $i[4], $i[5]);
+            $potion = new PotionTypeRecipe(InventoryManager::convertPotionId($i[0]), InventoryManager::convertPotionId($i[1]), InventoryManager::convertPotionId($i[2]), InventoryManager::convertPotionId($i[3]), InventoryManager::convertPotionId($i[4]), InventoryManager::convertPotionId($i[5]));
+            $potionTypeRecipes[$potion->getInputItemId() . ":" . $potion->getInputItemMeta() . ":" . $potion->getIngredientItemId() . ":" . $potion->getIngredientItemMeta()] = clone $potion;
+        }
+
+        $potionContainerRecipes = [];
+        foreach([[426, 328, 561], [561, 560, 562]] as $key => $i){
+            $packet->potionContainerRecipes[] = new PotionContainerChangeRecipe($i[0], $i[1], $i[2]);
+            $potion = new PotionContainerChangeRecipe(InventoryManager::convertPotionId($i[0]), InventoryManager::convertPotionId($i[1]), InventoryManager::convertPotionId($i[2]));
+            $potionContainerRecipes[$potion->getInputItemId() . ":" . $potion->getIngredientItemId()] = clone $potion;
+        }
+        InventoryManager::getInstance()->setPotionTypeRecipes($potionTypeRecipes);
+        InventoryManager::getInstance()->setPotionContainerRecipes($potionContainerRecipes);
     }
 }

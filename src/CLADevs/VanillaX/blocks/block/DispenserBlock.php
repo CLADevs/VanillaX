@@ -15,9 +15,8 @@ use pocketmine\world\BlockTransaction;
 
 class DispenserBlock extends Opaque{
 
-    //TODO tile
     public function __construct(){
-        parent::__construct(new BlockIdentifier(BlockLegacyIds::DISPENSER, 0), "Dispenser", new BlockBreakInfo(3.5));
+        parent::__construct(new BlockIdentifier(BlockLegacyIds::DISPENSER, 0, null, DispenserTile::class), "Dispenser", new BlockBreakInfo(3.5));
     }
 
     public function place(BlockTransaction $tx, Item $item, Block $blockReplace, Block $blockClicked, int $face, Vector3 $clickVector, ?Player $player = null): bool{

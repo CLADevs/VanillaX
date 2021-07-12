@@ -13,7 +13,9 @@ use pocketmine\block\tile\ContainerTrait;
 use pocketmine\block\tile\Furnace;
 use pocketmine\block\tile\Spawnable;
 use pocketmine\item\ItemIds;
+use pocketmine\math\Vector3;
 use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\world\World;
 
 class HopperTile extends Spawnable implements Container{
 use ContainerTrait;
@@ -25,6 +27,11 @@ use ContainerTrait;
     private int $transferCooldown = 0;
 
     private HopperInventory $inventory;
+
+    public function __construct(World $world, Vector3 $pos){
+        parent::__construct($world, $pos);
+        $this->inventory = new HopperInventory($this->getPos());
+    }
 
     public function getInventory(): HopperInventory{
         return $this->inventory;
@@ -38,7 +45,7 @@ use ContainerTrait;
         return $this->getPos()->getWorld()->getBlock($this->getPos())->getSide($this->facing);
     }
 
-    private function transferItems(): void{
+    public function transferItems(): void{
         $block = $this->getFacingBlock();
 
         if(in_array($block->getId(), [BlockLegacyIds::HOPPER_BLOCK, BlockLegacyIds::FURNACE, BlockLegacyIds::BREWING_STAND_BLOCK, BlockLegacyIds::CHEST])){
@@ -71,40 +78,21 @@ use ContainerTrait;
         }
     }
 
-    public function onUpdate(): bool{
-        //Transfer items
-        if(count($this->inventory->getContents()) >= 1){
-            $this->transferCooldown--;
-            if($this->transferCooldown < 1){
-                $this->transferCooldown = 8;
-                $this->transferItems();
-            }
-        }
+    public function getTransferCooldown(): int{
+        return $this->transferCooldown;
+    }
 
-        //Thanks to nukkit for bounding box code
-        //Collect dropped items
-        //TODO fix items not being picked up when dropped
-//        $bb = $this->getBlock()->getBoundingBox();
-//        $bb->maxY += 1;
-//        foreach($this->getLevel()->getNearbyEntities($bb) as $entity){
-//            if(!$entity->isClosed() && !$entity->isFlaggedForDespawn() && $entity instanceof ItemEntity){
-//                $item = $entity->getItem();
-//
-//                if(!$item->isNull()){
-//                    $this->getInventory()->addItem($item);
-//                    $entity->flagForDespawn();
-//                }
-//            }
-//        }
-        return true;
+    public function setTransferCooldown(int $transferCooldown): void{
+        $this->transferCooldown = $transferCooldown;
+    }
+
+    public function decreaseTransferCooldown(): void{
+        $this->transferCooldown--;
     }
 
     public function readSaveData(CompoundTag $nbt): void{
         $this->facing = $this->getPos()->getWorld()->getBlock($this->pos)->getMeta();
-        $this->inventory = new HopperInventory($this->getPos());
         $this->loadItems($nbt);
-       // $this->scheduleUpdate();
-        //TODO schedule
     }
 
     protected function writeSaveData(CompoundTag $nbt): void{

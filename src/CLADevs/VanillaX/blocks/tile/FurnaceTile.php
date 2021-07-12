@@ -5,6 +5,10 @@ namespace CLADevs\VanillaX\blocks\tile;
 use CLADevs\VanillaX\blocks\utils\TileVanilla;
 use pocketmine\block\BlockLegacyIds;
 use pocketmine\block\tile\Furnace;
+use pocketmine\inventory\CallbackInventoryListener;
+use pocketmine\inventory\Inventory;
+use pocketmine\item\Item;
+use pocketmine\item\ItemIds;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\world\Position;
 
@@ -26,22 +30,16 @@ class FurnaceTile extends Furnace{
         if(($tag = $nbt->getTag("xpHolder")) !== null){
             $this->xpHolder = $tag->getValue();
         }
-        //todo give xp when received output item
-//        $this->inventory->setEventProcessor(new class($this) implements InventoryEventProcessor{
-//            private FurnaceTile $furnace;
-//
-//            public function __construct(FurnaceTile $furnace){
-//                $this->furnace = $furnace;
-//            }
-//
-//            public function onSlotChange(Inventory $inventory, int $slot, Item $oldItem, Item $newItem) : ?Item{
-//                if($slot === 2 && $oldItem->getId() !== ItemIds::AIR && $newItem->getId() === ItemIds::AIR){
-//                    $this->furnace->dropXpHolder($this->furnace->asPosition());
-//                }
-//                $this->furnace->scheduleUpdate();
-//                return $newItem;
-//            }
-//        });
+        $this->inventory->getListeners()->add(new CallbackInventoryListener(
+            function(Inventory $unused, int $slot, Item $oldItem): void{
+                $newItem = $this->inventory->getItem($slot);
+
+                if($slot === 2 && $oldItem->getId() !== ItemIds::AIR && $newItem->getId() === ItemIds::AIR){
+                    $this->dropXpHolder($this->getPos());
+                }
+            },
+            null
+        ));
     }
 
     public function getXpHolder(): float{

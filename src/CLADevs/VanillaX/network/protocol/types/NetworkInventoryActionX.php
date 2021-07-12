@@ -10,10 +10,11 @@ use CLADevs\VanillaX\inventories\types\EnchantInventory;
 use CLADevs\VanillaX\inventories\types\TradeInventory;
 use pocketmine\inventory\transaction\action\InventoryAction;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
-use pocketmine\network\mcpe\protocol\types\ContainerBlockLegacyIds;
+use pocketmine\network\mcpe\convert\TypeConverter;
+use pocketmine\network\mcpe\protocol\types\inventory\ContainerIds;
+use pocketmine\network\mcpe\protocol\types\inventory\NetworkInventoryAction;
 use pocketmine\network\mcpe\protocol\types\inventory\UIInventorySlotOffset;
-use pocketmine\network\mcpe\protocol\types\NetworkInventoryAction;
-use pocketmine\network\mcpe\protocol\types\WindowTypes;
+use pocketmine\network\mcpe\protocol\types\inventory\WindowTypes;
 use pocketmine\player\Player;
 use UnexpectedValueException;
 
@@ -32,17 +33,17 @@ class NetworkInventoryActionX extends NetworkInventoryAction{
 
     public function createInventoryAction(Player $player): ?InventoryAction{
         /** Nukkit Transaction for Anvil */
-        $oldItem = $this->oldItem->getItemStack();
-        $newItem = $this->newItem->getItemStack();
+        $oldItem = TypeConverter::getInstance()->netItemStackToCore($this->oldItem->getItemStack());
+        $newItem = TypeConverter::getInstance()->netItemStackToCore($this->newItem->getItemStack());
 
         switch($this->sourceType){
             case self::SOURCE_CONTAINER:
 
                 $otherInventory = true;
-                if($this->windowId === ContainerBlockLegacyBlockLegacyIds::UI){
+                if($this->windowId === ContainerIds::UI){
                     if(array_key_exists($this->inventorySlot, UIInventorySlotOffset::ANVIL)){
                         //Anvil
-                        $window = $player->getWindow(WindowTypes::ANVIL);
+                        $window = $player->getCurrentWindow();
 
                         if(!$window instanceof AnvilInventory){
                             throw new UnexpectedValueException("Player " . $player->getName() . " has no open anvil window");
@@ -52,7 +53,7 @@ class NetworkInventoryActionX extends NetworkInventoryAction{
                         $otherInventory = false;
                     }elseif(array_key_exists($this->inventorySlot, UIInventorySlotOffset::ENCHANTING_TABLE)){
                         //Enchantment Table
-                        $window = $player->getWindow(WindowTypes::ENCHANTMENT);
+                        $window = $player->getCurrentWindow();
 
                         if(!$window instanceof EnchantInventory){
                             throw new UnexpectedValueException("Player " . $player->getName() . " has no open enchant window");
@@ -62,7 +63,7 @@ class NetworkInventoryActionX extends NetworkInventoryAction{
                         $otherInventory = false;
                     }elseif(array_key_exists($this->inventorySlot, UIInventorySlotOffset::TRADE2_INGREDIENT)){
                         //Trade
-                        $window = $player->getWindow(WindowTypes::TRADING);
+                        $window = $player->getCurrentWindow();
 
                         if(!$window instanceof TradeInventory){
                             throw new UnexpectedValueException("Player " . $player->getName() . " has no open trade window");
@@ -72,15 +73,15 @@ class NetworkInventoryActionX extends NetworkInventoryAction{
                         $otherInventory = false;
                     }
                 }
-                if(!$otherInventory && ($window = $player->getWindow($this->windowId)) != null){
-                    return new SlotChangeAction($window, $this->inventorySlot, $oldItem, $newItem);
+                if(!$otherInventory && ($window = $player->getNetworkSession()->getInvManager()->getWindow($this->windowId) !== null)){
+                    return new SlotChangeAction($player->getCurrentWindow(), $this->inventorySlot, $oldItem, $newItem);
                 }
                 break;
             case self::SOURCE_TODO:
             case self::SOURCE_CRAFT_SLOT:
                 if($this->windowId >= self::SOURCE_TYPE_ANVIL_OUTPUT && $this->windowId <= self::SOURCE_TYPE_ANVIL_INPUT){
                     //Anvil
-                    $window = $player->getWindow(WindowTypes::ANVIL);
+                    $window = $player->getCurrentWindow();
 
                     if(!$window instanceof AnvilInventory){
                         throw new UnexpectedValueException("Player " . $player->getName() . " has no open anvil window");
@@ -94,7 +95,7 @@ class NetworkInventoryActionX extends NetworkInventoryAction{
                     return new SlotChangeAction($window, $this->inventorySlot, $oldItem, $newItem);
                 }elseif($this->windowId >= self::SOURCE_TYPE_ENCHANT_OUTPUT && $this->windowId <= self::SOURCE_TYPE_ENCHANT_INPUT){
                     //Enchantment Table
-                    $window = $player->getWindow(WindowTypes::ENCHANTMENT);
+                    $window = $player->getCurrentWindow();
 
                     if(!$window instanceof EnchantInventory){
                         throw new UnexpectedValueException("Player " . $player->getName() . " has no open enchant window");
@@ -108,7 +109,7 @@ class NetworkInventoryActionX extends NetworkInventoryAction{
                     return new SlotChangeAction($window, $this->inventorySlot, $oldItem, $newItem);
                 }elseif($this->windowId === self::SOURCE_TYPE_TRADE_OUTPUT || $this->windowId === self::SOURCE_TYPE_TRADE_INPUT){
                     //Trade
-                    $window = $player->getWindow(WindowTypes::TRADING);
+                    $window = $player->getCurrentWindow();
 
                     if(!$window instanceof TradeInventory){
                         throw new UnexpectedValueException("Player " . $player->getName() . " has no open trade window");
@@ -119,6 +120,6 @@ class NetworkInventoryActionX extends NetworkInventoryAction{
                 }
                 break;
         }
-        return parent::createInventoryAction($player);
+        return null;
     }
 }

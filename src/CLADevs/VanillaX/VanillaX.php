@@ -55,7 +55,6 @@ class VanillaX extends PluginBase{
         $this->itemManager->startup();
         $this->commandManager->startup();
         $this->networkManager->startup();
-        $this->inventoryManager->startup();
         $this->weatherManager->startup();
         $this->listenerManager->startup();
     }

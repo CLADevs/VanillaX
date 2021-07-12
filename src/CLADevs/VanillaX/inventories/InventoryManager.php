@@ -2,29 +2,15 @@
 
 namespace CLADevs\VanillaX\inventories;
 
-use CLADevs\VanillaX\utils\Utils;
-use pocketmine\crafting\CraftingManager;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
-use pocketmine\network\mcpe\cache\CraftingDataCache;
-use pocketmine\network\mcpe\convert\TypeConverter;
-use pocketmine\network\mcpe\protocol\CraftingDataPacket;
-use pocketmine\network\mcpe\protocol\types\inventory\ItemStack;
-use pocketmine\network\mcpe\protocol\types\recipe\FurnaceRecipe as ProtocolFurnaceRecipe;
 use pocketmine\network\mcpe\protocol\types\recipe\PotionContainerChangeRecipe;
 use pocketmine\network\mcpe\protocol\types\recipe\PotionTypeRecipe;
-use pocketmine\network\mcpe\protocol\types\recipe\RecipeIngredient;
-use pocketmine\network\mcpe\protocol\types\recipe\ShapedRecipe as ProtocolShapedRecipe;
-use pocketmine\network\mcpe\protocol\types\recipe\ShapelessRecipe as ProtocolShapelessRecipe;
-use pocketmine\Server;
-use pocketmine\timings\Timings;
-use pocketmine\utils\Binary;
-use Ramsey\Uuid\Uuid;
-use ReflectionException;
-use ReflectionProperty;
+use pocketmine\utils\SingletonTrait;
 
 class InventoryManager{
+    use SingletonTrait;
 
     const BREW_CONVERSATION = [
         426 => ItemIds::POTION,
@@ -54,92 +40,22 @@ class InventoryManager{
     /** @var PotionContainerChangeRecipe[] */
     private array $potionContainerRecipes = [];
 
-    /**
-     * @throws ReflectionException
-     */
-    public function startup(): void{
-        $manager = Server::getInstance()->getCraftingManager();
-        $id = spl_object_id($manager);
-        $reflection = new ReflectionProperty(CraftingDataCache::getInstance(), "caches");
-        $reflection->setAccessible(true);
-        $reflection->setValue($manager, [$id => $this->getCraftingDataPacket($manager)]);
+    public function __construct(){
+        self::setInstance($this);
     }
 
-    private function getCraftingDataPacket(CraftingManager $manager): CraftingDataPacket{
-        Timings::$craftingDataCacheRebuild->startTiming();
-        $pk = new CraftingDataPacket();
-        $pk->cleanRecipes = true;
+    /**
+     * @param PotionTypeRecipe[] $potionTypeRecipes
+     */
+    public function setPotionTypeRecipes(array $potionTypeRecipes): void{
+        $this->potionTypeRecipes = $potionTypeRecipes;
+    }
 
-        $counter = 0;
-        $nullUUID = Uuid::fromString(Uuid::NIL);
-        $converter = TypeConverter::getInstance();
-        foreach($manager->getShapelessRecipes() as $list){
-            foreach($list as $recipe){
-                $pk->entries[] = new ProtocolShapelessRecipe(
-                    CraftingDataPacket::ENTRY_SHAPELESS,
-                    Binary::writeInt(++$counter),
-                    array_map(function(Item $item) use ($converter) : RecipeIngredient{
-                        return $converter->coreItemStackToRecipeIngredient($item);
-                    }, $recipe->getIngredientList()),
-                    array_map(function(Item $item) use ($converter) : ItemStack{
-                        return $converter->coreItemStackToNet($item);
-                    }, $recipe->getResults()),
-                    $nullUUID,
-                    "crafting_table",
-                    50,
-                    $counter
-                );
-            }
-        }
-        foreach($manager->getShapedRecipes() as $list){
-            foreach($list as $recipe){
-                $inputs = [];
-
-                for($row = 0, $height = $recipe->getHeight(); $row < $height; ++$row){
-                    for($column = 0, $width = $recipe->getWidth(); $column < $width; ++$column){
-                        $inputs[$row][$column] = $converter->coreItemStackToRecipeIngredient($recipe->getIngredient($column, $row));
-                    }
-                }
-                $pk->entries[] = $r = new ProtocolShapedRecipe(
-                    CraftingDataPacket::ENTRY_SHAPED,
-                    Binary::writeInt(++$counter),
-                    $inputs,
-                    array_map(function(Item $item) use ($converter) : ItemStack{
-                        return $converter->coreItemStackToNet($item);
-                    }, $recipe->getResults()),
-                    $nullUUID,
-                    "crafting_table",
-                    50,
-                    $counter
-                );
-            }
-        }
-
-        foreach($manager->getFurnaceRecipeManager()->getAll() as $recipe){
-            $input = $converter->coreItemStackToNet($recipe->getInput());
-            $pk->entries[] = new ProtocolFurnaceRecipe(
-                CraftingDataPacket::ENTRY_FURNACE_DATA,
-                $input->getId(),
-                $input->getMeta(),
-                $converter->coreItemStackToNet($recipe->getResult()),
-                "furnace"
-            );
-
-            foreach(json_decode(file_get_contents(Utils::getResourceFile("brewing_recipes.json")), true) as $key => $i){
-                $pk->potionTypeRecipes[] = new PotionTypeRecipe($i[0], $i[1], $i[2], $i[3], $i[4], $i[5]);
-                $potion = new PotionTypeRecipe(self::convertPotionId($i[0]), self::convertPotionId($i[1]), self::convertPotionId($i[2]), self::convertPotionId($i[3]), self::convertPotionId($i[4]), self::convertPotionId($i[5]));
-                $this->potionTypeRecipes[$potion->getInputItemId() . ":" . $potion->getInputItemMeta() . ":" . $potion->getIngredientItemId() . ":" . $potion->getIngredientItemMeta()] = clone $potion;
-            }
-
-            foreach([[426, 328, 561], [561, 560, 562]] as $key => $i){
-                $pk->potionContainerRecipes[] = new PotionContainerChangeRecipe($i[0], $i[1], $i[2]);
-                $potion = new PotionContainerChangeRecipe(self::convertPotionId($i[0]), self::convertPotionId($i[1]), self::convertPotionId($i[2]));
-                $this->potionContainerRecipes[$potion->getInputItemId() . ":" . $potion->getIngredientItemId()] = clone $potion;
-            }
-        }
-
-        Timings::$craftingDataCacheRebuild->stopTiming();
-        return $pk;
+    /**
+     * @param PotionContainerChangeRecipe[] $potionContainerRecipes
+     */
+    public function setPotionContainerRecipes(array $potionContainerRecipes): void{
+        $this->potionContainerRecipes = $potionContainerRecipes;
     }
 
     public function getBrewingOutput(Item $input, Item $ingredient): ?Item{
@@ -160,7 +76,7 @@ class InventoryManager{
         return null;
     }
 
-    private static function convertPotionId(int $value): int{
+    public static function convertPotionId(int $value): int{
         return self::BREW_CONVERSATION[$value] ?? $value;
     }
 

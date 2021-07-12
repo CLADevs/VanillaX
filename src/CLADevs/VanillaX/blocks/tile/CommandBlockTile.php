@@ -66,28 +66,9 @@ class CommandBlockTile extends Spawnable implements Nameable{
     private bool $auto = false;
     private bool $conditionMet = false;
     private bool $conditionalMode = false;
-    private bool $isScheduled = false;
 
     public function getDefaultName(): string{
         return "Command Block";
-    }
-
-    public function onUpdate(): bool{
-        if($this->closed || !$this->isScheduled){
-            return false;
-        }
-        if($this->tickDelay > 0 && $this->countDelayTick > 0){
-            $this->countDelayTick--;
-            return true;
-        }
-        $this->runCommand();
-        if($this->commandBlockMode === self::TYPE_REPEAT){
-            $this->countDelayTick = $this->tickDelay;
-        }else{
-            $this->isScheduled = false;
-            return false;
-        }
-        return true;
     }
 
     public function runCommand(): void{
@@ -107,7 +88,8 @@ class CommandBlockTile extends Spawnable implements Nameable{
             $block = BlockFactory::getInstance()->get(CommandBlock::asCommandBlockFromMode($this->commandBlockMode), $tileBlock->getMeta());
 
             if($tileBlock instanceof CommandBlock){
-                $block->setDamage($tileBlock->getMeta());
+                //TODO facing
+              //  $block->setDamage($tileBlock->getMeta());
             }
             $this->getPos()->getWorld()->setBlock($this->getPos(), $block);
         }
@@ -142,11 +124,8 @@ class CommandBlockTile extends Spawnable implements Nameable{
         }
         if($this->tickDelay == 0 && strlen($this->command) >= 1){
             $this->runCommand();
-        }elseif(($this->tickDelay >= 1 && strlen($this->command) >= 1 && !$this->isScheduled) || $this->commandBlockMode == self::TYPE_REPEAT){
-         //   $this->scheduleUpdate();
-            //TODO schedule
-            $this->isScheduled = true;
         }
+        $this->pos->getWorld()->scheduleDelayedBlockUpdate($this->pos, 1);
      //   $this->onChanged();
         //TODO onChange
     }
@@ -197,11 +176,6 @@ class CommandBlockTile extends Spawnable implements Nameable{
         if(($tag = $nbt->getTag(self::TAG_CONDITIONAL_MODE)) !== null){
             $this->conditionalMode = boolval($tag->getValue());
         }
-        if($this->commandBlockMode === self::TYPE_REPEAT){
-         //   $this->scheduleUpdate();
-            //TODO schedule
-            $this->isScheduled = true;
-        }
        // $this->onChanged();
         //TODO on change
     }
@@ -224,5 +198,25 @@ class CommandBlockTile extends Spawnable implements Nameable{
         $nbt->setByte(self::TAG_AUTO, intval($this->auto));
         $nbt->setByte(self::TAG_CONDITION_MET, intval($this->conditionMet));
         $nbt->setByte(self::TAG_CONDITIONAL_MODE, intval($this->conditionalMode));
+    }
+
+    public function getTickDelay(): int{
+        return $this->tickDelay;
+    }
+
+    public function getCountDelayTick(): int{
+        return $this->countDelayTick;
+    }
+
+    public function setCountDelayTick(int $countDelayTick): void{
+        $this->countDelayTick = $countDelayTick;
+    }
+
+    public function decreaseCountDelayTick(): void{
+        $this->countDelayTick--;
+    }
+
+    public function getCommandBlockMode(): int{
+        return $this->commandBlockMode;
     }
 }

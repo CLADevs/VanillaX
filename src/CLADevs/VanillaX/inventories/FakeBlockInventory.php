@@ -2,15 +2,16 @@
 
 namespace CLADevs\VanillaX\inventories;
 
-use CLADevs\VanillaX\VanillaX;
 use pocketmine\block\Block;
 use pocketmine\block\BlockFactory;
 use pocketmine\block\BlockLegacyIds;
 use pocketmine\block\inventory\BlockInventory;
+use pocketmine\block\inventory\BlockInventoryTrait;
 use pocketmine\inventory\SimpleInventory;
 use pocketmine\math\Vector3;
-use pocketmine\network\mcpe\convert\RuntimeBlockMapping;
-use pocketmine\network\mcpe\protocol\DataPacket;
+use pocketmine\network\mcpe\convert\RuntimeBlockMapping;;
+
+use pocketmine\network\mcpe\protocol\ContainerOpenPacket;
 use pocketmine\network\mcpe\protocol\ServerboundPacket;
 use pocketmine\network\mcpe\protocol\types\inventory\WindowTypes;
 use pocketmine\network\mcpe\protocol\UpdateBlockPacket;
@@ -18,6 +19,7 @@ use pocketmine\player\Player;
 use pocketmine\world\Position;
 
 class FakeBlockInventory extends SimpleInventory implements BlockInventory{
+    use BlockInventoryTrait;
 
     private string $title;
 
@@ -26,7 +28,6 @@ class FakeBlockInventory extends SimpleInventory implements BlockInventory{
 
     private ?Player $owner;
     private Block $block;
-    private Position $holder;
 
     /** @var null|callable */
     private $packetCallable;
@@ -68,10 +69,6 @@ class FakeBlockInventory extends SimpleInventory implements BlockInventory{
         return $this->defaultSize;
     }
 
-    public function getHolder(): Position{
-        return $this->holder;
-    }
-
     public function getName(): string{
         return "Inventory";
     }
@@ -85,16 +82,16 @@ class FakeBlockInventory extends SimpleInventory implements BlockInventory{
     }
 
     public function onOpen(Player $who): void{
-        VanillaX::getInstance()->getSessionManager()->get($who)->setCurrentWindow($this);
         if($this->block->getId() !== BlockLegacyIds::AIR){
             $block = clone $this->block;
             $this->sendBlock($who, $this->holder, $block->getId(), $block->getMeta());
         }
+        $who->getNetworkSession()->sendDataPacket(ContainerOpenPacket::blockInvVec3($who->getNetworkSession()->getInvManager()->getCurrentWindowId(), $this->windowType, $this->holder));
+        $who->getNetworkSession()->getInvManager()->syncContents($this);
         parent::onOpen($who);
     }
 
     public function onClose(Player $who): void{
-        VanillaX::getInstance()->getSessionManager()->get($who)->setCurrentWindow(null);
         if($this->block->getId() !== BlockLegacyIds::AIR){
             $block = $who->getWorld()->getBlock($this->holder);
             $this->sendBlock($who, $this->holder, $block->getId(), $block->getMeta());

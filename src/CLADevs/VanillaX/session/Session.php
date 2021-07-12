@@ -6,7 +6,6 @@ use CLADevs\VanillaX\entities\passive\VillagerEntity;
 use CLADevs\VanillaX\entities\projectile\TridentEntity;
 use CLADevs\VanillaX\entities\utils\interfaces\EntityRidable;
 use CLADevs\VanillaX\entities\VanillaEntity;
-use CLADevs\VanillaX\inventories\FakeBlockInventory;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\DataPacket;
 use pocketmine\network\mcpe\protocol\PlaySoundPacket;
@@ -24,7 +23,6 @@ class Session{
 
     private Player $player;
 
-    private ?FakeBlockInventory $currentWindow = null;
     private ?VanillaEntity $ridingEntity = null;
     private ?VillagerEntity $tradingEntity = null;
 
@@ -61,14 +59,6 @@ class Session{
             $this->tradingEntity->setCustomer(null);
         }
         $this->tradingEntity = $tradingEntity;
-    }
-
-    public function getCurrentWindow(): ?FakeBlockInventory{
-        return $this->currentWindow;
-    }
-
-    public function setCurrentWindow(?FakeBlockInventory $currentWindow): void{
-        $this->currentWindow = $currentWindow;
     }
 
     public function isGliding(): bool{

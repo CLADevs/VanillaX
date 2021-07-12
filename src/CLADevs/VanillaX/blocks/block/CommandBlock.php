@@ -23,7 +23,7 @@ class CommandBlock extends Block implements NonAutomaticCallItemTrait, NonCreati
 
     //TODO tile
     public function __construct(int $id){
-        parent::__construct(new BlockIdentifier($id, 0, $id), self::asCommandBlockName($id), new BlockBreakInfo(-1, BlockToolType::NONE, 0, 3600000));
+        parent::__construct(new BlockIdentifier($id, 0, $id, CommandBlockTile::class), self::asCommandBlockName($id), new BlockBreakInfo(-1, BlockToolType::NONE, 0, 3600000));
     }
 
     public function getMode(): int{
@@ -80,5 +80,22 @@ class CommandBlock extends Block implements NonAutomaticCallItemTrait, NonCreati
             $player->getNetworkSession()->sendDataPacket($pk);
         }
         return true;
+    }
+
+    public function onScheduledUpdate(): void{
+        $tile = $this->pos->getWorld()->getTile($this->pos);
+
+        if($tile->isClosed() || !$tile instanceof CommandBlockTile){
+            return;
+        }
+        if($tile->getTickDelay() > 0 && $tile->getCountDelayTick() > 0){
+            $tile->decreaseCountDelayTick();
+        }else{
+            $tile->runCommand();
+            if($tile->getCommandBlockMode() === CommandBlockTile::TYPE_REPEAT){
+                $tile->setCountDelayTick($tile->getTickDelay());
+                $this->pos->getWorld()->scheduleDelayedBlockUpdate($this->pos, 1);
+            }
+        }
     }
 }

@@ -37,6 +37,26 @@ class JukeboxTile extends Tile{
         $this->recordItem = $recordItem;
     }
 
+    public function getRecordDuration(): int{
+        return $this->recordDuration;
+    }
+
+    public function increaseRecordDuration(): void{
+        $this->recordDuration++;
+    }
+
+    public function getRecordMaxDuration(): int{
+        return $this->recordMaxDuration;
+    }
+
+    public function setRecordMaxDuration(int $recordMaxDuration): void{
+        $this->recordMaxDuration = $recordMaxDuration;
+    }
+
+    public function isFinishedPlaying(): bool{
+        return $this->finishedPlaying;
+    }
+
     public function insertTrack(Player $inserter, MusicDiscItem $disc): void{
         $this->recordDuration = 0;
         $this->finishedPlaying = false;

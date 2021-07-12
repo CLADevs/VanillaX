@@ -4,16 +4,17 @@ namespace CLADevs\VanillaX\blocks\tile;
 
 use CLADevs\VanillaX\blocks\utils\TileVanilla;
 use CLADevs\VanillaX\inventories\types\BrewingStandInventory;
-use CLADevs\VanillaX\VanillaX;
 use pocketmine\block\BlockLegacyIds;
 use pocketmine\block\tile\Container;
 use pocketmine\block\tile\ContainerTrait;
 use pocketmine\block\tile\Nameable;
 use pocketmine\block\tile\NameableTrait;
 use pocketmine\block\tile\Spawnable;
+use pocketmine\inventory\CallbackInventoryListener;
 use pocketmine\item\Item;
+use pocketmine\math\Vector3;
 use pocketmine\nbt\tag\CompoundTag;
-use pocketmine\network\mcpe\protocol\LevelSoundEventPacket;
+use pocketmine\world\World;
 
 class BrewingStandTile extends Spawnable implements Container, Nameable{
     use ContainerTrait, NameableTrait;
@@ -34,6 +35,14 @@ class BrewingStandTile extends Spawnable implements Container, Nameable{
     private int $fuelTotal = 0;
 
     private BrewingStandInventory $inventory;
+
+    public function __construct(World $world, Vector3 $pos){
+        parent::__construct($world, $pos);
+        $this->inventory = new BrewingStandInventory($this);
+        $this->inventory->getListeners()->add(CallbackInventoryListener::onAnyChange(static function() use($world, $pos): void{
+            $world->scheduleDelayedBlockUpdate($pos, 1);
+        }));
+    }
 
     public function getDefaultName(): string{
         return TileVanilla::BREWING_STAND;
@@ -57,6 +66,10 @@ class BrewingStandTile extends Spawnable implements Container, Nameable{
 
     public function setBrewTime(int $brewTime): void{
         $this->brewTime = $brewTime;
+    }
+
+    public function decreaseBrewTime(): void{
+        $this->brewTime--;
     }
 
     public function getFuelAmount(): int{
@@ -99,6 +112,14 @@ class BrewingStandTile extends Spawnable implements Container, Nameable{
         }
     }
 
+    public function canRemoveFuel(): bool{
+        return $this->removeFuel;
+    }
+
+    public function setRemoveFuel(bool $removeFuel): void{
+        $this->removeFuel = $removeFuel;
+    }
+
     public function checkBrewing(int $potionCount, Item $ingredient): void{
         if(!$this->isBrewing()){
             if($potionCount >= 1 && $this->isFueled() && !$ingredient->isNull()){
@@ -117,47 +138,6 @@ class BrewingStandTile extends Spawnable implements Container, Nameable{
         $this->inventory->sendBrewTimeData(null, $this->getBrewTime());
     }
 
-    public function onUpdate(): bool{
-        if($this->closed){
-            return false;
-        }
-        if($this->removeFuel && !$this->inventory->getFuel()->isNull()){
-            $this->inventory->decreaseFuel();
-            $this->removeFuel = false;
-        }
-        if($this->isBrewing()){
-            $this->brewTime--;
-
-            if($this->brewTime <= 0){
-                $ingredient = $this->inventory->getIngredient();
-
-                for($i = BrewingStandInventory::FIRST_POTION_SLOT; $i <= BrewingStandInventory::THIRD_POTION_SLOT; $i++){
-                    $potion = $this->inventory->getItem($i);
-
-                    if($this->inventory->isPotion($potion, $ingredient)){
-                        $inventoryManager = VanillaX::getInstance()->getInventoryManager();
-
-                        if(($output = $inventoryManager->getBrewingOutput($potion, $ingredient)) === null){
-                            $output = $inventoryManager->getBrewingContainerOutput($potion, $ingredient);
-                        }
-                        if($output !== null){
-                            $this->inventory->setItem($i, $output);
-                        }
-                    }
-                }
-                $this->inventory->decreaseIngredient();
-                $this->setFuelAmount($this->fuelAmount - 1, true);
-                $this->getPos()->getWorld()->broadcastPacketToViewers($this->getPos(), LevelSoundEventPacket::create(LevelSoundEventPacket::SOUND_POTION_BREWED, $this->getPos()));
-
-                if($this->fuelAmount <= 0 && !$this->inventory->getFuel()->isNull()){
-                    $this->inventory->decreaseFuel();
-                    $this->resetFuel();
-                }
-            }
-        }
-        return true;
-    }
-
     public function close(): void{
         foreach($this->inventory->getContents() as $item){
             $this->getPos()->getWorld()->dropItem($this->getPos(), $item);
@@ -167,7 +147,6 @@ class BrewingStandTile extends Spawnable implements Container, Nameable{
     }
 
     public function readSaveData(CompoundTag $nbt): void{
-        $this->inventory = new BrewingStandInventory($this);
         $this->loadItems($nbt);
         $this->loadName($nbt);
         if(($tag = $nbt->getTag(self::TAG_BREW_TIME)) !== null){
@@ -179,8 +158,6 @@ class BrewingStandTile extends Spawnable implements Container, Nameable{
         if(($tag = $nbt->getTag(self::TAG_FUEL_TOTAL)) !== null){
             $this->fuelTotal = $tag->getValue();
         }
-        //TODO repeating tick
-        //$this->scheduleUpdate();
     }
 
     protected function writeSaveData(CompoundTag $nbt): void{
