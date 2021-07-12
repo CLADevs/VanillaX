@@ -7,21 +7,32 @@ use CLADevs\VanillaX\entities\utils\ItemHelper;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
+use pocketmine\entity\EntitySizeInfo;
+use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\network\mcpe\protocol\types\entity\EntityIds;
 
 class IronGolemEntity extends VanillaEntity{
 
-    const NETWORK_ID = self::IRON_GOLEM;
+    const NETWORK_ID = EntityIds::IRON_GOLEM;
 
-    public $width = 1.4;
-    public $height = 2.9;
+    public float $width = 1.4;
+    public float $height = 2.9;
 
-    protected function initEntity(): void{
-        parent::initEntity();
+    protected function initEntity(CompoundTag $nbt): void{
+        parent::initEntity($nbt);
         $this->setMaxHealth(100);
     }
 
     public function getName(): string{
-        return "Iron Golem";
+        return "Iron_Golem";
+    }
+
+    protected function getInitialSizeInfo(): EntitySizeInfo{
+        return new EntitySizeInfo($this->height, $this->width);
+    }
+
+    public static function getNetworkTypeId(): string{
+        return self::NETWORK_ID;
     }
  
     /**

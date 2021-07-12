@@ -7,6 +7,7 @@ use CLADevs\VanillaX\network\gamerules\GameRule;
 use CLADevs\VanillaX\session\Session;
 use CLADevs\VanillaX\utils\instances\InteractButtonResult;
 use CLADevs\VanillaX\utils\item\InteractButtonItemTrait;
+use pocketmine\entity\EntitySizeInfo;
 use pocketmine\entity\Living;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
@@ -18,7 +19,10 @@ use pocketmine\item\ItemIds;
 use pocketmine\nbt\NBT;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\ListTag;
+use pocketmine\network\mcpe\convert\TypeConverter;
 use pocketmine\network\mcpe\protocol\MobEquipmentPacket;
+use pocketmine\network\mcpe\protocol\types\entity\EntityIds;
+use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataProperties;
 use pocketmine\network\mcpe\protocol\types\inventory\ItemStackWrapper;
 use pocketmine\player\Player;
 use pocketmine\Server;
@@ -28,7 +32,7 @@ class ArmorStandEntity extends Living implements InteractButtonItemTrait{
     const BUTTON_EQUIP = "Equip";
     const BUTTON_POSE = "Pose";
 
-    const NETWORK_ID = self::ARMOR_STAND;
+    const NETWORK_ID = EntityIds::ARMOR_STAND;
 
     const EQUIPMENT_MAINHAND = 0;
     const EQUIPMENT_HEAD = 1;
@@ -54,45 +58,54 @@ class ArmorStandEntity extends Living implements InteractButtonItemTrait{
     const TAG_MAINHAND = "MainHandItem";
     const TAG_OFFHAND = "OffHandItem";
 
-    public $width = 0.5;
-    public $height = 1.975;
-    protected $gravity = 0.5;
+    public float $width = 0.5;
+    public float $height = 1.975;
+    
+    protected float $gravity = 0.5;
 
     private Item $mainHand;
 
     private float $lastPunchTime = 0.0;
 
-    protected function initEntity(): void{
-        parent::initEntity();
+    protected function initEntity(CompoundTag $nbt): void{
+        parent::initEntity($nbt);
         /** Main Hand */
-        if($this->namedtag->hasTag(self::TAG_MAINHAND, CompoundTag::class)){
-            $this->setMainHand(Item::nbtDeserialize($this->namedtag->getCompoundTag(self::TAG_MAINHAND)));
+        if(($tag = $nbt->getTag(self::TAG_MAINHAND)) !== null){
+            $this->setMainHand(Item::nbtDeserialize($tag->getValue()));
         }else{
-            $this->mainHand = ItemFactory::getInstance()->get(ItemIds::AIR);
+            $this->mainHand = ItemFactory::air();
         }
 
         /** Armor */
-        $inventoryTag = $this->namedtag->getListTag(self::TAG_ARMOR);
-        if($inventoryTag !== null){
-            $armorListener = $this->armorInventory->getEventProcessor();
-            $this->armorInventory->setEventProcessor(null);
+        if(($tag = $nbt->getTag(self::TAG_ARMOR)) !== null){
+            $armorListener = $this->armorInventory->getListeners()->toArray();
+            $this->armorInventory->getListeners()->clear();
 
             /** @var CompoundTag $item */
-            foreach($inventoryTag as $i => $item){
+            foreach($tag as $i => $item){
                 $this->armorInventory->setItem($item->getByte("Slot"), Item::nbtDeserialize($item));
             }
-            $this->armorInventory->setEventProcessor($armorListener);
+            $this->armorInventory->getListeners()->add($armorListener);
         }
     }
-
+    
     public function getName(): string{
         return "ArmorStand";
     }
 
-    public function saveNBT(): void{
+    protected function getInitialSizeInfo(): EntitySizeInfo{
+        return new EntitySizeInfo($this->height, $this->width);
+    }
+
+    public static function getNetworkTypeId(): string{
+        return self::NETWORK_ID;
+    }
+    
+    public function saveNBT(): CompoundTag{
+        $nbt = parent::saveNBT();
         /** Armor */
-        $inventoryTag = new ListTag(self::TAG_ARMOR, [], NBT::TAG_Compound);
-        $this->namedtag->setTag($inventoryTag);
+        $inventoryTag = new ListTag([], NBT::TAG_Compound);
+        $nbt->setTag(self::TAG_ARMOR, $inventoryTag);
         for($slot = 0; $slot < 4; ++$slot){
             $item = $this->armorInventory->getItem($slot);
             if(!$item->isNull()){
@@ -101,13 +114,13 @@ class ArmorStandEntity extends Living implements InteractButtonItemTrait{
         }
 
         /** Main Hand */
-        $this->namedtag->setTag($this->mainHand->nbtSerialize(-1, self::TAG_MAINHAND));
-        parent::saveNBT();
+        $nbt->setTag(self::TAG_MAINHAND, $this->mainHand->nbtSerialize());
+        return $nbt;
     }
 
     protected function sendSpawnPacket(Player $player): void{
         parent::sendSpawnPacket($player);
-        $player->dataPacket($this->getMainHandPacket());
+        $player->getNetworkSession()->sendDataPacket($this->getMainHandPacket());
     }
 
     public function attack(EntityDamageEvent $source): void{
@@ -143,20 +156,20 @@ class ArmorStandEntity extends Living implements InteractButtonItemTrait{
         if(!$this->isFlaggedForDespawn()){
             $this->flagForDespawn();
 
-            if(GameRule::getGameRuleValue(GameRule::DO_TILE_DROPS, $this->getLevel())){
+            if(GameRule::getGameRuleValue(GameRule::DO_TILE_DROPS, $this->getWorld())){
                 $items = array_merge([ItemFactory::getInstance()->get(ItemIds::ARMOR_STAND)], $this->getArmorInventory()->getContents());
                 if(!$this->mainHand->isNull()){
                     $items[] = $this->mainHand;
                 }
                 foreach($items as $item){
-                    $this->getLevel()->dropItem($this->add(0.5, 0.5, 0.5), $item);
+                    $this->getWorld()->dropItem($this->getPosition()->add(0.5, 0.5, 0.5), $item);
                 }
             }
         }
     }
 
     public function onMouseHover(Player $player): void{
-        $player->getDataPropertyManager()->setString(self::DATA_INTERACTIVE_TAG, $player->isSneaking() ? self::BUTTON_POSE : self::BUTTON_EQUIP);
+        $player->getNetworkProperties()->setString(EntityMetadataProperties::INTERACTIVE_TAG, $player->isSneaking() ? self::BUTTON_POSE : self::BUTTON_EQUIP);
     }
 
     public function onButtonPressed(InteractButtonResult $result): void{
@@ -174,7 +187,7 @@ class ArmorStandEntity extends Living implements InteractButtonItemTrait{
         switch($button){
             case self::BUTTON_EQUIP:
                 if(($clickpos = $result->getClickPos()) !== null){
-                    $slot = $this->getClickedPosSlot($clickpos->y - $this->y);
+                    $slot = $this->getClickedPosSlot($clickpos->y - $this->getPosition()->y);
                 }else{
                     $slot = $item instanceof Armor ? ItemManager::getArmorSlot($item, true) + 1 : self::EQUIPMENT_MAINHAND;
                 }
@@ -231,7 +244,7 @@ class ArmorStandEntity extends Living implements InteractButtonItemTrait{
         if(!$old->isNull()){
             $player->getInventory()->setItemInHand($old);
         }else{
-            $player->getInventory()->setItemInHand(ItemFactory::getInstance()->get(ItemIds::AIR));
+            $player->getInventory()->setItemInHand(ItemFactory::air());
         }
         $this->setMainHand($new);
         Session::playSound($player, "mob.armor_stand.place");
@@ -241,21 +254,21 @@ class ArmorStandEntity extends Living implements InteractButtonItemTrait{
         if(!$old->isNull()){
             $player->getInventory()->setItemInHand($old);
         }else{
-            $player->getInventory()->setItemInHand(ItemFactory::getInstance()->get(ItemIds::AIR));
+            $player->getInventory()->setItemInHand(ItemFactory::air());
         }
         $this->getArmorInventory()->setItem($slot, $new);
         Session::playSound($player, "mob.armor_stand.place");
     }
 
     public function getPose(): int{
-        return $this->getDataPropertyManager()->getInt(self::DATA_ARMOR_STAND_POSE_INDEX) ?? self::POSE_DEFAULT;
+        return $this->getNetworkProperties()->getAll[EntityMetadataProperties::ARMOR_STAND_POSE_INDEX] ?? self::POSE_DEFAULT;
     }
 
     public function setPose(int $pose, bool $strict = true): void{
         if($strict && ($pose > self::POSE_CANCAN_B || $pose < self::POSE_DEFAULT)){
             $pose = self::POSE_DEFAULT;
         }
-        $this->getDataPropertyManager()->setInt(self::DATA_ARMOR_STAND_POSE_INDEX, $pose);
+        $this->getNetworkProperties()->setInt(EntityMetadataProperties::ARMOR_STAND_POSE_INDEX, $pose);
     }
 
     public function getMainHand(): Item{
@@ -264,7 +277,7 @@ class ArmorStandEntity extends Living implements InteractButtonItemTrait{
 
     public function setMainHand(Item $mainHand): void{
         $this->mainHand = $mainHand;
-        Server::getInstance()->broadcastPacket($this->getViewers(), $this->getMainHandPacket());
+        Server::getInstance()->broadcastPackets($this->getViewers(), [$this->getMainHandPacket()]);
     }
 
     public function getMainHandPacket(Item $item = null): MobEquipmentPacket{
@@ -273,7 +286,7 @@ class ArmorStandEntity extends Living implements InteractButtonItemTrait{
         }
         $pk = new MobEquipmentPacket();
         $pk->entityRuntimeId = $this->id;
-        $pk->item = ItemStackWrapper::legacy($item);
+        $pk->item = ItemStackWrapper::legacy(TypeConverter::getInstance()->coreItemStackToNet($item));
         $pk->inventorySlot = 0;
         $pk->hotbarSlot = $pk->inventorySlot;
         return $pk;

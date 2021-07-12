@@ -7,21 +7,36 @@ use CLADevs\VanillaX\entities\utils\ItemHelper;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
+use pocketmine\entity\EntitySizeInfo;
+use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\network\mcpe\protocol\types\entity\EntityIds;
 
 class SheepEntity extends VanillaEntity{
 
-    const NETWORK_ID = self::SHEEP;
+    const NETWORK_ID = EntityIds::SHEEP;
 
-    public $width = 0.9;
-    public $height = 1.3;
+    public float $width = 0.9;
+    public float $height = 1.3;
 
-    protected function initEntity(): void{
-        parent::initEntity();
+    protected function initEntity(CompoundTag $nbt): void{
+        parent::initEntity($nbt);
         $this->setMaxHealth(8);
     }
 
     public function getName(): string{
         return "Sheep";
+    }
+
+    protected function getInitialSizeInfo(): EntitySizeInfo{
+        return new EntitySizeInfo($this->height, $this->width);
+    }
+
+    public static function getNetworkTypeId(): string{
+        return self::NETWORK_ID;
+    }
+    
+    public function getXpDropAmount(): int{
+        return $this->getLastHitByPlayer() ? mt_rand(1,3) : 0;
     }
  
     /**
@@ -32,12 +47,8 @@ class SheepEntity extends VanillaEntity{
          
         $muttonraw = ItemFactory::getInstance()->get(ItemIds::RAW_MUTTON, 0, 1);
         ItemHelper::applySetCount($muttonraw, 1, 2);
-        if($this->isOnFire()) ItemHelper::applyFurnaceSmelt($muttonraw);
+        ItemHelper::applyFurnaceSmelt($muttonraw);
         ItemHelper::applyLootingEnchant($this, $muttonraw);
         return [$wool, $muttonraw];
-    }
-    
-    public function getXpDropAmount(): int{
-        return $this->getLastHitByPlayer() ? mt_rand(1,3) : 0;
     }
 }

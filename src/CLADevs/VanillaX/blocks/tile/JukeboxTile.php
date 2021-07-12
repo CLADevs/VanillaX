@@ -5,15 +5,14 @@ namespace CLADevs\VanillaX\blocks\tile;
 use CLADevs\VanillaX\blocks\utils\TileVanilla;
 use CLADevs\VanillaX\items\types\MusicDiscItem;
 use pocketmine\block\BlockLegacyIds;
+use pocketmine\block\tile\Tile;
 use pocketmine\item\Item;
-use pocketmine\level\particle\GenericParticle;
-use pocketmine\level\particle\Particle;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\network\mcpe\protocol\LevelSoundEventPacket;
 use pocketmine\player\Player;
 use pocketmine\Server;
-use pocketmine\tile\Tile;
 use pocketmine\utils\TextFormat;
+use pocketmine\world\Position;
 
 class JukeboxTile extends Tile{
 
@@ -45,14 +44,14 @@ class JukeboxTile extends Tile{
         $this->recordItem = clone $disc;
         $disc->pop();
         $inserter->sendPopup(TextFormat::LIGHT_PURPLE . "Now playing: " . MusicDiscItem::getRecordName($disc->getId()));
-        $this->getLevel()->broadcastLevelSoundEvent($this, $disc->getSoundId());
+        $this->broadcastLevelSoundEvent($this->getPos(), $disc->getSoundId());
     }
 
     public function removeTrack(): void{
         if($this->recordItem !== null){
             $this->recordDuration = 0;
-            $this->getLevel()->broadcastLevelSoundEvent($this, LevelSoundEventPacket::SOUND_STOP_RECORD);
-            $this->getLevel()->dropItem($this->add(0, 1), $this->recordItem);
+            $this->broadcastLevelSoundEvent($this->getPos(), LevelSoundEventPacket::SOUND_STOP_RECORD);
+            $this->getPos()->getWorld()->dropItem($this->getPos()->add(0, 1, 0), $this->recordItem);
             $this->recordItem = null;
         }
     }
@@ -75,7 +74,7 @@ class JukeboxTile extends Tile{
                 return true;
             }
             if(Server::getInstance()->getTick() % 30 === 0){
-                $this->getLevel()->addParticle(new GenericParticle($this->add(0.5, 1.25, 0.5), Particle::TYPE_NOTE));
+                //TODO note particle
             }
         }
         return true;
@@ -86,21 +85,33 @@ class JukeboxTile extends Tile{
         parent::close();
     }
 
-    protected function readSaveData(CompoundTag $nbt): void{
-        if($nbt->hasTag(self::TAG_RECORD_ITEM)){
-            $this->recordItem = Item::nbtDeserialize($nbt->getCompoundTag(self::TAG_RECORD_ITEM));
+    public function readSaveData(CompoundTag $nbt): void{
+        if(($tag = $nbt->getTag(self::TAG_RECORD_ITEM)) !== null){
+            $this->recordItem = Item::nbtDeserialize($tag->getValue());
         }
-        if($nbt->hasTag(self::TAG_RECORD_DURATION)){
-            $this->recordDuration = $nbt->getInt(self::TAG_RECORD_DURATION);
+        if(($tag = $nbt->getTag(self::TAG_RECORD_DURATION)) !== null){
+            $this->recordDuration = $tag->getValue();
         }
         $this->validateDuration();
-        $this->scheduleUpdate();
+     //   $this->scheduleUpdate();
+        //TODO schedule
     }
 
     protected function writeSaveData(CompoundTag $nbt): void{
         if($this->recordItem !== null){
-            $nbt->setTag($this->recordItem->nbtSerialize(-1, self::TAG_RECORD_ITEM));
+            $nbt->setTag(self::TAG_RECORD_ITEM, $this->recordItem->nbtSerialize());
         }
         $nbt->setInt(self::TAG_RECORD_DURATION, $this->recordDuration);
+    }
+
+    private function broadcastLevelSoundEvent(Position $pos, int $soundId): void{
+        $pk = new LevelSoundEventPacket();
+        $pk->sound = $soundId;
+        $pk->extraData = -1;
+        $pk->entityType = ":";
+        $pk->isBabyMob = false;
+        $pk->disableRelativeVolume = false;
+        $pk->position = $pos->asVector3();
+        $pos->getWorld()->broadcastPacketToViewers($pos, $pk);
     }
 }

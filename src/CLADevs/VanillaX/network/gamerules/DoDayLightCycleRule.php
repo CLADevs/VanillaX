@@ -2,7 +2,7 @@
 
 namespace CLADevs\VanillaX\network\gamerules;
 
-use pocketmine\level\Level;
+use pocketmine\world\World;
 
 class DoDayLightCycleRule extends GameRule{
 
@@ -10,11 +10,11 @@ class DoDayLightCycleRule extends GameRule{
         parent::__construct(self::DO_DAY_LIGHT_CYCLE, true);
     }
 
-    public function handleValue($value, Level $level): void{
+    public function handleValue($value, World $world): void{
         if($value){
-            $level->startTime();
+            $world->startTime();
         }else{
-            $level->stopTime();
+            $world->stopTime();
         }
     }
 }

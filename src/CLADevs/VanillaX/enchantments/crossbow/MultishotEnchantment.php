@@ -3,8 +3,10 @@
 namespace CLADevs\VanillaX\enchantments\crossbow;
 
 use CLADevs\VanillaX\enchantments\utils\EnchantmentTrait;
-use pocketmine\data\bedrock\EnchantmentIdMap;
 use pocketmine\data\bedrock\EnchantmentIds;
+use pocketmine\item\enchantment\Enchantment;
+use pocketmine\item\enchantment\ItemFlags;
+use pocketmine\item\enchantment\Rarity;
 use pocketmine\item\Item;
 use pocketmine\item\ItemIds;
 
@@ -13,11 +15,11 @@ class MultishotEnchantment extends Enchantment{
 
     public function __construct(){
         //TODO
-        parent::__construct(self::MULTISHOT, "%enchantment.crossbowMultishot", self::RARITY_RARE, self::$SLOT_CROSSBOW, self::SLOT_NONE, 1);
+        parent::__construct(EnchantmentIds::MULTISHOT, "%enchantment.crossbowMultishot", Rarity::RARE, self::$SLOT_CROSSBOW, ItemFlags::NONE, 1);
     }
 
     public function getIncompatibles(): array{
-        return [self::PIERCING];
+        return [EnchantmentIds::PIERCING];
     }
 
     public function isItemCompatible(Item $item): bool{

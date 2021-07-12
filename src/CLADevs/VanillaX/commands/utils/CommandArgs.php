@@ -3,8 +3,8 @@
 namespace CLADevs\VanillaX\commands\utils;
 
 use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
-use pocketmine\network\mcpe\protocol\types\CommandEnum;
-use pocketmine\network\mcpe\protocol\types\CommandParameter;
+use pocketmine\network\mcpe\protocol\types\command\CommandEnum;
+use pocketmine\network\mcpe\protocol\types\command\CommandParameter;
 use pocketmine\network\mcpe\protocol\types\PlayerPermissions;
 
 class CommandArgs{
@@ -76,9 +76,7 @@ class CommandArgs{
             return false;
         }
         if($name !== null){
-            $enum = new CommandEnum();
-            $enum->enumName = $name;
-            $enum->enumValues = $values;
+            $enum = new CommandEnum($name, $values);
         }
         $parameter->enum = $name === null ? null : $enum;
         return true;

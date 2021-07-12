@@ -9,11 +9,10 @@ use CLADevs\VanillaX\entities\utils\villager\VillagerTradeNBTStream;
 use CLADevs\VanillaX\entities\VanillaEntity;
 use CLADevs\VanillaX\inventories\types\TradeInventory;
 use CLADevs\VanillaX\VanillaX;
-use pocketmine\level\Level;
+use pocketmine\entity\EntitySizeInfo;
 use pocketmine\nbt\tag\CompoundTag;
-use pocketmine\nbt\tag\IntTag;
-use pocketmine\nbt\tag\StringTag;
-use pocketmine\network\mcpe\protocol\types\WindowTypes;
+use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataProperties;
+use pocketmine\network\mcpe\protocol\types\entity\IntMetadataProperty;
 use pocketmine\player\Player;
 
 class VillagerEntity extends VanillaEntity implements EntityInteractable{
@@ -36,53 +35,58 @@ class VillagerEntity extends VanillaEntity implements EntityInteractable{
     private int $experience = 0;
     private string $offerBuffer;
 
-    public function __construct(Level $level, CompoundTag $nbt){
-        parent::__construct($level, $nbt);
+    protected function initEntity(CompoundTag $nbt): void{
+        parent::initEntity($nbt);
+        $this->setMaxHealth(20);
         $this->inventory = new TradeInventory($this);
         /** Tier */
-        if($nbt->hasTag(self::TAG_TIER, IntTag::class)){
+        if(($tag = $nbt->getTag(self::TAG_TIER)) !== null){
             $this->tier = $nbt->getInt(self::TAG_TIER);
         }else{
             $this->tier = VillagerProfession::TIER_NOVICE;
         }
         /** Experience */
-        if($nbt->hasTag(self::TAG_EXPERIENCE, IntTag::class)){
+        if(($tag = $nbt->getTag(self::TAG_EXPERIENCE)) !== null){
             $this->experience = $nbt->getInt(self::TAG_EXPERIENCE);
         }
         /** Profession */
-        if($nbt->hasTag(self::TAG_PROFESSION, IntTag::class)){
+        if(($tag = $nbt->getTag(self::TAG_PROFESSION)) !== null){
             $profession = $nbt->getInt(self::TAG_PROFESSION);
         }else{
             $profession = mt_rand(VillagerProfession::UNEMPLOYED, VillagerProfession::NITWIT);
         }
         $this->profession = VillagerProfession::getProfession($profession);
 
-        if($hasOfferBuffer = $this->namedtag->hasTag(self::TAG_OFFER_BUFFER, StringTag::class)){
-            $this->offerBuffer = $this->namedtag->getString(self::TAG_OFFER_BUFFER);
+        if($hasOfferBuffer = ($tag = $nbt->getTag(self::TAG_OFFER_BUFFER)) !== null){
+            $this->offerBuffer = $nbt->getString(self::TAG_OFFER_BUFFER);
         }
         $this->setProfession($this->profession, VillagerProfession::BIOME_PLAINS, $hasOfferBuffer);
         $this->setTier($this->tier);
         $this->setExperience($this->experience);
-        $this->propertyManager->setInt(self::DATA_MAX_TRADE_TIER, VillagerProfession::TIER_MASTER);
+        $this->getNetworkProperties()->setInt(EntityMetadataProperties::MAX_TRADE_TIER, VillagerProfession::TIER_MASTER);
     }
 
     public function getName(): string{
         return "Villager";
     }
 
-    protected function initEntity(): void{
-        parent::initEntity();
-        $this->setMaxHealth(20);
+    protected function getInitialSizeInfo(): EntitySizeInfo{
+        return new EntitySizeInfo($this->height, $this->width);
     }
 
-    public function saveNBT(): void{
-        $this->namedtag->setInt(self::TAG_PROFESSION, $this->profession->getId());
+    public static function getNetworkTypeId(): string{
+        return self::NETWORK_ID;
+    }
+
+    public function saveNBT(): CompoundTag{
+        $nbt = parent::saveNBT();
+        $nbt->setInt(self::TAG_PROFESSION, $this->profession->getId());
         if($this->profession->hasTrades()){
-            $this->namedtag->setInt(self::TAG_TIER, $this->tier);
-            $this->namedtag->setInt(self::TAG_EXPERIENCE, $this->experience);
-            $this->namedtag->setString(self::TAG_OFFER_BUFFER, $this->offerBuffer);
+            $nbt->setInt(self::TAG_TIER, $this->tier);
+            $nbt->setInt(self::TAG_EXPERIENCE, $this->experience);
+            $nbt->setString(self::TAG_OFFER_BUFFER, $this->offerBuffer);
         }
-        parent::saveNBT();
+        return $nbt;
     }
 
     public function setTier(int $tier): void{
@@ -91,7 +95,7 @@ class VillagerEntity extends VanillaEntity implements EntityInteractable{
         }elseif($tier > VillagerProfession::TIER_MASTER){
             $tier = VillagerProfession::TIER_MASTER;
         }
-        $this->propertyManager->setInt(self::DATA_TRADE_TIER, $tier);
+        $this->getNetworkProperties()->setInt(EntityMetadataProperties::TRADE_TIER, $tier);
         $this->tier = $tier;
     }
 
@@ -112,7 +116,7 @@ class VillagerEntity extends VanillaEntity implements EntityInteractable{
             $experience = 0;
             $this->setTier($this->tier + 1);
         }
-        $this->propertyManager->setInt(self::DATA_TRADE_XP, $experience);
+        $this->getNetworkProperties()->setInt(EntityMetadataProperties::TRADE_XP, $experience);
         $this->experience = $experience;
     }
 
@@ -133,7 +137,7 @@ class VillagerEntity extends VanillaEntity implements EntityInteractable{
             $stream->initialize();
             $this->offerBuffer = $stream->getBuffer();
         }
-        $this->propertyManager->setInt(self::DATA_VARIANT, $profession->getId());
+        $this->getNetworkProperties()->setInt(EntityMetadataProperties::VARIANT, $profession->getId());
         $this->setBiomeType($biomeId);
     }
 
@@ -145,11 +149,16 @@ class VillagerEntity extends VanillaEntity implements EntityInteractable{
         if($type < VillagerProfession::BIOME_PLAINS || $type > VillagerProfession::BIOME_TAIGA){
             $type = VillagerProfession::BIOME_PLAINS;
         }
-        $this->propertyManager->setInt(self::DATA_MARK_VARIANT, $type);
+        $this->getNetworkProperties()->setInt(EntityMetadataProperties::MARK_VARIANT, $type);
     }
 
     public function getBiomeType(): int{
-        return $this->propertyManager->getInt(self::DATA_MARK_VARIANT) ?? VillagerProfession::BIOME_PLAINS;
+        /** @var IntMetadataProperty $data */
+        $data = $this->getNetworkProperties()->getAll()[EntityMetadataProperties::MARK_VARIANT] ?? null;
+        if($data !== null){
+            $data = $data->getValue();
+        }
+        return $data ?? VillagerProfession::BIOME_PLAINS;
     }
 
     public function setOfferBuffer(string $offerBuffer): void{
@@ -173,7 +182,7 @@ class VillagerEntity extends VanillaEntity implements EntityInteractable{
             $player = $result->getPlayer();
             $this->customer = $player;
             VanillaX::getInstance()->getSessionManager()->get($player)->setTradingEntity($this);
-            $player->addWindow($this->inventory, WindowTypes::TRADING);
+            $player->setCurrentWindow($this->inventory);
         }
     }
 

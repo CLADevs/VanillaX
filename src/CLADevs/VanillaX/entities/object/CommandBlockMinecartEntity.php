@@ -2,7 +2,9 @@
 
 namespace CLADevs\VanillaX\entities\object;
 
+use pocketmine\network\mcpe\protocol\types\entity\EntityIds;
+
 class CommandBlockMinecartEntity extends MinecartEntity{
 
-    const NETWORK_ID = self::COMMAND_BLOCK_MINECART;
+    const NETWORK_ID = EntityIds::COMMAND_BLOCK_MINECART;
 }

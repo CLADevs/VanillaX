@@ -7,21 +7,36 @@ use CLADevs\VanillaX\entities\utils\ItemHelper;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
+use pocketmine\entity\EntitySizeInfo;
+use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\network\mcpe\protocol\types\entity\EntityIds;
 
 class ParrotEntity extends VanillaEntity{
 
-    const NETWORK_ID = self::PARROT;
+    const NETWORK_ID = EntityIds::PARROT;
 
-    public $width = 0.5;
-    public $height = 1;
+    public float $width = 0.5;
+    public float $height = 1;
 
-    protected function initEntity(): void{
-        parent::initEntity();
+    protected function initEntity(CompoundTag $nbt): void{
+        parent::initEntity($nbt);
         $this->setMaxHealth(6);
     }
 
     public function getName(): string{
         return "Parrot";
+    }
+
+    protected function getInitialSizeInfo(): EntitySizeInfo{
+        return new EntitySizeInfo($this->height, $this->width);
+    }
+
+    public static function getNetworkTypeId(): string{
+        return self::NETWORK_ID;
+    }
+    
+    public function getXpDropAmount(): int{
+        return $this->getLastHitByPlayer() ? mt_rand(1,3) : 0;
     }
  
     /**
@@ -31,9 +46,5 @@ class ParrotEntity extends VanillaEntity{
         $feather = ItemFactory::getInstance()->get(ItemIds::FEATHER, 0, 1);
         ItemHelper::applySetCount($feather, 1, 2);
         return [$feather];
-    }
-    
-    public function getXpDropAmount(): int{
-        return $this->getLastHitByPlayer() ? mt_rand(1,3) : 0;
     }
 }

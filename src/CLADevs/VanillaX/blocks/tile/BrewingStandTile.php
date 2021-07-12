@@ -6,14 +6,14 @@ use CLADevs\VanillaX\blocks\utils\TileVanilla;
 use CLADevs\VanillaX\inventories\types\BrewingStandInventory;
 use CLADevs\VanillaX\VanillaX;
 use pocketmine\block\BlockLegacyIds;
+use pocketmine\block\tile\Container;
+use pocketmine\block\tile\ContainerTrait;
+use pocketmine\block\tile\Nameable;
+use pocketmine\block\tile\NameableTrait;
+use pocketmine\block\tile\Spawnable;
 use pocketmine\item\Item;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\network\mcpe\protocol\LevelSoundEventPacket;
-use pocketmine\tile\Container;
-use pocketmine\tile\ContainerTrait;
-use pocketmine\tile\Nameable;
-use pocketmine\tile\NameableTrait;
-use pocketmine\tile\Spawnable;
 
 class BrewingStandTile extends Spawnable implements Container, Nameable{
     use ContainerTrait, NameableTrait;
@@ -147,7 +147,7 @@ class BrewingStandTile extends Spawnable implements Container, Nameable{
                 }
                 $this->inventory->decreaseIngredient();
                 $this->setFuelAmount($this->fuelAmount - 1, true);
-                $this->getLevel()->broadcastLevelSoundEvent($this, LevelSoundEventPacket::SOUND_POTION_BREWED);
+                $this->getPos()->getWorld()->broadcastPacketToViewers($this->getPos(), LevelSoundEventPacket::create(LevelSoundEventPacket::SOUND_POTION_BREWED, $this->getPos()));
 
                 if($this->fuelAmount <= 0 && !$this->inventory->getFuel()->isNull()){
                     $this->inventory->decreaseFuel();
@@ -160,26 +160,27 @@ class BrewingStandTile extends Spawnable implements Container, Nameable{
 
     public function close(): void{
         foreach($this->inventory->getContents() as $item){
-            $this->getLevel()->dropItem($this, $item);
+            $this->getPos()->getWorld()->dropItem($this->getPos(), $item);
         }
         $this->inventory->clearAll();
         parent::close();
     }
 
-    protected function readSaveData(CompoundTag $nbt): void{
+    public function readSaveData(CompoundTag $nbt): void{
         $this->inventory = new BrewingStandInventory($this);
         $this->loadItems($nbt);
         $this->loadName($nbt);
-        if($nbt->hasTag($tag = self::TAG_BREW_TIME)){
-            $this->brewTime = $nbt->getInt($tag);
+        if(($tag = $nbt->getTag(self::TAG_BREW_TIME)) !== null){
+            $this->brewTime = $tag->getValue();
         }
-        if($nbt->hasTag($tag = self::TAG_FUEL_AMOUNT)){
-            $this->fuelAmount = $nbt->getInt($tag);
+        if(($tag = $nbt->getTag(self::TAG_FUEL_AMOUNT)) !== null){
+            $this->fuelAmount = $tag->getValue();
         }
-        if($nbt->hasTag($tag = self::TAG_FUEL_TOTAL)){
-            $this->fuelTotal = $nbt->getInt($tag);
+        if(($tag = $nbt->getTag(self::TAG_FUEL_TOTAL)) !== null){
+            $this->fuelTotal = $tag->getValue();
         }
-        $this->scheduleUpdate();
+        //TODO repeating tick
+        //$this->scheduleUpdate();
     }
 
     protected function writeSaveData(CompoundTag $nbt): void{

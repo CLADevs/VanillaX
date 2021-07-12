@@ -4,19 +4,21 @@ namespace CLADevs\VanillaX\enchantments\armors\boots;
 
 use CLADevs\VanillaX\enchantments\utils\EnchantmentTrait;
 use CLADevs\VanillaX\items\ItemManager;
-use pocketmine\data\bedrock\EnchantmentIdMap;
 use pocketmine\data\bedrock\EnchantmentIds;
+use pocketmine\item\enchantment\Enchantment;
+use pocketmine\item\enchantment\ItemFlags;
+use pocketmine\item\enchantment\Rarity;
 use pocketmine\item\Item;
 
 class DepthStriderEnchantment extends Enchantment{
     use EnchantmentTrait;
 
     public function __construct(){
-        parent::__construct(self::DEPTH_STRIDER, "%enchantment.waterWalker", self::RARITY_RARE, self::SLOT_FEET, self::SLOT_NONE, 3);
+        parent::__construct(EnchantmentIds::DEPTH_STRIDER, "%enchantment.waterWalker", Rarity::RARE, ItemFlags::FEET, ItemFlags::NONE, 3);
     }
 
     public function getIncompatibles(): array{
-        return [self::FROST_WALKER];
+        return [EnchantmentIds::FROST_WALKER];
     }
 
     public function isItemCompatible(Item $item): bool{

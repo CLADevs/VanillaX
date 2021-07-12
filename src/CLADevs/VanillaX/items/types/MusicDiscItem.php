@@ -4,6 +4,8 @@ namespace CLADevs\VanillaX\items\types;
 
 use CLADevs\VanillaX\utils\item\NonAutomaticCallItemTrait;
 use pocketmine\item\Item;
+use pocketmine\item\ItemIdentifier;
+use pocketmine\item\ItemIds;
 
 class MusicDiscItem extends Item implements NonAutomaticCallItemTrait{
 
@@ -11,8 +13,8 @@ class MusicDiscItem extends Item implements NonAutomaticCallItemTrait{
 
     private ?int $soundId;
 
-    public function __construct(int $id, int $meta = 0, string $name = "Unknown", ?int $soundId = null){
-        parent::__construct($id, $meta, $name);
+    public function __construct(int $id, string $name = "Unknown", ?int $soundId = null){
+        parent::__construct(new ItemIdentifier($id, 0), $name);
         $this->soundId = $soundId;
     }
 
@@ -22,37 +24,37 @@ class MusicDiscItem extends Item implements NonAutomaticCallItemTrait{
 
     public static function getRecordName(int $id, bool $returnNull = false): ?string{
         switch($id){
-            case self::RECORD_CAT:
+            case ItemIds::RECORD_CAT:
                 $name = "cat";
                 break;
-            case self::RECORD_BLOCKS:
+            case ItemIds::RECORD_BLOCKS:
                 $name = "blocks";
                 break;
-            case self::RECORD_CHIRP:
+            case ItemIds::RECORD_CHIRP:
                 $name = "chirp";
                 break;
-            case self::RECORD_FAR:
+            case ItemIds::RECORD_FAR:
                 $name = "far";
                 break;
-            case self::RECORD_MALL:
+            case ItemIds::RECORD_MALL:
                 $name = "mall";
                 break;
-            case self::RECORD_MELLOHI:
+            case ItemIds::RECORD_MELLOHI:
                 $name = "mellohi";
                 break;
-            case self::RECORD_STAL:
+            case ItemIds::RECORD_STAL:
                 $name = "stal";
                 break;
-            case self::RECORD_STRAD:
+            case ItemIds::RECORD_STRAD:
                 $name = "strad";
                 break;
-            case self::RECORD_WARD:
+            case ItemIds::RECORD_WARD:
                 $name = "ward";
                 break;
-            case self::RECORD_11:
+            case ItemIds::RECORD_11:
                 $name = "11";
                 break;
-            case self::RECORD_WAIT:
+            case ItemIds::RECORD_WAIT:
                 $name = "wait";
                 break;
             case self::RECORD_PIGSTEP:
@@ -71,26 +73,26 @@ class MusicDiscItem extends Item implements NonAutomaticCallItemTrait{
      */
     public static function getRecordLength(int $id): int{
         switch($id){
-            case self::RECORD_CHIRP:
-            case self::RECORD_CAT:
+            case ItemIds::RECORD_CHIRP:
+            case ItemIds::RECORD_CAT:
                 return (60 * 3) + 5;
-            case self::RECORD_BLOCKS:
+            case ItemIds::RECORD_BLOCKS:
                 return (60 * 5) + 45;
-            case self::RECORD_FAR:
+            case ItemIds::RECORD_FAR:
                 return (60 * 2) + 54;
-            case self::RECORD_MALL:
+            case ItemIds::RECORD_MALL:
                 return (60 * 3) + 17;
-            case self::RECORD_MELLOHI:
+            case ItemIds::RECORD_MELLOHI:
                 return 60 + 36;
-            case self::RECORD_STAL:
+            case ItemIds::RECORD_STAL:
                 return (60 * 2) + 30;
-            case self::RECORD_STRAD:
+            case ItemIds::RECORD_STRAD:
                 return (60 * 3) + 8;
-            case self::RECORD_WARD:
+            case ItemIds::RECORD_WARD:
                 return (60 * 4) + 11;
-            case self::RECORD_11:
+            case ItemIds::RECORD_11:
                 return 60 + 11;
-            case self::RECORD_WAIT:
+            case ItemIds::RECORD_WAIT:
                 return (60 * 3) + 51;
             case self::RECORD_PIGSTEP:
                 return (60 * 2) + 28;

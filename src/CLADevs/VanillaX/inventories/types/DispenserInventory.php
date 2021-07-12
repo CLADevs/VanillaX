@@ -4,12 +4,12 @@ namespace CLADevs\VanillaX\inventories\types;
 
 use CLADevs\VanillaX\inventories\FakeBlockInventory;
 use pocketmine\block\BlockLegacyIds;
-use pocketmine\math\Vector3;
-use pocketmine\network\mcpe\protocol\types\WindowTypes;
+use pocketmine\network\mcpe\protocol\types\inventory\WindowTypes;
+use pocketmine\world\Position;
 
 class DispenserInventory extends FakeBlockInventory{
 
-    public function __construct(Vector3 $holder){
+    public function __construct(Position $holder){
         parent::__construct($holder, 9, BlockLegacyIds::AIR, WindowTypes::DISPENSER);
     }
 }

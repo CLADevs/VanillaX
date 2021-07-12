@@ -2,27 +2,41 @@
 
 namespace CLADevs\VanillaX\entities\passive;
 
-use CLADevs\VanillaX\entities\utils\interfaces\EntityClassification;
 use CLADevs\VanillaX\entities\VanillaEntity;
 use CLADevs\VanillaX\entities\utils\ItemHelper;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
+use pocketmine\entity\EntitySizeInfo;
+use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\network\mcpe\protocol\types\entity\EntityIds;
 
 class ZombieHorseEntity extends VanillaEntity{
 
-    const NETWORK_ID = self::ZOMBIE_HORSE;
+    const NETWORK_ID = EntityIds::ZOMBIE_HORSE;
 
-    public $width = 1.4;
-    public $height = 1.6;
+    public float $width = 1.4;
+    public float $height = 1.6;
 
-    protected function initEntity(): void{
-        parent::initEntity();
+    protected function initEntity(CompoundTag $nbt): void{
+        parent::initEntity($nbt);
         $this->setMaxHealth(15);
     }
 
     public function getName(): string{
-        return "Zombie Horse";
+        return "Zombie_Horse";
+    }
+
+    protected function getInitialSizeInfo(): EntitySizeInfo{
+        return new EntitySizeInfo($this->height, $this->width);
+    }
+
+    public static function getNetworkTypeId(): string{
+        return self::NETWORK_ID;
+    }
+    
+    public function getXpDropAmount(): int{
+        return $this->getLastHitByPlayer() ? mt_rand(1,3) : 0;
     }
  
     /**
@@ -33,13 +47,5 @@ class ZombieHorseEntity extends VanillaEntity{
         ItemHelper::applySetCount($rotten_flesh, 0, 2);
         ItemHelper::applyLootingEnchant($this, $rotten_flesh);
         return [$rotten_flesh];
-    }
-    
-    public function getXpDropAmount(): int{
-        return $this->getLastHitByPlayer() ? mt_rand(1,3) : 0;
-    }
-
-    public function getClassification(): int{
-        return EntityClassification::UNDEAD;
     }
 }

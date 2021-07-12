@@ -5,8 +5,8 @@ namespace CLADevs\VanillaX\inventories\actions;
 use CLADevs\VanillaX\inventories\types\EnchantInventory;
 use pocketmine\block\BlockLegacyIds;
 use pocketmine\inventory\transaction\action\InventoryAction;
+use pocketmine\inventory\transaction\TransactionValidationException;
 use pocketmine\item\Item;
-use pocketmine\network\mcpe\protocol\types\WindowTypes;
 use pocketmine\player\Player;
 
 class EnchantItemAction extends InventoryAction{
@@ -18,23 +18,18 @@ class EnchantItemAction extends InventoryAction{
         $this->sourceType = $sourceType;
     }
 
-    public function isValid(Player $source): bool{
-        return $source->getWindow(WindowTypes::ENCHANTMENT) !== null;
-    }
-
-    public function execute(Player $source): bool{
-        return true;
-    }
-
-    public function onExecuteSuccess(Player $source): void{
-        $inv = $source->getWindow(WindowTypes::ENCHANTMENT);
+    public function execute(Player $source): void{
+        $inv = $source->getCurrentWindow();
 
         if($inv instanceof EnchantInventory && $this->targetItem->getId() === BlockLegacyIds::AIR){
             $inv->onSuccess($source, $this->sourceItem);
         }
     }
 
-    public function onExecuteFail(Player $source): void{
+    public function validate(Player $source): void{
+        if(!$source->getCurrentWindow() instanceof EnchantInventory){
+            throw new TransactionValidationException("Enchantment Inventory is not opened");
+        }
     }
 
     public function getType(): int{

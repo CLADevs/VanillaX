@@ -7,32 +7,36 @@ use CLADevs\VanillaX\entities\utils\ItemHelper;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
+use pocketmine\entity\EntitySizeInfo;
+use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\network\mcpe\protocol\types\entity\EntityIds;
 
 class CatEntity extends VanillaEntity{
 
-    const NETWORK_ID = self::CAT;
+    const NETWORK_ID = EntityIds::CAT;
 
-    public $width = 0.6;
-    public $height = 0.7;
-    
-    public bool $isWild = true;
+    public float $width = 0.6;
+    public float $height = 0.7;
 
-    protected function initEntity(): void{
-        parent::initEntity();
-        $this->initializeHealth();
-    }
-
-    protected function initializeHealth(): void{
-        if($this->isWild){
-            $health = 10;
-        }else{
-            $health = 20;
-        }
-        $this->setMaxHealth($health);
+    protected function initEntity(CompoundTag $nbt): void{
+        parent::initEntity($nbt);
+        
     }
 
     public function getName(): string{
         return "Cat";
+    }
+
+    protected function getInitialSizeInfo(): EntitySizeInfo{
+        return new EntitySizeInfo($this->height, $this->width);
+    }
+
+    public static function getNetworkTypeId(): string{
+        return self::NETWORK_ID;
+    }
+    
+    public function getXpDropAmount(): int{
+        return $this->getLastHitByPlayer() ? mt_rand(1,3) : 0;
     }
  
     /**
@@ -42,9 +46,5 @@ class CatEntity extends VanillaEntity{
         $string = ItemFactory::getInstance()->get(ItemIds::STRING, 0, 1);
         ItemHelper::applySetCount($string, 0, 2);
         return [$string];
-    }
-    
-    public function getXpDropAmount(): int{
-        return $this->getLastHitByPlayer() ? mt_rand(1,3) : 0;
     }
 }

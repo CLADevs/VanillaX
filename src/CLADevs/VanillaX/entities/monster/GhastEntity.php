@@ -7,21 +7,36 @@ use CLADevs\VanillaX\entities\utils\ItemHelper;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
+use pocketmine\entity\EntitySizeInfo;
+use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\network\mcpe\protocol\types\entity\EntityIds;
 
 class GhastEntity extends VanillaEntity{
 
-    const NETWORK_ID = self::GHAST;
+    const NETWORK_ID = EntityIds::GHAST;
 
-    public $width = 4;
-    public $height = 4;
+    public float $width = 4;
+    public float $height = 4;
 
-    protected function initEntity(): void{
-        parent::initEntity();
+    protected function initEntity(CompoundTag $nbt): void{
+        parent::initEntity($nbt);
         $this->setMaxHealth(10);
     }
 
     public function getName(): string{
         return "Ghast";
+    }
+
+    protected function getInitialSizeInfo(): EntitySizeInfo{
+        return new EntitySizeInfo($this->height, $this->width);
+    }
+
+    public static function getNetworkTypeId(): string{
+        return self::NETWORK_ID;
+    }
+    
+    public function getXpDropAmount(): int{
+        return $this->getLastHitByPlayer() ? 5 + (count($this->getArmorInventory()->getContents()) * mt_rand(1,3)) : 0;
     }
  
     /**
@@ -36,9 +51,5 @@ class GhastEntity extends VanillaEntity{
         ItemHelper::applySetCount($gunpowder, 0, 2);
         ItemHelper::applyLootingEnchant($this, $gunpowder);
         return [$ghast_tear, $gunpowder];
-    }
-    
-    public function getXpDropAmount(): int{
-        return $this->getLastHitByPlayer() ? 5 + (count($this->getArmorInventory()->getContents()) * mt_rand(1,3)) : 0;
     }
 }

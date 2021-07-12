@@ -7,21 +7,36 @@ use CLADevs\VanillaX\entities\utils\ItemHelper;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
+use pocketmine\entity\EntitySizeInfo;
+use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\network\mcpe\protocol\types\entity\EntityIds;
 
 class CowEntity extends VanillaEntity{
 
-    const NETWORK_ID = self::COW;
+    const NETWORK_ID = EntityIds::COW;
 
-    public $width = 0.9;
-    public $height = 1.3;
+    public float $width = 0.9;
+    public float $height = 1.3;
 
-    protected function initEntity(): void{
-        parent::initEntity();
+    protected function initEntity(CompoundTag $nbt): void{
+        parent::initEntity($nbt);
         $this->setMaxHealth(10);
     }
 
     public function getName(): string{
         return "Cow";
+    }
+
+    protected function getInitialSizeInfo(): EntitySizeInfo{
+        return new EntitySizeInfo($this->height, $this->width);
+    }
+
+    public static function getNetworkTypeId(): string{
+        return self::NETWORK_ID;
+    }
+    
+    public function getXpDropAmount(): int{
+        return $this->getLastHitByPlayer() ? mt_rand(1,3) : 0;
     }
  
     /**
@@ -34,12 +49,8 @@ class CowEntity extends VanillaEntity{
          
         $beef = ItemFactory::getInstance()->get(ItemIds::RAW_BEEF, 0, 1);
         ItemHelper::applySetCount($beef, 1, 3);
-        if($this->isOnFire()) ItemHelper::applyFurnaceSmelt($beef);
+        ItemHelper::applyFurnaceSmelt($beef);
         ItemHelper::applyLootingEnchant($this, $beef);
         return [$leather, $beef];
-    }
-    
-    public function getXpDropAmount(): int{
-        return $this->getLastHitByPlayer() ? mt_rand(1,3) : 0;
     }
 }

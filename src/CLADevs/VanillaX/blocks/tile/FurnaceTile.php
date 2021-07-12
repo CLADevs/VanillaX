@@ -2,19 +2,15 @@
 
 namespace CLADevs\VanillaX\blocks\tile;
 
+use CLADevs\VanillaX\blocks\utils\TileVanilla;
 use pocketmine\block\BlockLegacyIds;
-use pocketmine\inventory\Inventory;
-use pocketmine\inventory\InventoryEventProcessor;
-use pocketmine\item\Item;
-use pocketmine\item\ItemIds;
-use pocketmine\level\Position;
+use pocketmine\block\tile\Furnace;
 use pocketmine\nbt\tag\CompoundTag;
-use pocketmine\nbt\tag\FloatTag;
-use pocketmine\tile\Furnace;
+use pocketmine\world\Position;
 
 class FurnaceTile extends Furnace{
 
-    const TILE_ID = self::FURNACE;
+    const TILE_ID = TileVanilla::FURNACE;
     const TILE_BLOCK = BlockLegacyIds::FURNACE;
 
     private float $xpHolder = 0.0;
@@ -24,27 +20,28 @@ class FurnaceTile extends Furnace{
         $nbt->setFloat("xpHolder", $this->xpHolder);
     }
 
-    protected function readSaveData(CompoundTag $nbt): void{
+    public function readSaveData(CompoundTag $nbt): void{
         parent::readSaveData($nbt);
 
-        if($nbt->hasTag("xpHolder", FloatTag::class)){
-            $this->xpHolder = $nbt->getFloat("xpHolder", 0.0);
+        if(($tag = $nbt->getTag("xpHolder")) !== null){
+            $this->xpHolder = $tag->getValue();
         }
-        $this->inventory->setEventProcessor(new class($this) implements InventoryEventProcessor{
-            private FurnaceTile $furnace;
-
-            public function __construct(FurnaceTile $furnace){
-                $this->furnace = $furnace;
-            }
-
-            public function onSlotChange(Inventory $inventory, int $slot, Item $oldItem, Item $newItem) : ?Item{
-                if($slot === 2 && $oldItem->getId() !== ItemIds::AIR && $newItem->getId() === ItemIds::AIR){
-                    $this->furnace->dropXpHolder($this->furnace->asPosition());
-                }
-                $this->furnace->scheduleUpdate();
-                return $newItem;
-            }
-        });
+        //todo give xp when received output item
+//        $this->inventory->setEventProcessor(new class($this) implements InventoryEventProcessor{
+//            private FurnaceTile $furnace;
+//
+//            public function __construct(FurnaceTile $furnace){
+//                $this->furnace = $furnace;
+//            }
+//
+//            public function onSlotChange(Inventory $inventory, int $slot, Item $oldItem, Item $newItem) : ?Item{
+//                if($slot === 2 && $oldItem->getId() !== ItemIds::AIR && $newItem->getId() === ItemIds::AIR){
+//                    $this->furnace->dropXpHolder($this->furnace->asPosition());
+//                }
+//                $this->furnace->scheduleUpdate();
+//                return $newItem;
+//            }
+//        });
     }
 
     public function getXpHolder(): float{
@@ -59,7 +56,7 @@ class FurnaceTile extends Furnace{
         $xpHolder = $this->xpHolder;
 
         if($xpHolder > 0.1){
-            $position->getLevel()->dropExperience($position, intval($xpHolder * 10));
+            $position->getWorld()->dropExperience($position, intval($xpHolder * 10));
             $this->xpHolder = 0.0;
         }
     }

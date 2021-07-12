@@ -6,11 +6,13 @@ use CLADevs\VanillaX\items\ItemIdentifiers;
 use pocketmine\entity\Effect;
 use pocketmine\entity\EffectInstance;
 use pocketmine\item\Food;
+use pocketmine\item\ItemIdentifier;
+use pocketmine\item\ItemIds;
 
 class SuspiciousStewItem extends Food{
 
-    public function __construct(int $meta = 0){
-        parent::__construct(ItemIdentifiers::SUSPICIOUS_STEW, $meta, "Suspicious Stew");
+    public function __construct(){
+        parent::__construct(new ItemIdentifier(ItemIdentifiers::SUSPICIOUS_STEW, 0), "Suspicious Stew");
     }
 
     public function getMaxStackSize(): int{

@@ -3,19 +3,14 @@
 namespace CLADevs\VanillaX\items\types\netherite;
 
 use CLADevs\VanillaX\items\ItemIdentifiers;
+use pocketmine\inventory\ArmorInventory;
 use pocketmine\item\Armor;
+use pocketmine\item\ArmorTypeInfo;
+use pocketmine\item\ItemIdentifier;
 
 class NetheriteBoots extends Armor{
 
-    public function __construct(int $meta = 0){
-        parent::__construct(ItemIdentifiers::NETHERITE_BOOTS, $meta, "Netherite Boots");
-    }
-
-    public function getDefensePoints(): int{
-        return 3;
-    }
-
-    public function getMaxDurability(): int{
-        return 482;
+    public function __construct(){
+        parent::__construct(new ItemIdentifier(ItemIdentifiers::NETHERITE_BOOTS, 0), "Netherite Boots", new ArmorTypeInfo(3, 482, ArmorInventory::SLOT_FEET));
     }
 }

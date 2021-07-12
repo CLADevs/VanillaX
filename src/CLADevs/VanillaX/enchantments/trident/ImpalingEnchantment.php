@@ -3,8 +3,10 @@
 namespace CLADevs\VanillaX\enchantments\trident;
 
 use CLADevs\VanillaX\enchantments\utils\EnchantmentTrait;
-use pocketmine\data\bedrock\EnchantmentIdMap;
 use pocketmine\data\bedrock\EnchantmentIds;
+use pocketmine\item\enchantment\Enchantment;
+use pocketmine\item\enchantment\ItemFlags;
+use pocketmine\item\enchantment\Rarity;
 use pocketmine\item\Item;
 use pocketmine\item\ItemIds;
 
@@ -12,7 +14,7 @@ class ImpalingEnchantment extends Enchantment{
     use EnchantmentTrait;
 
     public function __construct(){
-        parent::__construct(self::IMPALING, "%enchantment.tridentImpaling", self::RARITY_RARE, self::SLOT_TRIDENT, self::SLOT_NONE, 5);
+        parent::__construct(EnchantmentIds::IMPALING, "%enchantment.tridentImpaling", Rarity::RARE, ItemFlags::TRIDENT, ItemFlags::NONE, 5);
     }
 
     public function isItemCompatible(Item $item): bool{

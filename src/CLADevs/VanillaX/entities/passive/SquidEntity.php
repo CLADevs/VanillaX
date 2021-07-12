@@ -2,27 +2,41 @@
 
 namespace CLADevs\VanillaX\entities\passive;
 
-use CLADevs\VanillaX\entities\utils\interfaces\EntityClassification;
 use CLADevs\VanillaX\entities\VanillaEntity;
 use CLADevs\VanillaX\entities\utils\ItemHelper;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
+use pocketmine\entity\EntitySizeInfo;
+use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\network\mcpe\protocol\types\entity\EntityIds;
 
 class SquidEntity extends VanillaEntity{
 
-    const NETWORK_ID = self::SQUID;
+    const NETWORK_ID = EntityIds::SQUID;
 
-    public $width = 0.95;
-    public $height = 0.95;
+    public float $width = 0.95;
+    public float $height = 0.95;
 
-    protected function initEntity(): void{
-        parent::initEntity();
+    protected function initEntity(CompoundTag $nbt): void{
+        parent::initEntity($nbt);
         $this->setMaxHealth(10);
     }
 
     public function getName(): string{
         return "Squid";
+    }
+
+    protected function getInitialSizeInfo(): EntitySizeInfo{
+        return new EntitySizeInfo($this->height, $this->width);
+    }
+
+    public static function getNetworkTypeId(): string{
+        return self::NETWORK_ID;
+    }
+    
+    public function getXpDropAmount(): int{
+        return !$this->isBaby() && $this->getLastHitByPlayer() ? mt_rand(1,3) : 0;
     }
  
     /**
@@ -34,13 +48,5 @@ class SquidEntity extends VanillaEntity{
         ItemHelper::applySetData($dye, 0);
         ItemHelper::applyLootingEnchant($this, $dye);
         return [$dye];
-    }
-    
-    public function getXpDropAmount(): int{
-        return !$this->isBaby() && $this->getLastHitByPlayer() ? mt_rand(1,3) : 0;
-    }
-
-    public function getClassification(): int{
-        return EntityClassification::AQUATIC;
     }
 }

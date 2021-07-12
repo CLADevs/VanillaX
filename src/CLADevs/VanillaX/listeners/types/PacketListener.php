@@ -6,12 +6,12 @@ use CLADevs\VanillaX\blocks\tile\CommandBlockTile;
 use CLADevs\VanillaX\entities\utils\EntityInteractResult;
 use CLADevs\VanillaX\entities\utils\interfaces\EntityInteractable;
 use CLADevs\VanillaX\entities\utils\interfaces\EntityRidable;
+use CLADevs\VanillaX\inventories\types\TradeInventory;
 use CLADevs\VanillaX\listeners\ListenerManager;
 use CLADevs\VanillaX\utils\instances\InteractButtonResult;
 use CLADevs\VanillaX\utils\item\InteractButtonItemTrait;
 use CLADevs\VanillaX\VanillaX;
-use pocketmine\block\BlockFactory;
-use pocketmine\block\BlockLegacyIds;
+use pocketmine\block\VanillaBlocks;
 use pocketmine\entity\Entity;
 use pocketmine\entity\Human;
 use pocketmine\event\inventory\InventoryTransactionEvent;
@@ -21,9 +21,8 @@ use pocketmine\event\server\DataPacketReceiveEvent;
 use pocketmine\event\server\DataPacketSendEvent;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
-use pocketmine\level\Position;
+use pocketmine\network\mcpe\convert\TypeConverter;
 use pocketmine\network\mcpe\protocol\ActorPickRequestPacket;
-use pocketmine\network\mcpe\protocol\AddPlayerPacket;
 use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
 use pocketmine\network\mcpe\protocol\CommandBlockUpdatePacket;
 use pocketmine\network\mcpe\protocol\ContainerClosePacket;
@@ -35,11 +34,15 @@ use pocketmine\network\mcpe\protocol\ProtocolInfo;
 use pocketmine\network\mcpe\protocol\SetDefaultGameTypePacket;
 use pocketmine\network\mcpe\protocol\SetDifficultyPacket;
 use pocketmine\network\mcpe\protocol\SetPlayerGameTypePacket;
+use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataProperties;
+use pocketmine\network\mcpe\protocol\types\entity\StringMetadataProperty;
 use pocketmine\network\mcpe\protocol\types\inventory\UseItemOnEntityTransactionData;
 use pocketmine\network\mcpe\protocol\types\inventory\UseItemTransactionData;
-use pocketmine\network\mcpe\protocol\types\WindowTypes;
+use pocketmine\permission\DefaultPermissions;
+use pocketmine\player\GameMode;
 use pocketmine\player\Player;
 use pocketmine\Server;
+use pocketmine\world\Position;
 
 class PacketListener implements Listener{
 
@@ -54,25 +57,13 @@ class PacketListener implements Listener{
     }
 
     public function onDataPacketSend(DataPacketSendEvent $event): void{
-        $packet = $event->getPacket();
-
         if(!$event->isCancelled()){
-            $player = $event->getPlayer();
-
-            switch($packet::NETWORK_ID){
-                case ProtocolInfo::AVAILABLE_COMMANDS_PACKET:
-                    if($packet instanceof AvailableCommandsPacket) $this->handleCommandEnum($packet);
-                    break;
-                case ProtocolInfo::ADD_PLAYER_PACKET:
-                    if($packet instanceof AddPlayerPacket){
-                        $p = Server::getInstance()->getPlayer($packet->username);
-
-                        if($p !== null){
-                            VanillaX::getInstance()->getSessionManager()->get($player)->getOffHandInventory()->sendContents();
-                            VanillaX::getInstance()->getSessionManager()->get($p)->getOffHandInventory()->sendContents();
-                        }
-                    }
-                    break;
+            foreach($event->getPackets() as $packet){
+                switch($packet::NETWORK_ID){
+                    case ProtocolInfo::AVAILABLE_COMMANDS_PACKET:
+                        if($packet instanceof AvailableCommandsPacket) $this->handleCommandEnum($packet);
+                        break;
+                }
             }
         }
     }
@@ -80,14 +71,14 @@ class PacketListener implements Listener{
     public function onDataPacketReceive(DataPacketReceiveEvent $event): void{
         if(!$event->isCancelled()){
             $packet = $event->getPacket();
-            $player = $event->getPlayer();
+            $player = $event->getOrigin()->getPlayer();
             $sessionManager = VanillaX::getInstance()->getSessionManager();
             $session = $sessionManager->has($player) ? $sessionManager->get($player) : null;
 
             if($session !== null && ($window = $session->getCurrentWindow()) !== null) $window->handlePacket($player, $packet);
             switch($packet::NETWORK_ID){
                 case ProtocolInfo::COMMAND_BLOCK_UPDATE_PACKET:
-                    if($packet instanceof CommandBlockUpdatePacket && $player->isOp()) $this->handleCommandBlock($player, $packet);
+                    if($packet instanceof CommandBlockUpdatePacket && $player->hasPermission(DefaultPermissions::ROOT_OPERATOR)) $this->handleCommandBlock($player, $packet);
                     break;
                 case ProtocolInfo::PLAYER_ACTION_PACKET:
                     if($packet instanceof PlayerActionPacket && in_array($packet->action, [PlayerActionPacket::ACTION_START_GLIDE, PlayerActionPacket::ACTION_STOP_GLIDE])){
@@ -99,26 +90,30 @@ class PacketListener implements Listener{
                     break;
                 case ProtocolInfo::SET_PLAYER_GAME_TYPE_PACKET:
                     /** Server Form Personal Game Type Setting */
-                    if($player->isOp() && $packet instanceof SetPlayerGameTypePacket){
-                        $player->setGamemode($packet->gamemode);
+                    if($player->hasPermission(DefaultPermissions::ROOT_OPERATOR) && $packet instanceof SetPlayerGameTypePacket){
+                        $player->setGamemode(GameMode::fromMagicNumber($packet->gamemode));
                     }
                     break;
                 case ProtocolInfo::SET_DEFAULT_GAME_TYPE_PACKET:
                     /** Server Form Default Game Type Setting */
-                    if($player->isOp() && $packet instanceof SetDefaultGameTypePacket){
-                        Server::getInstance()->setConfigInt("gamemode", $packet->gamemode);
+                    if($player->hasPermission(DefaultPermissions::ROOT_OPERATOR) && $packet instanceof SetDefaultGameTypePacket){
+                        Server::getInstance()->getConfigGroup()->setConfigInt("gamemode", $packet->gamemode);
                     }
                     break;
                 case ProtocolInfo::SET_DIFFICULTY_PACKET:
                     /** Server Form Difficulty Setting */
-                    if($player->isOp() && $packet instanceof SetDifficultyPacket){
-                        $player->getLevel()->setDifficulty($packet->difficulty);
+                    if($player->hasPermission(DefaultPermissions::ROOT_OPERATOR) && $packet instanceof SetDifficultyPacket){
+                        $player->getWorld()->setDifficulty($packet->difficulty);
                     }
                     break;
                 case ProtocolInfo::CONTAINER_CLOSE_PACKET:
                     /** Fixes Trading GUI issue */
                     if($packet instanceof ContainerClosePacket && $packet->windowId === 255){
-                        $player->removeWindow($player->getWindow(WindowTypes::TRADING));
+                        $inv = $player->getCurrentWindow();
+
+                        if($inv instanceof TradeInventory){
+                            $player->removeCurrentWindow();
+                        }
                     }
                     break;
                 case ProtocolInfo::INTERACT_PACKET:
@@ -155,8 +150,8 @@ class PacketListener implements Listener{
      * Changes server sided command block tile data
      */
     private function handleCommandBlock(Player $player, CommandBlockUpdatePacket $packet): void{
-        $position = new Position($packet->x, $packet->y, $packet->z, $player->getLevel());
-        $tile = $position->getLevel()->getTile($position);
+        $position = new Position($packet->x, $packet->y, $packet->z, $player->getWorld());
+        $tile = $position->getWorld()->getTile($position);
 
         if($tile instanceof CommandBlockTile){
             $tile->handleCommandBlockUpdateReceive($packet);
@@ -170,12 +165,18 @@ class PacketListener implements Listener{
      */
     private function handleInventoryTransaction(Player $player, InventoryTransactionPacket $packet): void{
         if($packet->trData instanceof UseItemOnEntityTransactionData && $packet->trData->getActionType() === UseItemOnEntityTransactionData::ACTION_INTERACT){
-            $entity = $player->getLevel()->getEntity($packet->trData->getEntityRuntimeId());
-            $item = $packet->trData->getItemInHand()->getItemStack();
-            $currentButton = $player->getDataPropertyManager()->getString(Entity::DATA_INTERACTIVE_TAG);
+            $entity = $player->getWorld()->getEntity($packet->trData->getEntityRuntimeId());
+            $item = TypeConverter::getInstance()->netItemStackToCore($packet->trData->getItemInHand()->getItemStack());
+            /** @var StringMetadataProperty $currentButton */
+            $currentButton = $player->getNetworkProperties()->getAll()[EntityMetadataProperties::INTERACTIVE_TAG] ?? null;
             $clickPos = $packet->trData->getClickPos();
             $button = null;
 
+            if($currentButton !== null){
+             //   $currentButton = $currentButton->getValue();
+                $currentButton = null;
+                //TODO get value
+            }
             if(is_string($currentButton) && count($packet->trData->getActions()) < 1){
                 if($entity instanceof InteractButtonItemTrait){
                     /** Whenever a player interacts with interactable button for entity */
@@ -199,8 +200,10 @@ class PacketListener implements Listener{
             }
         }elseif($packet->trData instanceof UseItemTransactionData && $packet->trData->getActionType() === UseItemTransactionData::ACTION_CLICK_AIR){
             $entity = VanillaX::getInstance()->getSessionManager()->get($player)->getRidingEntity();
-            $item = $packet->trData->getItemInHand()->getItemStack();
-            $currentButton = $player->getDataPropertyManager()->getString(Entity::DATA_INTERACTIVE_TAG);
+            $item = TypeConverter::getInstance()->netItemStackToCore($packet->trData->getItemInHand()->getItemStack());
+            $currentButton = null;
+            //TODO get current block value
+         //   $currentButton = $player->getDataPropertyManager()->getString(Entity::DATA_INTERACTIVE_TAG);
 
             if(is_string($currentButton) && count($packet->trData->getActions()) < 1){
                 if($entity instanceof InteractButtonItemTrait){
@@ -222,7 +225,7 @@ class PacketListener implements Listener{
      * or once you leave your ride
      */
     private function handleInteract(Player $player, InteractPacket $packet): void{
-        $entity = $player->getLevel()->getEntity($packet->target);
+        $entity = $player->getWorld()->getEntity($packet->target);
         $session = VanillaX::getInstance()->getSessionManager()->get($player);
 
         if($packet->action === InteractPacket::ACTION_MOUSEOVER){
@@ -230,7 +233,7 @@ class PacketListener implements Listener{
                 $entity = $session->getRidingEntity();
 
                 if($entity === null){
-                    $player->getDataPropertyManager()->setString(Entity::DATA_INTERACTIVE_TAG, "");
+                    $player->getNetworkProperties()->setString(EntityMetadataProperties::INTERACTIVE_TAG, "");
                 }
             }elseif($entity instanceof InteractButtonItemTrait){
                 $entity->onMouseHover($player);
@@ -250,11 +253,11 @@ class PacketListener implements Listener{
      * This is called whenever you middle click on an entity
      */
     private function handleActorPickRequest(Player $player, ActorPickRequestPacket $packet): void{
-        $entity = $player->getLevel()->getEntity($packet->entityUniqueId);
+        $entity = $player->getWorld()->getEntity($packet->entityUniqueId);
 
         if($entity instanceof Entity && !$entity instanceof Human){
             $result = ItemFactory::getInstance()->get(ItemIds::SPAWN_EGG, $entity::NETWORK_ID);
-            $ev = new PlayerBlockPickEvent($player, BlockFactory::get(BlockLegacyIds::AIR), $result);
+            $ev = new PlayerBlockPickEvent($player, VanillaBlocks::AIR(), $result);
             $ev->call();
 
             if(!$ev->isCancelled()){
@@ -270,7 +273,7 @@ class PacketListener implements Listener{
      */
     private function handleEmote(Player $player, EmotePacket $packet): void{
         foreach($player->getViewers() as $viewer){
-            $viewer->dataPacket($packet);
+            $viewer->getNetworkSession()->sendDataPacket($packet);
         }
     }
 }

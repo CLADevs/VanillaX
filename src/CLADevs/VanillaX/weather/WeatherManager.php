@@ -5,12 +5,12 @@ namespace CLADevs\VanillaX\weather;
 use CLADevs\VanillaX\entities\object\LightningBoltEntity;
 use CLADevs\VanillaX\network\gamerules\GameRule;
 use CLADevs\VanillaX\VanillaX;
-use pocketmine\level\Level;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\LevelEventPacket;
 use pocketmine\player\Player;
 use pocketmine\scheduler\ClosureTask;
 use pocketmine\Server;
+use pocketmine\world\World;
 
 class WeatherManager{
 
@@ -25,7 +25,7 @@ class WeatherManager{
             if(!GameRule::getGameRuleValue(GameRule::DO_WEATHER_CYCLE, $world)){
                 continue;
             }
-            $this->addWeather($level);
+            $this->addWeather($world);
         }
         VanillaX::getInstance()->getScheduler()->scheduleRepeatingTask(new ClosureTask(function(): void{
             foreach($this->weathers as $weather){
@@ -39,8 +39,10 @@ class WeatherManager{
 
                         if(count($players) >= 1){
                             $random = $players[array_rand($players)];
-                            $pos = $random->add(mt_rand(0, 15), mt_rand(0, 15));
-                            $entity = new LightningBoltEntity($weather->getLevel(), LightningBoltEntity::createBaseNBT($pos));
+                            $location = $random->getLocation();
+                            $location->x += mt_rand(0, 15);
+                            $location->y += mt_rand(0, 15);
+                            $entity = new LightningBoltEntity($location);
                             $entity->spawnToAll();
                         }
                     }
@@ -56,35 +58,35 @@ class WeatherManager{
         }), 20);
     }
 
-    public function addWeather(Level $level): void{
-        $this->weathers[strtolower($level->getFolderName())] = new Weather($level);
+    public function addWeather(World $world): void{
+        $this->weathers[strtolower($world->getFolderName())] = new Weather($world);
     }
 
-    public function removeWeather(Level $level): void{
-        if(isset($this->weathers[strtolower($level->getFolderName())])){
-            unset($this->weathers[strtolower($level->getFolderName())]);
+    public function removeWeather(World $world): void{
+        if(isset($this->weathers[strtolower($world->getFolderName())])){
+            unset($this->weathers[strtolower($world->getFolderName())]);
         }
     }
 
     /**
-     * @param Level|string $level
+     * @param World|string $world
      * @return Weather|null
      */
-    public function getWeather($level): ?Weather{
-        $levelName = $level;
+    public function getWeather($world): ?Weather{
+        $worldName = $world;
 
-        if($level instanceof Level){
-            $levelName = $level->getFolderName();
+        if($world instanceof World){
+            $worldName = $world->getFolderName();
 
-            if(!isset($this->weathers[strtolower($levelName)])){
-                $this->addWeather($level);
+            if(!isset($this->weathers[strtolower($worldName)])){
+                $this->addWeather($world);
             }
         }
-        return $this->weathers[strtolower($levelName)] ?? null;
+        return $this->weathers[strtolower($worldName)] ?? null;
     }
 
-    public function isRaining(Level $level, bool $checkThunder = true): bool{
-        $weather = $this->weathers[strtolower($level->getFolderName())] ?? null;
+    public function isRaining(World $world, bool $checkThunder = true): bool{
+        $weather = $this->weathers[strtolower($world->getFolderName())] ?? null;
 
         if($weather !== null){
             return $weather->isRaining() ? true : ($checkThunder ? $weather->isThundering() : false);
@@ -92,8 +94,8 @@ class WeatherManager{
         return false;
     }
 
-    public function isThundering(Level $level): bool{
-        $weather = $this->weathers[strtolower($level->getFolderName())] ?? null;
+    public function isThundering(World $world): bool{
+        $weather = $this->weathers[strtolower($world->getFolderName())] ?? null;
 
         if($weather !== null && $weather->isThundering()){
             return true;

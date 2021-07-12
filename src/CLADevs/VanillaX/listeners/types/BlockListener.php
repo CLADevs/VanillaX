@@ -19,14 +19,14 @@ class BlockListener implements Listener{
         if(!$event->isCancelled()){
             $block = $event->getBlock();
 
-            if(!GameRule::getGameRuleValue(GameRule::DO_TILE_DROPS, $block->getLevel())){
+            if(!GameRule::getGameRuleValue(GameRule::DO_TILE_DROPS, $block->getPos()->getWorld())){
                 $event->setDrops([]);
                 return;
             }
-            $tile = $block->getLevel()->getTile($block);
+            $tile = $block->getPos()->getWorld()->getTile($block->getPos());
 
             if($tile instanceof FurnaceTile){
-                $tile->dropXpHolder($block);
+                $tile->dropXpHolder($block->getPos());
             }
         }
     }
@@ -36,8 +36,8 @@ class BlockListener implements Listener{
             $entity = $event->getEntity();
 
             if($entity instanceof FallingBlock && ($to = $event->getTo())->getId() === BlockLegacyIds::ANVIL){
-                $pk = Session::playSound($to->asVector3(), "random.anvil_land", 1, 1, true);
-                $to->getLevel()->broadcastPacketToViewers($to, $pk);
+                $pk = Session::playSound($to->getPos(), "random.anvil_land", 1, 1, true);
+                $to->getPos()->getWorld()->broadcastPacketToViewers($to->getPos(), $pk);
             }
         }
     }

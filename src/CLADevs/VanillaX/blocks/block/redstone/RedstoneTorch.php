@@ -10,6 +10,6 @@ use pocketmine\block\RedstoneTorch as PMRedstoneTorch;
 class RedstoneTorch extends PMRedstoneTorch{
 
     public function __construct(){
-        parent::__construct(new BlockIdentifierFlattened(BlockLegacyIds::REDSTONE_TORCH, [Ids::UNLIT_REDSTONE_TORCH], 0), "Redstone Torch", BlockBreakInfo::instant());
+        parent::__construct(new BlockIdentifierFlattened(BlockLegacyIds::REDSTONE_TORCH, [BlockLegacyIds::UNLIT_REDSTONE_TORCH], 0), "Redstone Torch", BlockBreakInfo::instant());
     }
 }

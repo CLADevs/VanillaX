@@ -2,34 +2,47 @@
 
 namespace CLADevs\VanillaX\entities\monster;
 
-use CLADevs\VanillaX\entities\utils\interfaces\EntityClassification;
 use CLADevs\VanillaX\entities\VanillaEntity;
 use CLADevs\VanillaX\entities\utils\ItemHelper;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
+use pocketmine\entity\EntitySizeInfo;
+use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\network\mcpe\protocol\types\entity\EntityIds;
 
 class ElderGuardianEntity extends VanillaEntity{
 
-    const NETWORK_ID = self::ELDER_GUARDIAN;
+    const NETWORK_ID = EntityIds::ELDER_GUARDIAN;
 
-    public $width = 1.99;
-    public $height = 1.99;
+    public float $width = 1.99;
+    public float $height = 1.99;
 
-    protected function initEntity(): void{
-        parent::initEntity();
+    protected function initEntity(CompoundTag $nbt): void{
+        parent::initEntity($nbt);
         $this->setMaxHealth(80);
     }
 
     public function getName(): string{
-        return "Elder Guardian";
+        return "Elder_Guardian";
+    }
+
+    protected function getInitialSizeInfo(): EntitySizeInfo{
+        return new EntitySizeInfo($this->height, $this->width);
+    }
+
+    public static function getNetworkTypeId(): string{
+        return self::NETWORK_ID;
+    }
+    
+    public function getXpDropAmount(): int{
+        return $this->getLastHitByPlayer() ? 10 : 0;
     }
  
     /**
      * @return Item[]
      */
     public function getDrops(): array{
-        //TODO random fish
         $prismarine_shard = ItemFactory::getInstance()->get(ItemIds::PRISMARINE_SHARD, 0, 1);
         ItemHelper::applySetCount($prismarine_shard, 0, 2);
         ItemHelper::applyLootingEnchant($this, $prismarine_shard);
@@ -42,14 +55,6 @@ class ElderGuardianEntity extends VanillaEntity{
          
         $sponge = ItemFactory::getInstance()->get(ItemIds::SPONGE, 0, 1);
         ItemHelper::applySetData($sponge, 1);
-        return [$prismarine_shard, $fish, $prismarine_crystals, $sponge];
-    }
-    
-    public function getXpDropAmount(): int{
-        return $this->getLastHitByPlayer() ? 10 : 0;
-    }
-
-    public function getClassification(): int{
-        return EntityClassification::AQUATIC;
+        return [$prismarine_shard, $fish, $prismarine_crystals, $sponge, ItemFactory::getInstance()->get(ItemIds::AIR, 0, 1)];
     }
 }

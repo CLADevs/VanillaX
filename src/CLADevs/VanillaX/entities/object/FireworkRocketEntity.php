@@ -3,24 +3,27 @@
 namespace CLADevs\VanillaX\entities\object;
 
 use pocketmine\entity\Entity;
+use pocketmine\entity\EntitySizeInfo;
+use pocketmine\entity\Location;
 use pocketmine\entity\projectile\Projectile;
-use pocketmine\level\Level;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\network\mcpe\protocol\ActorEventPacket;
+use pocketmine\network\mcpe\protocol\types\entity\EntityIds;
+use pocketmine\Server;
 
 class FireworkRocketEntity extends Projectile{
 
-    public $width = 0.25;
-    public $height = 0.25;
+    public float $width = 0.25;
+    public float $height = 0.25;
 
-    const NETWORK_ID = self::FIREWORKS_ROCKET;
+    const NETWORK_ID = EntityIds::FIREWORKS_ROCKET;
 
     private int $age;
 
     private bool $straight = true;
 
-    public function __construct(Level $level, CompoundTag $nbt, ?Entity $shootingEntity = null){
-        parent::__construct($level, $nbt, $shootingEntity);
+    public function __construct(Location $location, ?Entity $shootingEntity, ?CompoundTag $nbt = null){
+        parent::__construct($location, $shootingEntity, $nbt);
         $this->age = 20 + mt_rand(0, 1);
     }
 
@@ -38,10 +41,22 @@ class FireworkRocketEntity extends Projectile{
             //TODO Horizontal Firework
         }else{
             if(!$this->isClosed() && !$this->isFlaggedForDespawn()){
-                $this->broadcastEntityEvent(ActorEventPacket::FIREWORK_PARTICLES);
+                $pk = new ActorEventPacket();
+                $pk->entityRuntimeId = $this->id;
+                $pk->event = ActorEventPacket::FIREWORK_PARTICLES;
+                $pk->data = 0;
+                Server::getInstance()->broadcastPackets($this->getViewers(), [$pk]);
                 $this->flagForDespawn();
             }
         }
         return $parent;
+    }
+
+    protected function getInitialSizeInfo(): EntitySizeInfo{
+        return new EntitySizeInfo($this->height, $this->width);
+    }
+
+    public static function getNetworkTypeId(): string{
+        return self::NETWORK_ID;
     }
 }

@@ -2,18 +2,20 @@
 
 namespace CLADevs\VanillaX\entities\monster;
 
-use CLADevs\VanillaX\entities\utils\interfaces\EntityClassification;
 use CLADevs\VanillaX\entities\VanillaEntity;
+use pocketmine\entity\EntitySizeInfo;
+use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\network\mcpe\protocol\types\entity\EntityIds;
 
-class SilverFishEntity extends VanillaEntity{
+class SilverfishEntity extends VanillaEntity{
 
-    const NETWORK_ID = self::SILVERFISH;
+    const NETWORK_ID = EntityIds::SILVERFISH;
 
-    public $width = 0.4;
-    public $height = 0.3;
+    public float $width = 0.4;
+    public float $height = 0.3;
 
-    protected function initEntity(): void{
-        parent::initEntity();
+    protected function initEntity(CompoundTag $nbt): void{
+        parent::initEntity($nbt);
         $this->setMaxHealth(8);
     }
 
@@ -21,7 +23,15 @@ class SilverFishEntity extends VanillaEntity{
         return "Silverfish";
     }
 
-    public function getClassification(): int{
-        return EntityClassification::ARTHROPODS;
+    protected function getInitialSizeInfo(): EntitySizeInfo{
+        return new EntitySizeInfo($this->height, $this->width);
+    }
+
+    public static function getNetworkTypeId(): string{
+        return self::NETWORK_ID;
+    }
+    
+    public function getXpDropAmount(): int{
+        return $this->getLastHitByPlayer() ? 5 : 0;
     }
 }

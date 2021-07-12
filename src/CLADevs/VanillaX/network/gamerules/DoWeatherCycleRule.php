@@ -3,7 +3,7 @@
 namespace CLADevs\VanillaX\network\gamerules;
 
 use CLADevs\VanillaX\VanillaX;
-use pocketmine\level\Level;
+use pocketmine\world\World;
 
 class DoWeatherCycleRule extends GameRule{
 
@@ -11,11 +11,11 @@ class DoWeatherCycleRule extends GameRule{
         parent::__construct(self::DO_WEATHER_CYCLE, true);
     }
 
-    public function handleValue($value, Level $level): void{
+    public function handleValue($value, World $world): void{
         if($value){
-            VanillaX::getInstance()->getWeatherManager()->addWeather($level);
+            VanillaX::getInstance()->getWeatherManager()->addWeather($world);
         }else{
-            VanillaX::getInstance()->getWeatherManager()->removeWeather($level);
+            VanillaX::getInstance()->getWeatherManager()->removeWeather($world);
         }
     }
 }

@@ -2,34 +2,32 @@
 
 namespace CLADevs\VanillaX\entities\passive;
 
-use CLADevs\VanillaX\entities\utils\ItemHelper;
 use CLADevs\VanillaX\entities\VanillaEntity;
-use pocketmine\item\Item;
-use pocketmine\item\ItemFactory;
-use pocketmine\item\ItemIds;
+use pocketmine\entity\EntitySizeInfo;
+use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\network\mcpe\protocol\types\entity\EntityIds;
 
 class SnowGolemEntity extends VanillaEntity{
 
-    const NETWORK_ID = self::SNOW_GOLEM;
+    const NETWORK_ID = EntityIds::SNOW_GOLEM;
 
-    public $width = 0.4;
-    public $height = 1.8;
+    public float $width = 0.4;
+    public float $height = 1.8;
 
-    protected function initEntity(): void{
-        parent::initEntity();
+    protected function initEntity(CompoundTag $nbt): void{
+        parent::initEntity($nbt);
         $this->setMaxHealth(4);
     }
 
     public function getName(): string{
-        return "Snow Golem";
+        return "Snow_Golem";
     }
 
-    /**
-     * @return Item[]
-     */
-    public function getDrops(): array{
-        $snowball = ItemFactory::getInstance()->get(ItemIds::SNOWBALL, 0, 1);
-        ItemHelper::applySetCount($snowball, 0, 15);
-        return [$snowball];
+    protected function getInitialSizeInfo(): EntitySizeInfo{
+        return new EntitySizeInfo($this->height, $this->width);
+    }
+
+    public static function getNetworkTypeId(): string{
+        return self::NETWORK_ID;
     }
 }

@@ -7,21 +7,36 @@ use CLADevs\VanillaX\entities\utils\ItemHelper;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
+use pocketmine\entity\EntitySizeInfo;
+use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\network\mcpe\protocol\types\entity\EntityIds;
 
 class HoglinEntity extends VanillaEntity{
 
-    const NETWORK_ID = self::HOGLIN;
+    const NETWORK_ID = EntityIds::HOGLIN;
 
-    public $width = 0.6;
-    public $height = 1.9;
+    public float $width = 0.6;
+    public float $height = 1.9;
 
-    protected function initEntity(): void{
-        parent::initEntity();
+    protected function initEntity(CompoundTag $nbt): void{
+        parent::initEntity($nbt);
         $this->setMaxHealth(40);
     }
 
     public function getName(): string{
         return "Hoglin";
+    }
+
+    protected function getInitialSizeInfo(): EntitySizeInfo{
+        return new EntitySizeInfo($this->height, $this->width);
+    }
+
+    public static function getNetworkTypeId(): string{
+        return self::NETWORK_ID;
+    }
+    
+    public function getXpDropAmount(): int{
+        return $this->getLastHitByPlayer() ? 5 : 0;
     }
  
     /**
@@ -37,9 +52,5 @@ class HoglinEntity extends VanillaEntity{
         ItemHelper::applySetCount($leather, 0, 1);
         ItemHelper::applyLootingEnchant($this, $leather);
         return [$porkchop, $leather];
-    }
-    
-    public function getXpDropAmount(): int{
-        return $this->getLastHitByPlayer() ? 5 : 0;
     }
 }

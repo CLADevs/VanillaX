@@ -2,28 +2,31 @@
 
 namespace CLADevs\VanillaX\entities\projectile;
 
-use pocketmine\entity\Effect;
-use pocketmine\entity\EffectInstance;
+use pocketmine\entity\effect\EffectInstance;
+use pocketmine\entity\effect\VanillaEffects;
 use pocketmine\entity\Entity;
+use pocketmine\entity\EntitySizeInfo;
 use pocketmine\entity\Living;
 use pocketmine\entity\projectile\Projectile;
 use pocketmine\event\entity\ProjectileHitEvent;
-use pocketmine\level\Explosion;
-use pocketmine\level\Position;
 use pocketmine\math\RayTraceResult;
+use pocketmine\network\mcpe\protocol\types\entity\EntityIds;
 use pocketmine\Server;
+use pocketmine\world\Explosion;
 
 class WitherSkullEntity extends Projectile{
 
-    public $width = 0.15;
-    public $height = 0.15;
+    public float $width = 0.15;
+    public float $height = 0.15;
 
-    const NETWORK_ID = self::WITHER_SKULL;
+    const NETWORK_ID = EntityIds::WITHER_SKULL;
 
-    protected $gravity = 0.00;
+    protected float $gravity = 0.00;
 
     protected function onHit(ProjectileHitEvent $event): void{
-        $exp = new Explosion(Position::fromObject($this->add(0, $this->height / 2, 0), $this->level), 1, $this);
+        $pos = $this->getPosition();
+        $pos->y += $this->height / 2;
+        $exp = new Explosion($pos, 1, $this);
         $exp->explodeA();
         $exp->explodeB();
     }
@@ -37,8 +40,16 @@ class WitherSkullEntity extends Projectile{
             }elseif($diff === 3){
                 $duration = 800;
             }
-            $entityHit->addEffect(new EffectInstance(Effect::getEffect(Effect::WITHER), $duration, 1));
+            $entityHit->getEffects()->add(new EffectInstance(VanillaEffects::WITHER(), $duration, 1));
         }
         parent::onHitEntity($entityHit, $hitResult);
+    }
+
+    protected function getInitialSizeInfo(): EntitySizeInfo{
+        return new EntitySizeInfo($this->height, $this->width);
+    }
+
+    public static function getNetworkTypeId(): string{
+        return self::NETWORK_ID;
     }
 }

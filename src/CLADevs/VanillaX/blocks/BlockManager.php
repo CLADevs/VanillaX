@@ -6,18 +6,18 @@ use CLADevs\VanillaX\blocks\block\CommandBlock;
 use CLADevs\VanillaX\blocks\block\redstone\RedstoneComparator;
 use CLADevs\VanillaX\blocks\block\redstone\RedstoneLamp;
 use CLADevs\VanillaX\blocks\block\redstone\RedstoneRepeater;
-use CLADevs\VanillaX\blocks\block\ShulkerBoxBlock;
 use CLADevs\VanillaX\blocks\utils\TileVanilla;
 use CLADevs\VanillaX\utils\item\NonAutomaticCallItemTrait;
 use CLADevs\VanillaX\utils\item\NonCreativeItemTrait;
 use CLADevs\VanillaX\utils\Utils;
 use CLADevs\VanillaX\VanillaX;
 use pocketmine\block\Block;
+use pocketmine\block\BlockBreakInfo;
 use pocketmine\block\BlockFactory;
 use pocketmine\block\BlockIdentifier;
 use pocketmine\block\BlockLegacyIds;
-use pocketmine\item\Item;
-use pocketmine\item\ItemFactory;
+use pocketmine\block\tile\TileFactory;
+use pocketmine\inventory\CreativeInventory;
 use pocketmine\Server;
 use ReflectionClass;
 use ReflectionException;
@@ -47,15 +47,12 @@ class BlockManager{
         self::registerBlock(new RedstoneComparator(false), true);
         self::registerBlock(new RedstoneRepeater(true), true);
         self::registerBlock(new RedstoneRepeater(false), true);
-        self::registerBlock(new RedstoneLamp(true), true);
-        self::registerBlock(new RedstoneLamp(false), true);
+        self::registerBlock(new RedstoneLamp(), true);
 
         foreach([BlockLegacyIds::COMMAND_BLOCK, BlockLegacyIds::REPEATING_COMMAND_BLOCK, BlockLegacyIds::CHAIN_COMMAND_BLOCK] as $block){
             self::registerBlock(new CommandBlock($block), true);
         }
-        self::registerBlock(new ShulkerBoxBlock(new BlockIdentifier(BlockLegacyIds::SHULKER_BOX, 0), "Shulker Box", 1), true, true);
-        self::registerBlock(new ShulkerBoxBlock(BlockLegacyIds::UNDYED_SHULKER_BOX, 0, "Shulker Box"), true, true);
-        self::registerBlock(new Block(BlockLegacyIds::SLIME_BLOCK, 0, "Slime"));
+        self::registerBlock(new Block(new BlockIdentifier(BlockLegacyIds::SLIME_BLOCK, 0), "Slime", new BlockBreakInfo(0)));
     }
 
     /**
@@ -92,9 +89,9 @@ class BlockManager{
         if(in_array($block->getId(), VanillaX::getInstance()->getConfig()->getNested("disabled.blocks", []))){
             return false;
         }
-        BlockFactory::registerBlock($block, $override);
-        if($creativeItem && !Item::isCreativeItem($item = ItemFactory::getInstance()->get($block->getItemId()))){
-            Item::addCreativeItem($item);
+        BlockFactory::getInstance()->register($block, $override);
+        if($creativeItem && !CreativeInventory::getInstance()->contains($item = $block->asItem())){
+            CreativeInventory::getInstance()->add($item);
         }
         return true;
     }
@@ -104,7 +101,6 @@ class BlockManager{
      * @param array $names Save names for Tile, for such use as Tile::createTile
      * @param array|int $blockId Block the Tile was made for not necessary
      * @return bool returns true if it succeed, if not it returns false
-     * @throws ReflectionException
      */
     public function registerTile(string $namespace, array $names = [], $blockId = BlockLegacyIds::AIR): bool{
         if(!is_array($blockId)){
@@ -115,7 +111,7 @@ class BlockManager{
                 return false;
             }
         }
-        Tile::registerTile($namespace, $names);
+        TileFactory::getInstance()->register($namespace, $names);
         return true;
     }
 }

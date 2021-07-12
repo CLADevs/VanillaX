@@ -6,9 +6,13 @@ use CLADevs\VanillaX\VanillaX;
 use pocketmine\nbt\tag\ByteTag;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\IntTag;
+use pocketmine\nbt\tag\Tag;
 use pocketmine\network\mcpe\protocol\GameRulesChangedPacket;
+use pocketmine\player\Player;
 use pocketmine\Server;
 use pocketmine\world\format\io\BaseWorldProvider;
+use pocketmine\world\format\io\data\BedrockWorldData;
+use pocketmine\world\World;
 
 class GameRule{
 
@@ -102,19 +106,23 @@ class GameRule{
                 $provider = $world->getProvider();
 
                 if($provider instanceof BaseWorldProvider){
-                    /** @var CompoundTag $nbt */
-                    $nbt = $provider->getWorldData()->getTag("GameRules");
+                    $data = $provider->getWorldData();
 
-                    foreach(self::$gameRules as $rule){
-                        if($nbt->hasTag($rule->getName())){
-                            $tag = $nbt->getTag($rule->getName());
+                    if($data instanceof BedrockWorldData){
+                        /** @var CompoundTag $nbt */
+                        $nbt = $data->getCompoundTag()->getTag("GameRules");
 
-                            if($rule->getType() === self::TYPE_BOOL && $tag instanceof ByteTag){
-                                $nbt->removeTag($rule->getName());
-                            }elseif($rule->getType() === self::TYPE_INT && $tag instanceof IntTag){
-                                $nbt->removeTag($rule->getName());
+                        foreach(self::$gameRules as $rule){
+                            if(($tag = $nbt->getTag($rule->getName())) !== null){
+                                $tag = $tag->getValue();
+
+                                if($rule->getType() === self::TYPE_BOOL && $tag instanceof ByteTag){
+                                    $nbt->removeTag($rule->getName());
+                                }elseif($rule->getType() === self::TYPE_INT && $tag instanceof IntTag){
+                                    $nbt->removeTag($rule->getName());
+                                }
+                                $data->save();
                             }
-                            $provider->saveLevelData();
                         }
                     }
                 }
@@ -127,71 +135,86 @@ class GameRule{
     }
 
     /**
-     * @param Level $level
+     * @param World $World
      * @param GameRule $rule
      * @param int|bool $value
      * @param bool $force
      */
-    public static function setGameRule(Level $level, GameRule $rule, $value, bool $force = false): void{
+    public static function setGameRule(World $World, GameRule $rule, $value, bool $force = false): void{
         if(!$force && !self::isGameRuleAllow()){
             return;
         }
-        $provider = $level->getProvider();
+        $provider = $World->getProvider();
 
-        if($provider instanceof BaseLevelProvider){
-            /** @var CompoundTag $nbt */
-            $nbt = $provider->getLevelData()->getTag("GameRules");
-            if($nbt->hasTag($rule->getName())) $nbt->removeTag($rule->getName());
-            if(is_bool($value)){
-                $nbt->setByte($rule->getName(), $value);
-            }else{
-                $nbt->setInt($rule->getName(), $value);
+        if($provider instanceof BaseWorldProvider){
+            $data = $provider->getWorldData();
+
+            if($data instanceof BedrockWorldData){
+                /** @var CompoundTag $nbt */
+                $nbt = $data->getCompoundTag()->getTag("GameRules");
+
+                if($nbt->getTag($rule->getName())) $nbt->removeTag($rule->getName());
+                if(is_bool($value)){
+                    $nbt->setByte($rule->getName(), $value);
+                }else{
+                    $nbt->setInt($rule->getName(), $value);
+                }
+                $data->save();
             }
-            $provider->saveLevelData();
         }
     }
 
-    public static function fixGameRule(Player $player, Level $level = null): void{
+    public static function fixGameRule(Player $player, World $World = null): void{
         if(!self::isGameRuleAllow()){
             return;
         }
-        if($level === null){
-            $level = $player->getLevel();
+        if($World === null){
+            $World = $player->getWorld();
         }
-        $provider = $level->getProvider();
+        $provider = $World->getProvider();
 
-        if($provider instanceof BaseLevelProvider){
-            /** @var CompoundTag $nbt */
-            $nbt = $provider->getLevelData()->getTag("GameRules");
+        if($provider instanceof BaseWorldProvider){
+            $data = $provider->getWorldData();
 
-            foreach($nbt->getValue() as $key => $tag){
-                $pk = new GameRulesChangedPacket();
-                $pk->gameRules = [$key => [$tag instanceof ByteTag ? 1 : 0, $tag->getValue(), false]];
-                $player->dataPacket($pk);
+            if($data instanceof BedrockWorldData){
+                /** @var CompoundTag $nbt */
+                $nbt = $data->getCompoundTag()->getTag("GameRules");
+
+                foreach($nbt->getValue() as $key => $tag){
+                    $pk = new GameRulesChangedPacket();
+                    $pk->gameRules = [$key => [$tag instanceof ByteTag ? 1 : 0, $tag->getValue(), false]];
+                    $player->getNetworkSession()->sendDataPacket($pk);
+                }
             }
         }
     }
 
     /**
      * @param string $name
-     * @param Level $level
+     * @param World $World
      * @param bool $stringify
      * @return bool|int|string|null
      */
-    public static function getGameRuleValue(string $name, Level $level, bool $stringify = false){
+    public static function getGameRuleValue(string $name, World $World, bool $stringify = false){
         $name = strtolower($name);
         $rule = self::$gameRules[$name] ?? null;
-        $provider = $level->getProvider();
+        $provider = $World->getProvider();
 
         if($rule !== null && !self::isGameRuleAllow()) return $rule->getValue();
-        if($rule !== null && $provider instanceof BaseLevelProvider){
-            $tag = $provider->getLevelData()->getTag("GameRules")->getValue()[$rule->getName()] ?? null;
+        if($rule !== null && $provider instanceof BaseWorldProvider){
+            $data = $provider->getWorldData();
 
-            if($tag instanceof NamedTag){
-                if($stringify && $tag instanceof ByteTag){
-                    return boolval($tag->getValue()) ? "true" : "false";
+            if($data instanceof BedrockWorldData){
+                /** @var CompoundTag $nbt */
+                $nbt = $data->getCompoundTag()->getTag("GameRules");
+                $tag = $nbt->getValue()[$rule->getName()] ?? null;
+
+                if($tag instanceof Tag){
+                    if($stringify && $tag instanceof ByteTag){
+                        return boolval($tag->getValue()) ? "true" : "false";
+                    }
+                    return $tag instanceof ByteTag ? boolval($tag->getValue()) : intval($tag->getValue());
                 }
-                return $tag instanceof ByteTag ? boolval($tag->getValue()) : intval($tag->getValue());
             }
         }
         if($stringify && is_bool($rule->getValue())){
@@ -221,8 +244,8 @@ class GameRule{
 
     /**
      * @param bool|int $value
-     * @param Level $level
+     * @param World $world
      */
-    public function handleValue($value, Level $level): void{
+    public function handleValue($value, World $world): void{
     }
 }

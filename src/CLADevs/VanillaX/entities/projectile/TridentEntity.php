@@ -6,6 +6,7 @@ use CLADevs\VanillaX\session\Session;
 use CLADevs\VanillaX\VanillaX;
 use pocketmine\block\Block;
 use pocketmine\entity\Entity;
+use pocketmine\entity\EntitySizeInfo;
 use pocketmine\entity\projectile\Projectile;
 use pocketmine\event\entity\EntityCombustByEntityEvent;
 use pocketmine\event\entity\EntityDamageByChildEntityEvent;
@@ -17,17 +18,19 @@ use pocketmine\item\Item;
 use pocketmine\math\RayTraceResult;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\TakeItemActorPacket;
+use pocketmine\network\mcpe\protocol\types\entity\EntityIds;
+use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataProperties;
 use pocketmine\player\Player;
 
 class TridentEntity extends Projectile{
 
-    public $width = 0.25;
-    public $height = 0.35;
+    public float $width = 0.25;
+    public float $height = 0.35;
 
-    protected $gravity = 0.05;
-    protected $drag = 0.01;
+    protected float $gravity = 0.05;
+    protected float $drag = 0.01;
 
-    const NETWORK_ID = self::THROWN_TRIDENT;
+    const NETWORK_ID = EntityIds::THROWN_TRIDENT;
 
     private Item $parent;
     private bool $hasLoyalty = false;
@@ -46,25 +49,26 @@ class TridentEntity extends Projectile{
             if($this->returnTick <= 0){
                 if($this->forceReturnTick !== null && $this->forceReturnTick > 0) $this->forceReturnTick--;
                 $this->tryChangeMovement();
-                $x = $this->getOwningEntity()->x - $this->x;
-                $z = $this->getOwningEntity()->z - $this->z;
+                $x = $this->getOwningEntity()->getPosition()->x - $this->getPosition()->x;
+                $z = $this->getOwningEntity()->getPosition()->z - $this->getPosition()->z;
                 $xz = sqrt($x * $x + $z * $z);
                 $x /= $xz;
                 $z /= $xz;
                 $y = 0;
 
-                if(!$this->getGenericFlag(self::DATA_FLAG_SHOW_TRIDENT_ROPE)){
-                    $this->setGenericFlag(self::DATA_FLAG_SHOW_TRIDENT_ROPE, true);
-                }
+                //TODO showe trident rope
+//                if(!$this->getGenericFlag(self::DATA_FLAG_SHOW_TRIDENT_ROPE)){
+//                    $this->setGenericFlag(self::DATA_FLAG_SHOW_TRIDENT_ROPE, true);
+//                }
                 //TODO No Clip
                 if($this->forceReturnTick === null){
                   //  $this->forceReturnTick = min(mt_rand(20 * 4, 20 * 6), $x + $z * 4);
                     $this->forceReturnTick = mt_rand(20 * 4, 20 * 6);
                 }
-                if($this->y < $this->getOwningEntity()->getY()){
-                    $diff = $this->getOwningEntity()->getY() - $this->y;
+                if($this->getPosition()->y < $this->getOwningEntity()->getPosition()->y){
+                    $diff = $this->getOwningEntity()->getPosition()->y - $this->getPosition()->y;
                     $y = ($diff / 10);
-                }elseif($this->y > ($this->getOwningEntity()->getY() + 4)){
+                }elseif($this->getPosition()->y > ($this->getOwningEntity()->getPosition()->y + 4)){
                     $y = -0.2;
                 }
                 $this->setMotion(new Vector3($x, $y, $z));
@@ -143,7 +147,7 @@ class TridentEntity extends Projectile{
         $pk = new TakeItemActorPacket();
         $pk->eid = $player->getId();
         $pk->target = $this->getId();
-        $this->server->broadcastPacket($this->getViewers(), $pk);
+        $this->server->broadcastPackets($this->getViewers(), [$pk]);
 
         $player->getInventory()->addItem($this->parent);
         $this->flagForDespawn();
@@ -165,14 +169,22 @@ class TridentEntity extends Projectile{
                 $session = VanillaX::getInstance()->getSessionManager()->get($owner);
                 $session->addTrident($this);
             }
-            $this->getDataPropertyManager()->setLong(self::DATA_OWNER_EID, $owner->getId());
+            $this->getNetworkProperties()->setLong(EntityMetadataProperties::OWNER_EID, $owner->getId());
         }
     }
 
     public function setParent(Item $parent): void{
         $this->parent = $parent;
-        if($parent->hasEnchantment(Enchantment::LOYALTY)){
+        if($parent->hasEnchantment(EnchantmentIdMap::getInstance()->fromId(EnchantmentIds::LOYALTY))){
             $this->hasLoyalty = true;
         }
+    }
+
+    protected function getInitialSizeInfo(): EntitySizeInfo{
+        return new EntitySizeInfo($this->height, $this->width);
+    }
+
+    public static function getNetworkTypeId(): string{
+        return self::NETWORK_ID;
     }
 }

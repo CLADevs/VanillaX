@@ -12,13 +12,13 @@ use CLADevs\VanillaX\utils\item\NonCreativeItemTrait;
 use CLADevs\VanillaX\utils\item\NonOverwriteItemTrait;
 use CLADevs\VanillaX\utils\Utils;
 use CLADevs\VanillaX\VanillaX;
+use pocketmine\inventory\CreativeInventory;
 use pocketmine\item\Armor;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
+use pocketmine\item\ItemIdentifier;
 use pocketmine\item\ItemIds;
-use pocketmine\network\mcpe\convert\ItemTranslator;
 use pocketmine\network\mcpe\protocol\LevelSoundEventPacket;
-use ReflectionProperty;
 use const pocketmine\RESOURCE_PATH;
 
 class ItemManager{
@@ -32,29 +32,27 @@ class ItemManager{
             }
         });
 
-        self::register(new Item(ItemIdentifiers::NETHERITE_INGOT)); //ITEM
-        self::register(new Item(ItemIdentifiers::NETHERITE_SCRAP)); //ITEM
-        self::register(new Item(ItemIdentifiers::HONEYCOMB, 0, "Honeycomb")); //ITEM
-        self::register(new Item(ItemIdentifiers::BELL, 0, "Bell")); //ITEM
-        self::register(new Item(ItemIdentifiers::LANTERN, 0, "Lantern")); //ITEM
-        self::register(new Item(ItemIdentifiers::CAMPFIRE, 0, "Campfire")); //ITEM
-        self::register(new Item(ItemIdentifiers::DRIED_KELP_BLOCK, 0, "Dried kelp")); //ITEM
-        self::register(new Item(ItemIds::KELP, 0, "Kelp")); //ITEM
-        self::register(new Item(ItemIds::DRIED_KELP, 0, "Dried Kelp")); //ITEM
-        self::register(new Item(ItemIds::NETHER_WART, 0, "Nether Wart")); //ITEM
-        self::register(new Item(ItemIds::TOTEM, 0, "Totem of Undying")); //ITEM
-        self::register(new Item(ItemIds::TURTLE_SHELL_PIECE, 0, "Turtle Shell")); //ITEM
-        self::register(new Item(ItemIds::PHANTOM_MEMBRANE, 0, "Phantom Membrane")); //ITEM
-        self::register(new Item(ItemIds::FIREWORKS_CHARGE, 0, "Fireworks Charge")); //ITEM
-        self::register(new Item(ItemIds::ENCHANTED_BOOK, 0, "Enchanted Book")); //ITEM
-        self::register(new Item(ItemIds::CARROT_ON_A_STICK, 0, "Carrot on a Stick")); //ITEM
+        self::register(new Item(new ItemIdentifier(ItemIdentifiers::NETHERITE_INGOT, 0), "Netherite Scrap")); //ITEM
+        self::register(new Item(new ItemIdentifier(ItemIdentifiers::HONEYCOMB, 0), "Honeycomb")); //ITEM
+        self::register(new Item(new ItemIdentifier(ItemIdentifiers::BELL, 0), "Bell")); //ITEM
+        self::register(new Item(new ItemIdentifier(ItemIdentifiers::LANTERN, 0), "Lantern")); //ITEM
+        self::register(new Item(new ItemIdentifier(ItemIdentifiers::CAMPFIRE, 0), "Campfire")); //ITEM
+        self::register(new Item(new ItemIdentifier(ItemIdentifiers::DRIED_KELP_BLOCK, 0), "Dried Kelp")); //ITEM
+        self::register(new Item(new ItemIdentifier(ItemIdentifiers::KELP, 0), "Kelp")); //ITEM
+        self::register(new Item(new ItemIdentifier(ItemIds::DRIED_KELP, 0), "Dried Kelp")); //ITEM
+        self::register(new Item(new ItemIdentifier(ItemIds::NETHER_WART, 0), "Nether Wart")); //ITEM
+        self::register(new Item(new ItemIdentifier(ItemIds::TURTLE_SHELL_PIECE, 0), "Turtle Shell")); //ITEM
+        self::register(new Item(new ItemIdentifier(ItemIds::PHANTOM_MEMBRANE, 0), "Phantom Membrane")); //ITEM
+        self::register(new Item(new ItemIdentifier(ItemIds::FIREWORKS_CHARGE, 0), "Fireworks Charge")); //ITEM
+        self::register(new Item(new ItemIdentifier(ItemIds::ENCHANTED_BOOK, 0), "Enchanted Book")); //ITEM
+        self::register(new Item(new ItemIdentifier(ItemIds::CARROT_ON_A_STICK, 0), "Carrot on a Stick")); //ITEM
         self::register(new MinecartItem(ItemIds::MINECART));
-        self::register(new MinecartItem(ItemIds::MINECART_WITH_CHEST, 0, "Chest"));
-        self::register(new MinecartItem(ItemIds::MINECART_WITH_TNT, 0, "TNT"));
-        self::register(new MinecartItem(ItemIds::MINECART_WITH_HOPPER, 0, "Hopper"));
-        self::register(new MinecartItem(ItemIds::MINECART_WITH_COMMAND_BLOCK, 0, "Command Block"));
-        self::register(new MapItem(MapItem::FILLED_MAP));
-        self::register(new MapItem(MapItem::EMPTY_MAP), true);
+        self::register(new MinecartItem(ItemIds::MINECART_WITH_CHEST, "Chest"));
+        self::register(new MinecartItem(ItemIds::MINECART_WITH_TNT, "TNT"));
+        self::register(new MinecartItem(ItemIds::MINECART_WITH_HOPPER, "Hopper"));
+        self::register(new MinecartItem(ItemIds::MINECART_WITH_COMMAND_BLOCK, "Command Block"));
+        self::register(new MapItem(MapItem::MAP_FILLED));
+        self::register(new MapItem(MapItem::MAP_EMPTY), true);
         for($i = 416; $i <= 419; $i++){
             self::register(new HorseArmorItem($i), true);
         }
@@ -77,9 +75,9 @@ class ItemManager{
         $startId = 500;
         foreach($musicDics as $name => $soundId){
             if($startId === 512){
-                self::register(new MusicDiscItem(759, 0, "Lena Raine - " . $name, $soundId));
+                self::register(new MusicDiscItem(759, "Lena Raine - " . $name, $soundId));
             }else{
-                self::register(new MusicDiscItem($startId, 0, "C418 - " . $name, $soundId));
+                self::register(new MusicDiscItem($startId, "C418 - " . $name, $soundId));
             }
             $startId++;
         }
@@ -87,8 +85,8 @@ class ItemManager{
     }
 
     private function initializeCreativeItems(): void{
-        $oldCreativeItems = Item::getCreativeItems();
-        Item::clearCreativeItems();
+        $oldCreativeItems = CreativeInventory::getInstance()->getAll();
+        CreativeInventory::getInstance()->clear();
         $creativeItems = json_decode(file_get_contents(RESOURCE_PATH . "vanilla" . DIRECTORY_SEPARATOR . "creativeitems.json"), true);
 
         foreach($creativeItems as $data){
@@ -96,21 +94,21 @@ class ItemManager{
             if($item->getName() === "Unknown"){
                 continue;
             }
-            Item::addCreativeItem($item);
+            CreativeInventory::getInstance()->add($item);
         }
         foreach($oldCreativeItems as $item){
-            if(!Item::isCreativeItem($item)) Item::addCreativeItem($item);
+            if(!CreativeInventory::getInstance()->contains($item)) CreativeInventory::getInstance()->add($item);
         }
 
         /** Shulker Box */
         for($i = 1; $i <= 15; $i++){
             $item = ItemFactory::getInstance()->get(ItemIds::SHULKER_BOX, $i);
-            if(!Item::isCreativeItem($item)) Item::addCreativeItem($item);
+            if(!CreativeInventory::getInstance()->contains($item)) CreativeInventory::getInstance()->add($item);
         }
         /** Spawn Egg */
         foreach([VanillaEntity::GOAT, VanillaEntity::GLOW_SQUID, VanillaEntity::AXOLOTL] as $id){
             $item = ItemFactory::getInstance()->get(ItemIds::SPAWN_EGG, $id);
-            if(!Item::isCreativeItem($item)) Item::addCreativeItem($item);
+            if(!CreativeInventory::getInstance()->contains($item)) CreativeInventory::getInstance()->add($item);
         }
     }
 
@@ -120,32 +118,32 @@ class ItemManager{
     }
 
     private function addComplexItem(string $newId, string $oldId, int $meta): void{
-        $runtimeBlockLegacyIds = json_decode(file_get_contents(RESOURCE_PATH . '/vanilla/required_item_list.json'), true);
-        $legacyStringToIntMap = json_decode(file_get_contents(RESOURCE_PATH . '/vanilla/item_id_map.json'), true);
-        $id = $legacyStringToIntMap[$oldId];
-        $netId = $runtimeBlockLegacyIds[$newId]["runtime_id"];
-
-        /** complexCoreToNetMapping */
-        $property = new ReflectionProperty(ItemTranslator::class, "complexCoreToNetMapping");
-        $property->setAccessible(true);
-        $value = $property->getValue(ItemTranslator::getInstance());
-        $value[$id][$meta] = $netId;
-        $property->setValue(ItemTranslator::getInstance(), $value);
-
-        /** complexNetToCoreMapping */
-        $property = new ReflectionProperty(ItemTranslator::class, "complexNetToCoreMapping");
-        $property->setAccessible(true);
-        $value = $property->getValue(ItemTranslator::getInstance());
-        $value[$netId] = [$id, $meta];
-        $property->setValue(ItemTranslator::getInstance(), $value);
+//        $runtimeBlockLegacyIds = json_decode(file_get_contents(RESOURCE_PATH . '/vanilla/required_item_list.json'), true);
+//        $legacyStringToIntMap = json_decode(file_get_contents(RESOURCE_PATH . '/vanilla/item_id_map.json'), true);
+//        $id = $legacyStringToIntMap[$oldId];
+//        $netId = $runtimeBlockLegacyIds[$newId]["runtime_id"];
+//
+//        /** complexCoreToNetMapping */
+//        $property = new ReflectionProperty(ItemTranslator::class, "complexCoreToNetMapping");
+//        $property->setAccessible(true);
+//        $value = $property->getValue(ItemTranslator::getInstance());
+//        $value[$id][$meta] = $netId;
+//        $property->setValue(ItemTranslator::getInstance(), $value);
+//
+//        /** complexNetToCoreMapping */
+//        $property = new ReflectionProperty(ItemTranslator::class, "complexNetToCoreMapping");
+//        $property->setAccessible(true);
+//        $value = $property->getValue(ItemTranslator::getInstance());
+//        $value[$netId] = [$id, $meta];
+//        $property->setValue(ItemTranslator::getInstance(), $value);
     }
     
     public static function register(Item $item, bool $creative = false, bool $overwrite = true): bool{
         if(in_array($item->getId(), VanillaX::getInstance()->getConfig()->getNested("disabled.items", []))){
             return false;
         }
-        ItemFactory::registerItem($item, $overwrite);
-        if($creative && !Item::isCreativeItem($item)) Item::addCreativeItem($item);
+        ItemFactory::getInstance()->register($item, $overwrite);
+        if($creative && !CreativeInventory::getInstance()->contains($item)) CreativeInventory::getInstance()->add($item);
         return true;
     }
 

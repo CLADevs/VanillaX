@@ -3,11 +3,21 @@
 namespace CLADevs\VanillaX\entities\projectile;
 
 use pocketmine\entity\Entity;
+use pocketmine\entity\EntitySizeInfo;
+use pocketmine\network\mcpe\protocol\types\entity\EntityIds;
 
 class FishingHookEntity extends Entity{
 
-    public $width = 0.15;
-    public $height = 0.15;
+    public float $width = 0.15;
+    public float $height = 0.15;
 
-    const NETWORK_ID = self::FISHING_HOOK;
+    const NETWORK_ID = EntityIds::FISHING_HOOK;
+
+    protected function getInitialSizeInfo(): EntitySizeInfo{
+        return new EntitySizeInfo($this->height, $this->width);
+    }
+
+    public static function getNetworkTypeId(): string{
+        return self::NETWORK_ID;
+    }
 }

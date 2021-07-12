@@ -4,35 +4,36 @@ namespace CLADevs\VanillaX\listeners\types;
 
 use CLADevs\VanillaX\network\gamerules\GameRule;
 use CLADevs\VanillaX\VanillaX;
-use pocketmine\event\entity\EntityLevelChangeEvent;
-use pocketmine\event\level\LevelLoadEvent;
-use pocketmine\event\level\LevelUnloadEvent;
+use pocketmine\event\entity\EntityTeleportEvent;
 use pocketmine\event\Listener;
+use pocketmine\event\world\WorldLoadEvent;
+use pocketmine\event\world\WorldUnloadEvent;
 use pocketmine\player\Player;
 
 class WorldListener implements Listener{
 
-    public function onLevelLoad(LevelLoadEvent $event): void{
-        VanillaX::getInstance()->getWeatherManager()->addWeather($event->getLevel());
+    public function onLevelLoad(WorldLoadEvent $event): void{
+        VanillaX::getInstance()->getWeatherManager()->addWeather($event->getWorld());
     }
 
-    public function onLevelUnload(LevelUnloadEvent $event): void{
+    public function onLevelUnload(WorldUnloadEvent $event): void{
         if(!$event->isCancelled()){
-            VanillaX::getInstance()->getWeatherManager()->removeWeather($event->getLevel());
+            VanillaX::getInstance()->getWeatherManager()->removeWeather($event->getWorld());
         }
     }
 
-    public function onLevelChange(EntityLevelChangeEvent $event): void{
-        if(!$event->isCancelled()){
+    public function onLevelChange(EntityTeleportEvent $event): void{
+        $from = $event->getFrom();
+        $to = $event->getTo();
+
+        if(!$event->isCancelled() && $from->getWorld()->getFolderName() !== $to->getWorld()->getFolderName()){
             $entity = $event->getEntity();
-            $previous = $event->getOrigin();
-            $target = $event->getTarget();
             $weather = VanillaX::getInstance()->getWeatherManager();
-            $previousWeather = $weather->getWeather($previous);
-            $targetWeather = $weather->getWeather($target);
+            $previousWeather = $weather->getWeather($from->getWorld());
+            $targetWeather = $weather->getWeather($to->getWorld());
 
             if($entity instanceof Player){
-                GameRule::fixGameRule($entity, $target);
+                GameRule::fixGameRule($entity, $to->getWorld());
                 if($previousWeather !== null && $targetWeather !== null && $previousWeather->isRaining() && !$targetWeather->isRaining()){
                     $weather->sendClear($entity);
                 }

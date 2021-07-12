@@ -3,9 +3,9 @@
 namespace CLADevs\VanillaX\weather;
 
 use CLADevs\VanillaX\VanillaX;
-use pocketmine\nbt\tag\ByteTag;
 use pocketmine\nbt\tag\CompoundTag;
-use pocketmine\nbt\tag\IntTag;
+use pocketmine\nbt\tag\Tag;
+use pocketmine\world\format\io\data\BedrockWorldData;
 use pocketmine\world\format\io\WritableWorldProvider;
 use pocketmine\world\World;
 
@@ -31,23 +31,36 @@ class Weather{
         $this->recalculateDelayDuration();
 
         if($provider instanceof WritableWorldProvider){
-            $nbt = $provider->getLevelData();
+            $data = $provider->getWorldData();
+            
+            if($data instanceof BedrockWorldData){
+                $nbt = $data->getCompoundTag();
 
-            if($nbt->hasTag(self::TAG_WEATHER)){
-                /** @var CompoundTag $tag */
-                $tag = $nbt->getTag(self::TAG_WEATHER);
+                if(($tag = $nbt->getTag(self::TAG_WEATHER)) !== null){
+                    $tag = $tag->getValue();
 
-                if($tag->hasTag(self::TAG_DURATION)){
-                    $this->duration = $tag->getInt(self::TAG_DURATION);
-                }
-                if($tag->hasTag(self::TAG_DELAY_DURATION)){
-                    $this->delayDuration = $tag->getInt(self::TAG_DELAY_DURATION);
-                }
-                if($tag->hasTag(self::TAG_THUNDERING)){
-                    $this->thundering = boolval($tag->getByte(self::TAG_THUNDERING));
-                }
-                if($this->duration >= 1){
-                    $this->startStorm($this->thundering, $this->duration);
+                    if(is_array($tag)){
+                        /**
+                         * @var string $key
+                         * @var Tag $v
+                         */
+                        foreach($tag as $key => $v){
+                            switch($key){
+                                case self::TAG_DURATION:
+                                    $this->duration = $v->getValue();
+                                    break;
+                                case self::TAG_DELAY_DURATION:
+                                    $this->delayDuration = $v->getValue();
+                                    break;
+                                case self::TAG_THUNDERING:
+                                    $this->thundering = $v->getValue();
+                                    break;
+                            }
+                        }
+                    }
+                    if($this->duration >= 1){
+                        $this->startStorm($this->thundering, $this->duration);
+                    }
                 }
             }
         }
@@ -72,13 +85,17 @@ class Weather{
         $provider = $this->world->getProvider();
 
         if($provider instanceof WritableWorldProvider){
-            $nbt = $provider->getLevelData();
-            $nbt->setTag(new CompoundTag(self::TAG_WEATHER, [
-                new IntTag(self::TAG_DURATION, $this->duration),
-                new IntTag(self::TAG_DELAY_DURATION, $this->delayDuration),
-                new ByteTag(self::TAG_THUNDERING, $this->thundering),
-            ]));
-            $provider->saveLevelData();
+            $data = $provider->getWorldData();
+
+            if($data instanceof BedrockWorldData){
+                $nbt = $data->getCompoundTag();
+                $tag = new CompoundTag();
+                $tag->setInt(self::TAG_DURATION, $this->duration);
+                $tag->setInt(self::TAG_DELAY_DURATION, $this->delayDuration);
+                $tag->setByte(self::TAG_THUNDERING, $this->thundering);
+                $nbt->setTag(self::TAG_WEATHER, $tag);
+                $data->save();
+            }
         }
     }
 

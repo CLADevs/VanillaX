@@ -9,7 +9,9 @@ use pocketmine\entity\projectile\Arrow as ArrowProjectile;
 use pocketmine\item\Arrow;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
+use pocketmine\item\ItemIdentifier;
 use pocketmine\item\ItemIds;
+use pocketmine\item\ItemUseResult;
 use pocketmine\item\Tool;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\LevelSoundEventPacket;
@@ -19,28 +21,29 @@ class CrossbowItem extends Tool{
 
     const TAG_CHARGED_ITEM = "chargedItem";
 
-    public function __construct(int $meta = 0){
-        parent::__construct(self::CROSSBOW, $meta, "Crossbow");
+    public function __construct(){
+        parent::__construct(new ItemIdentifier(ItemIds::CROSSBOW, 0), "Crossbow");
     }
 
     public function getMaxDurability(): int{
         return 464;
     }
 
-    public function onClickAir(Player $player, Vector3 $directionVector): bool{
-        if($this->isCharged()){
-            $this->fireProjectile($player);
-            return false;
-        }
-        $this->chargeBow($player);
-        return false;
+    public function onClickAir(Player $player, Vector3 $directionVector): ItemUseResult{
+        //        if($this->isCharged()){
+        //            $this->fireProjectile($player);
+        //            return false;
+        //        }
+        //        $this->chargeBow($player);
+        //        return false;
+        return parent::onClickAir($player, $directionVector);
     }
 
     private function chargeBow(Player $player): void{
         $duration = $player->getItemUseDuration();
 
         if($duration >= 24){
-            $offhandItem = VanillaX::getInstance()->getSessionManager()->get($player)->getOffHandInventory()->getItem(0);
+            $offhandItem = $player->getOffHandInventory()->getItem(0);
             $itemId = $offhandItem->getId() === ItemIds::FIREWORKS ? ItemIds::FIREWORKS : ItemIds::ARROW;
             $this->setCharged($player, true, $itemId);
             $player->getInventory()->setItemInHand($this);

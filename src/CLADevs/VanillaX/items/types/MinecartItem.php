@@ -12,18 +12,19 @@ use CLADevs\VanillaX\utils\item\NonAutomaticCallItemTrait;
 use pocketmine\block\BaseRail;
 use pocketmine\block\Block;
 use pocketmine\item\Item;
+use pocketmine\item\ItemIdentifier;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
 
 class MinecartItem extends Item implements NonAutomaticCallItemTrait{
 
-    public function __construct(int $id, int $meta = 0, string $name = "Unknown"){
+    public function __construct(int $id, string $name = "Unknown"){
         if($name === "Unknown"){
             $name = "Minecart";
         }else{
             $name = "Minecart with " . $name;
         }
-        parent::__construct($id, $meta, $name);
+        parent::__construct(new ItemIdentifier($id, 0), $name);
     }
 
     public function onActivate(Player $player, Block $blockReplace, Block $blockClicked, int $face, Vector3 $clickVector): bool{

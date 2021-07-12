@@ -7,14 +7,13 @@ use CLADevs\VanillaX\inventories\types\BrewingStandInventory;
 use CLADevs\VanillaX\inventories\types\HopperInventory;
 use pocketmine\block\Block;
 use pocketmine\block\BlockLegacyIds;
-use pocketmine\entity\object\ItemEntity;
+use pocketmine\block\tile\Chest;
+use pocketmine\block\tile\Container;
+use pocketmine\block\tile\ContainerTrait;
+use pocketmine\block\tile\Furnace;
+use pocketmine\block\tile\Spawnable;
 use pocketmine\item\ItemIds;
 use pocketmine\nbt\tag\CompoundTag;
-use pocketmine\tile\Chest;
-use pocketmine\tile\Container;
-use pocketmine\tile\ContainerTrait;
-use pocketmine\tile\Furnace;
-use pocketmine\tile\Spawnable;
 
 class HopperTile extends Spawnable implements Container{
 use ContainerTrait;
@@ -36,7 +35,7 @@ use ContainerTrait;
     }
 
     public function getFacingBlock(): Block{
-        return $this->getLevel()->getBlock($this)->getSide($this->facing);
+        return $this->getPos()->getWorld()->getBlock($this->getPos())->getSide($this->facing);
     }
 
     private function transferItems(): void{
@@ -44,10 +43,10 @@ use ContainerTrait;
 
         if(in_array($block->getId(), [BlockLegacyIds::HOPPER_BLOCK, BlockLegacyIds::FURNACE, BlockLegacyIds::BREWING_STAND_BLOCK, BlockLegacyIds::CHEST])){
             /** @var HopperTile|Furnace|BrewingStandTile|Chest $tile */
-            $tile = $this->getLevel()->getTile($block);
+            $tile = $this->getPos()->getWorld()->getTile($block->getPos());
             $inventory = $tile->getInventory();
 
-            if($tile instanceof HopperTile && $tile->getFacingBlock()->equals($this)){
+            if($tile instanceof HopperTile && $tile->getFacingBlock()->getPos()->equals($this->getPos())){
                 //Stops infinite loop
                 return;
             }
@@ -84,26 +83,28 @@ use ContainerTrait;
 
         //Thanks to nukkit for bounding box code
         //Collect dropped items
-        $bb = $this->getBlock()->getBoundingBox();
-        $bb->maxY += 1;
-        foreach($this->getLevel()->getNearbyEntities($bb) as $entity){
-            if(!$entity->isClosed() && !$entity->isFlaggedForDespawn() && $entity instanceof ItemEntity){
-                $item = $entity->getItem();
-
-                if(!$item->isNull()){
-                    $this->getInventory()->addItem($item);
-                    $entity->flagForDespawn();
-                }
-            }
-        }
+        //TODO fix items not being picked up when dropped
+//        $bb = $this->getBlock()->getBoundingBox();
+//        $bb->maxY += 1;
+//        foreach($this->getLevel()->getNearbyEntities($bb) as $entity){
+//            if(!$entity->isClosed() && !$entity->isFlaggedForDespawn() && $entity instanceof ItemEntity){
+//                $item = $entity->getItem();
+//
+//                if(!$item->isNull()){
+//                    $this->getInventory()->addItem($item);
+//                    $entity->flagForDespawn();
+//                }
+//            }
+//        }
         return true;
     }
 
-    protected function readSaveData(CompoundTag $nbt): void{
-        $this->facing = $this->getLevel()->getBlockDataAt($this->x, $this->y, $this->z);
-        $this->inventory = new HopperInventory($this);
+    public function readSaveData(CompoundTag $nbt): void{
+        $this->facing = $this->getPos()->getWorld()->getBlock($this->pos)->getMeta();
+        $this->inventory = new HopperInventory($this->getPos());
         $this->loadItems($nbt);
-        $this->scheduleUpdate();
+       // $this->scheduleUpdate();
+        //TODO schedule
     }
 
     protected function writeSaveData(CompoundTag $nbt): void{

@@ -7,8 +7,8 @@ use CLADevs\VanillaX\entities\utils\interfaces\EntityClassification;
 use CLADevs\VanillaX\entities\VanillaEntity;
 use CLADevs\VanillaX\utils\Utils;
 use CLADevs\VanillaX\VanillaX;
-use pocketmine\entity\Effect;
-use pocketmine\entity\EffectInstance;
+use pocketmine\entity\effect\EffectInstance;
+use pocketmine\entity\effect\VanillaEffects;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\inventory\InventoryTransactionEvent;
@@ -19,6 +19,7 @@ use pocketmine\item\Armor;
 use pocketmine\item\Axe;
 use pocketmine\data\bedrock\EnchantmentIdMap;
 use pocketmine\data\bedrock\EnchantmentIds;
+use pocketmine\item\enchantment\Enchantment;
 use pocketmine\item\Item;
 use pocketmine\item\ItemIds;
 use pocketmine\item\Pickaxe;
@@ -34,16 +35,16 @@ class EnchantmentManager{
     public function startup(): void{
         Utils::callDirectory("enchantments", function (string $namespace): void{
             if(in_array(EnchantmentTrait::class, class_uses($namespace), true)){
-                self::registerEnchantment(new $namespace());
+                $this->registerEnchantment(new $namespace());
             }
         });
         //TODO Crossbow enchantment
     }
 
     public function registerEnchantment(Enchantment $enchantment): void{
-        $this->enchantments[$enchantment->getId()] = $enchantment;
-        if(!in_array($enchantment->getId(), VanillaX::getInstance()->getConfig()->getNested("disabled.enchantments", []))){
-            Enchantment::registerEnchantment($enchantment);
+        $this->enchantments[$enchantment->getRuntimeId()] = $enchantment;
+        if(!in_array($enchantment->getRuntimeId(), VanillaX::getInstance()->getConfig()->getNested("disabled.enchantments", []))){
+            EnchantmentIdMap::getInstance()->register($enchantment->getRuntimeId(), $enchantment);
         }
     }
 
@@ -51,90 +52,90 @@ class EnchantmentManager{
      * @return int[]
      */
     public function getTreasureEnchantsId(): array{
-        return [Enchantment::FROST_WALKER, Enchantment::BINDING, Enchantment::SOUL_SPEED, Enchantment::MENDING, Enchantment::VANISHING];
+        return [EnchantmentIds::FROST_WALKER, EnchantmentIds::BINDING, EnchantmentIds::SOUL_SPEED, EnchantmentIds::MENDING, EnchantmentIds::VANISHING];
     }
 
     /**
      * @return int[]
      */
     public function getGlobalEnchantsId(): array{
-        return [Enchantment::VANISHING, Enchantment::UNBREAKING, Enchantment::MENDING];
+        return [EnchantmentIds::VANISHING, EnchantmentIds::UNBREAKING, EnchantmentIds::MENDING];
     }
 
     /**
      * @return int[]
      */
     public function getWeaponEnchantsId(): array{
-        return [Enchantment::BANE_OF_ARTHROPODS, Enchantment::SHARPNESS, Enchantment::SMITE];
+        return [EnchantmentIds::BANE_OF_ARTHROPODS, EnchantmentIds::SHARPNESS, EnchantmentIds::SMITE];
     }
 
     /**
      * @return int[]
      */
     public function getToolEnchantsId(): array{
-        return [Enchantment::EFFICIENCY, EnchantmentIdMap::getInstance()->fromId(EnchantmentIds::FORTUNE), Enchantment::SILK_TOUCH];
+        return [EnchantmentIds::EFFICIENCY, EnchantmentIds::FORTUNE, EnchantmentIds::SILK_TOUCH];
     }
 
     /**
      * @return int[]
      */
     public function getArmorEnchantsId(): array{
-        return [Enchantment::PROTECTION, Enchantment::BLAST_PROTECTION, Enchantment::FIRE_PROTECTION, Enchantment::PROJECTILE_PROTECTION];
+        return [EnchantmentIds::PROTECTION, EnchantmentIds::BLAST_PROTECTION, EnchantmentIds::FIRE_PROTECTION, EnchantmentIds::PROJECTILE_PROTECTION];
     }
 
     /**
      * @return int[]
      */
     public function getHelmetEnchantsId(): array{
-        return [Enchantment::AQUA_AFFINITY, Enchantment::RESPIRATION];
+        return [EnchantmentIds::AQUA_AFFINITY, EnchantmentIds::RESPIRATION];
     }
 
     /**
      * @return int[]
      */
     public function getBootEnchantsId(): array{
-        return [Enchantment::DEPTH_STRIDER, Enchantment::FEATHER_FALLING, Enchantment::FROST_WALKER, Enchantment::SOUL_SPEED];
+        return [EnchantmentIds::DEPTH_STRIDER, EnchantmentIds::FEATHER_FALLING, EnchantmentIds::FROST_WALKER, EnchantmentIds::SOUL_SPEED];
     }
 
     /**
      * @return int[]
      */
     public function getSwordEncantsId(): array{
-        return [Enchantment::FIRE_ASPECT, Enchantment::KNOCKBACK, Enchantment::LOOTING];
+        return [EnchantmentIds::FIRE_ASPECT, EnchantmentIds::KNOCKBACK, EnchantmentIds::LOOTING];
     }
 
     /**
      * @return int[]
      */
     public function getElytraEnchantsId(): array{
-        return [Enchantment::BINDING];
+        return [EnchantmentIds::BINDING];
     }
 
     /**
      * @return int[]
      */
     public function getBowEnchantsId(): array{
-        return [Enchantment::FLAME, Enchantment::INFINITY, Enchantment::PUNCH];
+        return [EnchantmentIds::FLAME, EnchantmentIds::INFINITY, EnchantmentIds::PUNCH];
     }
     /**
      * @return int[]
      */
     public function getCrossbowEnchantsId(): array{
-        return [Enchantment::MULTISHOT, Enchantment::PIERCING, Enchantment::QUICK_CHARGE];
+        return [EnchantmentIds::MULTISHOT, EnchantmentIds::PIERCING, EnchantmentIds::QUICK_CHARGE];
     }
 
     /**
      * @return int[]
      */
     public function getTridentEnchantsId(): array{
-        return [Enchantment::CHANNELING, Enchantment::IMPALING, Enchantment::LOYALTY, Enchantment::RIPTIDE];
+        return [EnchantmentIds::CHANNELING, EnchantmentIds::IMPALING, EnchantmentIds::LOYALTY, EnchantmentIds::RIPTIDE];
     }
 
     /**
      * @return int[]
      */
     public function getFishingRodEnchantsId(): array{
-        return [Enchantment::LUCK_OF_THE_SEA, Enchantment::LURE];
+        return [EnchantmentIds::LUCK_OF_THE_SEA, EnchantmentIds::LURE];
     }
 
     /**
@@ -201,16 +202,16 @@ class EnchantmentManager{
             case ItemIds::FISHING_ROD:
                 $enchantments = $this->getFishingRodEnchantsId();
                 if(!$includeTreasures){
-                    unset($enchantments[Enchantment::FROST_WALKER]);
-                    unset($enchantments[Enchantment::SOUL_SPEED]);
+                    unset($enchantments[EnchantmentIds::FROST_WALKER]);
+                    unset($enchantments[EnchantmentIds::SOUL_SPEED]);
                 }
                 break;
         }
         if(count($enchantments) < 1) return null;
         if($includeGlobal){
             $global = $this->getGlobalEnchantsId();
-            unset($global[Enchantment::MENDING]);
-            unset($global[Enchantment::VANISHING]);
+            unset($global[EnchantmentIds::MENDING]);
+            unset($global[EnchantmentIds::VANISHING]);
             return array_merge($global, $enchantments);
         }
         return $enchantments;
@@ -226,8 +227,8 @@ class EnchantmentManager{
                     $source = $act->getSourceItem();
                     $inv = $act->getInventory();
 
-                    if(!$player->isCreative() && $source->hasEnchantment(Enchantment::BINDING) && ($inv instanceof PlayerInventory || $inv instanceof ArmorInventory)){
-                        $event->setCancelled();
+                    if(!$player->isCreative() && $source->hasEnchantment(EnchantmentIdMap::getInstance()->fromId(EnchantmentIds::BINDING)) && ($inv instanceof PlayerInventory || $inv instanceof ArmorInventory)){
+                        $event->cancel();
                     }
                 }
             }
@@ -244,18 +245,18 @@ class EnchantmentManager{
                     $item = $damager->getInventory()->getItemInHand();
 
                     /** Bane of Arthropods  */
-                    if($item->hasEnchantment(Enchantment::BANE_OF_ARTHROPODS) && $entity->getClassification() === EntityClassification::ARTHROPODS){
-                        $level = $item->getEnchantmentLevel(Enchantment::BANE_OF_ARTHROPODS);
+                    if($item->hasEnchantment($enchantment = EnchantmentIdMap::getInstance()->fromId(EnchantmentIds::BANE_OF_ARTHROPODS)) && $entity->getClassification() === EntityClassification::ARTHROPODS){
+                        $level = $item->getEnchantmentLevel($enchantment);
                         $event->setBaseDamage($event->getBaseDamage() + ($level * 2.5));
 
                         $duration = mt_rand(10, 15) / 10;
                         $duration += $level > 1 ? (0.5 * $level) : 0;
-                        $entity->addEffect(new EffectInstance(Effect::getEffect(Effect::SLOWNESS), 20 * $duration, 4));
+                        $entity->getEffects()->add(new EffectInstance(VanillaEffects::SLOWNESS(), 20 * $duration, 4));
                     }
 
                     /** Smite  */
-                    if($item->hasEnchantment(Enchantment::SMITE) && $entity->getClassification() === EntityClassification::UNDEAD){
-                        $level = $item->getEnchantmentLevel(Enchantment::SMITE);
+                    if($item->hasEnchantment($enchantment = EnchantmentIdMap::getInstance()->fromId(EnchantmentIds::SMITE)) && $entity->getClassification() === EntityClassification::UNDEAD){
+                        $level = $item->getEnchantmentLevel($enchantment);
                         $event->setBaseDamage($event->getBaseDamage() + ($level * 2.5));
                     }
                 }

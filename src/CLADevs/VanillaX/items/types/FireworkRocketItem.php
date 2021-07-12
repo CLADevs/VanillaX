@@ -2,37 +2,38 @@
 
 namespace CLADevs\VanillaX\items\types;
 
-use CLADevs\VanillaX\entities\object\FireworkRocketEntity;
-use CLADevs\VanillaX\session\Session;
 use CLADevs\VanillaX\VanillaX;
 use pocketmine\block\Block;
 use pocketmine\item\Item;
+use pocketmine\item\ItemIdentifier;
+use pocketmine\item\ItemIds;
+use pocketmine\item\ItemUseResult;
 use pocketmine\math\Vector3;
-use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\player\Player;
 
 class FireworkRocketItem extends Item{
 
-    public function __construct(int $meta = 0){
-        parent::__construct(self::FIREWORKS, $meta, "Firework Rocket");
+    public function __construct(){
+        parent::__construct(new ItemIdentifier(ItemIds::FIREWORKS, 0), "Firework Rocket");
     }
 
-    public function onClickAir(Player $player, Vector3 $directionVector): bool{
-        $this->checkElytra($player);
+    public function onClickAir(Player $player, Vector3 $directionVector): ItemUseResult{
+        //$this->checkElytra($player);
         return parent::onClickAir($player, $directionVector);
     }
 
-    public function onActivate(Player $player, Block $blockReplace, Block $blockClicked, int $face, Vector3 $clickVector): bool{
-        if(!$this->checkElytra($player)){
-            $entity = new FireworkRocketEntity($player->getLevel(), FireworkRocketEntity::createBaseNBT($blockReplace->add(0.5, 0, 0.5)), $player);
-            if($this->getNamedTag()->hasTag("Fireworks", CompoundTag::class)){
-                $entity->getDataPropertyManager()->setCompoundTag(16, $this->getNamedTag());
-            }
-            $entity->spawnToAll();
-        }
-        Session::playSound($player, "firework.launch");
-        if($player->isSurvival() || $player->isAdventure()) $this->pop();
-       return true;
+    public function onInteractBlock(Player $player, Block $blockReplace, Block $blockClicked, int $face, Vector3 $clickVector): ItemUseResult{
+        //     if(!$this->checkElytra($player)){
+        //            $entity = new FireworkRocketEntity($player->getLevel(), FireworkRocketEntity::createBaseNBT($blockReplace->add(0.5, 0, 0.5)), $player);
+        //            if($this->getNamedTag()->hasTag("Fireworks", CompoundTag::class)){
+        //                $entity->getDataPropertyManager()->setCompoundTag(16, $this->getNamedTag());
+        //            }
+        //            $entity->spawnToAll();
+        //        }
+        //        Session::playSound($player, "firework.launch");
+        //        if($player->isSurvival() || $player->isAdventure()) $this->pop();
+        //       return true;
+        return parent::onInteractBlock($player, $blockReplace, $blockClicked, $face, $clickVector);
     }
 
     public function checkElytra(Player $player): bool{

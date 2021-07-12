@@ -13,7 +13,7 @@ class RedstoneRepeater extends Transparent implements NonAutomaticCallItemTrait{
 
     private bool $powered;
 
-    public function __conshtruct(bool $powered){
+    public function __construct(bool $powered){
         $id = $powered ? BlockLegacyIds::POWERED_REPEATER : BlockLegacyIds::UNPOWERED_REPEATER;
         $name = ($powered ? "Powered" : "Unpowered") . " Repeater";
         parent::__construct(new BlockIdentifier($id, 0, ItemIds::REPEATER), $name, new BlockBreakInfo(0));

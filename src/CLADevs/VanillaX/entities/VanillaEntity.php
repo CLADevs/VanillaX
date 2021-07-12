@@ -8,6 +8,8 @@ use pocketmine\entity\Living;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDeathEvent;
 use pocketmine\network\mcpe\protocol\AddActorPacket;
+use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataCollection;
+use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataFlags;
 use pocketmine\player\Player;
 
 abstract class VanillaEntity extends Living{
@@ -44,6 +46,8 @@ abstract class VanillaEntity extends Living{
         self::VILLAGER_V2 => "minecraft:villager_v2",
     ];
 
+    private bool $baby = false;
+
     /**
      * @param int[] 
      */
@@ -57,7 +61,7 @@ abstract class VanillaEntity extends Living{
     }
 
     public function isBaby(): bool{
-        return $this->getGenericFlag(self::DATA_FLAG_BABY);
+        return $this->baby;
     }
 
     public function getClassification(): int{
@@ -69,30 +73,33 @@ abstract class VanillaEntity extends Living{
         return $cause instanceof EntityDamageByEntityEvent && $cause->getDamager() instanceof Player;
     }
 
+    protected function syncNetworkData(EntityMetadataCollection $properties): void{
+        parent::syncNetworkData($properties);
+        $properties->setGenericFlag(EntityMetadataFlags::BABY, $this->baby);
+    }
+
     protected function onDeath(): void{
         $ev = new EntityDeathEvent($this, $this->getDrops(), $this->getXpDropAmount());
         $ev->call();
-        if(GameRule::getGameRuleValue(GameRule::DO_MOB_LOOT, $this->getLevel())){
+        if(GameRule::getGameRuleValue(GameRule::DO_MOB_LOOT, $this->getWorld())){
             foreach($ev->getDrops() as $item){
-                $this->getLevelNonNull()->dropItem($this, $item);
+                $this->getWorld()->dropItem($this->getPosition(), $item);
             }
-            $this->level->dropExperience($this, $ev->getXpDropAmount());
+            $this->getWorld()->dropExperience($this->getPosition(), $ev->getXpDropAmount());
         }
     }
 
     protected function sendSpawnPacket(Player $player): void{
         $pk = new AddActorPacket();
         $pk->entityRuntimeId = $this->getId();
-        $pk->type = AddActorPacket::LEGACY_ID_MAP_BC[static::NETWORK_ID] ?? self::LEGACY_ID_MAP_BC[static::NETWORK_ID];
-        $pk->position = $this->asVector3();
+        $pk->type = static::NETWORK_ID;
+        $pk->position = $this->getPosition();
         $pk->motion = $this->getMotion();
-        $pk->yaw = $this->yaw;
-        $pk->headYaw = $this->yaw;
-        $pk->pitch = $this->pitch;
+        $pk->yaw = $this->location->yaw;
+        $pk->headYaw = $this->location->yaw;
+        $pk->pitch = $this->location->pitch;
         $pk->attributes = $this->attributeMap->getAll();
-        $pk->metadata = $this->propertyManager->getAll();
-        $player->dataPacket($pk);
-
-        $this->armorInventory->sendContents($player);
+        $pk->metadata = $this->getAllNetworkData();
+        $player->getNetworkSession()->sendDataPacket($pk);
     }
 }

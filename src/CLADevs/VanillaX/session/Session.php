@@ -7,11 +7,10 @@ use CLADevs\VanillaX\entities\projectile\TridentEntity;
 use CLADevs\VanillaX\entities\utils\interfaces\EntityRidable;
 use CLADevs\VanillaX\entities\VanillaEntity;
 use CLADevs\VanillaX\inventories\FakeBlockInventory;
-use CLADevs\VanillaX\inventories\types\OffhandInventory;
-use pocketmine\entity\Entity;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\DataPacket;
 use pocketmine\network\mcpe\protocol\PlaySoundPacket;
+use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataFlags;
 use pocketmine\player\Player;
 
 class Session{
@@ -24,15 +23,13 @@ class Session{
     private bool $gliding = false;
 
     private Player $player;
-    private OffhandInventory $offHandInventory;
-    
+
     private ?FakeBlockInventory $currentWindow = null;
     private ?VanillaEntity $ridingEntity = null;
     private ?VillagerEntity $tradingEntity = null;
 
     public function __construct(Player $player){
         $this->player = $player;
-        $this->offHandInventory = new OffhandInventory($player);
         $this->entityId = $player->getId();
     }
 
@@ -42,10 +39,6 @@ class Session{
 
     public function getPlayer(): Player{
         return $this->player;
-    }
-
-    public function getOffHandInventory(): OffhandInventory{
-        return $this->offHandInventory;
     }
 
     public function getRidingEntity(): ?VanillaEntity{
@@ -83,7 +76,7 @@ class Session{
     }
 
     public function setGliding(bool $gliding): void{
-        $this->player->setGenericFlag(Entity::DATA_FLAG_GLIDING, $gliding);
+        $this->player->getNetworkProperties()->setGenericFlag(EntityMetadataFlags::GLIDING, $gliding);
         $this->gliding = $gliding;
     }
 
@@ -108,7 +101,7 @@ class Session{
      * @param float $pitch
      * @param float $volume
      * @param bool $packet
-     * @return DataPacket|null
+     * @return PlaySoundPacket|null
      */
     public static function playSound($player, string $sound, float $pitch = 1, float $volume = 1, bool $packet = false): ?DataPacket{
         $pk = new PlaySoundPacket();
@@ -121,7 +114,7 @@ class Session{
         if($packet){
             return $pk;
         }elseif($player instanceof Player){
-            $player->dataPacket($pk);
+            $player->getNetworkSession()->sendDataPacket($pk);
         }
         return null;
     }

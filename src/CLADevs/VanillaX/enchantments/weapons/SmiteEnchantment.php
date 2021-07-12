@@ -3,9 +3,11 @@
 namespace CLADevs\VanillaX\enchantments\weapons;
 
 use CLADevs\VanillaX\enchantments\utils\EnchantmentTrait;
-use pocketmine\item\Axe;
-use pocketmine\data\bedrock\EnchantmentIdMap;
 use pocketmine\data\bedrock\EnchantmentIds;
+use pocketmine\item\Axe;
+use pocketmine\item\enchantment\Enchantment;
+use pocketmine\item\enchantment\ItemFlags;
+use pocketmine\item\enchantment\Rarity;
 use pocketmine\item\Item;
 use pocketmine\item\Sword;
 
@@ -13,11 +15,11 @@ class SmiteEnchantment extends Enchantment{
     use EnchantmentTrait;
 
     public function __construct(){
-        parent::__construct(self::SMITE, "%enchantment.damage.undead", self::RARITY_UNCOMMON, self::SLOT_SWORD, self::SLOT_AXE, 5);
+        parent::__construct(EnchantmentIds::SMITE, "%enchantment.damage.undead", Rarity::UNCOMMON, ItemFlags::SWORD, ItemFlags::AXE, 5);
     }
 
     public function getIncompatibles(): array{
-        return [self::BANE_OF_ARTHROPODS, self::SHARPNESS];
+        return [EnchantmentIds::BANE_OF_ARTHROPODS, EnchantmentIds::SHARPNESS];
     }
 
     public function isItemCompatible(Item $item): bool{

@@ -3,12 +3,14 @@
 namespace CLADevs\VanillaX\items\types\netherite;
 
 use CLADevs\VanillaX\items\ItemIdentifiers;
+use pocketmine\item\ItemIdentifier;
 use pocketmine\item\Shovel;
+use pocketmine\item\ToolTier;
 
 class NetheriteShovel extends Shovel{
 
     public function __construct(){
-        parent::__construct(ItemIdentifiers::NETHERITE_SHOVEL, 0, "Netherite Shovel", ItemIdentifiers::TIER_NETHERITE);
+        parent::__construct(new ItemIdentifier(ItemIdentifiers::NETHERITE_SHOVEL, 0), "Netherite Shovel", ToolTier::DIAMOND());
     }
 
     public function getAttackPoints(): int{

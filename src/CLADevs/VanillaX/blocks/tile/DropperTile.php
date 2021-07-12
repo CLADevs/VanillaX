@@ -5,10 +5,10 @@ namespace CLADevs\VanillaX\blocks\tile;
 use CLADevs\VanillaX\blocks\utils\TileVanilla;
 use CLADevs\VanillaX\inventories\types\DropperInventory;
 use pocketmine\block\BlockLegacyIds;
+use pocketmine\block\tile\Container;
+use pocketmine\block\tile\ContainerTrait;
+use pocketmine\block\tile\Spawnable;
 use pocketmine\nbt\tag\CompoundTag;
-use pocketmine\tile\Container;
-use pocketmine\tile\ContainerTrait;
-use pocketmine\tile\Spawnable;
 
 class DropperTile extends Spawnable implements Container{
     use ContainerTrait;
@@ -26,8 +26,8 @@ class DropperTile extends Spawnable implements Container{
         return $this->inventory;
     }
 
-    protected function readSaveData(CompoundTag $nbt): void{
-        $this->inventory = new DropperInventory($this);
+    public function readSaveData(CompoundTag $nbt): void{
+        $this->inventory = new DropperInventory($this->getPos());
         $this->loadItems($nbt);
     }
 

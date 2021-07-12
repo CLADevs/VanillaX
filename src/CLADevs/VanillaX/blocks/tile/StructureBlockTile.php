@@ -4,8 +4,8 @@ namespace CLADevs\VanillaX\blocks\tile;
 
 use CLADevs\VanillaX\blocks\utils\TileVanilla;
 use pocketmine\block\BlockLegacyIds;
+use pocketmine\block\tile\Spawnable;
 use pocketmine\nbt\tag\CompoundTag;
-use pocketmine\tile\Spawnable;
 
 class StructureBlockTile extends Spawnable{
 
@@ -31,7 +31,7 @@ class StructureBlockTile extends Spawnable{
     const TILE_ID = TileVanilla::STRUCTURE_BLOCK;
     const TILE_BLOCK = BlockLegacyIds::STRUCTURE_BLOCK;
 
-    protected function readSaveData(CompoundTag $nbt): void{
+    public function readSaveData(CompoundTag $nbt): void{
     }
 
     protected function writeSaveData(CompoundTag $nbt): void{

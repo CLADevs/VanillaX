@@ -9,11 +9,12 @@ use CLADevs\VanillaX\VanillaX;
 use pocketmine\block\BlockLegacyIds;
 use pocketmine\item\Item;
 use pocketmine\item\ItemIds;
+use pocketmine\network\mcpe\convert\TypeConverter;
 use pocketmine\network\mcpe\protocol\ContainerSetDataPacket;
 use pocketmine\network\mcpe\protocol\DataPacket;
 use pocketmine\network\mcpe\protocol\InventoryTransactionPacket;
-use pocketmine\network\mcpe\protocol\types\NetworkInventoryAction;
-use pocketmine\network\mcpe\protocol\types\WindowTypes;
+use pocketmine\network\mcpe\protocol\types\inventory\NetworkInventoryAction;
+use pocketmine\network\mcpe\protocol\types\inventory\WindowTypes;
 use pocketmine\player\Player;
 
 class BrewingStandInventory extends FakeBlockInventory{
@@ -29,7 +30,7 @@ class BrewingStandInventory extends FakeBlockInventory{
     private BrewingStandTile $tile;
 
     public function __construct(BrewingStandTile $tile){
-        parent::__construct($tile, 5, BlockLegacyIds::AIR, WindowTypes::BREWING_STAND);
+        parent::__construct($tile->getPos(), 5, BlockLegacyIds::AIR, WindowTypes::BREWING_STAND);
         $this->tile = $tile;
     }
 
@@ -43,7 +44,7 @@ class BrewingStandInventory extends FakeBlockInventory{
 
     public function decreaseIngredient(): void{
         $item = $this->getIngredient();
-        $item->count--;
+        $item->setCount($item->getCount() - 1);
         $this->setIngredient($item);
     }
 
@@ -57,7 +58,7 @@ class BrewingStandInventory extends FakeBlockInventory{
 
     public function decreaseFuel(): void{
         $item = $this->getFuel();
-        $item->count--;
+        $item->setCount($item->getCount() - 1);
         $this->setFuel($item);
     }
 
@@ -94,7 +95,7 @@ class BrewingStandInventory extends FakeBlockInventory{
                         case self::FIRST_POTION_SLOT:
                         case self::SECOND_POTION_SLOT:
                         case self::THIRD_POTION_SLOT:
-                            $block = $player->getLevel()->getBlock($this->getHolder());
+                            $block = $player->getWorld()->getBlock($this->getHolder());
 
                             if($block instanceof BrewingStandBlock){
                                 /** Nukkit Reference */
@@ -111,9 +112,10 @@ class BrewingStandInventory extends FakeBlockInventory{
                                         $damage |= 1 << ($i - 1);
                                     }
                                 }
-                                $block->setDamage($damage);
+                                //$block->setDamage($damage);
+                                //TODO facing
                             }
-                            $player->getLevel()->setBlock($block, $block, true, true);
+                            $player->getWorld()->setBlock($block, $block);
                             break;
                         case self::FUEL_SLOT:
                             if(!$this->tile->isFueled() && $newItem->getId() === ItemIds::BLAZE_POWDER){
@@ -131,6 +133,7 @@ class BrewingStandInventory extends FakeBlockInventory{
                     $potionCount = 0;
 
                     for($i = self::FIRST_POTION_SLOT; $i <= self::THIRD_POTION_SLOT; $i++){
+                        $newItem = TypeConverter::getInstance()->netItemStackToCore($newItem);
                         if($this->isPotion($this->getItem($i), $ingredient)){
                             $potionCount++;
                             if($action->inventorySlot === $i && !$this->isPotion($newItem, $ingredient)){
@@ -160,10 +163,10 @@ class BrewingStandInventory extends FakeBlockInventory{
 
             if($player === null){
                 foreach($this->getViewers() as $p){
-                    $p->dataPacket($pk);
+                    $p->getNetworkSession()->sendDataPacket($pk);
                 }
             }else{
-                $player->dataPacket($pk);
+                $player->getNetworkSession()->sendDataPacket($pk);
             }
         }
     }

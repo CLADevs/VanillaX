@@ -3,12 +3,14 @@
 namespace CLADevs\VanillaX\items\types\netherite;
 
 use CLADevs\VanillaX\items\ItemIdentifiers;
+use pocketmine\item\ItemIdentifier;
 use pocketmine\item\Pickaxe;
+use pocketmine\item\ToolTier;
 
 class NetheritePickaxe extends Pickaxe{
 
     public function __construct(){
-        parent::__construct(ItemIdentifiers::NETHERITE_PICKAXE, 0, "Netherite Pickaxe", ItemIdentifiers::TIER_NETHERITE);
+        parent::__construct(new ItemIdentifier(ItemIdentifiers::NETHERITE_PICKAXE, 0), "Netherite Pickaxe", ToolTier::DIAMOND());
     }
 
     public function getAttackPoints(): int{

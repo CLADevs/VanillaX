@@ -3,17 +3,26 @@
 namespace CLADevs\VanillaX\blocks\block;
 
 use CLADevs\VanillaX\blocks\tile\MobSpawnerTile;
+use pocketmine\block\BlockBreakInfo;
+use pocketmine\block\BlockIdentifier;
 use pocketmine\block\BlockLegacyIds;
+use pocketmine\block\BlockToolType;
 use pocketmine\block\MonsterSpawner;
+use pocketmine\block\tile\MonsterSpawner as TileMonsterSpawner;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
+use pocketmine\item\ToolTier;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
 
 class MobSpawnerBlock extends MonsterSpawner{
 
     //TODO tile
+
+    public function __construct(){
+        parent::__construct(new BlockIdentifier(BlockLegacyIds::MOB_SPAWNER, 0, null, TileMonsterSpawner::class), "Monster Spawner", new BlockBreakInfo(5.0, BlockToolType::PICKAXE, ToolTier::WOOD()->getHarvestLevel()));
+    }
 
     public function isAffectedBySilkTouch(): bool{
         return true;

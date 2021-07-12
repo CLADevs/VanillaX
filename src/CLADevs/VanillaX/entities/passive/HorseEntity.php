@@ -2,21 +2,20 @@
 
 namespace CLADevs\VanillaX\entities\passive;
 
-use CLADevs\VanillaX\entities\utils\ItemHelper;
 use CLADevs\VanillaX\entities\VanillaEntity;
-use pocketmine\item\Item;
-use pocketmine\item\ItemFactory;
-use pocketmine\item\ItemIds;
+use pocketmine\entity\EntitySizeInfo;
+use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\network\mcpe\protocol\types\entity\EntityIds;
 
 class HorseEntity extends VanillaEntity{
 
-    const NETWORK_ID = self::HORSE;
+    const NETWORK_ID = EntityIds::HORSE;
 
-    public $width = 1.4;
-    public $height = 1.6;
+    public float $width = 1.4;
+    public float $height = 1.6;
 
-    protected function initEntity(): void{
-        parent::initEntity();
+    protected function initEntity(CompoundTag $nbt): void{
+        parent::initEntity($nbt);
         $this->setRangeHealth([15, 30]);
     }
 
@@ -24,14 +23,12 @@ class HorseEntity extends VanillaEntity{
         return "Horse";
     }
 
-    /**
-     * @return Item[]
-     */
-    public function getDrops(): array{
-        $leather = ItemFactory::getInstance()->get(ItemIds::LEATHER, 0, 1);
-        ItemHelper::applySetCount($leather, 0, 2);
-        ItemHelper::applyLootingEnchant($this, $leather);
-        return [$leather];
+    protected function getInitialSizeInfo(): EntitySizeInfo{
+        return new EntitySizeInfo($this->height, $this->width);
+    }
+
+    public static function getNetworkTypeId(): string{
+        return self::NETWORK_ID;
     }
     
     public function getXpDropAmount(): int{

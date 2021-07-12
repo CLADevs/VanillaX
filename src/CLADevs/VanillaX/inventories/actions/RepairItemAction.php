@@ -5,8 +5,8 @@ namespace CLADevs\VanillaX\inventories\actions;
 use CLADevs\VanillaX\inventories\types\AnvilInventory;
 use pocketmine\block\BlockLegacyIds;
 use pocketmine\inventory\transaction\action\InventoryAction;
+use pocketmine\inventory\transaction\TransactionValidationException;
 use pocketmine\item\Item;
-use pocketmine\network\mcpe\protocol\types\WindowTypes;
 use pocketmine\player\Player;
 
 class RepairItemAction extends InventoryAction{
@@ -20,23 +20,18 @@ class RepairItemAction extends InventoryAction{
         $this->sourceType = $sourceType;
     }
 
-    public function isValid(Player $source): bool{
-        return $source->getWindow(WindowTypes::ANVIL) !== null;
-    }
-
-    public function execute(Player $source): bool{
-        return true;
-    }
-
-    public function onExecuteSuccess(Player $source): void{
-        $inv = $source->getWindow(WindowTypes::ANVIL);
+    public function execute(Player $source): void{
+        $inv = $source->getCurrentWindow();
 
         if($inv instanceof AnvilInventory && $this->targetItem->getId() === BlockLegacyIds::AIR){
             $inv->onSuccess($source, $this->sourceItem);
         }
     }
 
-    public function onExecuteFail(Player $source): void{
+    public function validate(Player $source): void{
+        if(!$source->getCurrentWindow() instanceof AnvilInventory){
+            throw new TransactionValidationException("Anvil Inventory is not opened");
+        }
     }
 
     public function getType(): int{

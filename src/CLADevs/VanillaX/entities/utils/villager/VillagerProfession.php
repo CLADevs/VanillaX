@@ -3,16 +3,13 @@
 namespace CLADevs\VanillaX\entities\utils\villager;
 
 use CLADevs\VanillaX\entities\utils\ItemHelper;
-use CLADevs\VanillaX\entities\utils\villager\professions\ArmorerProfession;
 use CLADevs\VanillaX\entities\utils\villager\professions\NitwitProfession;
 use CLADevs\VanillaX\utils\Utils;
-use Exception;
 use InvalidArgumentException;
 use pocketmine\block\Block;
-use pocketmine\block\BlockFactory;
 use pocketmine\block\BlockLegacyIds;
 use pocketmine\item\Item;
-use pocketmine\item\ItemFactory;
+use pocketmine\item\LegacyStringToItemParser;
 
 abstract class VillagerProfession{
 
@@ -189,7 +186,7 @@ abstract class VillagerProfession{
                             $item = $choice[array_rand($choice)];
                             $functions = $item["functions"] ?? [];
                         }
-                        $item = ItemFactory::fromStringSingle(is_array($item) ? $item["item"] : $item);
+                        $item = LegacyStringToItemParser::getInstance()->parse(is_array($item) ? $item["item"] : $item);
                         $item->setCount(is_array($item) ? ($item["quantity"] ?? 1) : ($want["quantity"] ?? 1));
                         $this->applyFunction($item, $functions);
                     }catch (InvalidArgumentException $e){
@@ -219,7 +216,7 @@ abstract class VillagerProfession{
                             $item = $choice[array_rand($choice)];
                             $functions = $item["functions"] ?? [];
                         }
-                        $item = ItemFactory::fromStringSingle(is_array($item) ? $item["item"] : $item);
+                        $item = LegacyStringToItemParser::getInstance()->parse(is_array($item) ? $item["item"] : $item);
                         $item->setCount(is_array($item) ? ($item["quantity"] ?? 1) : ($give["quantity"] ?? 1));
                         $this->applyFunction($item, $functions);
                     }catch (InvalidArgumentException $e){

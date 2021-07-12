@@ -4,10 +4,7 @@ namespace CLADevs\VanillaX\entities\utils\villager;
 
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
-use pocketmine\nbt\tag\ByteTag;
 use pocketmine\nbt\tag\CompoundTag;
-use pocketmine\nbt\tag\FloatTag;
-use pocketmine\nbt\tag\IntTag;
 
 class VillagerOffer{
 
@@ -59,14 +56,13 @@ class VillagerOffer{
     }
 
     public function initializeNBT(): void{
-        $this->namedtag = new CompoundTag("", [
-            new IntTag(self::TAG_USES, $this->uses),
-            new IntTag(self::TAG_MAX_USES, $this->maxUses),
-            new IntTag(self::TAG_TRADER_EXP, $this->traderExp),
-            new FloatTag(self::TAG_PRICE_MULTIPLIER_A, $this->priceMultiplierA),
-            new FloatTag(self::TAG_PRICE_MULTIPLIER_B, $this->priceMultiplierB),
-            new ByteTag(self::TAG_REWARD_EXP, $this->rewardExp),
-        ]);
+        $this->namedtag = new CompoundTag();
+        $this->namedtag->setInt(self::TAG_USES, $this->uses);
+        $this->namedtag->setInt(self::TAG_MAX_USES, $this->maxUses);
+        $this->namedtag->setInt(self::TAG_TRADER_EXP, $this->traderExp);
+        $this->namedtag->setFloat(self::TAG_PRICE_MULTIPLIER_A, $this->priceMultiplierA);
+        $this->namedtag->setFloat(self::TAG_PRICE_MULTIPLIER_B, $this->priceMultiplierB);
+        $this->namedtag->setByte(self::TAG_REWARD_EXP, $this->rewardExp);
     }
 
     public function asItem(): ?CompoundTag{
@@ -76,10 +72,10 @@ class VillagerOffer{
 
         if($input !== null && $result !== null){
             $nbt = clone $this->namedtag;
-            $nbt->setTag($result->nbtSerialize(-1, self::TAG_SELL));
-            $nbt->setTag($input->nbtSerialize(-1, self::TAG_BUY_A));
+            $nbt->setTag(self::TAG_SELL, $result->nbtSerialize());
+            $nbt->setTag(self::TAG_BUY_A, $input->nbtSerialize());
            if($input2 !== null){
-               $nbt->setTag($input2->nbtSerialize(-1, self::TAG_BUY_B));
+               $nbt->setTag(self::TAG_BUY_B, $input2->nbtSerialize());
            }
            return $nbt;
         }

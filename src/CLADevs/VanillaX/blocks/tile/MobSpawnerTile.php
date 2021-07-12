@@ -4,10 +4,9 @@ namespace CLADevs\VanillaX\blocks\tile;
 
 use CLADevs\VanillaX\blocks\utils\TileVanilla;
 use pocketmine\block\BlockLegacyIds;
-use pocketmine\entity\Entity;
+use pocketmine\block\tile\Spawnable;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\Server;
-use pocketmine\tile\Spawnable;
 
 class MobSpawnerTile extends Spawnable{
 
@@ -37,7 +36,8 @@ class MobSpawnerTile extends Spawnable{
     public function setEntityId(int $entityId): void{
         $this->entityId = $entityId;
         $this->validEntity = true;
-        $this->onChanged();
+     //   $this->onChanged();
+        //TODO onChange
     }
 
     public function getSpawnCount(): int{
@@ -86,7 +86,7 @@ class MobSpawnerTile extends Spawnable{
 
     public function canEntityGenerate(): bool{
         foreach(Server::getInstance()->getOnlinePlayers() as $player){
-            if($player->distance($this) < 16){
+            if($player->getPosition()->distance($this->getPos()) < 16){
                 return true;
             }
         }
@@ -105,36 +105,38 @@ class MobSpawnerTile extends Spawnable{
                 for($i = 0; $i < $this->spawnCount; $i++){
                     $x = ((mt_rand(-10, 10) / 10) * $this->spawnRange) + 0.5;
                     $z = ((mt_rand(-10, 10) / 10) * $this->spawnRange) + 0.5;
-                    $entity = Entity::createEntity($this->getEntityId(), $this->getLevel(), Entity::createBaseNBT($this->add($x, mt_rand(1, 3), $z)));
+                    //TODO spawn an entity
+                  //  $entity = Entity::createEntity($this->getEntityId(), $this->getLevel(), Entity::createBaseNBT($this->add($x, mt_rand(1, 3), $z)));
 
-                    if($entity === null){
-                        $this->validEntity = false;
-                        return true;
-                    }
-                    $entity->spawnToAll();
+//                    if($entity === null){
+//                        $this->validEntity = false;
+//                        return true;
+//                    }
+                   // $entity->spawnToAll();
                 }
             }
         }
         return true;
     }
 
-    protected function readSaveData(CompoundTag $nbt): void{
-        if($nbt->hasTag(self::TAG_ENTITY_ID)){
+    public function readSaveData(CompoundTag $nbt): void{
+        if(($tag = $nbt->getTag(self::TAG_ENTITY_ID)) !== null){
             $this->entityId = $nbt->getInt(self::TAG_ENTITY_ID);
         }
-        if($nbt->hasTag(self::TAG_SPAWN_COUNT)){
+        if(($tag = $nbt->getTag(self::TAG_SPAWN_COUNT)) !== null){
             $this->spawnCount = $nbt->getInt(self::TAG_SPAWN_COUNT);
         }
-        if($nbt->hasTag(self::TAG_SPAWN_RANGE)){
+        if(($tag = $nbt->getTag(self::TAG_SPAWN_RANGE)) !== null){
             $this->spawnRange = $nbt->getInt(self::TAG_SPAWN_RANGE);
         }
-        if($nbt->hasTag(self::TAG_MIN_SPAWN_DELAY)){
+        if(($tag = $nbt->getTag(self::TAG_MIN_SPAWN_DELAY)) !== null){
             $this->minSpawnDelay = $nbt->getInt(self::TAG_MIN_SPAWN_DELAY);
         }
-        if($nbt->hasTag(self::TAG_MAX_SPAWN_DELAY)){
+        if(($tag = $nbt->getTag(self::TAG_MAX_SPAWN_DELAY)) !== null){
             $this->maxSpawnDelay = $nbt->getInt(self::TAG_MAX_SPAWN_DELAY);
         }
-        $this->scheduleUpdate();
+       // $this->scheduleUpdate();
+        //TODO schedule
     }
 
     protected function writeSaveData(CompoundTag $nbt): void{

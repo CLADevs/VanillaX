@@ -11,7 +11,10 @@ use pocketmine\item\ItemIds;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\tag\ByteTag;
 use pocketmine\network\mcpe\protocol\SetActorLinkPacket;
-use pocketmine\network\mcpe\protocol\types\EntityLink;
+use pocketmine\network\mcpe\protocol\types\entity\EntityLink;
+use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataCollection;
+use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataFlags;
+use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataProperties;
 use pocketmine\player\Player;
 use pocketmine\Server;
 
@@ -20,13 +23,18 @@ trait EntityRidableTrait{
     public ?Entity $rider = null;
     private bool $isSaddled = false;
 
+    protected function syncNetworkData(EntityMetadataCollection $properties): void{
+        parent::syncNetworkData($properties);
+        $properties->setGenericFlag(EntityMetadataFlags::RIDING, $this->rider !== null);
+    }
+
     public function linkRider(Entity $rider, Vector3 $pos, bool $immediate = true, bool $causedByRider = true): void{
-        $rider->setGenericFlag(Entity::DATA_FLAG_RIDING, true);
-        $rider->getDataPropertyManager()->setVector3(Entity::DATA_RIDER_SEAT_POSITION, $pos);
+        /** @var VanillaEntity $this */
+        $rider->getNetworkProperties()->setVector3(EntityMetadataProperties::RIDER_SEAT_POSITION, $pos);
 
         $pk = new SetActorLinkPacket();
         $pk->link = new EntityLink($this->getId(), $rider->getId(), EntityLink::TYPE_RIDER, $immediate, $causedByRider);
-        Server::getInstance()->broadcastPacket($this->getViewers(), $pk);
+        Server::getInstance()->broadcastPackets($this->getViewers(), [$pk]);
 
         $this->rider = $rider;
 
@@ -38,8 +46,7 @@ trait EntityRidableTrait{
     }
 
     public function unlinkRider(Entity $rider, $immediate = true, bool $causedByRider = true): void{
-        $rider->setGenericFlag(Entity::DATA_FLAG_RIDING, false);
-        $rider->getDataPropertyManager()->setVector3(Entity::DATA_RIDER_SEAT_POSITION, new Vector3());
+        $rider->getNetworkProperties()->setVector3(EntityMetadataProperties::DATA_RIDER_SEAT_POSITION, new Vector3(0, 0, 0));
 
         /** @var VanillaEntity $this */
         $pk = new SetActorLinkPacket();

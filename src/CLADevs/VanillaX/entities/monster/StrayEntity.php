@@ -2,27 +2,41 @@
 
 namespace CLADevs\VanillaX\entities\monster;
 
-use CLADevs\VanillaX\entities\utils\interfaces\EntityClassification;
 use CLADevs\VanillaX\entities\VanillaEntity;
 use CLADevs\VanillaX\entities\utils\ItemHelper;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
+use pocketmine\entity\EntitySizeInfo;
+use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\network\mcpe\protocol\types\entity\EntityIds;
 
 class StrayEntity extends VanillaEntity{
 
-    const NETWORK_ID = self::STRAY;
+    const NETWORK_ID = EntityIds::STRAY;
 
-    public $width = 0.6;
-    public $height = 1.9;
+    public float $width = 0.6;
+    public float $height = 1.9;
 
-    protected function initEntity(): void{
-        parent::initEntity();
+    protected function initEntity(CompoundTag $nbt): void{
+        parent::initEntity($nbt);
         $this->setMaxHealth(20);
     }
 
     public function getName(): string{
         return "Stray";
+    }
+
+    protected function getInitialSizeInfo(): EntitySizeInfo{
+        return new EntitySizeInfo($this->height, $this->width);
+    }
+
+    public static function getNetworkTypeId(): string{
+        return self::NETWORK_ID;
+    }
+    
+    public function getXpDropAmount(): int{
+        return $this->getLastHitByPlayer() ? 5 + (count($this->getArmorInventory()->getContents()) * mt_rand(1,3)) : 0;
     }
  
     /**
@@ -40,15 +54,6 @@ class StrayEntity extends VanillaEntity{
         $arrow = ItemFactory::getInstance()->get(ItemIds::ARROW, 0, 1);
         ItemHelper::applySetCount($arrow, 0, 1);
         ItemHelper::applyLootingEnchant($this, $arrow);
-        ItemHelper::applySetData($arrow, 19);
         return [$arrow, $bone, $arrow];
-    }
-    
-    public function getXpDropAmount(): int{
-        return $this->getLastHitByPlayer() ? 5 + (count($this->getArmorInventory()->getContents()) * mt_rand(1,3)) : 0;
-    }
-
-    public function getClassification(): int{
-        return EntityClassification::UNDEAD;
     }
 }

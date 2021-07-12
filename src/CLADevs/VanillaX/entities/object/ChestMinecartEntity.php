@@ -10,38 +10,41 @@ use CLADevs\VanillaX\network\gamerules\GameRule;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
-use pocketmine\level\Level;
 use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\network\mcpe\protocol\types\entity\EntityIds;
 
 class ChestMinecartEntity extends MinecartEntity implements EntityInteractable{
 use EntityContainer;
 
-    const NETWORK_ID = self::CHEST_MINECART;
+    const NETWORK_ID = EntityIds::CHEST_MINECART;
 
     private FakeBlockInventory $inventory;
 
-    public function __construct(Level $level, CompoundTag $nbt){
-        parent::__construct($level, $nbt);
-        $this->inventory = new FakeBlockInventory($this->subtract(0, 1));
+    protected function initEntity(CompoundTag $nbt): void{
+        parent::initEntity($nbt);
+        $pos = $this->getPosition();
+        $pos->y += 1;
+        $this->inventory = new FakeBlockInventory($pos);
         $this->loadItems($nbt);
     }
 
-    public function saveNBT(): void{
-        $this->saveItems($this->namedtag);
-        parent::saveNBT();
+    public function saveNBT(): CompoundTag{
+        $nbt = parent::saveNBT();
+        $this->saveItems($nbt);
+        return $nbt;
     }
 
     public function kill(): void{
-        if(GameRule::getGameRuleValue(GameRule::DO_ENTITY_DROPS, $this->getLevel())){
+        if(GameRule::getGameRuleValue(GameRule::DO_ENTITY_DROPS, $this->getWorld())){
             foreach(array_merge($this->getContents(), [ItemFactory::getInstance()->get(ItemIds::MINECART_WITH_CHEST)]) as $item){
-                $this->getLevel()->dropItem($this, $item);
+                $this->getWorld()->dropItem($this->getPosition(), $item);
             }
         }
         parent::kill();
     }
 
     public function onInteract(EntityInteractResult $result): void{
-        $result->getPlayer()->addWindow($this->inventory);
+        $result->getPlayer()->setCurrentWindow($this->inventory);
     }
 
     public function getContainerSaveName(): string{

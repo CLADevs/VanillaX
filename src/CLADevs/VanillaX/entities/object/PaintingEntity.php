@@ -4,16 +4,19 @@ namespace CLADevs\VanillaX\entities\object;
 
 use CLADevs\VanillaX\network\gamerules\GameRule;
 use CLADevs\VanillaX\utils\item\NonAutomaticCallItemTrait;
-use pocketmine\block\Block;
 use pocketmine\block\BlockFactory;
+use pocketmine\block\BlockLegacyIds;
 use pocketmine\entity\object\Painting;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
-use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
-use pocketmine\level\particle\DestroyBlockParticle;
+use pocketmine\item\ItemIds;
+use pocketmine\network\mcpe\protocol\types\entity\EntityIds;
 use pocketmine\player\Player;
+use pocketmine\world\particle\BlockBreakParticle;
 
 class PaintingEntity extends Painting implements NonAutomaticCallItemTrait{
+
+    const NETWORK_ID = EntityIds::PAINTING;
 
     public function kill(): void{
         if(!$this->isAlive()){
@@ -30,9 +33,9 @@ class PaintingEntity extends Painting implements NonAutomaticCallItemTrait{
             }
         }
 
-        if($drops && GameRule::getGameRuleValue(GameRule::DO_ENTITY_DROPS, $this->getLevel())){
-            $this->level->dropItem($this, ItemFactory::getInstance()->get(Item::PAINTING));
+        if($drops && GameRule::getGameRuleValue(GameRule::DO_ENTITY_DROPS, $this->getWorld())){
+            $this->getWorld()->dropItem($this->getPosition(), ItemFactory::getInstance()->get(ItemIds::PAINTING));
         }
-        $this->level->addParticle(new DestroyBlockParticle($this->add(0.5, 0.5, 0.5), BlockFactory::get(Block::PLANKS)));
+        $this->getWorld()->addParticle($this->getPosition()->add(0.5, 0.5, 0.5), new BlockBreakParticle(BlockFactory::getInstance()->get(BlockLegacyIds::PLANKS)));
     }
 }

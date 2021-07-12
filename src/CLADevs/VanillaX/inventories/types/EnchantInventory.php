@@ -5,13 +5,13 @@ namespace CLADevs\VanillaX\inventories\types;
 use CLADevs\VanillaX\inventories\FakeBlockInventory;
 use pocketmine\block\BlockLegacyIds;
 use pocketmine\item\Item;
-use pocketmine\math\Vector3;
-use pocketmine\network\mcpe\protocol\types\WindowTypes;
+use pocketmine\network\mcpe\protocol\types\inventory\WindowTypes;
 use pocketmine\player\Player;
+use pocketmine\world\Position;
 
 class EnchantInventory extends FakeBlockInventory{
 
-    public function __construct(Vector3 $holder){
+    public function __construct(Position $holder){
         parent::__construct($holder, 2, BlockLegacyIds::AIR, WindowTypes::ENCHANTMENT);
     }
 

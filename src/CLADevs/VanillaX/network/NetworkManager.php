@@ -11,7 +11,6 @@ use CLADevs\VanillaX\network\protocol\ContainerClosePacketX;
 use CLADevs\VanillaX\network\protocol\FilterTextPacketX;
 use CLADevs\VanillaX\network\protocol\InteractPacketX;
 use CLADevs\VanillaX\network\protocol\InventoryTransactionPacketX;
-use CLADevs\VanillaX\network\protocol\MobEquipmentPacketX;
 use CLADevs\VanillaX\network\protocol\PlayerActionPacketX;
 use CLADevs\VanillaX\network\protocol\PlayerInputPacketX;
 use pocketmine\network\mcpe\protocol\PacketPool;
@@ -22,16 +21,15 @@ class NetworkManager{
         GameRule::init();
         GameRule::startup();
 
-        PacketPool::registerPacket(new InventoryTransactionPacketX());
-        PacketPool::registerPacket(new FilterTextPacketX());
-        PacketPool::registerPacket(new AnvilDamagePacketX());
-        PacketPool::registerPacket(new ActorEventPacketX());
-        PacketPool::registerPacket(new PlayerActionPacketX());
-        PacketPool::registerPacket(new CommandBlockUpdatePacketX());
-        PacketPool::registerPacket(new PlayerInputPacketX());
-        PacketPool::registerPacket(new MobEquipmentPacketX());
-        PacketPool::registerPacket(new ActorPickupRequestPacketX());
-        PacketPool::registerPacket(new InteractPacketX());
-        PacketPool::registerPacket(new ContainerClosePacketX());
+        PacketPool::getInstance()->registerPacket(new InventoryTransactionPacketX());
+        PacketPool::getInstance()->registerPacket(new FilterTextPacketX());
+        PacketPool::getInstance()->registerPacket(new AnvilDamagePacketX());
+        PacketPool::getInstance()->registerPacket(new ActorEventPacketX());
+        PacketPool::getInstance()->registerPacket(new PlayerActionPacketX());
+        PacketPool::getInstance()->registerPacket(new CommandBlockUpdatePacketX());
+        PacketPool::getInstance()->registerPacket(new PlayerInputPacketX());
+        PacketPool::getInstance()->registerPacket(new ActorPickupRequestPacketX());
+        PacketPool::getInstance()->registerPacket(new InteractPacketX());
+        PacketPool::getInstance()->registerPacket(new ContainerClosePacketX());
     }
 }

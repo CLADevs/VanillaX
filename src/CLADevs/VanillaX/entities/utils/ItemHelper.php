@@ -5,16 +5,17 @@ namespace CLADevs\VanillaX\entities\utils;
 use CLADevs\VanillaX\enchantments\utils\EnchantmentTrait;
 use CLADevs\VanillaX\entities\VanillaEntity;
 use CLADevs\VanillaX\VanillaX;
+use pocketmine\color\Color;
+use pocketmine\data\bedrock\EnchantmentIdMap;
+use pocketmine\data\bedrock\EnchantmentIds;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\item\Armor;
 use pocketmine\item\Durable;
-use pocketmine\data\bedrock\EnchantmentIdMap;
-use pocketmine\data\bedrock\EnchantmentIds;
+use pocketmine\item\enchantment\Enchantment;
 use pocketmine\item\enchantment\EnchantmentInstance;
 use pocketmine\item\Item;
 use pocketmine\player\Player;
 use pocketmine\Server;
-use pocketmine\utils\Color;
 use pocketmine\utils\Random;
 
 class ItemHelper{
@@ -43,7 +44,7 @@ class ItemHelper{
             $enchantments = VanillaX::getInstance()->getEnchantmentManager()->getEnchantmentForItem($item);
 
             if($enchantments !== null){
-                $enchant = Enchantment::getEnchantment($enchantments[array_rand($enchantments)]);
+                $enchant = EnchantmentIdMap::getInstance()->fromId($enchantments[array_rand($enchantments)]);
 
                 if($enchant !== null){
                     $item->addEnchantment(new EnchantmentInstance($enchant, mt_rand(1, $enchant->getMaxLevel())));
@@ -58,13 +59,13 @@ class ItemHelper{
             /** @var EnchantmentTrait|Enchantment $enchantment */
             foreach(VanillaX::getInstance()->getEnchantmentManager()->getEnchantments() as $enchantment){
                 if($enchantment->isTreasure()){
-                    $enchantments[] = $enchantment->getId();
+                    $enchantments[] = $enchantment->getRuntimeId();
                 }
             }
         }else{
             $enchantments = VanillaX::getInstance()->getEnchantmentManager()->getAllEnchantments(false);
         }
-        $enchant = Enchantment::getEnchantment($enchantments[array_rand($enchantments)]);
+        $enchant = EnchantmentIdMap::getInstance()->fromId($enchantments[array_rand($enchantments)]);
         $item->addEnchantment(new EnchantmentInstance($enchant, mt_rand(1, $enchant->getMaxLevel())));
     }
 
@@ -79,12 +80,12 @@ class ItemHelper{
             $level = mt_rand($min, $max);
         }
         $level /= 10;
-        $enchant = Enchantment::getEnchantment($enchantments[array_rand($enchantments)]);
+        $enchant = EnchantmentIdMap::getInstance()->fromId($enchantments[array_rand($enchantments)]);
         $item->addEnchantment(new EnchantmentInstance($enchant, min(round($level), $enchant->getMaxLevel())));
     }
 
     public static function applyFurnaceSmelt(Item &$item): void{
-        foreach(Server::getInstance()->getCraftingManager()->getFurnaceRecipes() as $furnace){
+        foreach(Server::getInstance()->getCraftingManager()->getFurnaceRecipeManager()->getAll() as $furnace){
             if($furnace->getInput()->getId() === $item->getId()){
                 $item = $furnace->getResult();
             }
@@ -97,14 +98,16 @@ class ItemHelper{
         if($lastDamage instanceof EntityDamageByEntityEvent){
             $player = $lastDamage->getDamager();
 
-            if($player instanceof Player && ($level = $player->getInventory()->getItemInHand()->getEnchantmentLevel(Enchantment::LOOTING)) > 0){
+            if($player instanceof Player && ($level = $player->getInventory()->getItemInHand()->getEnchantmentLevel(EnchantmentIdMap::getInstance()->fromId(EnchantmentIds::LOOTING))) > 0){
                 $item->setCount($item->getCount() + mt_rand(0, $level));
             }
         }
     }
 
     public static function applyRandomAuxValue(Item $item, int $min, int $max): void{
-        $item->setDamage(mt_rand($min, $max));
+        if($item instanceof Durable){
+            $item->setDamage(mt_rand($min, $max));
+        }
     }
 
     public static function applySetCount(Item $item, int $min, int $max): void{
@@ -124,12 +127,14 @@ class ItemHelper{
     }
 
     public static function applySetData(Item $item, int $data): void{
-        $item->setDamage($data);
+        if($item instanceof Durable){
+            $item->setDamage($data);
+        }
     }
 
     public static function applySpecificEnchants(Item $item, array $enchants): void{
         foreach($enchants as $i){
-            $enchant = Enchantment::getEnchantment($i["id"]);
+            $enchant = EnchantmentIdMap::getInstance()->fromId($i["id"]);
 
             if($enchant !== null){
                 $level = mt_rand($i["level"][0], $i["level"][1]);

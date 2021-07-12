@@ -3,16 +3,19 @@
 namespace CLADevs\VanillaX\entities\monster;
 
 use CLADevs\VanillaX\entities\VanillaEntity;
+use pocketmine\entity\EntitySizeInfo;
+use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\network\mcpe\protocol\types\entity\EntityIds;
 
 class VexEntity extends VanillaEntity{
 
-    const NETWORK_ID = self::VEX;
+    const NETWORK_ID = EntityIds::VEX;
 
-    public $width = 0.4;
-    public $height = 0.8;
+    public float $width = 0.4;
+    public float $height = 0.8;
 
-    protected function initEntity(): void{
-        parent::initEntity();
+    protected function initEntity(CompoundTag $nbt): void{
+        parent::initEntity($nbt);
         $this->setMaxHealth(14);
     }
 
@@ -20,7 +23,13 @@ class VexEntity extends VanillaEntity{
         return "Vex";
     }
 
-    //TODO drops
+    protected function getInitialSizeInfo(): EntitySizeInfo{
+        return new EntitySizeInfo($this->height, $this->width);
+    }
+
+    public static function getNetworkTypeId(): string{
+        return self::NETWORK_ID;
+    }
     
     public function getXpDropAmount(): int{
         return $this->getLastHitByPlayer() ? 5 + (count($this->getArmorInventory()->getContents()) * mt_rand(1,3)) : 0;

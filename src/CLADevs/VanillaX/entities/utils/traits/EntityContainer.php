@@ -2,11 +2,11 @@
 
 namespace CLADevs\VanillaX\entities\utils\traits;
 
+use pocketmine\block\tile\Container;
 use pocketmine\item\Item;
 use pocketmine\nbt\NBT;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\ListTag;
-use pocketmine\tile\Container;
 
 trait EntityContainer{
 
@@ -14,9 +14,9 @@ trait EntityContainer{
         return Container::TAG_ITEMS;
     }
 
-    protected function loadItems(CompoundTag $tag): void{
-        if($tag->hasTag($this->getContainerSaveName(), ListTag::class)){
-            $inventoryTag = $tag->getListTag($this->getContainerSaveName());
+    protected function loadItems(CompoundTag $nbt): void{
+        if(($tag = $nbt->getTag($this->getContainerSaveName())) !== null){
+            $inventoryTag = $tag->getValue();
 
             /** @var CompoundTag $itemNBT */
             foreach($inventoryTag as $itemNBT){
@@ -30,7 +30,7 @@ trait EntityContainer{
         foreach($this->getContents() as $slot => $item){
             $items[] = $item->nbtSerialize($slot);
         }
-        $tag->setTag(new ListTag($this->getContainerSaveName(), $items, NBT::TAG_Compound));
+        $tag->setTag($this->getContainerSaveName(), new ListTag($items, NBT::TAG_Compound));
     }
 
     abstract public function setItem(Item $item, int $slot = 0): void;

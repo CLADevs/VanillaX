@@ -6,48 +6,54 @@ use CLADevs\VanillaX\VanillaX;
 use pocketmine\block\Block;
 use pocketmine\block\BlockFactory;
 use pocketmine\block\BlockLegacyIds;
-use pocketmine\inventory\ContainerInventory;
+use pocketmine\block\inventory\BlockInventory;
+use pocketmine\inventory\SimpleInventory;
 use pocketmine\math\Vector3;
+use pocketmine\network\mcpe\convert\RuntimeBlockMapping;
 use pocketmine\network\mcpe\protocol\DataPacket;
-use pocketmine\network\mcpe\protocol\types\WindowTypes;
+use pocketmine\network\mcpe\protocol\ServerboundPacket;
+use pocketmine\network\mcpe\protocol\types\inventory\WindowTypes;
+use pocketmine\network\mcpe\protocol\UpdateBlockPacket;
 use pocketmine\player\Player;
+use pocketmine\world\Position;
 
-class FakeBlockInventory extends ContainerInventory{
+class FakeBlockInventory extends SimpleInventory implements BlockInventory{
+
+    private string $title;
 
     private int $defaultSize;
     private int $windowType;
 
     private ?Player $owner;
     private Block $block;
+    private Position $holder;
 
     /** @var null|callable */
     private $packetCallable;
 
     /**
      * FakeBlockInventory constructor.
-     * @param Vector3 $holder
+     * @param Position $holder
      * @param int $size
      * @param Block|int $block
      * @param int $windowType
      * @param callable|null $packetCallable
+     * @param Player|null $owner
      */
-    public function __construct(Vector3 $holder, int $size = 27, $block = BlockLegacyIds::CHEST, int $windowType = WindowTypes::CONTAINER, callable $packetCallable = null, ?Player $owner = null){
+    public function __construct(Position $holder, int $size = 27, $block = BlockLegacyIds::CHEST, int $windowType = WindowTypes::CONTAINER, callable $packetCallable = null, ?Player $owner = null){
         $holder->x = intval($holder->x);
         $holder->y = intval($holder->y);
         $holder->z = intval($holder->z);
         if(is_int($block)){
-            $block = BlockFactory::get($block);
+            $block = BlockFactory::getInstance()->get($block, 0);
         }
         $this->block = $block;
         $this->defaultSize = $size;
         $this->windowType = $windowType;
         $this->packetCallable = $packetCallable;
         $this->owner = $owner;
-        parent::__construct($holder, [], $size, null);
-    }
-
-    public function setTitle(string $title): void{
-        $this->title = $this->name = $title;
+        $this->holder = $holder;
+        parent::__construct($size);
     }
 
     public function getOwner(): ?Player{
@@ -62,16 +68,27 @@ class FakeBlockInventory extends ContainerInventory{
         return $this->defaultSize;
     }
 
+    public function getHolder(): Position{
+        return $this->holder;
+    }
+
     public function getName(): string{
         return "Inventory";
+    }
+
+    public function setTitle(string $title): void{
+        $this->title = $title;
+    }
+
+    public function getTitle(): string{
+        return $this->title;
     }
 
     public function onOpen(Player $who): void{
         VanillaX::getInstance()->getSessionManager()->get($who)->setCurrentWindow($this);
         if($this->block->getId() !== BlockLegacyIds::AIR){
             $block = clone $this->block;
-            $block->setComponents($this->holder->x, $this->holder->y, $this->holder->z);
-            $who->getLevel()->sendBlocks([$who], [$block]);
+            $this->sendBlock($who, $this->holder, $block->getId(), $block->getMeta());
         }
         parent::onOpen($who);
     }
@@ -79,7 +96,8 @@ class FakeBlockInventory extends ContainerInventory{
     public function onClose(Player $who): void{
         VanillaX::getInstance()->getSessionManager()->get($who)->setCurrentWindow(null);
         if($this->block->getId() !== BlockLegacyIds::AIR){
-            $who->getLevel()->sendBlocks([$who], [$who->getLevel()->getBlock($this->holder)]);
+            $block = $who->getWorld()->getBlock($this->holder);
+            $this->sendBlock($who, $this->holder, $block->getId(), $block->getMeta());
         }
         parent::onClose($who);
     }
@@ -90,15 +108,25 @@ class FakeBlockInventory extends ContainerInventory{
 
     /**
      * @param Player $player
-     * @param DataPacket $packet
+     * @param ServerboundPacket $packet
      * @return bool, false will cancel event, true will let event continue
      */
-    public function handlePacket(Player $player, DataPacket $packet): bool{
+    public function handlePacket(Player $player, ServerboundPacket $packet): bool{
         $callable = $this->packetCallable;
 
         if($callable !== null){
             $callable($player, $packet);
         }
         return true;
+    }
+
+    public function sendBlock(Player $player, Vector3 $pos, int $blockId, int $blockMeta = 0): void{
+        $block = BlockFactory::getInstance()->get($blockId ,$blockMeta);
+        $pk = new UpdateBlockPacket();
+        $pk->x = $pos->x;
+        $pk->y = $pos->y;
+        $pk->z = $pos->z;
+        $pk->blockRuntimeId = RuntimeBlockMapping::getInstance()->toRuntimeId($block->getFullId());
+        $player->getNetworkSession()->sendDataPacket($pk);
     }
 }

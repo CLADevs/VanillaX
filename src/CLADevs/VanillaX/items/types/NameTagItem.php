@@ -5,11 +5,13 @@ namespace CLADevs\VanillaX\items\types;
 use CLADevs\VanillaX\entities\utils\EntityInteractResult;
 use CLADevs\VanillaX\entities\utils\interfaces\EntityInteractable;
 use pocketmine\item\Item;
+use pocketmine\item\ItemIdentifier;
+use pocketmine\item\ItemIds;
 
 class NameTagItem extends Item implements EntityInteractable{
 
-    public function __construct(int $meta = 0){
-        parent::__construct(self::NAMETAG, $meta, "Name Tag");
+    public function __construct(){
+        parent::__construct(new ItemIdentifier(ItemIds::NAMETAG, 0), "Name Tag");
     }
 
     public function onInteract(EntityInteractResult $result): void{

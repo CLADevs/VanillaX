@@ -13,12 +13,19 @@ use pocketmine\data\bedrock\EnchantmentIdMap;
 use pocketmine\data\bedrock\EnchantmentIds;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
+use pocketmine\item\ItemIdentifier;
+use pocketmine\item\ItemIds;
+use pocketmine\item\ItemUseResult;
 use pocketmine\network\mcpe\protocol\LevelSoundEventPacket;
 use pocketmine\player\Player;
 
 class BowItem extends Bow{
 
-    public function onReleaseUsing(Player $player) : bool{
+    public function __construct(){
+        parent::__construct(new ItemIdentifier(ItemIds::BOW, 0), "Bow");
+    }
+
+    public function onReleaseUsing(Player $player) : ItemUseResult{
         $inventory = VanillaX::getInstance()->getSessionManager()->get($player)->getOffHandInventory();
 
         if($player->isSurvival() && !$inventory->contains($arrowItem = ItemFactory::getInstance()->get(Item::ARROW, 0, 1))){

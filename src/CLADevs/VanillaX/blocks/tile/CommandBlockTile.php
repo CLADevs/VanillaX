@@ -7,14 +7,14 @@ use CLADevs\VanillaX\blocks\utils\TileVanilla;
 use CLADevs\VanillaX\commands\sender\CommandBlockSender;
 use pocketmine\block\BlockFactory;
 use pocketmine\block\BlockLegacyIds;
+use pocketmine\block\tile\Nameable;
+use pocketmine\block\tile\NameableTrait;
+use pocketmine\block\tile\Spawnable;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\ListTag;
-use pocketmine\nbt\tag\NamedTag;
+use pocketmine\nbt\tag\Tag;
 use pocketmine\network\mcpe\protocol\CommandBlockUpdatePacket;
 use pocketmine\Server;
-use pocketmine\tile\Nameable;
-use pocketmine\tile\NameableTrait;
-use pocketmine\tile\Spawnable;
 
 class CommandBlockTile extends Spawnable implements Nameable{
     use NameableTrait;
@@ -46,7 +46,7 @@ class CommandBlockTile extends Spawnable implements Nameable{
     /** CUSTOM TAGS */
     const TAG_COMMAND_BLOCK_MODE = "commandBlockMode";
 
-    /** @var NamedTag[] */
+    /** @var Tag[] */
     private array $lastOutputParam = [];
     
     private int $commandBlockMode = self::TYPE_IMPULSE;
@@ -92,7 +92,7 @@ class CommandBlockTile extends Spawnable implements Nameable{
 
     public function runCommand(): void{
         if(strlen($this->command) > 0){
-            $sender = new CommandBlockSender();
+            $sender = new CommandBlockSender(Server::getInstance(), Server::getInstance()->getLanguage());
             if(Server::getInstance()->dispatchCommand($sender, $this->command)){
                 $this->successCount++;
             }
@@ -103,13 +103,13 @@ class CommandBlockTile extends Spawnable implements Nameable{
     public function handleCommandBlockUpdateReceive(CommandBlockUpdatePacket $pk): void{
         if($pk->commandBlockMode !== $this->commandBlockMode){
             $this->commandBlockMode = $pk->commandBlockMode;
-            $tileBlock = $this->getLevel()->getBlock($this);
-            $block = BlockFactory::get(CommandBlock::asCommandBlockFromMode($this->commandBlockMode), $tileBlock->getMeta());
+            $tileBlock = $this->getPos()->getWorld()->getBlock($this->getPos());
+            $block = BlockFactory::getInstance()->get(CommandBlock::asCommandBlockFromMode($this->commandBlockMode), $tileBlock->getMeta());
 
             if($tileBlock instanceof CommandBlock){
                 $block->setDamage($tileBlock->getMeta());
             }
-            $this->getLevel()->setBlock($this, $block, true, true);
+            $this->getPos()->getWorld()->setBlock($this->getPos(), $block);
         }
         if($pk->name !== $this->getName()){
             $this->setName($pk->name);
@@ -134,18 +134,21 @@ class CommandBlockTile extends Spawnable implements Nameable{
         }
         if($pk->isConditional !== $this->conditionalMode){
             $this->conditionalMode = $pk->isConditional;
-            $tileBlock = $this->getLevel()->getBlock($this);
-            $block = BlockFactory::get(CommandBlock::asCommandBlockFromMode($this->commandBlockMode));
-            $block->setDamage($tileBlock->getMeta() + ($pk->isConditional ? 8 : -8));
-            $this->getLevel()->setBlock($this, $block, true, true);
+            $tileBlock = $this->getPos()->getWorld()->getBlock($this->getPos());
+            $block = BlockFactory::getInstance()->get(CommandBlock::asCommandBlockFromMode($this->commandBlockMode), 0);
+          //TODO meta
+            //  $block->setDamage($tileBlock->getMeta() + ($pk->isConditional ? 8 : -8));
+            $this->getPos()->getWorld()->setBlock($this->getPos(), $block);
         }
         if($this->tickDelay == 0 && strlen($this->command) >= 1){
             $this->runCommand();
         }elseif(($this->tickDelay >= 1 && strlen($this->command) >= 1 && !$this->isScheduled) || $this->commandBlockMode == self::TYPE_REPEAT){
-            $this->scheduleUpdate();
+         //   $this->scheduleUpdate();
+            //TODO schedule
             $this->isScheduled = true;
         }
-        $this->onChanged();
+     //   $this->onChanged();
+        //TODO onChange
     }
 
     protected function writeSaveData(CompoundTag $nbt): void{
@@ -162,43 +165,45 @@ class CommandBlockTile extends Spawnable implements Nameable{
         $nbt->setInt(self::TAG_CONDITIONAL_MODE, $this->conditionalMode);
     }
 
-    protected function readSaveData(CompoundTag $nbt): void{
+    public function readSaveData(CompoundTag $nbt): void{
         $this->loadName($nbt);
-        if($nbt->hasTag($tag = self::TAG_COMMAND_BLOCK_MODE)){
-            $this->commandBlockMode = $nbt->getInt($tag);
+        if(($tag = $nbt->getTag(self::TAG_COMMAND_BLOCK_MODE)) !== null){
+            $this->commandBlockMode = $tag->getValue();
         }
-        if($nbt->hasTag($tag = self::TAG_COMMAND)){
-            $this->command = $nbt->getString($tag);
+        if(($tag = $nbt->getTag(self::TAG_COMMAND)) !== null){
+            $this->command = $tag->getValue();
         }
-        if($nbt->hasTag($tag = self::TAG_EXECUTE_ON_FIRE_TICK)){
-            $this->executeOnFirstTick = boolval($nbt->getInt($tag));
+        if(($tag = $nbt->getTag(self::TAG_EXECUTE_ON_FIRE_TICK)) !== null){
+            $this->executeOnFirstTick = boolval($tag->getValue());
         }
-        if($nbt->hasTag($tag = self::TAG_LAST_EXECUTION)){
-            $this->lastExecution = $nbt->getInt($tag);
+        if(($tag = $nbt->getTag(self::TAG_LAST_EXECUTION)) !== null){
+            $this->lastExecution = $tag->getValue();
         }
-        if($nbt->hasTag($tag = self::TAG_SUCCESS_COUNT)){
-            $this->successCount = $nbt->getInt($tag);
+        if(($tag = $nbt->getTag(self::TAG_SUCCESS_COUNT)) !== null){
+            $this->successCount = $tag->getValue();
         }
-        if($nbt->hasTag($tag = self::TAG_TICK_DELAY)){
-            $this->tickDelay = $nbt->getInt($tag);
+        if(($tag = $nbt->getTag(self::TAG_TICK_DELAY)) !== null){
+            $this->tickDelay = $tag->getValue();
         }
-        if($nbt->hasTag($tag = self::TAG_TRACK_OUTPUT)){
-            $this->shouldTrackOutput = boolval($nbt->getInt($tag));
+        if(($tag = $nbt->getTag(self::TAG_TRACK_OUTPUT)) !== null){
+            $this->shouldTrackOutput = boolval($tag->getValue());
         }
-        if($nbt->hasTag($tag = self::TAG_AUTO)){
-            $this->auto = boolval($nbt->getInt($tag));
+        if(($tag = $nbt->getTag(self::TAG_AUTO)) !== null){
+            $this->auto = boolval($tag->getValue());
         }
-        if($nbt->hasTag($tag = self::TAG_CONDITION_MET)){
-            $this->conditionMet = boolval($nbt->getInt($tag));
+        if(($tag = $nbt->getTag(self::TAG_CONDITION_MET)) !== null){
+            $this->conditionMet = boolval($tag->getValue());
         }
-        if($nbt->hasTag($tag = self::TAG_CONDITIONAL_MODE)){
-            $this->conditionalMode = boolval($nbt->getInt($tag));
+        if(($tag = $nbt->getTag(self::TAG_CONDITIONAL_MODE)) !== null){
+            $this->conditionalMode = boolval($tag->getValue());
         }
         if($this->commandBlockMode === self::TYPE_REPEAT){
-            $this->scheduleUpdate();
+         //   $this->scheduleUpdate();
+            //TODO schedule
             $this->isScheduled = true;
         }
-        $this->onChanged();
+       // $this->onChanged();
+        //TODO on change
     }
 
     protected function addAdditionalSpawnData(CompoundTag $nbt): void{
@@ -211,7 +216,7 @@ class CommandBlockTile extends Spawnable implements Nameable{
         $nbt->setInt(self::TAG_LAST_EXECUTION, $this->lastExecution);
         $nbt->setString(self::TAG_LAST_OUTPUT, $this->lastOutput);
         if(count($this->lastOutputParam) >= 1){
-            $nbt->setTag(new ListTag(self::TAG_LAST_OUTPUT_PARAMS, $this->lastOutputParam));
+            $nbt->setTag(self::TAG_LAST_OUTPUT_PARAMS, new ListTag($this->lastOutputParam));
         }
         $nbt->setInt(self::TAG_SUCCESS_COUNT, $this->successCount);
         $nbt->setInt(self::TAG_TICK_DELAY, $this->tickDelay);

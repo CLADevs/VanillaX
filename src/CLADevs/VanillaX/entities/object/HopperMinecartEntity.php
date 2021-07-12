@@ -11,39 +11,42 @@ use pocketmine\block\BlockLegacyIds;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
-use pocketmine\level\Level;
 use pocketmine\nbt\tag\CompoundTag;
-use pocketmine\network\mcpe\protocol\types\WindowTypes;
+use pocketmine\network\mcpe\protocol\types\entity\EntityIds;
+use pocketmine\network\mcpe\protocol\types\inventory\WindowTypes;
 
 class HopperMinecartEntity extends MinecartEntity implements EntityInteractable{
 use EntityContainer;
 
-    const NETWORK_ID = self::HOPPER_MINECART;
+    const NETWORK_ID = EntityIds::HOPPER_MINECART;
 
     private FakeBlockInventory $inventory;
 
-    public function __construct(Level $level, CompoundTag $nbt){
-        parent::__construct($level, $nbt);
-        $this->inventory = new FakeBlockInventory($this->subtract(0, 1), 5, BlockLegacyIds::HOPPER_BLOCK, WindowTypes::HOPPER);
+    protected function initEntity(CompoundTag $nbt): void{
+        parent::initEntity($nbt);
+        $pos = $this->getPosition();
+        $pos->y -= 1;
+        $this->inventory = new FakeBlockInventory($pos, 5, BlockLegacyIds::HOPPER_BLOCK, WindowTypes::HOPPER);
         $this->loadItems($nbt);
     }
 
-    public function saveNBT(): void{
-        $this->saveItems($this->namedtag);
-        parent::saveNBT();
+    public function saveNBT(): CompoundTag{
+        $nbt = parent::saveNBT();
+        $this->saveItems($nbt);
+        return $nbt;
     }
 
     public function kill(): void{
-        if(GameRule::getGameRuleValue(GameRule::DO_ENTITY_DROPS, $this->getLevel())){
+        if(GameRule::getGameRuleValue(GameRule::DO_ENTITY_DROPS, $this->getWorld())){
             foreach(array_merge($this->getContents(), [ItemFactory::getInstance()->get(ItemIds::MINECART_WITH_HOPPER)]) as $item){
-                $this->getLevel()->dropItem($this, $item);
+                $this->getWorld()->dropItem($this->getPosition(), $item);
             }
         }
         parent::kill();
     }
 
     public function onInteract(EntityInteractResult $result): void{
-        $result->getPlayer()->addWindow($this->inventory);
+        $result->getPlayer()->setCurrentWindow($this->inventory);
     }
 
     public function getContainerSaveName(): string{
