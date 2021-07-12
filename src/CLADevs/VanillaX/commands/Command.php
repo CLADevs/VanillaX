@@ -3,7 +3,6 @@
 namespace CLADevs\VanillaX\commands;
 
 use CLADevs\VanillaX\commands\utils\CommandArgs;
-use CLADevs\VanillaX\VanillaX;
 use pocketmine\command\CommandSender;
 use pocketmine\permission\DefaultPermissions;
 use pocketmine\permission\Permission;
@@ -31,20 +30,6 @@ abstract class Command extends \pocketmine\command\Command{
             }
         }
         parent::setPermission($permission);
-    }
-
-    public function testPermissionSilent(CommandSender $target) : bool{
-        if($this->getPermission() === null or $this->getPermission() === ""){
-            return true;
-        }
-        $target->recalculatePermissions();
-        foreach(explode(";", $this->getPermission()) as $permission){
-            if($target->hasPermission($permission)){
-                return true;
-            }
-            var_dump("Failed $permission");
-        }
-        return false;
     }
 
     public function getCommandArg(): ?CommandArgs{
