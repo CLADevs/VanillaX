@@ -4,7 +4,7 @@ namespace CLADevs\VanillaX\items\types;
 
 use pocketmine\item\ProjectileItem;
 use pocketmine\math\Vector3;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class LingeringPotionItem extends ProjectileItem{
 
@@ -36,7 +36,7 @@ class LingeringPotionItem extends ProjectileItem{
 //        }else{
 //            $projectile->spawnToAll();
 //
-//            $player->getLevelNonNull()->broadcastLevelSoundEvent($player, LevelSoundEventPacket::SOUND_THROW, 0, EntityIds::PLAYER);
+//            $player->getLevelNonNull()->broadcastLevelSoundEvent($player, LevelSoundEventPacket::SOUND_THROW, 0, EntityBlockLegacyBlockLegacyIds::PLAYER);
 //        }
 //        $projectile->spawnToAll();
         return true;

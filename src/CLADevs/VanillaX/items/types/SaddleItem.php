@@ -3,9 +3,9 @@
 namespace CLADevs\VanillaX\items\types;
 
 use pocketmine\entity\Entity;
-use pocketmine\entity\EntityIds;
+use pocketmine\entity\EntityBlockLegacyIds;
 use pocketmine\item\Item;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class SaddleItem extends Item{
 
@@ -14,7 +14,7 @@ class SaddleItem extends Item{
     }
 
     public function onInteractWithEntity(Player $player, Entity $entity): void{
-//        if(in_array($entity->getId(), [EntityIds::HORSE, EntityIds::PIG, EntityIds::DONKEY, EntityIds::MULE])){
+//        if(in_array($entity->getId(), [EntityBlockLegacyBlockLegacyIds::HORSE, EntityBlockLegacyBlockLegacyIds::PIG, EntityBlockLegacyBlockLegacyIds::DONKEY, EntityBlockLegacyBlockLegacyIds::MULE])){
 //            //TODO
 //        }
     }

@@ -29,11 +29,11 @@ class EvocationIllagerEntity extends VanillaEntity{
      * @return Item[]
      */
     public function getDrops(): array{
-        $emerald = ItemFactory::get(ItemIds::EMERALD, 0, 1);
+        $emerald = ItemFactory::getInstance()->get(ItemIds::EMERALD, 0, 1);
         ItemHelper::applySetCount($emerald, 0, 1);
         ItemHelper::applyLootingEnchant($this, $emerald);
          
-        $totem = ItemFactory::get(ItemIds::TOTEM, 0, 1);
+        $totem = ItemFactory::getInstance()->get(ItemIds::TOTEM, 0, 1);
         ItemHelper::applySetCount($totem, 1, 1);
         return [$emerald, $totem];
     }

@@ -9,7 +9,7 @@ use pocketmine\command\CommandSender;
 use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
 use pocketmine\network\mcpe\protocol\StopSoundPacket;
 use pocketmine\network\mcpe\protocol\types\PlayerPermissions;
-use pocketmine\Player;
+use pocketmine\player\Player;
 class StopSoundCommand extends Command{
 
     public function __construct(){

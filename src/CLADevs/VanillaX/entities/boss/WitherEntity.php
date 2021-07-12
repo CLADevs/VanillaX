@@ -28,7 +28,7 @@ class WitherEntity extends VanillaEntity{
      * @return Item[]
      */
     public function getDrops(): array{
-        return [ItemFactory::get(ItemIds::NETHER_STAR, 0, 1)];
+        return [ItemFactory::getInstance()->get(ItemIds::NETHER_STAR, 0, 1)];
     }
     
     public function getXpDropAmount(): int{

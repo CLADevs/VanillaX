@@ -17,7 +17,7 @@ class BoatEntity extends Entity{
 
     public function kill(): void{
         if(GameRule::getGameRuleValue(GameRule::DO_ENTITY_DROPS, $this->getLevel())){
-            $this->getLevel()->dropItem($this, ItemFactory::get(ItemIds::BOAT)); //TODO boat block
+            $this->getLevel()->dropItem($this, ItemFactory::getInstance()->get(ItemIds::BOAT)); //TODO boat block
         }
         parent::kill();
     }

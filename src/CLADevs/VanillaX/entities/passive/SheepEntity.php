@@ -28,9 +28,9 @@ class SheepEntity extends VanillaEntity{
      * @return Item[]
      */
     public function getDrops(): array{
-        $wool = ItemFactory::get(ItemIds::WOOL, 0, 1);
+        $wool = ItemFactory::getInstance()->get(ItemIds::WOOL, 0, 1);
          
-        $muttonraw = ItemFactory::get(ItemIds::RAW_MUTTON, 0, 1);
+        $muttonraw = ItemFactory::getInstance()->get(ItemIds::RAW_MUTTON, 0, 1);
         ItemHelper::applySetCount($muttonraw, 1, 2);
         if($this->isOnFire()) ItemHelper::applyFurnaceSmelt($muttonraw);
         ItemHelper::applyLootingEnchant($this, $muttonraw);

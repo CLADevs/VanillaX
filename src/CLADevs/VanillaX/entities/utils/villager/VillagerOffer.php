@@ -126,10 +126,10 @@ class VillagerOffer{
      */
     public function setInput($input, $input2 = null): void{
         if(is_numeric($input)){
-            $input = ItemFactory::get($input);
+            $input = ItemFactory::getInstance()->get($input);
         }
         if(is_numeric($input2)){
-            $input2 = ItemFactory::get($input2);
+            $input2 = ItemFactory::getInstance()->get($input2);
         }
         $this->input = $input;
         $this->input2 = $input2;
@@ -144,7 +144,7 @@ class VillagerOffer{
      */
     public function setResult($result): void{
         if(is_numeric($result)){
-            $result = ItemFactory::get($result);
+            $result = ItemFactory::getInstance()->get($result);
         }
         $this->result = $result;
     }

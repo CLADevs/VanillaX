@@ -3,7 +3,7 @@
 namespace CLADevs\VanillaX\utils\item;
 
 use CLADevs\VanillaX\utils\instances\InteractButtonResult;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 interface InteractButtonItemTrait{
 

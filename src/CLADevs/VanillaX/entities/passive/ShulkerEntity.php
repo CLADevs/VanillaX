@@ -28,7 +28,7 @@ class ShulkerEntity extends VanillaEntity{
      * @return Item[]
      */
     public function getDrops(): array{
-        $shulker_shell = ItemFactory::get(ItemIds::SHULKER_SHELL, 0, 1);
+        $shulker_shell = ItemFactory::getInstance()->get(ItemIds::SHULKER_SHELL, 0, 1);
         ItemHelper::applySetCount($shulker_shell, 0, 1);
         ItemHelper::applyLootingEnchant($this, $shulker_shell);
         return [$shulker_shell];

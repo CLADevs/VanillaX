@@ -3,7 +3,7 @@
 namespace CLADevs\VanillaX\utils\item;
 
 use pocketmine\item\Item;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 interface HeldItemChangeTrait{
 

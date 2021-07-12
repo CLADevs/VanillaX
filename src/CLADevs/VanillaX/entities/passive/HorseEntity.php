@@ -28,7 +28,7 @@ class HorseEntity extends VanillaEntity{
      * @return Item[]
      */
     public function getDrops(): array{
-        $leather = ItemFactory::get(ItemIds::LEATHER, 0, 1);
+        $leather = ItemFactory::getInstance()->get(ItemIds::LEATHER, 0, 1);
         ItemHelper::applySetCount($leather, 0, 2);
         ItemHelper::applyLootingEnchant($this, $leather);
         return [$leather];

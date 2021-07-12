@@ -30,17 +30,17 @@ class ElderGuardianEntity extends VanillaEntity{
      */
     public function getDrops(): array{
         //TODO random fish
-        $prismarine_shard = ItemFactory::get(ItemIds::PRISMARINE_SHARD, 0, 1);
+        $prismarine_shard = ItemFactory::getInstance()->get(ItemIds::PRISMARINE_SHARD, 0, 1);
         ItemHelper::applySetCount($prismarine_shard, 0, 2);
         ItemHelper::applyLootingEnchant($this, $prismarine_shard);
          
-        $fish = ItemFactory::get(ItemIds::RAW_FISH, 0, 1);
+        $fish = ItemFactory::getInstance()->get(ItemIds::RAW_FISH, 0, 1);
         ItemHelper::applyLootingEnchant($this, $fish);
          
-        $prismarine_crystals = ItemFactory::get(ItemIds::PRISMARINE_CRYSTALS, 0, 1);
+        $prismarine_crystals = ItemFactory::getInstance()->get(ItemIds::PRISMARINE_CRYSTALS, 0, 1);
         ItemHelper::applyLootingEnchant($this, $prismarine_crystals);
          
-        $sponge = ItemFactory::get(ItemIds::SPONGE, 0, 1);
+        $sponge = ItemFactory::getInstance()->get(ItemIds::SPONGE, 0, 1);
         ItemHelper::applySetData($sponge, 1);
         return [$prismarine_shard, $fish, $prismarine_crystals, $sponge];
     }

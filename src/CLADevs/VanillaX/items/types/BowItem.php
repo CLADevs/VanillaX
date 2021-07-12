@@ -9,18 +9,19 @@ use pocketmine\entity\projectile\Projectile;
 use pocketmine\event\entity\EntityShootBowEvent;
 use pocketmine\event\entity\ProjectileLaunchEvent;
 use pocketmine\item\Bow;
-use pocketmine\item\enchantment\Enchantment;
+use pocketmine\data\bedrock\EnchantmentIdMap;
+use pocketmine\data\bedrock\EnchantmentIds;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\network\mcpe\protocol\LevelSoundEventPacket;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class BowItem extends Bow{
 
     public function onReleaseUsing(Player $player) : bool{
         $inventory = VanillaX::getInstance()->getSessionManager()->get($player)->getOffHandInventory();
 
-        if($player->isSurvival() && !$inventory->contains($arrowItem = ItemFactory::get(Item::ARROW, 0, 1))){
+        if($player->isSurvival() && !$inventory->contains($arrowItem = ItemFactory::getInstance()->get(Item::ARROW, 0, 1))){
             $inventory = $player->getInventory();
 
             if(!$inventory->contains($arrowItem)){
@@ -74,7 +75,7 @@ class BowItem extends Bow{
                 $entity->setMotion($entity->getMotion()->multiply($ev->getForce()));
                 if($player->isSurvival()){
                     if(!$infinity){ //TODO: tipped arrows are still consumed when Infinity is applied
-                        $inventory->removeItem(ItemFactory::get(Item::ARROW, 0, 1));
+                        $inventory->removeItem(ItemFactory::getInstance()->get(Item::ARROW, 0, 1));
                     }
                     $this->applyDamage(1);
                 }

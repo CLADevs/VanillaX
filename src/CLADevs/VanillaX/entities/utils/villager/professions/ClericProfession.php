@@ -3,11 +3,11 @@
 namespace CLADevs\VanillaX\entities\utils\villager\professions;
 
 use CLADevs\VanillaX\entities\utils\villager\VillagerProfession;
-use pocketmine\block\BlockIds;
+use pocketmine\block\BlockLegacyIds;
 
 class ClericProfession extends VillagerProfession{
 
     public function __construct(){
-        parent::__construct(self::CLERIC, "Cleric", BlockIds::BREWING_STAND_BLOCK);
+        parent::__construct(self::CLERIC, "Cleric", BlockLegacyIds::BREWING_STAND_BLOCK);
     }
 }

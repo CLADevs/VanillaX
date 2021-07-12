@@ -97,10 +97,10 @@ class InventoryManager{
     }
 
     public function getBrewingOutput(Item $input, Item $ingredient): ?Item{
-        $potion = $this->potionTypeRecipes[$input->getId() . ":" . $input->getDamage() . ":" . $ingredient->getId() . ":" . $ingredient->getDamage()] ?? null;
+        $potion = $this->potionTypeRecipes[$input->getId() . ":" . $input->getMeta() . ":" . $ingredient->getId() . ":" . $ingredient->getMeta()] ?? null;
 
         if($potion instanceof PotionTypeRecipe){
-            return ItemFactory::get($potion->getOutputItemId(), $potion->getOutputItemMeta(), $input->getCount());
+            return ItemFactory::getInstance()->get($potion->getOutputItemId(), $potion->getOutputItemMeta(), $input->getCount());
         }
         return null;
     }
@@ -109,7 +109,7 @@ class InventoryManager{
         $potion = $this->potionContainerRecipes[$input->getId() . ":" . $ingredient->getId()] ?? null;
 
         if($potion instanceof PotionContainerChangeRecipe){
-            return ItemFactory::get($potion->getOutputItemId(), $input->getDamage(), $input->getCount());
+            return ItemFactory::getInstance()->get($potion->getOutputItemId(), $input->getMeta(), $input->getCount());
         }
         return null;
     }
@@ -146,7 +146,7 @@ class InventoryManager{
             case ItemIds::LOG:
             case ItemIds::LOG2:
             case ItemIds::SPONGE:
-                if($ingredient === ItemIds::SPONGE && $ingredient->getDamage() !== 1){
+                if($ingredient === ItemIds::SPONGE && $ingredient->getMeta() !== 1){
                     break;
                 }
                 return 0.15;

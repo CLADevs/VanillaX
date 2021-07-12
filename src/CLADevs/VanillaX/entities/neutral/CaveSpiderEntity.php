@@ -29,11 +29,11 @@ class CaveSpiderEntity extends VanillaEntity{
      * @return Item[]
      */
     public function getDrops(): array{
-        $string = ItemFactory::get(ItemIds::STRING, 0, 1);
+        $string = ItemFactory::getInstance()->get(ItemIds::STRING, 0, 1);
         ItemHelper::applySetCount($string, 0, 2);
         ItemHelper::applyLootingEnchant($this, $string);
          
-        $spider_eye = ItemFactory::get(ItemIds::SPIDER_EYE, 0, 1);
+        $spider_eye = ItemFactory::getInstance()->get(ItemIds::SPIDER_EYE, 0, 1);
         ItemHelper::applySetCount($spider_eye, 0, 1);
         ItemHelper::applyLootingEnchant($this, $spider_eye);
         return [$string, $spider_eye];

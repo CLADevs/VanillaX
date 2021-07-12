@@ -7,7 +7,7 @@ use CLADevs\VanillaX\entities\utils\villager\VillagerOffer;
 use CLADevs\VanillaX\entities\utils\villager\VillagerTradeNBTStream;
 use CLADevs\VanillaX\inventories\FakeBlockInventory;
 use CLADevs\VanillaX\VanillaX;
-use pocketmine\block\BlockIds;
+use pocketmine\block\BlockLegacyIds;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\nbt\NetworkLittleEndianNBTStream;
@@ -18,7 +18,7 @@ use pocketmine\nbt\tag\NamedTag;
 use pocketmine\network\mcpe\protocol\ContainerClosePacket;
 use pocketmine\network\mcpe\protocol\types\WindowTypes;
 use pocketmine\network\mcpe\protocol\UpdateTradePacket;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class TradeInventory extends FakeBlockInventory{
 
@@ -28,7 +28,7 @@ class TradeInventory extends FakeBlockInventory{
     private ?Item $sellItem = null;
 
     public function __construct(VillagerEntity $holder){
-        parent::__construct($holder, 2, BlockIds::AIR, WindowTypes::TRADING);
+        parent::__construct($holder, 2, BlockLegacyIds::AIR, WindowTypes::TRADING);
         $this->villager = $holder;
     }
 
@@ -93,9 +93,9 @@ class TradeInventory extends FakeBlockInventory{
                 $value = $recipe->getValue();
                 /** @var NamedTag $buyA */
                 $buyA = $value[VillagerOffer::TAG_BUY_A]->getValue();
-                $buyA = ItemFactory::get($buyA["id"]->getValue(), $buyA["Damage"]->getValue(), $buyA["Count"]->getValue());
+                $buyA = ItemFactory::getInstance()->get($buyA["id"]->getValue(), $buyA["Damage"]->getValue(), $buyA["Count"]->getValue());
                 $sell = $value[VillagerOffer::TAG_SELL]->getValue();
-                $sell = ItemFactory::get($sell["id"]->getValue(), $sell["Damage"]->getValue(), $sell["Count"]->getValue());
+                $sell = ItemFactory::getInstance()->get($sell["id"]->getValue(), $sell["Damage"]->getValue(), $sell["Count"]->getValue());
                 $experience = $value[VillagerOffer::TAG_TRADER_EXP]->getValue();
 
                 if($this->buyAItem->equalsExact($buyA) && $this->sellItem->equalsExact($sell)){

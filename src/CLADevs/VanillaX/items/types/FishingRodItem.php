@@ -4,7 +4,7 @@ namespace CLADevs\VanillaX\items\types;
 
 use pocketmine\item\Item;
 use pocketmine\math\Vector3;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class FishingRodItem extends Item{
 

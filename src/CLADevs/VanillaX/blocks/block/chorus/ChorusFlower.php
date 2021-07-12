@@ -3,26 +3,25 @@
 namespace CLADevs\VanillaX\blocks\block\chorus;
 
 use pocketmine\block\Block;
-use pocketmine\block\BlockIds;
+use pocketmine\block\BlockBreakInfo;
+use pocketmine\block\BlockIdentifier;
+use pocketmine\block\BlockLegacyIds;
 use pocketmine\block\Transparent;
 use pocketmine\item\Item;
 use pocketmine\math\Vector3;
-use pocketmine\Player;
+use pocketmine\player\Player;
+use pocketmine\world\BlockTransaction;
 
 class ChorusFlower extends Transparent{
 
-    public function __construct(int $meta = 0){
-        parent::__construct(self::CHORUS_FLOWER, $meta, "Chorus Flower");
+    public function __construct(){
+        parent::__construct(new BlockIdentifier(BlockLegacyIds::CHORUS_FLOWER, 0), "Chorus Flower", new BlockBreakInfo(0.4));
     }
 
-    public function getHardness(): float{
-        return 0.4;
-    }
-
-    public function place(Item $item, Block $blockReplace, Block $blockClicked, int $face, Vector3 $clickVector, Player $player = null): bool{
-        if($blockClicked->getId() !== BlockIds::END_STONE && $blockClicked->getId() !== BlockIds::CHORUS_PLANT){
+    public function place(BlockTransaction $tx, Item $item, Block $blockReplace, Block $blockClicked, int $face, Vector3 $clickVector, ?Player $player = null): bool{
+        if($blockClicked->getId() !== BlockLegacyIds::END_STONE && $blockClicked->getId() !== BlockLegacyIds::CHORUS_PLANT){
             return false;
         }
-        return parent::place($item, $blockReplace, $blockClicked, $face, $clickVector, $player);
+        return parent::place($tx, $item, $blockReplace, $blockClicked, $face, $clickVector, $player);
     }
 }

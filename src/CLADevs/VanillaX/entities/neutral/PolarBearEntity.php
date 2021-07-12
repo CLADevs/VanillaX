@@ -28,11 +28,11 @@ class PolarBearEntity extends VanillaEntity{
      * @return Item[]
      */
     public function getDrops(): array{
-        $fish = ItemFactory::get(ItemIds::RAW_FISH, 0, 1);
+        $fish = ItemFactory::getInstance()->get(ItemIds::RAW_FISH, 0, 1);
         ItemHelper::applySetCount($fish, 0, 2);
         ItemHelper::applyLootingEnchant($this, $fish);
          
-        $salmon = ItemFactory::get(ItemIds::SALMON, 0, 1);
+        $salmon = ItemFactory::getInstance()->get(ItemIds::SALMON, 0, 1);
         ItemHelper::applySetCount($salmon, 0, 2);
         ItemHelper::applyLootingEnchant($this, $salmon);
         return [$fish, $salmon];

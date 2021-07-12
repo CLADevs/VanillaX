@@ -8,7 +8,7 @@ use pocketmine\event\entity\EntityLevelChangeEvent;
 use pocketmine\event\level\LevelLoadEvent;
 use pocketmine\event\level\LevelUnloadEvent;
 use pocketmine\event\Listener;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class WorldListener implements Listener{
 

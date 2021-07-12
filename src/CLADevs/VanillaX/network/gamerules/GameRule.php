@@ -3,15 +3,12 @@
 namespace CLADevs\VanillaX\network\gamerules;
 
 use CLADevs\VanillaX\VanillaX;
-use pocketmine\level\format\io\BaseLevelProvider;
-use pocketmine\level\Level;
 use pocketmine\nbt\tag\ByteTag;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\IntTag;
-use pocketmine\nbt\tag\NamedTag;
 use pocketmine\network\mcpe\protocol\GameRulesChangedPacket;
-use pocketmine\Player;
 use pocketmine\Server;
+use pocketmine\world\format\io\BaseWorldProvider;
 
 class GameRule{
 
@@ -64,8 +61,8 @@ class GameRule{
 
     public static function startup(): void{
         foreach(GameRule::$gameRules as $rule){
-            foreach(Server::getInstance()->getLevels() as $level){
-                $rule->handleValue(self::getGameRuleValue($rule->getName(), $level), $level);
+            foreach(Server::getInstance()->getWorldManager() as $world){
+                $rule->handleValue(self::getGameRuleValue($rule->getName(), $world), $world);
             }
         }
     }
@@ -101,12 +98,12 @@ class GameRule{
         self::register(new GameRule(self::SHOW_TAGS, true)); //TODO
 
         if(!self::isGameRuleAllow() && VanillaX::getInstance()->getConfig()->get("gamerule-remove-cache", true)){
-            foreach(Server::getInstance()->getLevels() as $level){
-                $provider = $level->getProvider();
+            foreach(Server::getInstance()->getWorldManager() as $world){
+                $provider = $world->getProvider();
 
-                if($provider instanceof BaseLevelProvider){
+                if($provider instanceof BaseWorldProvider){
                     /** @var CompoundTag $nbt */
-                    $nbt = $provider->getLevelData()->getTag("GameRules");
+                    $nbt = $provider->getWorldData()->getTag("GameRules");
 
                     foreach(self::$gameRules as $rule){
                         if($nbt->hasTag($rule->getName())){

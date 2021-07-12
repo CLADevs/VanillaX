@@ -30,7 +30,7 @@ class DrownedEntity extends VanillaEntity{
      */
     public function getDrops(): array{
         //TODO Copper Ingot & other items
-        $rotten_flesh = ItemFactory::get(ItemIds::ROTTEN_FLESH, 0, 1);
+        $rotten_flesh = ItemFactory::getInstance()->get(ItemIds::ROTTEN_FLESH, 0, 1);
         ItemHelper::applySetCount($rotten_flesh, 0, 2);
         ItemHelper::applyLootingEnchant($this, $rotten_flesh);
         return [$rotten_flesh];

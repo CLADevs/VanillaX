@@ -2,7 +2,7 @@
 
 namespace CLADevs\VanillaX\entities\utils\interfaces;
 
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 interface EntityRidable{
 

@@ -29,7 +29,7 @@ class SkeletonHorseEntity extends VanillaEntity{
      * @return Item[]
      */
     public function getDrops(): array{
-        $bone = ItemFactory::get(ItemIds::BONE, 0, 1);
+        $bone = ItemFactory::getInstance()->get(ItemIds::BONE, 0, 1);
         ItemHelper::applySetCount($bone, 0, 2);
         ItemHelper::applyLootingEnchant($this, $bone);
         return [$bone];

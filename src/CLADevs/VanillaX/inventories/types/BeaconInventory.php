@@ -3,15 +3,15 @@
 namespace CLADevs\VanillaX\inventories\types;
 
 use CLADevs\VanillaX\inventories\FakeBlockInventory;
-use pocketmine\block\BlockIds;
+use pocketmine\block\BlockLegacyIds;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\types\WindowTypes;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class BeaconInventory extends FakeBlockInventory{
 
     public function __construct(Vector3 $holder){
-        parent::__construct($holder, 1, BlockIds::AIR, WindowTypes::BEACON);
+        parent::__construct($holder, 1, BlockLegacyIds::AIR, WindowTypes::BEACON);
     }
 
     public function onClose(Player $who): void{

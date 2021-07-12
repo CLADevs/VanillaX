@@ -12,7 +12,7 @@ class TNTMinecartEntity extends MinecartEntity{
 
     public function kill(): void{
         if(GameRule::getGameRuleValue(GameRule::DO_ENTITY_DROPS, $this->getLevel())){
-            $this->getLevel()->dropItem($this, ItemFactory::get(ItemIds::MINECART_WITH_TNT));
+            $this->getLevel()->dropItem($this, ItemFactory::getInstance()->get(ItemIds::MINECART_WITH_TNT));
         }
         parent::kill();
     }

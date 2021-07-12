@@ -3,7 +3,7 @@
 namespace CLADevs\VanillaX\blocks\tile;
 
 use CLADevs\VanillaX\blocks\utils\TileVanilla;
-use pocketmine\block\BlockIds;
+use pocketmine\block\BlockLegacyIds;
 use pocketmine\nbt\tag\ByteTag;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\IntTag;
@@ -17,7 +17,7 @@ class CauldronTile extends Spawnable{
     const TAG_CUSTOM_COLOR = "CustomColor";
 
     const TILE_ID = TileVanilla::CAULDRON;
-    const TILE_BLOCK = BlockIds::CAULDRON_BLOCK;
+    const TILE_BLOCK = BlockLegacyIds::CAULDRON_BLOCK;
 
     private int $potionId = -1;
     private int $potionType = -1;

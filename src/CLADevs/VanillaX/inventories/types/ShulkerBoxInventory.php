@@ -3,18 +3,18 @@
 namespace CLADevs\VanillaX\inventories\types;
 
 use CLADevs\VanillaX\inventories\FakeBlockInventory;
-use pocketmine\block\BlockIds;
+use pocketmine\block\BlockLegacyIds;
 use pocketmine\level\Level;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\BlockEventPacket;
 use pocketmine\network\mcpe\protocol\PlaySoundPacket;
 use pocketmine\network\mcpe\protocol\types\WindowTypes;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class ShulkerBoxInventory extends FakeBlockInventory{
 
     public function __construct(Vector3 $holder){
-        parent::__construct($holder, 27, BlockIds::AIR, WindowTypes::CONTAINER);
+        parent::__construct($holder, 27, BlockLegacyIds::AIR, WindowTypes::CONTAINER);
     }
 
     public function onOpen(Player $who): void{

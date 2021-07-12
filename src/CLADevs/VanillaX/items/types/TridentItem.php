@@ -6,8 +6,9 @@ use CLADevs\VanillaX\entities\projectile\TridentEntity;
 use CLADevs\VanillaX\session\Session;
 use pocketmine\entity\Entity;
 use pocketmine\item\Durable;
-use pocketmine\item\enchantment\Enchantment;
-use pocketmine\Player;
+use pocketmine\data\bedrock\EnchantmentIdMap;
+use pocketmine\data\bedrock\EnchantmentIds;
+use pocketmine\player\Player;
 
 class TridentItem extends Durable{
 

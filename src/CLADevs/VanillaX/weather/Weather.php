@@ -3,11 +3,11 @@
 namespace CLADevs\VanillaX\weather;
 
 use CLADevs\VanillaX\VanillaX;
-use pocketmine\level\format\io\BaseLevelProvider;
-use pocketmine\level\Level;
 use pocketmine\nbt\tag\ByteTag;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\IntTag;
+use pocketmine\world\format\io\WritableWorldProvider;
+use pocketmine\world\World;
 
 class Weather{
 
@@ -16,7 +16,7 @@ class Weather{
     const TAG_DELAY_DURATION = "DelayDuration";
     const TAG_THUNDERING = "Thundering";
 
-    private Level $level;
+    private World $world;
 
     private bool $raining = false;
     private bool $thundering = false;
@@ -24,12 +24,13 @@ class Weather{
     public int $duration = 0;
     public int $delayDuration = 0;
 
-    public function __construct(Level $level){
-        $this->level = $level;
-        $provider = $this->level->getProvider();
+    public function __construct(World $world){
+        $this->world = $world;
+        $provider = $world->getProvider();
 
         $this->recalculateDelayDuration();
-        if($provider instanceof BaseLevelProvider){
+
+        if($provider instanceof WritableWorldProvider){
             $nbt = $provider->getLevelData();
 
             if($nbt->hasTag(self::TAG_WEATHER)){
@@ -52,8 +53,8 @@ class Weather{
         }
     }
 
-    public function getLevel(): Level{
-        return $this->level;
+    public function getWorld(): World{
+        return $this->world;
     }
 
     public function isRaining(): bool{
@@ -65,12 +66,12 @@ class Weather{
     }
 
     public function saveData(): void{
-        if($this->level->isClosed()){
+        if($this->world->isClosed()){
             return;
         }
-        $provider = $this->level->getProvider();
+        $provider = $this->world->getProvider();
 
-        if($provider instanceof BaseLevelProvider){
+        if($provider instanceof WritableWorldProvider){
             $nbt = $provider->getLevelData();
             $nbt->setTag(new CompoundTag(self::TAG_WEATHER, [
                 new IntTag(self::TAG_DURATION, $this->duration),

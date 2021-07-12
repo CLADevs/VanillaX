@@ -7,9 +7,9 @@ use pocketmine\inventory\BaseInventory;
 use pocketmine\item\Item;
 use pocketmine\network\mcpe\protocol\InventoryContentPacket;
 use pocketmine\network\mcpe\protocol\MobEquipmentPacket;
-use pocketmine\network\mcpe\protocol\types\ContainerIds;
+use pocketmine\network\mcpe\protocol\types\ContainerBlockLegacyIds;
 use pocketmine\network\mcpe\protocol\types\inventory\ItemStackWrapper;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class OffhandInventory extends BaseInventory{
 
@@ -29,7 +29,7 @@ class OffhandInventory extends BaseInventory{
     public function __construct(Player $player){
         parent::__construct();
         $player->getDataPropertyManager()->setByte(Entity::DATA_COLOR, self::COLOR_NORMAL);
-        $player->addWindow($this, ContainerIds::OFFHAND, true);
+        $player->addWindow($this, ContainerBlockLegacyBlockLegacyIds::OFFHAND, true);
         $this->player = $player;
         if($player->namedtag->hasTag(self::TAG_OFF_HAND_ITEM)){
             $this->setItem(0, Item::nbtDeserialize($player->namedtag->getCompoundTag(self::TAG_OFF_HAND_ITEM)), true);
@@ -60,7 +60,7 @@ class OffhandInventory extends BaseInventory{
             $target = [$target];
         }
         $pk = new InventoryContentPacket();
-        $pk->windowId = ContainerIds::OFFHAND;
+        $pk->windowId = ContainerBlockLegacyBlockLegacyIds::OFFHAND;
         $pk->items = array_map([ItemStackWrapper::class, 'legacy'], $this->getContents(true));
 
         foreach($target as $player){
@@ -78,7 +78,7 @@ class OffhandInventory extends BaseInventory{
         $pk->item = ItemStackWrapper::legacy($this->getItem(0));
         $pk->inventorySlot = 1;
         $pk->hotbarSlot = 0;
-        $pk->windowId = ContainerIds::OFFHAND;
+        $pk->windowId = ContainerBlockLegacyBlockLegacyIds::OFFHAND;
         $player->dataPacket($pk);
     }
 

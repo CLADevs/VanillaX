@@ -3,39 +3,42 @@
 namespace CLADevs\VanillaX\blocks\block;
 
 use CLADevs\VanillaX\blocks\tile\CommandBlockTile;
-use CLADevs\VanillaX\blocks\utils\TileUtils;
-use CLADevs\VanillaX\blocks\utils\TileVanilla;
 use CLADevs\VanillaX\utils\item\NonAutomaticCallItemTrait;
 use CLADevs\VanillaX\utils\item\NonCreativeItemTrait;
 use pocketmine\block\Block;
-use pocketmine\block\BlockIds;
+use pocketmine\block\BlockBreakInfo;
+use pocketmine\block\BlockIdentifier;
+use pocketmine\block\BlockLegacyIds;
+use pocketmine\block\BlockToolType;
 use pocketmine\item\Item;
 use pocketmine\math\Vector3;
-use pocketmine\nbt\tag\IntTag;
 use pocketmine\network\mcpe\protocol\ContainerOpenPacket;
-use pocketmine\network\mcpe\protocol\types\ContainerIds;
-use pocketmine\network\mcpe\protocol\types\WindowTypes;
-use pocketmine\Player;
+use pocketmine\network\mcpe\protocol\types\inventory\ContainerIds;
+use pocketmine\network\mcpe\protocol\types\inventory\WindowTypes;
+use pocketmine\permission\DefaultPermissions;
+use pocketmine\player\Player;
+use pocketmine\world\BlockTransaction;
 
 class CommandBlock extends Block implements NonAutomaticCallItemTrait, NonCreativeItemTrait{
 
+    //TODO tile
     public function __construct(int $id){
-        parent::__construct($id, 0, self::asCommandBlockName($id), $id);
+        parent::__construct(new BlockIdentifier($id, 0, $id), self::asCommandBlockName($id), new BlockBreakInfo(-1, BlockToolType::NONE, 0, 3600000));
     }
 
     public function getMode(): int{
-        if($this->getId() == BlockIds::REPEATING_COMMAND_BLOCK){
+        if($this->getId() == BlockLegacyIds::REPEATING_COMMAND_BLOCK){
             return CommandBlockTile::TYPE_REPEAT;
-        }elseif($this->getId() == BlockIds::CHAIN_COMMAND_BLOCK){
+        }elseif($this->getId() == BlockLegacyIds::CHAIN_COMMAND_BLOCK){
             return CommandBlockTile::TYPE_CHAIN;
         }
         return CommandBlockTile::TYPE_IMPULSE;
     }
 
     public static function asCommandBlockName(int $id): string{
-        if($id === BlockIds::REPEATING_COMMAND_BLOCK){
+        if($id === BlockLegacyIds::REPEATING_COMMAND_BLOCK){
             return "Repeating Command Block";
-        }elseif($id === BlockIds::CHAIN_COMMAND_BLOCK){
+        }elseif($id === BlockLegacyIds::CHAIN_COMMAND_BLOCK){
             return "Chain Command Block";
         }
         return "Command Block";
@@ -43,42 +46,38 @@ class CommandBlock extends Block implements NonAutomaticCallItemTrait, NonCreati
 
     public static function asCommandBlockFromMode(int $mode): int{
         if($mode == CommandBlockTile::TYPE_REPEAT){
-            return BlockIds::REPEATING_COMMAND_BLOCK;
+            return BlockLegacyIds::REPEATING_COMMAND_BLOCK;
         }elseif($mode == CommandBlockTile::TYPE_CHAIN){
-            return BlockIds::CHAIN_COMMAND_BLOCK;
+            return BlockLegacyIds::CHAIN_COMMAND_BLOCK;
         }
-        return BlockIds::COMMAND_BLOCK;
+        return BlockLegacyIds::COMMAND_BLOCK;
     }
 
-    public function place(Item $item, Block $blockReplace, Block $blockClicked, int $face, Vector3 $clickVector, Player $player = null): bool{
-        $faces = [
-            Vector3::SIDE_DOWN => 0,
-            Vector3::SIDE_UP => 1,
-            Vector3::SIDE_NORTH => 2,
-            Vector3::SIDE_SOUTH => 3,
-            Vector3::SIDE_WEST => 4,
-            Vector3::SIDE_EAST => 5
-        ];
-        $this->meta = $faces[$face] ?? $face;
-        parent::place($item, $blockReplace, $blockClicked, $face, $clickVector, $player);
-        TileUtils::generateTile($blockReplace, TileVanilla::COMMAND_BLOCK, CommandBlockTile::class, [new IntTag(CommandBlockTile::TAG_COMMAND_BLOCK_MODE, $this->getMode())]);
-        return true;
+    public function place(BlockTransaction $tx, Item $item, Block $blockReplace, Block $blockClicked, int $face, Vector3 $clickVector, ?Player $player = null): bool{
+//        $faces = [
+//            Facing::DOWN => 0,
+//            Facing::UP => 1,
+//            Facing::NORTH => 2,
+//            Facing::SOUTH => 3,
+//            Facing::WEST => 4,
+//            Facing::EAST => 5
+//        ];
+//        $this->facing = $faces[$face] ?? $face;
+        //TODO facing
+        return parent::place($tx, $item, $blockReplace, $blockClicked, $face, $clickVector, $player);
     }
 
-    public function onActivate(Item $item, Player $player = null): bool{
-        if($player !== null && $player->isOp()){
-            $tile = $this->getLevel()->getTile($this);
+    public function onInteract(Item $item, int $face, Vector3 $clickVector, ?Player $player = null): bool{
+        if($player !== null && $player->hasPermission(DefaultPermissions::ROOT_OPERATOR)){
+            $tile = $this->getPos()->getWorld()->getTile($this->getPos());
 
-            if(!$tile instanceof CommandBlockTile){
-                $tile = TileUtils::generateTile($this, TileVanilla::COMMAND_BLOCK, CommandBlockTile::class, [new IntTag(CommandBlockTile::TAG_COMMAND_BLOCK_MODE, $this->getMode())]);
-            }
             $pk = new ContainerOpenPacket();
             $pk->type = WindowTypes::COMMAND_BLOCK;
             $pk->windowId = ContainerIds::NONE;
-            $pk->x = $tile->x;
-            $pk->y = $tile->y;
-            $pk->z = $tile->z;
-            $player->dataPacket($pk);
+            $pk->x = $tile->getPos()->x;
+            $pk->y = $tile->getPos()->y;
+            $pk->z = $tile->getPos()->z;
+            $player->getNetworkSession()->sendDataPacket($pk);
         }
         return true;
     }

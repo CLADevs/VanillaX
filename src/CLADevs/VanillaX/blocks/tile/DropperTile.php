@@ -4,7 +4,7 @@ namespace CLADevs\VanillaX\blocks\tile;
 
 use CLADevs\VanillaX\blocks\utils\TileVanilla;
 use CLADevs\VanillaX\inventories\types\DropperInventory;
-use pocketmine\block\BlockIds;
+use pocketmine\block\BlockLegacyIds;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\tile\Container;
 use pocketmine\tile\ContainerTrait;
@@ -14,7 +14,7 @@ class DropperTile extends Spawnable implements Container{
     use ContainerTrait;
 
     const TILE_ID = TileVanilla::DROPPER;
-    const TILE_BLOCK = BlockIds::DROPPER;
+    const TILE_BLOCK = BlockLegacyIds::DROPPER;
 
     private DropperInventory $inventory;
 

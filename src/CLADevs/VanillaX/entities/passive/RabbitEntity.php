@@ -28,14 +28,14 @@ class RabbitEntity extends VanillaEntity{
      * @return Item[]
      */
     public function getDrops(): array{
-        $rabbit_hide = ItemFactory::get(ItemIds::RABBIT_HIDE, 0, 1);
+        $rabbit_hide = ItemFactory::getInstance()->get(ItemIds::RABBIT_HIDE, 0, 1);
         ItemHelper::applySetCount($rabbit_hide, 0, 1);
         ItemHelper::applyLootingEnchant($this, $rabbit_hide);
          
-        $rabbit = ItemFactory::get(ItemIds::RAW_RABBIT, 0, 1);
+        $rabbit = ItemFactory::getInstance()->get(ItemIds::RAW_RABBIT, 0, 1);
         ItemHelper::applySetCount($rabbit, 0, 1);
         if($this->isOnFire()) ItemHelper::applyFurnaceSmelt($rabbit);
-        return [$rabbit_hide, $rabbit, ItemFactory::get(ItemIds::RABBIT_FOOT, 0, 1)];
+        return [$rabbit_hide, $rabbit, ItemFactory::getInstance()->get(ItemIds::RABBIT_FOOT, 0, 1)];
     }
     
     public function getXpDropAmount(): int{

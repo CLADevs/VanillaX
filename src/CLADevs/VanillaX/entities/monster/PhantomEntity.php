@@ -29,7 +29,7 @@ class PhantomEntity extends VanillaEntity{
      * @return Item[]
      */
     public function getDrops(): array{
-        $phantom_membrane = ItemFactory::get(ItemIds::PHANTOM_MEMBRANE, 0, 1);
+        $phantom_membrane = ItemFactory::getInstance()->get(ItemIds::PHANTOM_MEMBRANE, 0, 1);
         ItemHelper::applySetCount($phantom_membrane, 0, 1);
         ItemHelper::applyLootingEnchant($this, $phantom_membrane);
         return [$phantom_membrane];

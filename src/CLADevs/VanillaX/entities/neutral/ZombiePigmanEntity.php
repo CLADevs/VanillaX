@@ -29,14 +29,14 @@ class ZombiePigmanEntity extends VanillaEntity{
      * @return Item[]
      */
     public function getDrops(): array{
-        $rotten_flesh = ItemFactory::get(ItemIds::ROTTEN_FLESH, 0, 1);
+        $rotten_flesh = ItemFactory::getInstance()->get(ItemIds::ROTTEN_FLESH, 0, 1);
         ItemHelper::applySetCount($rotten_flesh, 0, 1);
         ItemHelper::applyLootingEnchant($this, $rotten_flesh);
          
-        $gold_nugget = ItemFactory::get(ItemIds::GOLD_NUGGET, 0, 1);
+        $gold_nugget = ItemFactory::getInstance()->get(ItemIds::GOLD_NUGGET, 0, 1);
         ItemHelper::applySetCount($gold_nugget, 0, 1);
         ItemHelper::applyLootingEnchant($this, $gold_nugget);
-        return [$rotten_flesh, $gold_nugget, ItemFactory::get(ItemIds::GOLD_INGOT, 0, 1)];
+        return [$rotten_flesh, $gold_nugget, ItemFactory::getInstance()->get(ItemIds::GOLD_INGOT, 0, 1)];
     }
     
     public function getXpDropAmount(): int{

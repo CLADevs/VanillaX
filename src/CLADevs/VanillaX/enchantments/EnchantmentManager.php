@@ -17,13 +17,14 @@ use pocketmine\inventory\PlayerInventory;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
 use pocketmine\item\Armor;
 use pocketmine\item\Axe;
-use pocketmine\item\enchantment\Enchantment;
+use pocketmine\data\bedrock\EnchantmentIdMap;
+use pocketmine\data\bedrock\EnchantmentIds;
 use pocketmine\item\Item;
 use pocketmine\item\ItemIds;
 use pocketmine\item\Pickaxe;
 use pocketmine\item\Shovel;
 use pocketmine\item\Sword;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class EnchantmentManager{
 
@@ -71,7 +72,7 @@ class EnchantmentManager{
      * @return int[]
      */
     public function getToolEnchantsId(): array{
-        return [Enchantment::EFFICIENCY, Enchantment::FORTUNE, Enchantment::SILK_TOUCH];
+        return [Enchantment::EFFICIENCY, EnchantmentIdMap::getInstance()->fromId(EnchantmentIds::FORTUNE), Enchantment::SILK_TOUCH];
     }
 
     /**

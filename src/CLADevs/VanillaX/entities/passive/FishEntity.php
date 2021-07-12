@@ -29,10 +29,10 @@ class FishEntity extends VanillaEntity{
      * @return Item[]
      */
     public function getDrops(): array{
-        $fish = ItemFactory::get(ItemIds::RAW_FISH, 0, 1);
+        $fish = ItemFactory::getInstance()->get(ItemIds::RAW_FISH, 0, 1);
         if($this->isOnFire()) ItemHelper::applyFurnaceSmelt($fish);
          
-        $bone = ItemFactory::get(ItemIds::BONE, 0, 1);
+        $bone = ItemFactory::getInstance()->get(ItemIds::BONE, 0, 1);
         ItemHelper::applyLootingEnchant($this, $bone);
         return [$fish, $bone];
     }

@@ -20,7 +20,7 @@ use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\ListTag;
 use pocketmine\network\mcpe\protocol\MobEquipmentPacket;
 use pocketmine\network\mcpe\protocol\types\inventory\ItemStackWrapper;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\Server;
 
 class ArmorStandEntity extends Living implements InteractButtonItemTrait{
@@ -68,7 +68,7 @@ class ArmorStandEntity extends Living implements InteractButtonItemTrait{
         if($this->namedtag->hasTag(self::TAG_MAINHAND, CompoundTag::class)){
             $this->setMainHand(Item::nbtDeserialize($this->namedtag->getCompoundTag(self::TAG_MAINHAND)));
         }else{
-            $this->mainHand = ItemFactory::get(ItemIds::AIR);
+            $this->mainHand = ItemFactory::getInstance()->get(ItemIds::AIR);
         }
 
         /** Armor */
@@ -144,7 +144,7 @@ class ArmorStandEntity extends Living implements InteractButtonItemTrait{
             $this->flagForDespawn();
 
             if(GameRule::getGameRuleValue(GameRule::DO_TILE_DROPS, $this->getLevel())){
-                $items = array_merge([ItemFactory::get(ItemIds::ARMOR_STAND)], $this->getArmorInventory()->getContents());
+                $items = array_merge([ItemFactory::getInstance()->get(ItemIds::ARMOR_STAND)], $this->getArmorInventory()->getContents());
                 if(!$this->mainHand->isNull()){
                     $items[] = $this->mainHand;
                 }
@@ -231,7 +231,7 @@ class ArmorStandEntity extends Living implements InteractButtonItemTrait{
         if(!$old->isNull()){
             $player->getInventory()->setItemInHand($old);
         }else{
-            $player->getInventory()->setItemInHand(ItemFactory::get(ItemIds::AIR));
+            $player->getInventory()->setItemInHand(ItemFactory::getInstance()->get(ItemIds::AIR));
         }
         $this->setMainHand($new);
         Session::playSound($player, "mob.armor_stand.place");
@@ -241,7 +241,7 @@ class ArmorStandEntity extends Living implements InteractButtonItemTrait{
         if(!$old->isNull()){
             $player->getInventory()->setItemInHand($old);
         }else{
-            $player->getInventory()->setItemInHand(ItemFactory::get(ItemIds::AIR));
+            $player->getInventory()->setItemInHand(ItemFactory::getInstance()->get(ItemIds::AIR));
         }
         $this->getArmorInventory()->setItem($slot, $new);
         Session::playSound($player, "mob.armor_stand.place");

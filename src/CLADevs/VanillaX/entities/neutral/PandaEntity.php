@@ -26,7 +26,7 @@ class PandaEntity extends VanillaEntity{
      */
     public function getDrops(): array{
         //TODO bamboo
-//        $bamboo = ItemFactory::get(ItemIds::AIR, 0, 1);
+//        $bamboo = ItemFactory::getInstance()->get(ItemIds::AIR, 0, 1);
 //        ItemHelper::applySetCount($bamboo, 0, 2);
 //        ItemHelper::applyLootingEnchant($this, $bamboo);
         return [];

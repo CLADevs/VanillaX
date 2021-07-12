@@ -28,7 +28,7 @@ class EndermanEntity extends VanillaEntity{
      * @return Item[]
      */
     public function getDrops(): array{
-        $ender_pearl = ItemFactory::get(ItemIds::ENDER_PEARL, 0, 1);
+        $ender_pearl = ItemFactory::getInstance()->get(ItemIds::ENDER_PEARL, 0, 1);
         ItemHelper::applySetCount($ender_pearl, 0, 1);
         ItemHelper::applyLootingEnchant($this, $ender_pearl);
         return [$ender_pearl];

@@ -5,7 +5,8 @@ namespace CLADevs\VanillaX\enchantments\armors;
 use CLADevs\VanillaX\enchantments\utils\EnchantmentTrait;
 use CLADevs\VanillaX\items\ItemManager;
 use pocketmine\item\Armor;
-use pocketmine\item\enchantment\Enchantment;
+use pocketmine\data\bedrock\EnchantmentIdMap;
+use pocketmine\data\bedrock\EnchantmentIds;
 use pocketmine\item\Item;
 
 class BindingEnchantment extends Enchantment{

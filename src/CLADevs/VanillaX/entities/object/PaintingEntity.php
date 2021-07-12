@@ -11,7 +11,7 @@ use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\level\particle\DestroyBlockParticle;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class PaintingEntity extends Painting implements NonAutomaticCallItemTrait{
 
@@ -31,7 +31,7 @@ class PaintingEntity extends Painting implements NonAutomaticCallItemTrait{
         }
 
         if($drops && GameRule::getGameRuleValue(GameRule::DO_ENTITY_DROPS, $this->getLevel())){
-            $this->level->dropItem($this, ItemFactory::get(Item::PAINTING));
+            $this->level->dropItem($this, ItemFactory::getInstance()->get(Item::PAINTING));
         }
         $this->level->addParticle(new DestroyBlockParticle($this->add(0.5, 0.5, 0.5), BlockFactory::get(Block::PLANKS)));
     }

@@ -7,7 +7,7 @@ use CLADevs\VanillaX\session\Session;
 use pocketmine\block\Block;
 use pocketmine\item\Item;
 use pocketmine\math\Vector3;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class ArmorStandItem extends Item{
 

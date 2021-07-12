@@ -6,7 +6,7 @@ use CLADevs\VanillaX\blocks\tile\FurnaceTile;
 use CLADevs\VanillaX\inventories\InventoryManager;
 use CLADevs\VanillaX\network\gamerules\GameRule;
 use CLADevs\VanillaX\session\Session;
-use pocketmine\block\BlockIds;
+use pocketmine\block\BlockLegacyIds;
 use pocketmine\entity\object\FallingBlock;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\entity\EntityBlockChangeEvent;
@@ -35,7 +35,7 @@ class BlockListener implements Listener{
         if(!$event->isCancelled()){
             $entity = $event->getEntity();
 
-            if($entity instanceof FallingBlock && ($to = $event->getTo())->getId() === BlockIds::ANVIL){
+            if($entity instanceof FallingBlock && ($to = $event->getTo())->getId() === BlockLegacyIds::ANVIL){
                 $pk = Session::playSound($to->asVector3(), "random.anvil_land", 1, 1, true);
                 $to->getLevel()->broadcastPacketToViewers($to, $pk);
             }

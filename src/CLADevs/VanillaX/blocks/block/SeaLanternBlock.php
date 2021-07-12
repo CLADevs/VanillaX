@@ -3,9 +3,11 @@
 namespace CLADevs\VanillaX\blocks\block;
 
 use pocketmine\block\SeaLantern;
-use pocketmine\item\enchantment\Enchantment;
+use pocketmine\data\bedrock\EnchantmentIdMap;
+use pocketmine\data\bedrock\EnchantmentIds;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
+use pocketmine\item\ItemIds;
 
 class SeaLanternBlock extends SeaLantern{
 
@@ -14,6 +16,6 @@ class SeaLanternBlock extends SeaLantern{
      * @return Item[]
      */
     public function getDropsForCompatibleTool(Item $item): array{
-        return [ItemFactory::get(Item::PRISMARINE_CRYSTALS, 0, min(5, mt_rand(2, 3) + $item->getEnchantmentLevel(Enchantment::FORTUNE)))];
+        return [ItemFactory::getInstance()->get(ItemIds::PRISMARINE_CRYSTALS, 0, min(5, mt_rand(2, 3) + $item->getEnchantmentLevel(EnchantmentIdMap::getInstance()->fromId(EnchantmentIds::FORTUNE))))];
     }
 }

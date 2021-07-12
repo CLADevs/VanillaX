@@ -13,7 +13,7 @@ use pocketmine\block\BaseRail;
 use pocketmine\block\Block;
 use pocketmine\item\Item;
 use pocketmine\math\Vector3;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class MinecartItem extends Item implements NonAutomaticCallItemTrait{
 

@@ -13,7 +13,7 @@ use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
 use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
 use pocketmine\network\mcpe\protocol\types\PlayerPermissions;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class ClearCommand extends Command{
@@ -92,7 +92,7 @@ class ClearCommand extends Command{
                             continue;
                         }
                         $itemsCount += $item->getCount();
-                        $p->getInventory()->setItem($slot, ItemFactory::get(ItemIds::AIR));
+                        $p->getInventory()->setItem($slot, ItemFactory::getInstance()->get(ItemIds::AIR));
                     }
                 }
                 foreach($p->getArmorInventory()->getContents() as $slot => $item){
@@ -101,7 +101,7 @@ class ClearCommand extends Command{
                             continue;
                         }
                         $itemsCount++;
-                        $p->getArmorInventory()->setItem($slot, ItemFactory::get(ItemIds::AIR));
+                        $p->getArmorInventory()->setItem($slot, ItemFactory::getInstance()->get(ItemIds::AIR));
                     }
                 }
                 if($offhandItem->equals($itemName)){
@@ -112,7 +112,7 @@ class ClearCommand extends Command{
                     }
                     if($passed){
                         $itemsCount++;
-                        $offhand->setItem(0, ItemFactory::get(ItemIds::AIR));
+                        $offhand->setItem(0, ItemFactory::getInstance()->get(ItemIds::AIR));
                     }
                 }
                 if($itemsCount < 1){

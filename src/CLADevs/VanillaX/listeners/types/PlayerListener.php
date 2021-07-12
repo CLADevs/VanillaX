@@ -10,7 +10,7 @@ use CLADevs\VanillaX\network\gamerules\GameRule;
 use CLADevs\VanillaX\utils\item\HeldItemChangeTrait;
 use CLADevs\VanillaX\VanillaX;
 use pocketmine\block\BlockFactory;
-use pocketmine\block\BlockIds;
+use pocketmine\block\BlockLegacyIds;
 use pocketmine\block\StillWater;
 use pocketmine\entity\Entity;
 use pocketmine\event\Listener;
@@ -23,7 +23,8 @@ use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\player\PlayerMoveEvent;
 use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\event\player\PlayerToggleSneakEvent;
-use pocketmine\item\enchantment\Enchantment;
+use pocketmine\data\bedrock\EnchantmentIdMap;
+use pocketmine\data\bedrock\EnchantmentIds;
 use pocketmine\level\Level;
 use pocketmine\math\Vector3;
 use pocketmine\scheduler\ClosureTask;
@@ -146,18 +147,18 @@ class PlayerListener implements Listener{
                 $block = $player->getLevel()->getBlock($player);
                 $aboveBlock = $player->getLevel()->getBlock($player->add(0, 1));
 
-                if($block->getId() === BlockIds::AIR && $aboveBlock->getId() === BlockIds::AIR){
+                if($block->getId() === BlockLegacyIds::AIR && $aboveBlock->getId() === BlockLegacyIds::AIR){
                     $belowBlock = $player->getLevel()->getBlock($player->subtract(0, 1));
 
                     if($belowBlock instanceof StillWater){
                         $size = 2 + min($boots->getEnchantmentLevel(Enchantment::FROST_WALKER), 2);
-                        $ice = BlockFactory::get(BlockIds::FROSTED_ICE, 0);
+                        $ice = BlockFactory::get(BlockLegacyIds::FROSTED_ICE, 0);
 
                         for($x = intval($player->x) - $size; $x <= intval($player->x) + $size; $x++){
                             for($z = intval($player->z) - $size; $z <= intval($player->z) + $size; $z++){
                                 $pos = new Vector3($x, intval($player->y - 1), $z);
 
-                                if(in_array($player->getLevel()->getBlock($pos)->getId(), [BlockIds::AIR, BlockIds::STILL_WATER, BlockIds::FROSTED_ICE])){
+                                if(in_array($player->getLevel()->getBlock($pos)->getId(), [BlockLegacyIds::AIR, BlockLegacyIds::STILL_WATER, BlockLegacyIds::FROSTED_ICE])){
                                     $player->getLevel()->setBlock($pos, $ice, true);
                                 }
                             }

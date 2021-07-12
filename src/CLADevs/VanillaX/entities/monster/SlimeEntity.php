@@ -51,7 +51,7 @@ class SlimeEntity extends VanillaEntity{
      * @return Item[]
      */
     public function getDrops(): array{
-        $slime_ball = ItemFactory::get(ItemIds::SLIME_BALL, 0, 1);
+        $slime_ball = ItemFactory::getInstance()->get(ItemIds::SLIME_BALL, 0, 1);
         ItemHelper::applySetCount($slime_ball, 0, 2);
         ItemHelper::applyLootingEnchant($this, $slime_ball);
         return [$slime_ball];

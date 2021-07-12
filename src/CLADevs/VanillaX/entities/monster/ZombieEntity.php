@@ -29,10 +29,10 @@ class ZombieEntity extends VanillaEntity{
      * @return Item[]
      */
     public function getDrops(): array{
-        $rotten_flesh = ItemFactory::get(ItemIds::ROTTEN_FLESH, 0, 1);
+        $rotten_flesh = ItemFactory::getInstance()->get(ItemIds::ROTTEN_FLESH, 0, 1);
         ItemHelper::applySetCount($rotten_flesh, 0, 2);
         ItemHelper::applyLootingEnchant($this, $rotten_flesh);
-        return [$rotten_flesh, ItemFactory::get(ItemIds::IRON_INGOT, 0, 1), ItemFactory::get(ItemIds::CARROT, 0, 1), ItemFactory::get(ItemIds::POTATO, 0, 1)];
+        return [$rotten_flesh, ItemFactory::getInstance()->get(ItemIds::IRON_INGOT, 0, 1), ItemFactory::getInstance()->get(ItemIds::CARROT, 0, 1), ItemFactory::getInstance()->get(ItemIds::POTATO, 0, 1)];
     }
     
     public function getXpDropAmount(): int{

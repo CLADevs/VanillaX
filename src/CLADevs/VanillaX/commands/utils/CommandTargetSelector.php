@@ -5,7 +5,7 @@ namespace CLADevs\VanillaX\commands\utils;
 use pocketmine\command\CommandSender;
 use pocketmine\entity\Entity;
 use pocketmine\level\Level;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 

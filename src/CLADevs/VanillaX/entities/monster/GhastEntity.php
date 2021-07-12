@@ -28,11 +28,11 @@ class GhastEntity extends VanillaEntity{
      * @return Item[]
      */
     public function getDrops(): array{
-        $ghast_tear = ItemFactory::get(ItemIds::GHAST_TEAR, 0, 1);
+        $ghast_tear = ItemFactory::getInstance()->get(ItemIds::GHAST_TEAR, 0, 1);
         ItemHelper::applySetCount($ghast_tear, 0, 1);
         ItemHelper::applyLootingEnchant($this, $ghast_tear);
          
-        $gunpowder = ItemFactory::get(ItemIds::GUNPOWDER, 0, 1);
+        $gunpowder = ItemFactory::getInstance()->get(ItemIds::GUNPOWDER, 0, 1);
         ItemHelper::applySetCount($gunpowder, 0, 2);
         ItemHelper::applyLootingEnchant($this, $gunpowder);
         return [$ghast_tear, $gunpowder];

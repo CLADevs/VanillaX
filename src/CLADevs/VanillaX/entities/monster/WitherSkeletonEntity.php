@@ -29,15 +29,15 @@ class WitherSkeletonEntity extends VanillaEntity{
      * @return Item[]
      */
     public function getDrops(): array{
-        $coal = ItemFactory::get(ItemIds::COAL, 0, 1);
+        $coal = ItemFactory::getInstance()->get(ItemIds::COAL, 0, 1);
         ItemHelper::applySetCount($coal, 0, 1);
         ItemHelper::applyLootingEnchant($this, $coal);
          
-        $bone = ItemFactory::get(ItemIds::BONE, 0, 1);
+        $bone = ItemFactory::getInstance()->get(ItemIds::BONE, 0, 1);
         ItemHelper::applySetCount($bone, 0, 2);
         ItemHelper::applyLootingEnchant($this, $bone);
          
-        $skull = ItemFactory::get(ItemIds::SKULL, 0, 1);
+        $skull = ItemFactory::getInstance()->get(ItemIds::SKULL, 0, 1);
         ItemHelper::applySetData($skull, 1);
         return [$coal, $bone, $skull];
     }

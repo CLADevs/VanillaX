@@ -28,31 +28,31 @@ class WitchEntity extends VanillaEntity{
      * @return Item[]
      */
     public function getDrops(): array{
-        $glowstone_dust = ItemFactory::get(ItemIds::GLOWSTONE_DUST, 0, 1);
+        $glowstone_dust = ItemFactory::getInstance()->get(ItemIds::GLOWSTONE_DUST, 0, 1);
         ItemHelper::applySetCount($glowstone_dust, 0, 2);
         ItemHelper::applyLootingEnchant($this, $glowstone_dust);
          
-        $sugar = ItemFactory::get(ItemIds::SUGAR, 0, 1);
+        $sugar = ItemFactory::getInstance()->get(ItemIds::SUGAR, 0, 1);
         ItemHelper::applySetCount($sugar, 0, 2);
         ItemHelper::applyLootingEnchant($this, $sugar);
          
-        $redstone = ItemFactory::get(ItemIds::REDSTONE_DUST, 0, 1);
+        $redstone = ItemFactory::getInstance()->get(ItemIds::REDSTONE_DUST, 0, 1);
         ItemHelper::applySetCount($redstone, 0, 2);
         ItemHelper::applyLootingEnchant($this, $redstone);
          
-        $spider_eye = ItemFactory::get(ItemIds::SPIDER_EYE, 0, 1);
+        $spider_eye = ItemFactory::getInstance()->get(ItemIds::SPIDER_EYE, 0, 1);
         ItemHelper::applySetCount($spider_eye, 0, 2);
         ItemHelper::applyLootingEnchant($this, $spider_eye);
          
-        $glass_bottle = ItemFactory::get(ItemIds::GLASS_BOTTLE, 0, 1);
+        $glass_bottle = ItemFactory::getInstance()->get(ItemIds::GLASS_BOTTLE, 0, 1);
         ItemHelper::applySetCount($glass_bottle, 0, 2);
         ItemHelper::applyLootingEnchant($this, $glass_bottle);
          
-        $gunpowder = ItemFactory::get(ItemIds::GUNPOWDER, 0, 1);
+        $gunpowder = ItemFactory::getInstance()->get(ItemIds::GUNPOWDER, 0, 1);
         ItemHelper::applySetCount($gunpowder, 0, 2);
         ItemHelper::applyLootingEnchant($this, $gunpowder);
          
-        $stick = ItemFactory::get(ItemIds::STICK, 0, 1);
+        $stick = ItemFactory::getInstance()->get(ItemIds::STICK, 0, 1);
         ItemHelper::applySetCount($stick, 0, 2);
         ItemHelper::applyLootingEnchant($this, $stick);
         return [$glowstone_dust, $sugar, $redstone, $spider_eye, $glass_bottle, $gunpowder, $stick];

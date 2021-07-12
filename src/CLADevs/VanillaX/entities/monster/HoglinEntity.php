@@ -28,12 +28,12 @@ class HoglinEntity extends VanillaEntity{
      * @return Item[]
      */
     public function getDrops(): array{
-        $porkchop = ItemFactory::get(ItemIds::RAW_PORKCHOP, 0, 1);
+        $porkchop = ItemFactory::getInstance()->get(ItemIds::RAW_PORKCHOP, 0, 1);
         ItemHelper::applySetCount($porkchop, 2, 4);
         ItemHelper::applyFurnaceSmelt($porkchop);
         ItemHelper::applyLootingEnchant($this, $porkchop);
          
-        $leather = ItemFactory::get(ItemIds::LEATHER, 0, 1);
+        $leather = ItemFactory::getInstance()->get(ItemIds::LEATHER, 0, 1);
         ItemHelper::applySetCount($leather, 0, 1);
         ItemHelper::applyLootingEnchant($this, $leather);
         return [$porkchop, $leather];

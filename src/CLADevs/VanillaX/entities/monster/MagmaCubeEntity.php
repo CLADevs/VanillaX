@@ -19,7 +19,7 @@ class MagmaCubeEntity extends SlimeEntity{
      * @return Item[]
      */
     public function getDrops(): array{
-        $magma_cream = ItemFactory::get(ItemIds::MAGMA_CREAM, 0, 1);
+        $magma_cream = ItemFactory::getInstance()->get(ItemIds::MAGMA_CREAM, 0, 1);
         ItemHelper::applySetCount($magma_cream, 0, 1);
         ItemHelper::applyLootingEnchant($this, $magma_cream);
         return [$magma_cream];

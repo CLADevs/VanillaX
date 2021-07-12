@@ -10,11 +10,11 @@ use CLADevs\VanillaX\inventories\types\EnchantInventory;
 use CLADevs\VanillaX\inventories\types\TradeInventory;
 use pocketmine\inventory\transaction\action\InventoryAction;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
-use pocketmine\network\mcpe\protocol\types\ContainerIds;
+use pocketmine\network\mcpe\protocol\types\ContainerBlockLegacyIds;
 use pocketmine\network\mcpe\protocol\types\inventory\UIInventorySlotOffset;
 use pocketmine\network\mcpe\protocol\types\NetworkInventoryAction;
 use pocketmine\network\mcpe\protocol\types\WindowTypes;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use UnexpectedValueException;
 
 class NetworkInventoryActionX extends NetworkInventoryAction{
@@ -39,7 +39,7 @@ class NetworkInventoryActionX extends NetworkInventoryAction{
             case self::SOURCE_CONTAINER:
 
                 $otherInventory = true;
-                if($this->windowId === ContainerIds::UI){
+                if($this->windowId === ContainerBlockLegacyBlockLegacyIds::UI){
                     if(array_key_exists($this->inventorySlot, UIInventorySlotOffset::ANVIL)){
                         //Anvil
                         $window = $player->getWindow(WindowTypes::ANVIL);

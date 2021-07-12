@@ -5,7 +5,7 @@ namespace CLADevs\VanillaX\inventories\actions;
 use CLADevs\VanillaX\inventories\types\TradeInventory;
 use pocketmine\inventory\transaction\action\InventoryAction;
 use pocketmine\network\mcpe\protocol\types\WindowTypes;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class TradeItemAction extends InventoryAction{
 

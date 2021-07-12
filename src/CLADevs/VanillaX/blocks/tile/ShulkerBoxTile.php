@@ -4,7 +4,7 @@ namespace CLADevs\VanillaX\blocks\tile;
 
 use CLADevs\VanillaX\blocks\utils\TileVanilla;
 use CLADevs\VanillaX\inventories\types\ShulkerBoxInventory;
-use pocketmine\block\BlockIds;
+use pocketmine\block\BlockLegacyIds;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\tag\ByteTag;
 use pocketmine\nbt\tag\CompoundTag;
@@ -16,11 +16,11 @@ class ShulkerBoxTile extends Spawnable{
     use ContainerTrait;
 
     const TILE_ID = TileVanilla::SHULKER_BOX;
-    const TILE_BLOCK = [BlockIds::SHULKER_BOX, BlockIds::UNDYED_SHULKER_BOX];
+    const TILE_BLOCK = [BlockLegacyIds::SHULKER_BOX, BlockLegacyIds::UNDYED_SHULKER_BOX];
 
     const TAG_FACING = "facing";
 
-    private int $facing = Vector3::SIDE_DOWN;
+    private int $facing = Facing::DOWN;
 
     private ShulkerBoxInventory $inventory;
 

@@ -16,7 +16,7 @@ use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\LevelSoundEventPacket;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class PigEntity extends VanillaEntity implements EntityInteractable, InteractButtonItemTrait, EntityRidable, HeldItemChangeTrait{
     use EntityRidableTrait;
@@ -46,7 +46,7 @@ class PigEntity extends VanillaEntity implements EntityInteractable, InteractBut
      * @return Item[]
      */
     public function getDrops(): array{
-        $porkchop = ItemFactory::get(ItemIds::RAW_PORKCHOP, 0, 1);
+        $porkchop = ItemFactory::getInstance()->get(ItemIds::RAW_PORKCHOP, 0, 1);
         ItemHelper::applySetCount($porkchop, 1, 3);
         if($this->isOnFire()) ItemHelper::applyFurnaceSmelt($porkchop);
         ItemHelper::applyLootingEnchant($this, $porkchop);

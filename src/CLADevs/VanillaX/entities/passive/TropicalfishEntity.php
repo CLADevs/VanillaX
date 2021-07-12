@@ -29,9 +29,9 @@ class TropicalfishEntity extends VanillaEntity{
      * @return Item[]
      */
     public function getDrops(): array{
-        $bone = ItemFactory::get(ItemIds::BONE, 0, 1);
+        $bone = ItemFactory::getInstance()->get(ItemIds::BONE, 0, 1);
         ItemHelper::applyLootingEnchant($this, $bone);
-        return [ItemFactory::get(ItemIds::CLOWNFISH, 0, 1), $bone];
+        return [ItemFactory::getInstance()->get(ItemIds::CLOWNFISH, 0, 1), $bone];
     }
 
     public function getXpDropAmount(): int{

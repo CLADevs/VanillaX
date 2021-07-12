@@ -4,7 +4,7 @@ namespace CLADevs\VanillaX\blocks\tile;
 
 use CLADevs\VanillaX\blocks\utils\TileVanilla;
 use CLADevs\VanillaX\inventories\types\DispenserInventory;
-use pocketmine\block\BlockIds;
+use pocketmine\block\BlockLegacyIds;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\tile\Container;
 use pocketmine\tile\ContainerTrait;
@@ -14,7 +14,7 @@ class DispenserTile extends Spawnable implements Container{
     use ContainerTrait;
 
     const TILE_ID = TileVanilla::DISPENSER;
-    const TILE_BLOCK = BlockIds::DISPENSER;
+    const TILE_BLOCK = BlockLegacyIds::DISPENSER;
 
     private DispenserInventory $inventory;
 

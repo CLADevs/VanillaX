@@ -31,7 +31,7 @@ class HoneyBottleItem extends Item implements Consumable{
     }
 
     public function getResidue(): Item{
-        return ItemFactory::get(ItemIds::GLASS_BOTTLE);
+        return ItemFactory::getInstance()->get(ItemIds::GLASS_BOTTLE);
     }
 
     public function getAdditionalEffects(): array{

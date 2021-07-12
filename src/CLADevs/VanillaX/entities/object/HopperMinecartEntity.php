@@ -7,7 +7,7 @@ use CLADevs\VanillaX\entities\utils\interfaces\EntityInteractable;
 use CLADevs\VanillaX\entities\utils\traits\EntityContainer;
 use CLADevs\VanillaX\inventories\FakeBlockInventory;
 use CLADevs\VanillaX\network\gamerules\GameRule;
-use pocketmine\block\BlockIds;
+use pocketmine\block\BlockLegacyIds;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
@@ -24,7 +24,7 @@ use EntityContainer;
 
     public function __construct(Level $level, CompoundTag $nbt){
         parent::__construct($level, $nbt);
-        $this->inventory = new FakeBlockInventory($this->subtract(0, 1), 5, BlockIds::HOPPER_BLOCK, WindowTypes::HOPPER);
+        $this->inventory = new FakeBlockInventory($this->subtract(0, 1), 5, BlockLegacyIds::HOPPER_BLOCK, WindowTypes::HOPPER);
         $this->loadItems($nbt);
     }
 
@@ -35,7 +35,7 @@ use EntityContainer;
 
     public function kill(): void{
         if(GameRule::getGameRuleValue(GameRule::DO_ENTITY_DROPS, $this->getLevel())){
-            foreach(array_merge($this->getContents(), [ItemFactory::get(ItemIds::MINECART_WITH_HOPPER)]) as $item){
+            foreach(array_merge($this->getContents(), [ItemFactory::getInstance()->get(ItemIds::MINECART_WITH_HOPPER)]) as $item){
                 $this->getLevel()->dropItem($this, $item);
             }
         }

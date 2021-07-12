@@ -28,10 +28,10 @@ class IronGolemEntity extends VanillaEntity{
      * @return Item[]
      */
     public function getDrops(): array{
-        $red_flower = ItemFactory::get(ItemIds::RED_FLOWER, 0, 1);
+        $red_flower = ItemFactory::getInstance()->get(ItemIds::RED_FLOWER, 0, 1);
         ItemHelper::applySetCount($red_flower, 0, 2);
          
-        $iron_ingot = ItemFactory::get(ItemIds::IRON_INGOT, 0, 1);
+        $iron_ingot = ItemFactory::getInstance()->get(ItemIds::IRON_INGOT, 0, 1);
         ItemHelper::applySetCount($iron_ingot, 3, 5);
         return [$red_flower, $iron_ingot];
     }

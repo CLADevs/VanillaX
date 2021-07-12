@@ -3,7 +3,7 @@
 namespace CLADevs\VanillaX\blocks\tile;
 
 use CLADevs\VanillaX\blocks\utils\TileVanilla;
-use pocketmine\block\BlockIds;
+use pocketmine\block\BlockLegacyIds;
 use pocketmine\entity\Entity;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\Server;
@@ -12,7 +12,7 @@ use pocketmine\tile\Spawnable;
 class MobSpawnerTile extends Spawnable{
 
     const TILE_ID = TileVanilla::MOB_SPAWNER;
-    const TILE_BLOCK = BlockIds::MOB_SPAWNER;
+    const TILE_BLOCK = BlockLegacyIds::MOB_SPAWNER;
 
     const TAG_ENTITY_ID = "EntityId";
     const TAG_SPAWN_COUNT = "SpawnCount";

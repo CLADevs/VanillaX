@@ -29,7 +29,7 @@ class SquidEntity extends VanillaEntity{
      * @return Item[]
      */
     public function getDrops(): array{
-        $dye = ItemFactory::get(ItemIds::DYE, 0, 1);
+        $dye = ItemFactory::getInstance()->get(ItemIds::DYE, 0, 1);
         ItemHelper::applySetCount($dye, 1, 3);
         ItemHelper::applySetData($dye, 0);
         ItemHelper::applyLootingEnchant($this, $dye);

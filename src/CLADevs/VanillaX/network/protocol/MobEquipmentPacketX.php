@@ -6,8 +6,8 @@ use CLADevs\VanillaX\VanillaX;
 use pocketmine\network\mcpe\NetworkSession;
 use pocketmine\network\mcpe\PlayerNetworkSessionAdapter;
 use pocketmine\network\mcpe\protocol\MobEquipmentPacket;
-use pocketmine\network\mcpe\protocol\types\ContainerIds;
-use pocketmine\Player;
+use pocketmine\network\mcpe\protocol\types\ContainerBlockLegacyIds;
+use pocketmine\player\Player;
 use pocketmine\Server;
 use ReflectionClass;
 use ReflectionException;
@@ -20,7 +20,7 @@ class MobEquipmentPacketX extends MobEquipmentPacket{
      * @throws ReflectionException
      */
     public function handle(NetworkSession $handler): bool{
-        if($handler instanceof PlayerNetworkSessionAdapter && $this->windowId === ContainerIds::OFFHAND){
+        if($handler instanceof PlayerNetworkSessionAdapter && $this->windowId === ContainerBlockLegacyBlockLegacyIds::OFFHAND){
             //VERY hacky way
             $rc = new ReflectionClass(PlayerNetworkSessionAdapter::class);
             $var = $rc->getProperty("player");

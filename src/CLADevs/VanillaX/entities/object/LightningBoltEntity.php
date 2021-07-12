@@ -3,7 +3,7 @@
 namespace CLADevs\VanillaX\entities\object;
 
 use pocketmine\block\BlockFactory;
-use pocketmine\block\BlockIds;
+use pocketmine\block\BlockLegacyIds;
 use pocketmine\entity\Entity;
 use pocketmine\level\Level;
 use pocketmine\network\mcpe\protocol\LevelSoundEventPacket;
@@ -31,8 +31,8 @@ class LightningBoltEntity extends Entity{
             if(in_array(Server::getInstance()->getDifficulty(), [Level::DIFFICULTY_NORMAL, Level::DIFFICULTY_HARD])){
                 for($i = 1; $i <= 3; $i++){
                     $block = $this->add(mt_rand(0, 2), mt_rand(0, 2), mt_rand(0, 2));
-                    if($this->getLevel()->getBlock($block)->getId() === BlockIds::AIR && $this->getLevel()->getBlock($block->subtract(0, 1))->getId() !== BlockIds::AIR){
-                        $this->getLevel()->setBlock($block, BlockFactory::get(BlockIds::FIRE), true, true);
+                    if($this->getLevel()->getBlock($block)->getId() === BlockLegacyIds::AIR && $this->getLevel()->getBlock($block->subtract(0, 1))->getId() !== BlockLegacyIds::AIR){
+                        $this->getLevel()->setBlock($block, BlockFactory::get(BlockLegacyIds::FIRE), true, true);
                     }
                 }
             }

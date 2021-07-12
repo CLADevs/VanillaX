@@ -33,7 +33,7 @@ use EntityContainer;
 
     public function kill(): void{
         if(GameRule::getGameRuleValue(GameRule::DO_ENTITY_DROPS, $this->getLevel())){
-            foreach(array_merge($this->getContents(), [ItemFactory::get(ItemIds::MINECART_WITH_CHEST)]) as $item){
+            foreach(array_merge($this->getContents(), [ItemFactory::getInstance()->get(ItemIds::MINECART_WITH_CHEST)]) as $item){
                 $this->getLevel()->dropItem($this, $item);
             }
         }

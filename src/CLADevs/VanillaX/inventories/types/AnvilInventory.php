@@ -4,19 +4,19 @@ namespace CLADevs\VanillaX\inventories\types;
 
 use CLADevs\VanillaX\inventories\FakeBlockInventory;
 use CLADevs\VanillaX\network\protocol\FilterTextPacketX;
-use pocketmine\block\BlockIds;
+use pocketmine\block\BlockLegacyIds;
 use pocketmine\item\Item;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\ActorEventPacket;
 use pocketmine\network\mcpe\protocol\DataPacket;
 use pocketmine\network\mcpe\protocol\LevelSoundEventPacket;
 use pocketmine\network\mcpe\protocol\types\WindowTypes;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class AnvilInventory extends FakeBlockInventory{
 
     public function __construct(Vector3 $holder){
-        parent::__construct($holder, 2, BlockIds::AIR, WindowTypes::ANVIL, null);
+        parent::__construct($holder, 2, BlockLegacyIds::AIR, WindowTypes::ANVIL, null);
     }
 
     public function onClose(Player $who): void{

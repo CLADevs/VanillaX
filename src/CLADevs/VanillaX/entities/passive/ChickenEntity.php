@@ -28,11 +28,11 @@ class ChickenEntity extends VanillaEntity{
      * @return Item[]
      */
     public function getDrops(): array{
-        $feather = ItemFactory::get(ItemIds::FEATHER, 0, 1);
+        $feather = ItemFactory::getInstance()->get(ItemIds::FEATHER, 0, 1);
         ItemHelper::applySetCount($feather, 0, 2);
         ItemHelper::applyLootingEnchant($this, $feather);
          
-        $chicken = ItemFactory::get(ItemIds::RAW_CHICKEN, 0, 1);
+        $chicken = ItemFactory::getInstance()->get(ItemIds::RAW_CHICKEN, 0, 1);
         if($this->isOnFire()) ItemHelper::applyFurnaceSmelt($chicken);
         ItemHelper::applyLootingEnchant($this, $chicken);
         return [$feather, $chicken];

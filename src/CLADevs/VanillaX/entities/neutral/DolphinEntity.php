@@ -29,7 +29,7 @@ class DolphinEntity extends VanillaEntity{
      * @return Item[]
      */
     public function getDrops(): array{
-        $fish = ItemFactory::get(ItemIds::RAW_FISH, 0, 1);
+        $fish = ItemFactory::getInstance()->get(ItemIds::RAW_FISH, 0, 1);
         ItemHelper::applySetCount($fish, 0, 1);
         ItemHelper::applyLootingEnchant($this, $fish);
         if($this->isOnFire()) ItemHelper::applyFurnaceSmelt($fish);

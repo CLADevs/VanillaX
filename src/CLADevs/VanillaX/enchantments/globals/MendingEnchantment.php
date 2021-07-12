@@ -3,7 +3,8 @@
 namespace CLADevs\VanillaX\enchantments\globals;
 
 use CLADevs\VanillaX\enchantments\utils\EnchantmentTrait;
-use pocketmine\item\enchantment\Enchantment;
+use pocketmine\data\bedrock\EnchantmentIdMap;
+use pocketmine\data\bedrock\EnchantmentIds;
 
 class MendingEnchantment extends Enchantment{
     use EnchantmentTrait;

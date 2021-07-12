@@ -5,7 +5,7 @@ namespace CLADevs\VanillaX\blocks\tile;
 use CLADevs\VanillaX\blocks\utils\TileVanilla;
 use CLADevs\VanillaX\inventories\types\BrewingStandInventory;
 use CLADevs\VanillaX\VanillaX;
-use pocketmine\block\BlockIds;
+use pocketmine\block\BlockLegacyIds;
 use pocketmine\item\Item;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\network\mcpe\protocol\LevelSoundEventPacket;
@@ -19,7 +19,7 @@ class BrewingStandTile extends Spawnable implements Container, Nameable{
     use ContainerTrait, NameableTrait;
 
     const TILE_ID = TileVanilla::BREWING_STAND;
-    const TILE_BLOCK = BlockIds::BREWING_STAND_BLOCK;
+    const TILE_BLOCK = BlockLegacyIds::BREWING_STAND_BLOCK;
 
     const TAG_BREW_TIME = "BrewTime";
     const TAG_FUEL_AMOUNT = "FuelAmount";

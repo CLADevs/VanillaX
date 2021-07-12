@@ -5,7 +5,7 @@ namespace CLADevs\VanillaX\entities\utils;
 use pocketmine\entity\Entity;
 use pocketmine\item\Item;
 use pocketmine\math\Vector3;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class EntityInteractResult{
 

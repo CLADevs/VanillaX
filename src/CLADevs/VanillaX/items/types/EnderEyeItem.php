@@ -6,7 +6,7 @@ use CLADevs\VanillaX\entities\object\EnderEyeEntity;
 use pocketmine\entity\Entity;
 use pocketmine\item\Item;
 use pocketmine\math\Vector3;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class EnderEyeItem extends Item{
 

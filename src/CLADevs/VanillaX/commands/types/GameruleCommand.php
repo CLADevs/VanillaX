@@ -10,7 +10,7 @@ use pocketmine\command\CommandSender;
 use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
 use pocketmine\network\mcpe\protocol\GameRulesChangedPacket;
 use pocketmine\network\mcpe\protocol\types\PlayerPermissions;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\Server;
 
 class GameruleCommand extends Command{

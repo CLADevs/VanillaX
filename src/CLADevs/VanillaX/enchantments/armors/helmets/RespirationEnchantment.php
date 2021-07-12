@@ -4,7 +4,8 @@ namespace CLADevs\VanillaX\enchantments\armors\helmets;
 
 use CLADevs\VanillaX\enchantments\utils\EnchantmentTrait;
 use CLADevs\VanillaX\items\ItemManager;
-use pocketmine\item\enchantment\Enchantment;
+use pocketmine\data\bedrock\EnchantmentIdMap;
+use pocketmine\data\bedrock\EnchantmentIds;
 use pocketmine\item\Item;
 
 class RespirationEnchantment extends Enchantment{

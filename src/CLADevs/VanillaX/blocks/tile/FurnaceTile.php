@@ -2,7 +2,7 @@
 
 namespace CLADevs\VanillaX\blocks\tile;
 
-use pocketmine\block\BlockIds;
+use pocketmine\block\BlockLegacyIds;
 use pocketmine\inventory\Inventory;
 use pocketmine\inventory\InventoryEventProcessor;
 use pocketmine\item\Item;
@@ -15,7 +15,7 @@ use pocketmine\tile\Furnace;
 class FurnaceTile extends Furnace{
 
     const TILE_ID = self::FURNACE;
-    const TILE_BLOCK = BlockIds::FURNACE;
+    const TILE_BLOCK = BlockLegacyIds::FURNACE;
 
     private float $xpHolder = 0.0;
 

@@ -28,7 +28,7 @@ class SnowGolemEntity extends VanillaEntity{
      * @return Item[]
      */
     public function getDrops(): array{
-        $snowball = ItemFactory::get(ItemIds::SNOWBALL, 0, 1);
+        $snowball = ItemFactory::getInstance()->get(ItemIds::SNOWBALL, 0, 1);
         ItemHelper::applySetCount($snowball, 0, 15);
         return [$snowball];
     }

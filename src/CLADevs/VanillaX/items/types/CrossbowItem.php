@@ -13,7 +13,7 @@ use pocketmine\item\ItemIds;
 use pocketmine\item\Tool;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\LevelSoundEventPacket;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class CrossbowItem extends Tool{
 
@@ -94,20 +94,20 @@ class CrossbowItem extends Tool{
             }
             return;
         }
-        $item = ItemFactory::get($itemId);
+        $item = ItemFactory::getInstance()->get($itemId);
         $nbt = $item->nbtSerialize(-1, self::TAG_CHARGED_ITEM);
         $nbt->setString(self::TAG_DISPLAY_NAME, "minecraft:" . strtolower(str_replace(" ", "_", $item->getVanillaName())));
         $this->setNamedTagEntry($nbt);
 
         if($itemId === ItemIds::ARROW){
-            if($player->isSurvival() and $player->getInventory()->contains(ItemFactory::get(Item::ARROW, 0, 1))){
-                $player->getInventory()->removeItem(ItemFactory::get(Item::ARROW, 0, 1));
+            if($player->isSurvival() and $player->getInventory()->contains(ItemFactory::getInstance()->get(Item::ARROW, 0, 1))){
+                $player->getInventory()->removeItem(ItemFactory::getInstance()->get(Item::ARROW, 0, 1));
             }
         }elseif($itemId === ItemIds::FIREWORKS){
             $offhand = VanillaX::getInstance()->getSessionManager()->get($player)->getOffHandInventory();
 
-            if($player->isSurvival() and $offhand->contains(ItemFactory::get(Item::FIREWORKS, 0, 1))){
-                $offhand->removeItem(ItemFactory::get(Item::FIREWORKS, 0, 1));
+            if($player->isSurvival() and $offhand->contains(ItemFactory::getInstance()->get(Item::FIREWORKS, 0, 1))){
+                $offhand->removeItem(ItemFactory::getInstance()->get(Item::FIREWORKS, 0, 1));
             }
         }
     }

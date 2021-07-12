@@ -2,39 +2,37 @@
 
 namespace CLADevs\VanillaX\blocks\block\redstone\pistons;
 
+use CLADevs\VanillaX\utils\item\NonAutomaticCallItemTrait;
 use pocketmine\block\Block;
-use pocketmine\block\Solid;
+use pocketmine\block\BlockBreakInfo;
+use pocketmine\block\BlockIdentifier;
+use pocketmine\block\BlockToolType;
+use pocketmine\block\Opaque;
 use pocketmine\item\Item;
 use pocketmine\math\Vector3;
-use pocketmine\Player;
+use pocketmine\player\Player;
+use pocketmine\world\BlockTransaction;
 
-class Piston extends Solid{
+class Piston extends Opaque implements NonAutomaticCallItemTrait{
 
-    public function __construct(int $meta = 0){
-        parent::__construct(self::PISTON, $meta, "Piston");
+    public function __construct(BlockIdentifier $id, string $name){
+        parent::__construct($id, $name, new BlockBreakInfo(1.5, BlockToolType::PICKAXE, 0, 0.5));
     }
 
-    public function getHardness(): float{
-        return 1.5;
-    }
-
-    public function getBlastResistance(): float{
-        return 0.5;
-    }
-
-    public function place(Item $item, Block $blockReplace, Block $blockClicked, int $face, Vector3 $clickVector, Player $player = null): bool{
-        $faces = [
-            Vector3::SIDE_DOWN => 0,
-            Vector3::SIDE_UP => 1,
-            Vector3::SIDE_NORTH => 2,
-            Vector3::SIDE_SOUTH => 3,
-            Vector3::SIDE_WEST => 5,
-            Vector3::SIDE_EAST => 4
-        ];
-        if(($meta = $faces[$face] ?? null) === null){
-            return false;
-        }
-        $this->meta = $meta;
-        return parent::place($item, $blockReplace, $blockClicked, $face, $clickVector, $player);
+    public function place(BlockTransaction $tr, Item $item, Block $blockReplace, Block $blockClicked, int $face, Vector3 $clickVector, Player $player = null): bool{
+//        $faces = [
+//            Facing::DOWN => 0,
+//            Facing::UP => 1,
+//            Facing::NORTH => 2,
+//            Facing::SOUTH => 3,
+//            Facing::WEST => 5,
+//            Facing::EAST => 4
+//        ];
+//        if(($facing = $faces[$face] ?? null) === null){
+//            return false;
+//        }
+//        $this->facing = $facing;
+        //TODO facing
+        return parent::place($tr, $item, $blockReplace, $blockClicked, $face, $clickVector, $player);
     }
 }

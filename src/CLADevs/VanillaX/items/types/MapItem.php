@@ -10,7 +10,7 @@ use pocketmine\entity\Entity;
 use pocketmine\item\Item;
 use pocketmine\item\ItemIds;
 use pocketmine\math\Vector3;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class MapItem extends Item implements NonAutomaticCallItemTrait, HeldItemChangeTrait, InteractButtonItemTrait{
 

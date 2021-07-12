@@ -29,7 +29,7 @@ class PillagerEntity extends VanillaEntity{
      * @return Item[]
      */
     public function getDrops(): array{
-        $arrow = ItemFactory::get(ItemIds::ARROW, 0, 1);
+        $arrow = ItemFactory::getInstance()->get(ItemIds::ARROW, 0, 1);
         ItemHelper::applySetCount($arrow, 0, 2);
         ItemHelper::applyLootingEnchant($this, $arrow);
         return [$arrow];

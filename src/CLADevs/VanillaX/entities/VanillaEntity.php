@@ -8,7 +8,7 @@ use pocketmine\entity\Living;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDeathEvent;
 use pocketmine\network\mcpe\protocol\AddActorPacket;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 abstract class VanillaEntity extends Living{
 

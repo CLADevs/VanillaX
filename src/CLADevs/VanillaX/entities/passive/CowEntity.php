@@ -28,11 +28,11 @@ class CowEntity extends VanillaEntity{
      * @return Item[]
      */
     public function getDrops(): array{
-        $leather = ItemFactory::get(ItemIds::LEATHER, 0, 1);
+        $leather = ItemFactory::getInstance()->get(ItemIds::LEATHER, 0, 1);
         ItemHelper::applySetCount($leather, 0, 2);
         ItemHelper::applyLootingEnchant($this, $leather);
          
-        $beef = ItemFactory::get(ItemIds::RAW_BEEF, 0, 1);
+        $beef = ItemFactory::getInstance()->get(ItemIds::RAW_BEEF, 0, 1);
         ItemHelper::applySetCount($beef, 1, 3);
         if($this->isOnFire()) ItemHelper::applyFurnaceSmelt($beef);
         ItemHelper::applyLootingEnchant($this, $beef);

@@ -3,46 +3,43 @@
 namespace CLADevs\VanillaX\blocks\block;
 
 use CLADevs\VanillaX\blocks\tile\DispenserTile;
-use CLADevs\VanillaX\blocks\utils\TileUtils;
-use CLADevs\VanillaX\blocks\utils\TileVanilla;
 use pocketmine\block\Block;
-use pocketmine\block\BlockIds;
-use pocketmine\block\Solid;
+use pocketmine\block\BlockBreakInfo;
+use pocketmine\block\BlockIdentifier;
+use pocketmine\block\BlockLegacyIds;
+use pocketmine\block\Opaque;
 use pocketmine\item\Item;
 use pocketmine\math\Vector3;
-use pocketmine\Player;
+use pocketmine\player\Player;
+use pocketmine\world\BlockTransaction;
 
-class DispenserBlock extends Solid{
+class DispenserBlock extends Opaque{
 
-    public function __construct(int $meta = 0){
-        parent::__construct(BlockIds::DISPENSER, $meta);
+    //TODO tile
+    public function __construct(){
+        parent::__construct(new BlockIdentifier(BlockLegacyIds::DISPENSER, 0), "Dispenser", new BlockBreakInfo(3.5));
     }
 
-    public function getHardness(): float{
-        return 3.5;
+    public function place(BlockTransaction $tx, Item $item, Block $blockReplace, Block $blockClicked, int $face, Vector3 $clickVector, ?Player $player = null): bool{
+//        $faces = [
+//            Facing::DOWN => 0,
+//            Facing::UP => 1,
+//            Facing::NORTH => 2,
+//            Facing::SOUTH => 3,
+//            Facing::WEST => 4,
+//            Facing::EAST => 5
+//        ];
+//        $this->facing = $faces[$face] ?? $face;
+        //TODO facing
+        return parent::place($tx, $item, $blockReplace, $blockClicked, $face, $clickVector, $player);
     }
 
-    public function place(Item $item, Block $blockReplace, Block $blockClicked, int $face, Vector3 $clickVector, Player $player = null): bool{
-        $faces = [
-            Vector3::SIDE_DOWN => 0,
-            Vector3::SIDE_UP => 1,
-            Vector3::SIDE_NORTH => 2,
-            Vector3::SIDE_SOUTH => 3,
-            Vector3::SIDE_WEST => 4,
-            Vector3::SIDE_EAST => 5
-        ];
-        $this->meta = $faces[$face] ?? $face;
-        parent::place($item, $blockReplace, $blockClicked, $face, $clickVector, $player);
-        TileUtils::generateTile($this, TileVanilla::DISPENSER, DispenserTile::class);
-        return true;
-    }
-
-    public function onActivate(Item $item, Player $player = null): bool{
+    public function onInteract(Item $item, int $face, Vector3 $clickVector, ?Player $player = null): bool{
         if($player !== null){
-            $tile = $this->getLevel()->getTile($this);
+            $tile = $this->getPos()->getWorld()->getTile($this->getPos());
 
             if($tile instanceof DispenserTile){
-                $player->addWindow($tile->getInventory());
+                $player->setCurrentWindow($tile->getInventory());
             }
         }
         return true;

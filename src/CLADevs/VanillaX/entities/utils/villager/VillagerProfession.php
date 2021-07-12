@@ -10,7 +10,7 @@ use Exception;
 use InvalidArgumentException;
 use pocketmine\block\Block;
 use pocketmine\block\BlockFactory;
-use pocketmine\block\BlockIds;
+use pocketmine\block\BlockLegacyIds;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 
@@ -61,7 +61,7 @@ abstract class VillagerProfession{
      * @param string $name
      * @param Block|int $block
      */
-    public function __construct(int $id, string $name, $block = BlockIds::AIR){
+    public function __construct(int $id, string $name, $block = BlockLegacyIds::AIR){
         $this->id = $id;
         $this->name = $name;
         //TODO uncomment this on 4.0
@@ -69,7 +69,7 @@ abstract class VillagerProfession{
 //            try{
 //                $block = BlockFactory::get($block);
 //            }catch (Exception $e){
-//                $block = BlockFactory::get(BlockIds::AIR);
+//                $block = BlockFactory::get(BlockLegacyIds::AIR);
 //            }
 //        }
         $this->block = $block;

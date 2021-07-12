@@ -28,7 +28,7 @@ class BlazeEntity extends VanillaEntity{
      * @return Item[]
      */
     public function getDrops(): array{
-        $blaze_rod = ItemFactory::get(ItemIds::BLAZE_ROD, 0, 1);
+        $blaze_rod = ItemFactory::getInstance()->get(ItemIds::BLAZE_ROD, 0, 1);
         ItemHelper::applySetCount($blaze_rod, 0, 1);
         ItemHelper::applyLootingEnchant($this, $blaze_rod);
         return [$blaze_rod];

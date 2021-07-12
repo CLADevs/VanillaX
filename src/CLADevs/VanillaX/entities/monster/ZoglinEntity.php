@@ -29,7 +29,7 @@ class ZoglinEntity extends VanillaEntity{
      * @return Item[]
      */
     public function getDrops(): array{
-        $rotten_flesh = ItemFactory::get(ItemIds::ROTTEN_FLESH, 0, 1);
+        $rotten_flesh = ItemFactory::getInstance()->get(ItemIds::ROTTEN_FLESH, 0, 1);
         ItemHelper::applySetCount($rotten_flesh, 1, 3);
         ItemHelper::applyLootingEnchant($this, $rotten_flesh);
         return [$rotten_flesh];

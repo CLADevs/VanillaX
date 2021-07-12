@@ -8,7 +8,7 @@ use CLADevs\VanillaX\VanillaX;
 use pocketmine\level\Level;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\LevelEventPacket;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\scheduler\ClosureTask;
 use pocketmine\Server;
 
@@ -21,8 +21,8 @@ class WeatherManager{
         if(!VanillaX::getInstance()->getConfig()->getNested("features.weather", true)){
             return;
         }
-        foreach(Server::getInstance()->getLevels() as $level){
-            if(!GameRule::getGameRuleValue(GameRule::DO_WEATHER_CYCLE, $level)){
+        foreach(Server::getInstance()->getWorldManager()->getWorlds() as $world){
+            if(!GameRule::getGameRuleValue(GameRule::DO_WEATHER_CYCLE, $world)){
                 continue;
             }
             $this->addWeather($level);

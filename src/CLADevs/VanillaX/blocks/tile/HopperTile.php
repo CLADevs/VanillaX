@@ -6,7 +6,7 @@ use CLADevs\VanillaX\blocks\utils\TileVanilla;
 use CLADevs\VanillaX\inventories\types\BrewingStandInventory;
 use CLADevs\VanillaX\inventories\types\HopperInventory;
 use pocketmine\block\Block;
-use pocketmine\block\BlockIds;
+use pocketmine\block\BlockLegacyIds;
 use pocketmine\entity\object\ItemEntity;
 use pocketmine\item\ItemIds;
 use pocketmine\nbt\tag\CompoundTag;
@@ -20,7 +20,7 @@ class HopperTile extends Spawnable implements Container{
 use ContainerTrait;
 
     const TILE_ID = TileVanilla::HOPPER;
-    const TILE_BLOCK = BlockIds::HOPPER_BLOCK;
+    const TILE_BLOCK = BlockLegacyIds::HOPPER_BLOCK;
 
     private int $facing = -1;
     private int $transferCooldown = 0;
@@ -42,7 +42,7 @@ use ContainerTrait;
     private function transferItems(): void{
         $block = $this->getFacingBlock();
 
-        if(in_array($block->getId(), [BlockIds::HOPPER_BLOCK, BlockIds::FURNACE, BlockIds::BREWING_STAND_BLOCK, BlockIds::CHEST])){
+        if(in_array($block->getId(), [BlockLegacyIds::HOPPER_BLOCK, BlockLegacyIds::FURNACE, BlockLegacyIds::BREWING_STAND_BLOCK, BlockLegacyIds::CHEST])){
             /** @var HopperTile|Furnace|BrewingStandTile|Chest $tile */
             $tile = $this->getLevel()->getTile($block);
             $inventory = $tile->getInventory();

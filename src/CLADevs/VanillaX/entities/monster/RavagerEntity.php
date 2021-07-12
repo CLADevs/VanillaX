@@ -28,7 +28,7 @@ class RavagerEntity extends VanillaEntity{
      * @return Item[]
      */
     public function getDrops(): array{
-        return [ItemFactory::get(ItemIds::SADDLE, 0, 1)];
+        return [ItemFactory::getInstance()->get(ItemIds::SADDLE, 0, 1)];
     }
     
     public function getXpDropAmount(): int{

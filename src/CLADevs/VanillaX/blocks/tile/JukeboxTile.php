@@ -4,13 +4,13 @@ namespace CLADevs\VanillaX\blocks\tile;
 
 use CLADevs\VanillaX\blocks\utils\TileVanilla;
 use CLADevs\VanillaX\items\types\MusicDiscItem;
-use pocketmine\block\BlockIds;
+use pocketmine\block\BlockLegacyIds;
 use pocketmine\item\Item;
 use pocketmine\level\particle\GenericParticle;
 use pocketmine\level\particle\Particle;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\network\mcpe\protocol\LevelSoundEventPacket;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\Server;
 use pocketmine\tile\Tile;
 use pocketmine\utils\TextFormat;
@@ -18,7 +18,7 @@ use pocketmine\utils\TextFormat;
 class JukeboxTile extends Tile{
 
     const TILE_ID = TileVanilla::JUKEBOX;
-    const TILE_BLOCK = BlockIds::JUKEBOX;
+    const TILE_BLOCK = BlockLegacyIds::JUKEBOX;
 
     const TAG_RECORD_ITEM = "RecordItem";
     const TAG_RECORD_DURATION = "RecordDuration";

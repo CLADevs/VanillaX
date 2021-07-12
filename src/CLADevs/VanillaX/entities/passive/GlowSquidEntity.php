@@ -27,7 +27,7 @@ class GlowSquidEntity extends VanillaEntity{
      */
     public function getDrops(): array{
         //TODO glow ink sac
-//        $glow_ink_sac = ItemFactory::get(ItemIds::AIR, 0, 1);
+//        $glow_ink_sac = ItemFactory::getInstance()->get(ItemIds::AIR, 0, 1);
 //        ItemHelper::applySetCount($glow_ink_sac, 1, 3);
 //        ItemHelper::applySetData($glow_ink_sac, 0);
 //        ItemHelper::applyLootingEnchant($this, $glow_ink_sac);

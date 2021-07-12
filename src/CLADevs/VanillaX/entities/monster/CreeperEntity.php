@@ -33,7 +33,7 @@ class CreeperEntity extends VanillaEntity{
      */
     public function getDrops(): array{
         //TODO, killed by skeleton drops music disc
-        $gunpowder = ItemFactory::get(ItemIds::GUNPOWDER, 0, 1);
+        $gunpowder = ItemFactory::getInstance()->get(ItemIds::GUNPOWDER, 0, 1);
         ItemHelper::applySetCount($gunpowder, 0, 2);
         ItemHelper::applyLootingEnchant($this, $gunpowder);
         return [$gunpowder];

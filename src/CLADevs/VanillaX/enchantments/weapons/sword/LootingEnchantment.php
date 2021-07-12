@@ -3,7 +3,8 @@
 namespace CLADevs\VanillaX\enchantments\weapons\sword;
 
 use CLADevs\VanillaX\enchantments\utils\EnchantmentTrait;
-use pocketmine\item\enchantment\Enchantment;
+use pocketmine\data\bedrock\EnchantmentIdMap;
+use pocketmine\data\bedrock\EnchantmentIds;
 use pocketmine\item\Item;
 use pocketmine\item\Sword;
 

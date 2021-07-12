@@ -6,7 +6,7 @@ use CLADevs\VanillaX\blocks\tile\BrewingStandTile;
 use CLADevs\VanillaX\blocks\block\BrewingStandBlock;
 use CLADevs\VanillaX\inventories\FakeBlockInventory;
 use CLADevs\VanillaX\VanillaX;
-use pocketmine\block\BlockIds;
+use pocketmine\block\BlockLegacyIds;
 use pocketmine\item\Item;
 use pocketmine\item\ItemIds;
 use pocketmine\network\mcpe\protocol\ContainerSetDataPacket;
@@ -14,7 +14,7 @@ use pocketmine\network\mcpe\protocol\DataPacket;
 use pocketmine\network\mcpe\protocol\InventoryTransactionPacket;
 use pocketmine\network\mcpe\protocol\types\NetworkInventoryAction;
 use pocketmine\network\mcpe\protocol\types\WindowTypes;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class BrewingStandInventory extends FakeBlockInventory{
 
@@ -29,7 +29,7 @@ class BrewingStandInventory extends FakeBlockInventory{
     private BrewingStandTile $tile;
 
     public function __construct(BrewingStandTile $tile){
-        parent::__construct($tile, 5, BlockIds::AIR, WindowTypes::BREWING_STAND);
+        parent::__construct($tile, 5, BlockLegacyIds::AIR, WindowTypes::BREWING_STAND);
         $this->tile = $tile;
     }
 

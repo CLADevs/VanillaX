@@ -28,7 +28,7 @@ class ParrotEntity extends VanillaEntity{
      * @return Item[]
      */
     public function getDrops(): array{
-        $feather = ItemFactory::get(ItemIds::FEATHER, 0, 1);
+        $feather = ItemFactory::getInstance()->get(ItemIds::FEATHER, 0, 1);
         ItemHelper::applySetCount($feather, 1, 2);
         return [$feather];
     }

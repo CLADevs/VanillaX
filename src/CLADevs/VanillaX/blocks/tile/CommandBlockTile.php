@@ -6,7 +6,7 @@ use CLADevs\VanillaX\blocks\block\CommandBlock;
 use CLADevs\VanillaX\blocks\utils\TileVanilla;
 use CLADevs\VanillaX\commands\sender\CommandBlockSender;
 use pocketmine\block\BlockFactory;
-use pocketmine\block\BlockIds;
+use pocketmine\block\BlockLegacyIds;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\ListTag;
 use pocketmine\nbt\tag\NamedTag;
@@ -20,7 +20,7 @@ class CommandBlockTile extends Spawnable implements Nameable{
     use NameableTrait;
 
     const TILE_ID = TileVanilla::COMMAND_BLOCK;
-    const TILE_BLOCK = [BlockIds::COMMAND_BLOCK, BlockIds::CHAIN_COMMAND_BLOCK, BlockIds::REPEATING_COMMAND_BLOCK];
+    const TILE_BLOCK = [BlockLegacyIds::COMMAND_BLOCK, BlockLegacyIds::CHAIN_COMMAND_BLOCK, BlockLegacyIds::REPEATING_COMMAND_BLOCK];
 
     /** TYPES OF COMMAND BLOCKS */
     const TYPE_IMPULSE = 0;
@@ -104,10 +104,10 @@ class CommandBlockTile extends Spawnable implements Nameable{
         if($pk->commandBlockMode !== $this->commandBlockMode){
             $this->commandBlockMode = $pk->commandBlockMode;
             $tileBlock = $this->getLevel()->getBlock($this);
-            $block = BlockFactory::get(CommandBlock::asCommandBlockFromMode($this->commandBlockMode), $tileBlock->getDamage());
+            $block = BlockFactory::get(CommandBlock::asCommandBlockFromMode($this->commandBlockMode), $tileBlock->getMeta());
 
             if($tileBlock instanceof CommandBlock){
-                $block->setDamage($tileBlock->getDamage());
+                $block->setDamage($tileBlock->getMeta());
             }
             $this->getLevel()->setBlock($this, $block, true, true);
         }
@@ -136,7 +136,7 @@ class CommandBlockTile extends Spawnable implements Nameable{
             $this->conditionalMode = $pk->isConditional;
             $tileBlock = $this->getLevel()->getBlock($this);
             $block = BlockFactory::get(CommandBlock::asCommandBlockFromMode($this->commandBlockMode));
-            $block->setDamage($tileBlock->getDamage() + ($pk->isConditional ? 8 : -8));
+            $block->setDamage($tileBlock->getMeta() + ($pk->isConditional ? 8 : -8));
             $this->getLevel()->setBlock($this, $block, true, true);
         }
         if($this->tickDelay == 0 && strlen($this->command) >= 1){

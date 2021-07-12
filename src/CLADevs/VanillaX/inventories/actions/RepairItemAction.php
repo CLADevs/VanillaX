@@ -3,11 +3,11 @@
 namespace CLADevs\VanillaX\inventories\actions;
 
 use CLADevs\VanillaX\inventories\types\AnvilInventory;
-use pocketmine\block\BlockIds;
+use pocketmine\block\BlockLegacyIds;
 use pocketmine\inventory\transaction\action\InventoryAction;
 use pocketmine\item\Item;
 use pocketmine\network\mcpe\protocol\types\WindowTypes;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class RepairItemAction extends InventoryAction{
 
@@ -31,7 +31,7 @@ class RepairItemAction extends InventoryAction{
     public function onExecuteSuccess(Player $source): void{
         $inv = $source->getWindow(WindowTypes::ANVIL);
 
-        if($inv instanceof AnvilInventory && $this->targetItem->getId() === BlockIds::AIR){
+        if($inv instanceof AnvilInventory && $this->targetItem->getId() === BlockLegacyIds::AIR){
             $inv->onSuccess($source, $this->sourceItem);
         }
     }

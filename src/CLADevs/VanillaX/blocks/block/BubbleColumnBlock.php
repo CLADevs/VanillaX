@@ -2,20 +2,15 @@
 
 namespace CLADevs\VanillaX\blocks\block;
 
-use CLADevs\VanillaX\blocks\utils\BlockVanilla;
+use pocketmine\block\BlockBreakInfo;
+use pocketmine\block\BlockIdentifier;
+use pocketmine\block\BlockLegacyIds;
+use pocketmine\block\BlockToolType;
 use pocketmine\block\Transparent;
 
 class BubbleColumnBlock extends Transparent{
 
-    public function __construct(int $meta = 0){
-        parent::__construct(BlockVanilla::BUBBLE_COLUMN, $meta, "Bubble Column");
-    }
-
-    public function getBlastResistance(): float{
-        return 100;
-    }
-
-    public function getHardness(): float{
-        return 0;
+    public function __construct(){
+        parent::__construct(new BlockIdentifier(BlockLegacyIds::BUBBLE_COLUMN, 0), "Bubble Column", new BlockBreakInfo(0, BlockToolType::NONE, 0, 100));
     }
 }

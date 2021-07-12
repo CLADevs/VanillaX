@@ -12,7 +12,7 @@ use pocketmine\item\ItemFactory;
 use pocketmine\nbt\JsonNbtParser;
 use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
 use pocketmine\network\mcpe\protocol\types\PlayerPermissions;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class GiveCommand extends Command{
 

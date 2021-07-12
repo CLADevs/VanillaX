@@ -5,7 +5,7 @@ namespace CLADevs\VanillaX\commands\utils;
 use CLADevs\VanillaX\commands\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\math\Vector3;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class CommandHelper{
 

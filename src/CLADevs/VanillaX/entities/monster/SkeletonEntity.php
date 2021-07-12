@@ -29,11 +29,11 @@ class SkeletonEntity extends VanillaEntity{
      * @return Item[]
      */
     public function getDrops(): array{
-        $arrow = ItemFactory::get(ItemIds::ARROW, 0, 1);
+        $arrow = ItemFactory::getInstance()->get(ItemIds::ARROW, 0, 1);
         ItemHelper::applySetCount($arrow, 0, 2);
         ItemHelper::applyLootingEnchant($this, $arrow);
          
-        $bone = ItemFactory::get(ItemIds::BONE, 0, 1);
+        $bone = ItemFactory::getInstance()->get(ItemIds::BONE, 0, 1);
         ItemHelper::applySetCount($bone, 0, 2);
         ItemHelper::applyLootingEnchant($this, $bone);
         return [$arrow, $bone];

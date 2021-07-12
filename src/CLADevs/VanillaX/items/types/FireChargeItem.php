@@ -5,10 +5,10 @@ namespace CLADevs\VanillaX\items\types;
 use CLADevs\VanillaX\session\Session;
 use pocketmine\block\Block;
 use pocketmine\block\BlockFactory;
-use pocketmine\block\BlockIds;
+use pocketmine\block\BlockLegacyIds;
 use pocketmine\item\Item;
 use pocketmine\math\Vector3;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class FireChargeItem extends Item{
 
@@ -17,8 +17,8 @@ class FireChargeItem extends Item{
     }
 
     public function onActivate(Player $player, Block $blockReplace, Block $blockClicked, int $face, Vector3 $clickVector): bool{
-        if($blockReplace->getId() === BlockIds::AIR){
-            $player->getLevel()->setBlock($blockReplace, BlockFactory::get(BlockIds::FIRE), true, true);
+        if($blockReplace->getId() === BlockLegacyIds::AIR){
+            $player->getLevel()->setBlock($blockReplace, BlockFactory::get(BlockLegacyIds::FIRE), true, true);
             Session::playSound($player, "mob.blaze.shoot");
             if($player->isSurvival() || $player->isAdventure()) $this->pop();
         }

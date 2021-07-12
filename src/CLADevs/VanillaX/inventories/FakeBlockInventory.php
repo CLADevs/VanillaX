@@ -5,12 +5,12 @@ namespace CLADevs\VanillaX\inventories;
 use CLADevs\VanillaX\VanillaX;
 use pocketmine\block\Block;
 use pocketmine\block\BlockFactory;
-use pocketmine\block\BlockIds;
+use pocketmine\block\BlockLegacyIds;
 use pocketmine\inventory\ContainerInventory;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\DataPacket;
 use pocketmine\network\mcpe\protocol\types\WindowTypes;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class FakeBlockInventory extends ContainerInventory{
 
@@ -31,7 +31,7 @@ class FakeBlockInventory extends ContainerInventory{
      * @param int $windowType
      * @param callable|null $packetCallable
      */
-    public function __construct(Vector3 $holder, int $size = 27, $block = BlockIds::CHEST, int $windowType = WindowTypes::CONTAINER, callable $packetCallable = null, ?Player $owner = null){
+    public function __construct(Vector3 $holder, int $size = 27, $block = BlockLegacyIds::CHEST, int $windowType = WindowTypes::CONTAINER, callable $packetCallable = null, ?Player $owner = null){
         $holder->x = intval($holder->x);
         $holder->y = intval($holder->y);
         $holder->z = intval($holder->z);
@@ -68,7 +68,7 @@ class FakeBlockInventory extends ContainerInventory{
 
     public function onOpen(Player $who): void{
         VanillaX::getInstance()->getSessionManager()->get($who)->setCurrentWindow($this);
-        if($this->block->getId() !== BlockIds::AIR){
+        if($this->block->getId() !== BlockLegacyIds::AIR){
             $block = clone $this->block;
             $block->setComponents($this->holder->x, $this->holder->y, $this->holder->z);
             $who->getLevel()->sendBlocks([$who], [$block]);
@@ -78,7 +78,7 @@ class FakeBlockInventory extends ContainerInventory{
 
     public function onClose(Player $who): void{
         VanillaX::getInstance()->getSessionManager()->get($who)->setCurrentWindow(null);
-        if($this->block->getId() !== BlockIds::AIR){
+        if($this->block->getId() !== BlockLegacyIds::AIR){
             $who->getLevel()->sendBlocks([$who], [$who->getLevel()->getBlock($this->holder)]);
         }
         parent::onClose($who);

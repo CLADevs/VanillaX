@@ -39,7 +39,7 @@ class CatEntity extends VanillaEntity{
      * @return Item[]
      */
     public function getDrops(): array{
-        $string = ItemFactory::get(ItemIds::STRING, 0, 1);
+        $string = ItemFactory::getInstance()->get(ItemIds::STRING, 0, 1);
         ItemHelper::applySetCount($string, 0, 2);
         return [$string];
     }

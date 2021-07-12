@@ -3,16 +3,16 @@
 namespace CLADevs\VanillaX\inventories\types;
 
 use CLADevs\VanillaX\inventories\FakeBlockInventory;
-use pocketmine\block\BlockIds;
+use pocketmine\block\BlockLegacyIds;
 use pocketmine\item\Item;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\types\WindowTypes;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class EnchantInventory extends FakeBlockInventory{
 
     public function __construct(Vector3 $holder){
-        parent::__construct($holder, 2, BlockIds::AIR, WindowTypes::ENCHANTMENT);
+        parent::__construct($holder, 2, BlockLegacyIds::AIR, WindowTypes::ENCHANTMENT);
     }
 
     public function onClose(Player $who): void{

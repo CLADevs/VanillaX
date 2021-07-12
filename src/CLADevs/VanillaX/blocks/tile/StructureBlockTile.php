@@ -3,7 +3,7 @@
 namespace CLADevs\VanillaX\blocks\tile;
 
 use CLADevs\VanillaX\blocks\utils\TileVanilla;
-use pocketmine\block\BlockIds;
+use pocketmine\block\BlockLegacyIds;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\tile\Spawnable;
 
@@ -29,7 +29,7 @@ class StructureBlockTile extends Spawnable{
     const TAG_STRUCTURE_Z_SIZE = "zStructureSize";
 
     const TILE_ID = TileVanilla::STRUCTURE_BLOCK;
-    const TILE_BLOCK = BlockIds::STRUCTURE_BLOCK;
+    const TILE_BLOCK = BlockLegacyIds::STRUCTURE_BLOCK;
 
     protected function readSaveData(CompoundTag $nbt): void{
     }

@@ -104,12 +104,12 @@ class ItemManager{
 
         /** Shulker Box */
         for($i = 1; $i <= 15; $i++){
-            $item = ItemFactory::get(ItemIds::SHULKER_BOX, $i);
+            $item = ItemFactory::getInstance()->get(ItemIds::SHULKER_BOX, $i);
             if(!Item::isCreativeItem($item)) Item::addCreativeItem($item);
         }
         /** Spawn Egg */
         foreach([VanillaEntity::GOAT, VanillaEntity::GLOW_SQUID, VanillaEntity::AXOLOTL] as $id){
-            $item = ItemFactory::get(ItemIds::SPAWN_EGG, $id);
+            $item = ItemFactory::getInstance()->get(ItemIds::SPAWN_EGG, $id);
             if(!Item::isCreativeItem($item)) Item::addCreativeItem($item);
         }
     }
@@ -120,10 +120,10 @@ class ItemManager{
     }
 
     private function addComplexItem(string $newId, string $oldId, int $meta): void{
-        $runtimeIds = json_decode(file_get_contents(RESOURCE_PATH . '/vanilla/required_item_list.json'), true);
+        $runtimeBlockLegacyIds = json_decode(file_get_contents(RESOURCE_PATH . '/vanilla/required_item_list.json'), true);
         $legacyStringToIntMap = json_decode(file_get_contents(RESOURCE_PATH . '/vanilla/item_id_map.json'), true);
         $id = $legacyStringToIntMap[$oldId];
-        $netId = $runtimeIds[$newId]["runtime_id"];
+        $netId = $runtimeBlockLegacyIds[$newId]["runtime_id"];
 
         /** complexCoreToNetMapping */
         $property = new ReflectionProperty(ItemTranslator::class, "complexCoreToNetMapping");

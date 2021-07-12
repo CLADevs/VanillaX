@@ -11,7 +11,7 @@ use pocketmine\command\ConsoleCommandSender;
 use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
 use pocketmine\network\mcpe\protocol\PlaySoundPacket;
 use pocketmine\network\mcpe\protocol\types\PlayerPermissions;
-use pocketmine\Player;
+use pocketmine\player\Player;
 class PlaySoundCommand extends Command{
 
     public function __construct(){

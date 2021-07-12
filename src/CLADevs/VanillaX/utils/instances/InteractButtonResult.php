@@ -4,7 +4,7 @@ namespace CLADevs\VanillaX\utils\instances;
 
 use pocketmine\item\Item;
 use pocketmine\math\Vector3;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class InteractButtonResult{
 

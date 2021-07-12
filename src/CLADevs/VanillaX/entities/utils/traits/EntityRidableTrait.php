@@ -12,7 +12,7 @@ use pocketmine\math\Vector3;
 use pocketmine\nbt\tag\ByteTag;
 use pocketmine\network\mcpe\protocol\SetActorLinkPacket;
 use pocketmine\network\mcpe\protocol\types\EntityLink;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\Server;
 
 trait EntityRidableTrait{
@@ -70,7 +70,7 @@ trait EntityRidableTrait{
     public function getSaddleDrops(): array{
         $drops = [];
         if($this->isSaddled){
-            $drops[] = ItemFactory::get(ItemIds::SADDLE, 0, 1);
+            $drops[] = ItemFactory::getInstance()->get(ItemIds::SADDLE, 0, 1);
         }
         return $drops;
     }

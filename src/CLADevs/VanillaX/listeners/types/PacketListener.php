@@ -11,7 +11,7 @@ use CLADevs\VanillaX\utils\instances\InteractButtonResult;
 use CLADevs\VanillaX\utils\item\InteractButtonItemTrait;
 use CLADevs\VanillaX\VanillaX;
 use pocketmine\block\BlockFactory;
-use pocketmine\block\BlockIds;
+use pocketmine\block\BlockLegacyIds;
 use pocketmine\entity\Entity;
 use pocketmine\entity\Human;
 use pocketmine\event\inventory\InventoryTransactionEvent;
@@ -38,7 +38,7 @@ use pocketmine\network\mcpe\protocol\SetPlayerGameTypePacket;
 use pocketmine\network\mcpe\protocol\types\inventory\UseItemOnEntityTransactionData;
 use pocketmine\network\mcpe\protocol\types\inventory\UseItemTransactionData;
 use pocketmine\network\mcpe\protocol\types\WindowTypes;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\Server;
 
 class PacketListener implements Listener{
@@ -253,8 +253,8 @@ class PacketListener implements Listener{
         $entity = $player->getLevel()->getEntity($packet->entityUniqueId);
 
         if($entity instanceof Entity && !$entity instanceof Human){
-            $result = ItemFactory::get(ItemIds::SPAWN_EGG, $entity::NETWORK_ID);
-            $ev = new PlayerBlockPickEvent($player, BlockFactory::get(BlockIds::AIR), $result);
+            $result = ItemFactory::getInstance()->get(ItemIds::SPAWN_EGG, $entity::NETWORK_ID);
+            $ev = new PlayerBlockPickEvent($player, BlockFactory::get(BlockLegacyIds::AIR), $result);
             $ev->call();
 
             if(!$ev->isCancelled()){

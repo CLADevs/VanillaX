@@ -9,7 +9,7 @@ use pocketmine\block\Block;
 use pocketmine\item\Item;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\tag\CompoundTag;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class FireworkRocketItem extends Item{
 

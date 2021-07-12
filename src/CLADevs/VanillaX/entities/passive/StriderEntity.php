@@ -16,7 +16,7 @@ use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\LevelSoundEventPacket;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class StriderEntity extends VanillaEntity implements EntityInteractable, InteractButtonItemTrait, EntityRidable, HeldItemChangeTrait{
     use EntityRidableTrait;
@@ -44,7 +44,7 @@ class StriderEntity extends VanillaEntity implements EntityInteractable, Interac
      * @return Item[]
      */
     public function getDrops(): array{
-        $string = ItemFactory::get(ItemIds::STRING, 0, 1);
+        $string = ItemFactory::getInstance()->get(ItemIds::STRING, 0, 1);
         ItemHelper::applySetCount($string, 2, 5);
         return array_merge([$string], $this->getSaddleDrops());
     }
