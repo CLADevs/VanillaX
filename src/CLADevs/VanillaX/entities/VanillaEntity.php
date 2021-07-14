@@ -4,6 +4,7 @@ namespace CLADevs\VanillaX\entities;
 
 use CLADevs\VanillaX\entities\utils\interfaces\EntityClassification;
 use CLADevs\VanillaX\network\gamerules\GameRule;
+use pocketmine\entity\Attribute;
 use pocketmine\entity\Living;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDeathEvent;
@@ -11,6 +12,7 @@ use pocketmine\network\mcpe\protocol\AddActorPacket;
 use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataCollection;
 use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataFlags;
 use pocketmine\player\Player;
+use pocketmine\network\mcpe\protocol\types\entity\Attribute as NetworkAttribute;
 
 abstract class VanillaEntity extends Living{
 
@@ -98,7 +100,9 @@ abstract class VanillaEntity extends Living{
         $pk->yaw = $this->location->yaw;
         $pk->headYaw = $this->location->yaw;
         $pk->pitch = $this->location->pitch;
-        $pk->attributes = $this->attributeMap->getAll();
+        $pk->attributes = array_map(function(Attribute $attr): NetworkAttribute{
+            return new NetworkAttribute($attr->getId(), $attr->getMinValue(), $attr->getMaxValue(), $attr->getValue(), $attr->getDefaultValue());
+        }, $this->attributeMap->getAll());
         $pk->metadata = $this->getAllNetworkData();
         $player->getNetworkSession()->sendDataPacket($pk);
     }

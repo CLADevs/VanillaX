@@ -19,7 +19,8 @@ class ShulkerBulletEntity extends Projectile{
     public float $width = 0.625;
     public float $height = 0.625;
 
-    protected float $gravity = 0.05;
+    /** @var float */
+    protected $gravity = 0.05;
 
     const NETWORK_ID = EntityIds::SHULKER_BULLET;
 

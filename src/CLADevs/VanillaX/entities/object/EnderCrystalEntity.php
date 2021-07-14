@@ -13,7 +13,9 @@ class EnderCrystalEntity extends Entity{
 
     public float $width = 0.98;
     public float $height = 0.98;
-    protected float $gravity = 0.00;
+
+    /** @var float */
+    protected $gravity = 0.00;
 
     const NETWORK_ID = EntityIds::ENDER_CRYSTAL;
 

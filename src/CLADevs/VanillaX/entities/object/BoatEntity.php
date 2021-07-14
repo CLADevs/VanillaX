@@ -13,7 +13,9 @@ class BoatEntity extends Entity{
 
     public float $width = 1.4;
     public float $height = 0.455;
-    protected float $gravity = 0.05;
+
+    /** @var float */
+    protected $gravity = 0.05;
 
     const NETWORK_ID = EntityIds::BOAT;
 

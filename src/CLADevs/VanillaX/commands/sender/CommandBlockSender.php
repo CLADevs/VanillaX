@@ -2,7 +2,7 @@
 
 namespace CLADevs\VanillaX\commands\sender;
 
-use pocketmine\command\ConsoleCommandSender;
+use pocketmine\console\ConsoleCommandSender;
 use pocketmine\lang\TranslationContainer;
 
 class CommandBlockSender extends ConsoleCommandSender{

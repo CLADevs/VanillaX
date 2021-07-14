@@ -2,7 +2,12 @@
 
 namespace CLADevs\VanillaX\entities;
 
+use CLADevs\VanillaX\entities\monster\PiglinBruteEntity;
+use CLADevs\VanillaX\entities\neutral\GoatEntity;
 use CLADevs\VanillaX\entities\object\PaintingEntity;
+use CLADevs\VanillaX\entities\passive\AxolotlEntity;
+use CLADevs\VanillaX\entities\passive\GlowSquidEntity;
+use CLADevs\VanillaX\entities\utils\EntityIdentifierX;
 use CLADevs\VanillaX\entities\utils\villager\VillagerProfession;
 use CLADevs\VanillaX\utils\item\NonAutomaticCallItemTrait;
 use CLADevs\VanillaX\utils\Utils;
@@ -16,14 +21,16 @@ use pocketmine\math\Facing;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\tag\ByteTag;
 use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\network\mcpe\protocol\types\entity\EntityIds;
 use pocketmine\utils\SingletonTrait;
 use pocketmine\world\World;
+use ReflectionClass;
 use UnexpectedValueException;
 
 class EntityManager{
     use SingletonTrait;
 
-    /** @var string[] */
+    /** @var EntityIdentifierX[] */
     private array $entities = [];
 
     public function __construct(){
@@ -44,13 +51,52 @@ class EntityManager{
         }
     }
 
+    private function initializeEntityIds(string $namespace): void{
+        $entityIds = (new ReflectionClass(EntityIds::class))->getConstants();
+        $entityLegacyIds = (new ReflectionClass(EntityLegacyIds::class))->getConstants();
+        $networkId = $namespace::NETWORK_ID;
+        $key = array_search($networkId, $entityIds);
+        $id = $entityLegacyIds[$key] ?? null;
+
+        if($id === null){
+            switch($networkId){
+                case GlowSquidEntity::NETWORK_ID:
+                    $key = "GLOW_SQUID";
+                    $id = VanillaEntity::GLOW_SQUID;
+                    break;
+                case GoatEntity::NETWORK_ID:
+                    $key = "GOAT";
+                    $id = VanillaEntity::GOAT;
+                    break;
+                case AxolotlEntity::NETWORK_ID:
+                    $key = "AXOLOTL";
+                    $id = VanillaEntity::AXOLOTL;
+                    break;
+                case PiglinBruteEntity::NETWORK_ID:
+                    $key = "PIGLIN_BRUTE";
+                    $id = VanillaEntity::PIGLIN_BRUTE;
+                    break;
+            }
+        }
+
+        if($id !== null && $key !== false){
+            $entityName = [];
+            foreach(explode("_", $key) as $value){
+                $entityName[] = ucfirst(strtolower($value));
+            }
+            $entityName = implode(" ", $entityName);
+            $this->entities[$networkId] = new EntityIdentifierX($networkId, $entityName, $namespace, $id);
+        }
+    }
+
     public function registerEntity(string $namespace, array $saveNames = []): void{
         $disabledMobs = VanillaX::getInstance()->getConfig()->getNested("disabled.mobs", []);
 
         if(in_array($namespace::NETWORK_ID, $disabledMobs)){
            return;
         }
-        $this->entities[$namespace::NETWORK_ID] = $namespace;
+        $this->initializeEntityIds($namespace);
+
         if($namespace::NETWORK_ID === PaintingEntity::NETWORK_ID){
             EntityFactory::getInstance()->register(PaintingEntity::class, function(World $world, CompoundTag $nbt): PaintingEntity{
                 $motive = PaintingMotive::getMotiveByName($nbt->getString("Motive"));
@@ -77,7 +123,7 @@ class EntityManager{
 
     /**
      * @param string $entity
-     * @return string|null
+     * @return EntityIdentifierX|null
      * returns namespace of the entity or null if not found
      */
     public function getEntity(string $entity): ?string{
@@ -85,7 +131,7 @@ class EntityManager{
     }
 
     /**
-     * @return string[]
+     * @return EntityIdentifierX[]
      */
     public function getEntities(): array{
         return $this->entities;

@@ -27,8 +27,10 @@ class TridentEntity extends Projectile{
     public float $width = 0.25;
     public float $height = 0.35;
 
-    protected float $gravity = 0.05;
-    protected float $drag = 0.01;
+    /** @var float */
+    protected $gravity = 0.05;
+    /** @var float */
+    protected $drag = 0.01;
 
     const NETWORK_ID = EntityIds::THROWN_TRIDENT;
 

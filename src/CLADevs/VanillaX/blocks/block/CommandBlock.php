@@ -78,7 +78,7 @@ class CommandBlock extends Block implements NonAutomaticCallItemTrait, NonCreati
         }
         if($tile->getTickDelay() > 0 && $tile->getCountDelayTick() > 0){
             $tile->decreaseCountDelayTick();
-        }else{
+        }else{;
             $tile->runCommand();
             if($tile->getCommandBlockMode() === CommandBlockTile::TYPE_REPEAT){
                 $tile->setCountDelayTick($tile->getTickDelay());

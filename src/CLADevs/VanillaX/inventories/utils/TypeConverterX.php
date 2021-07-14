@@ -9,6 +9,7 @@ use CLADevs\VanillaX\inventories\FakeBlockInventory;
 use pocketmine\inventory\transaction\action\InventoryAction;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
 use pocketmine\network\mcpe\convert\TypeConverter;
+use pocketmine\network\mcpe\InventoryManager;
 use pocketmine\network\mcpe\protocol\types\inventory\ContainerIds;
 use pocketmine\network\mcpe\protocol\types\inventory\NetworkInventoryAction;
 use pocketmine\network\mcpe\protocol\types\inventory\UIInventorySlotOffset;
@@ -28,10 +29,10 @@ class TypeConverterX extends TypeConverter{
     public const SOURCE_TYPE_TRADE_INPUT = -31;
     public const SOURCE_TYPE_TRADE_OUTPUT = -30;
 
-    public function createInventoryAction(NetworkInventoryAction $action, Player $player): ?InventoryAction{
+    public function createInventoryAction(NetworkInventoryAction $action, Player $player, InventoryManager $inventoryManager): ?InventoryAction{
         $oldItem = TypeConverter::getInstance()->netItemStackToCore($action->oldItem->getItemStack());
         $newItem = TypeConverter::getInstance()->netItemStackToCore($action->newItem->getItemStack());
-        $currentWindowId = $player->getNetworkSession()->getInvManager()->getCurrentWindowId();
+        $currentWindowId = $inventoryManager->getCurrentWindowId();
         $currentWindow = $player->getCurrentWindow();
 
         if($currentWindow instanceof FakeBlockInventory){
@@ -94,6 +95,7 @@ class TypeConverterX extends TypeConverter{
                     break;
             }
         }
-        return parent::createInventoryAction($action, $player);
+        return parent::createInventoryAction($action, $player, $inventoryManager);
     }
+
 }

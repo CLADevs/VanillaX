@@ -21,7 +21,8 @@ class WitherSkullEntity extends Projectile{
 
     const NETWORK_ID = EntityIds::WITHER_SKULL;
 
-    protected float $gravity = 0.00;
+    /** @var float */
+    protected $gravity = 0.00;
 
     protected function onHit(ProjectileHitEvent $event): void{
         $pos = $this->getPosition();

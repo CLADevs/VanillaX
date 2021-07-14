@@ -31,7 +31,7 @@ class CauldronTile extends Spawnable{
         if(($tag = $nbt->getTag(self::TAG_CUSTOM_COLOR)) !== null){
             $this->customColor = $tag->getValue();
         }
-        $this->getBlock()->onNearbyBlockChange();
+        $this->setDirty();
         BlockManager::onChange($this);
     }
 

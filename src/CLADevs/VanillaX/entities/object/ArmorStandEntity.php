@@ -60,8 +60,9 @@ class ArmorStandEntity extends Living implements InteractButtonItemTrait{
 
     public float $width = 0.5;
     public float $height = 1.975;
-    
-    protected float $gravity = 0.5;
+
+    /** @var float */
+    protected $gravity = 0.5;
 
     private Item $mainHand;
 

@@ -3,10 +3,6 @@
 namespace CLADevs\VanillaX\items;
 
 use CLADevs\VanillaX\entities\EntityManager;
-use CLADevs\VanillaX\entities\monster\PiglinBruteEntity;
-use CLADevs\VanillaX\entities\neutral\GoatEntity;
-use CLADevs\VanillaX\entities\passive\AxolotlEntity;
-use CLADevs\VanillaX\entities\passive\GlowSquidEntity;
 use CLADevs\VanillaX\entities\VanillaEntity;
 use CLADevs\VanillaX\items\types\HorseArmorItem;
 use CLADevs\VanillaX\items\types\MapItem;
@@ -17,7 +13,6 @@ use CLADevs\VanillaX\utils\item\NonCreativeItemTrait;
 use CLADevs\VanillaX\utils\item\NonOverwriteItemTrait;
 use CLADevs\VanillaX\utils\Utils;
 use CLADevs\VanillaX\VanillaX;
-use pocketmine\data\bedrock\EntityLegacyIds;
 use pocketmine\entity\Entity;
 use pocketmine\entity\Location;
 use pocketmine\inventory\CreativeInventory;
@@ -29,9 +24,7 @@ use pocketmine\item\ItemIds;
 use pocketmine\item\SpawnEgg;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\LevelSoundEventPacket;
-use pocketmine\network\mcpe\protocol\types\entity\EntityIds;
 use pocketmine\world\World;
-use ReflectionClass;
 use const pocketmine\RESOURCE_PATH;
 
 class ItemManager{
@@ -96,55 +89,20 @@ class ItemManager{
         }
 
         /** Spawn Egg */
-//        $entityIds = (new ReflectionClass(EntityIds::class))->getConstants();
-//        $entityLegacyIds = (new ReflectionClass(EntityLegacyIds::class))->getConstants();
-//
-//        foreach(EntityManager::getInstance()->getEntities() as $namespace){
-//            $networkId = $namespace::NETWORK_ID;
-//            $key = array_search($networkId, $entityIds);
-//            $id = $entityLegacyIds[$key] ?? null;
-//
-//            if($id === null){
-//                switch($networkId){
-//                    case GlowSquidEntity::NETWORK_ID:
-//                        $key = "GLOW_SQUID";
-//                        $id = VanillaEntity::GLOW_SQUID;
-//                        break;
-//                    case GoatEntity::NETWORK_ID:
-//                        $key = "GOAT";
-//                        $id = VanillaEntity::GOAT;
-//                        break;
-//                    case AxolotlEntity::NETWORK_ID:
-//                        $key = "AXOLOTL";
-//                        $id = VanillaEntity::AXOLOTL;
-//                        break;
-//                    case PiglinBruteEntity::NETWORK_ID:
-//                        $key = "PIGLIN_BRUTE";
-//                        $id = VanillaEntity::PIGLIN_BRUTE;
-//                        break;
-//                }
-//            }
-//
-//            if($id !== null){
-//                $entityName = [];
-//                foreach(explode("_", $key) as $value){
-//                    $entityName[] = ucfirst(strtolower($value));
-//                }
-//                $entityName = implode(" ", $entityName);
-//                ItemFactory::getInstance()->register(new class(new ItemIdentifier(ItemIds::SPAWN_EGG, $id), $entityName . " Spawn Egg", $namespace) extends SpawnEgg{
-//                    private string $namespace;
-//
-//                    public function __construct(ItemIdentifier $identifier, string $name = "Unknown", string $namespace = ""){
-//                        parent::__construct($identifier, $name);
-//                        $this->namespace = $namespace;
-//                    }
-//
-//                    public function createEntity(World $world, Vector3 $pos, float $yaw, float $pitch): Entity{
-//                        return new $this->namespace(Location::fromObject($pos, $world, $yaw, $pitch));
-//                    }
-//                }, true);
-//            }
-//        }
+        foreach(EntityManager::getInstance()->getEntities() as $entity){
+            ItemFactory::getInstance()->register(new class(new ItemIdentifier(ItemIds::SPAWN_EGG, $entity->getId()), $entity->getName() . " Spawn Egg", $entity->getNamespace()) extends SpawnEgg{
+                private string $namespace;
+
+                public function __construct(ItemIdentifier $identifier, string $name = "Unknown", string $namespace = ""){
+                    parent::__construct($identifier, $name);
+                    $this->namespace = $namespace;
+                }
+
+                public function createEntity(World $world, Vector3 $pos, float $yaw, float $pitch): Entity{
+                    return new $this->namespace(Location::fromObject($pos, $world, $yaw, $pitch));
+                }
+            }, true);
+        }
         $this->initializeCreativeItems();
     }
 

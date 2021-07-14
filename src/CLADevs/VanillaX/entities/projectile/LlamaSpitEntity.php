@@ -11,7 +11,8 @@ class LlamaSpitEntity extends Projectile{
     public float $width = 0.31;
     public float $height = 0.31;
 
-    protected float $gravity = 0.06;
+    /** @var float */
+    protected $gravity = 0.06;
 
     const NETWORK_ID = EntityIds::LLAMA_SPIT;
 

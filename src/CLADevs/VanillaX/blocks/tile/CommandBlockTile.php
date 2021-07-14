@@ -43,6 +43,7 @@ class CommandBlockTile extends Spawnable implements Nameable{
     const TAG_AUTO = "auto";
     const TAG_CONDITION_MET = "conditionMet";
     const TAG_CONDITIONAL_MODE = "conditionalMode";
+    const TAG_RAN_COMMAND = "hasRanCommand";
 
     /** CUSTOM TAGS */
     const TAG_COMMAND_BLOCK_MODE = "commandBlockMode";
@@ -67,6 +68,7 @@ class CommandBlockTile extends Spawnable implements Nameable{
     private bool $auto = false;
     private bool $conditionMet = false;
     private bool $conditionalMode = false;
+    private bool $ranCommand = false;
 
     public function getDefaultName(): string{
         return "Command Block";
@@ -74,16 +76,23 @@ class CommandBlockTile extends Spawnable implements Nameable{
 
     public function runCommand(): void{
         if(strlen($this->command) > 0){
+            if($this->ranCommand){
+               return;
+            }
             $sender = new CommandBlockSender(Server::getInstance(), Server::getInstance()->getLanguage());
             if(Server::getInstance()->dispatchCommand($sender, $this->command)){
                 $this->successCount++;
             }
             $this->lastOutput = $sender->getMessage();
+            if($this->commandBlockMode !== self::TYPE_REPEAT){
+                $this->ranCommand = true;
+            }
         }
     }
 
     public function handleCommandBlockUpdateReceive(CommandBlockUpdatePacket $pk): void{
         if($pk->commandBlockMode !== $this->commandBlockMode){
+            $this->ranCommand = false;
             $this->commandBlockMode = $pk->commandBlockMode;
             $tileBlock = $this->getPos()->getWorld()->getBlock($this->getPos());
             /** @var CommandBlock $block */
@@ -127,6 +136,7 @@ class CommandBlockTile extends Spawnable implements Nameable{
             $this->runCommand();
         }
         $this->pos->getWorld()->scheduleDelayedBlockUpdate($this->pos, 1);
+        $this->setDirty();
         BlockManager::onChange($this);
     }
 
@@ -142,6 +152,7 @@ class CommandBlockTile extends Spawnable implements Nameable{
         $nbt->setInt(self::TAG_AUTO, $this->auto);
         $nbt->setInt(self::TAG_CONDITION_MET, $this->conditionMet);
         $nbt->setInt(self::TAG_CONDITIONAL_MODE, $this->conditionalMode);
+        $nbt->setInt(self::TAG_RAN_COMMAND, $this->ranCommand);
     }
 
     public function readSaveData(CompoundTag $nbt): void{
@@ -176,6 +187,10 @@ class CommandBlockTile extends Spawnable implements Nameable{
         if(($tag = $nbt->getTag(self::TAG_CONDITIONAL_MODE)) !== null){
             $this->conditionalMode = boolval($tag->getValue());
         }
+        if(($tag = $nbt->getTag(self::TAG_RAN_COMMAND)) !== null){
+            $this->ranCommand = boolval($tag->getValue());
+        }
+        $this->setDirty();
         BlockManager::onChange($this);
     }
 
@@ -217,5 +232,13 @@ class CommandBlockTile extends Spawnable implements Nameable{
 
     public function getCommandBlockMode(): int{
         return $this->commandBlockMode;
+    }
+
+    public function hasRanCommand(): bool{
+        return $this->ranCommand;
+    }
+
+    public function setRanCommand(bool $ranCommand): void{
+        $this->ranCommand = $ranCommand;
     }
 }

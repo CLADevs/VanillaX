@@ -19,7 +19,6 @@ use pocketmine\block\BlockLegacyIds;
 use pocketmine\block\tile\Spawnable;
 use pocketmine\block\tile\TileFactory;
 use pocketmine\inventory\CreativeInventory;
-use pocketmine\network\mcpe\protocol\BlockActorDataPacket;
 use pocketmine\Server;
 use ReflectionClass;
 use ReflectionException;
@@ -117,12 +116,9 @@ class BlockManager{
         return true;
     }
 
-    /**
-     * @param Spawnable $tile
-     * Idk how to do this function on 4.0 LOL so ill replicate it from 3.0
-     */
     public static function onChange(Spawnable $tile): void{
-        $pk = BlockActorDataPacket::create($tile->getPos()->x, $tile->getPos()->y, $tile->getPos()->z, $tile->getSerializedSpawnCompound());
-        $tile->getPos()->getWorld()->broadcastPacketToViewers($tile->getPos(), $pk);
+        foreach($tile->getPos()->getWorld()->createBlockUpdatePackets([$tile->getPos()]) as $pk){
+            $tile->getPos()->getWorld()->broadcastPacketToViewers($tile->getPos(), $pk);
+        }
     }
 }

@@ -15,6 +15,7 @@ use CLADevs\VanillaX\utils\item\InteractButtonItemTrait;
 use CLADevs\VanillaX\utils\Utils;
 use CLADevs\VanillaX\VanillaX;
 use pocketmine\block\VanillaBlocks;
+use pocketmine\data\java\GameModeIdMap;
 use pocketmine\entity\Entity;
 use pocketmine\entity\Human;
 use pocketmine\event\inventory\InventoryTransactionEvent;
@@ -45,7 +46,6 @@ use pocketmine\network\mcpe\protocol\types\inventory\UseItemTransactionData;
 use pocketmine\network\mcpe\protocol\types\recipe\PotionContainerChangeRecipe;
 use pocketmine\network\mcpe\protocol\types\recipe\PotionTypeRecipe;
 use pocketmine\permission\DefaultPermissions;
-use pocketmine\player\GameMode;
 use pocketmine\player\Player;
 use pocketmine\Server;
 use pocketmine\world\Position;
@@ -103,7 +103,7 @@ class PacketListener implements Listener{
                 case ProtocolInfo::SET_PLAYER_GAME_TYPE_PACKET:
                     /** Server Form Personal Game Type Setting */
                     if($player->hasPermission(DefaultPermissions::ROOT_OPERATOR) && $packet instanceof SetPlayerGameTypePacket){
-                        $player->setGamemode(GameMode::fromMagicNumber($packet->gamemode));
+                        $player->setGamemode(GameModeIdMap::getInstance()->fromId($packet->gamemode));
                     }
                     break;
                 case ProtocolInfo::SET_DEFAULT_GAME_TYPE_PACKET:

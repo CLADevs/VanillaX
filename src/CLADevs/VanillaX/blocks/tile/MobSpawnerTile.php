@@ -4,6 +4,8 @@ namespace CLADevs\VanillaX\blocks\tile;
 
 use CLADevs\VanillaX\blocks\BlockManager;
 use CLADevs\VanillaX\blocks\utils\TileVanilla;
+use CLADevs\VanillaX\entities\EntityManager;
+use CLADevs\VanillaX\entities\utils\EntityIdentifierX;
 use pocketmine\block\BlockLegacyIds;
 use pocketmine\block\tile\Spawnable;
 use pocketmine\nbt\tag\CompoundTag;
@@ -15,6 +17,8 @@ class MobSpawnerTile extends Spawnable{
     const TILE_BLOCK = BlockLegacyIds::MOB_SPAWNER;
 
     const TAG_ENTITY_ID = "EntityId";
+    const TAG_ENTITY_IDENTIFIER = "EntityIdentifier";
+    const TAG_DISPLAY_ENTITY_SCALE = "DisplayEntityScale";
     const TAG_SPAWN_COUNT = "SpawnCount";
     const TAG_SPAWN_RANGE = "SpawnRange";
     const TAG_MIN_SPAWN_DELAY = "MinSpawnDelay";
@@ -30,14 +34,31 @@ class MobSpawnerTile extends Spawnable{
     private int $maxSpawnDelay = 800;
     private int $tick = 20;
 
+    private ?EntityIdentifierX $entity = null;
+
     public function getEntityId(): int{
         return $this->entityId;
     }
 
     public function setEntityId(int $entityId): void{
+        $previousEntity = $this->entity;
+        foreach(EntityManager::getInstance()->getEntities() as $entity){
+            if($entity->getId() === $entityId){
+                $this->entity = $entity;
+                break;
+            }
+        }
         $this->entityId = $entityId;
         $this->validEntity = true;
+        $this->setDirty();
         BlockManager::onChange($this);
+        if($previousEntity === null && $this->entity !== null){
+            $this->pos->getWorld()->scheduleDelayedBlockUpdate($this->pos, 1);
+        }
+    }
+
+    public function getEntity(): ?EntityIdentifierX{
+        return $this->entity;
     }
 
     public function getSpawnCount(): int{
@@ -111,7 +132,7 @@ class MobSpawnerTile extends Spawnable{
 
     public function readSaveData(CompoundTag $nbt): void{
         if(($tag = $nbt->getTag(self::TAG_ENTITY_ID)) !== null){
-            $this->entityId = $nbt->getInt(self::TAG_ENTITY_ID);
+            $this->setEntityId($nbt->getInt(self::TAG_ENTITY_ID));
         }
         if(($tag = $nbt->getTag(self::TAG_SPAWN_COUNT)) !== null){
             $this->spawnCount = $nbt->getInt(self::TAG_SPAWN_COUNT);
@@ -136,6 +157,9 @@ class MobSpawnerTile extends Spawnable{
     }
 
     protected function addAdditionalSpawnData(CompoundTag $nbt): void{
-        $nbt->setInt(self::TAG_ENTITY_ID, $this->entityId);
+        if($this->entity !== null){
+            $nbt->setString(self::TAG_ENTITY_IDENTIFIER, $this->entity->getMcpeId());
+            $nbt->setFloat(self::TAG_DISPLAY_ENTITY_SCALE, 1.0);
+        }
     }
 }
