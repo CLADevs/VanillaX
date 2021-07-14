@@ -1,31 +1,34 @@
 <?php
 
-namespace CLADevs\VanillaX\entities\passive;
+namespace CLADevs\VanillaX\entities\neutral;
 
 use CLADevs\VanillaX\entities\utils\interfaces\EntityClassification;
 use CLADevs\VanillaX\entities\VanillaEntity;
 use pocketmine\entity\EntitySizeInfo;
 use pocketmine\nbt\tag\CompoundTag;
-use pocketmine\network\mcpe\protocol\types\entity\EntityIds;
 
-class TurtleEntity extends VanillaEntity{
+class BeeEntity extends VanillaEntity{
 
-    const NETWORK_ID = EntityIds::TURTLE;
+    const NETWORK_ID = self::LEGACY_ID_MAP_BC[self::BEE];
 
-    public float $width = 0.6;
-    public float $height = 1.9;
+    public $width = 0.55;
+    public $height = 0.5;
 
     protected function initEntity(CompoundTag $nbt): void{
         parent::initEntity($nbt);
-        $this->setMaxHealth(30);
+        $this->setMaxHealth(10);
     }
 
     public function getName(): string{
-        return "Turtle";
+        return "Bee";
+    }
+    
+    public function getXpDropAmount(): int{
+        return $this->getLastHitByPlayer() ? mt_rand(1,3) : 0;
     }
 
     public function getClassification(): int{
-        return EntityClassification::AQUATIC;
+        return EntityClassification::ARTHROPODS;
     }
 
     protected function getInitialSizeInfo(): EntitySizeInfo{
@@ -34,9 +37,5 @@ class TurtleEntity extends VanillaEntity{
 
     public static function getNetworkTypeId(): string{
         return self::NETWORK_ID;
-    }
-    
-    public function getXpDropAmount(): int{
-        return $this->getLastHitByPlayer() ? mt_rand(1,3) : 0;
     }
 }

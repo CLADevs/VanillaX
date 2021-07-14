@@ -47,4 +47,35 @@ class MobSpawnerBlock extends MonsterSpawner{
         }
         return false;
     }
+    
+    public function onScheduledUpdate(): void{
+        $tile = $this->pos->getWorld()->getTile($this->pos);
+
+        if($tile->isClosed() || !$tile instanceof MobSpawnerTile){
+            return;
+        }
+        if($tile->getTick() > 0) $tile->decreaseTick();
+        if($tile->isValidEntity() && $tile->canEntityGenerate() && $tile->getTick() <= 0){
+            $tile->setTick(20);
+            if($tile->getSpawnDelay() > 0){
+                $tile->decreaseSpawnDelay();
+            }else{
+                $tile->setSpawnDelay($tile->getMinSpawnDelay() + mt_rand(0, min(0, $tile->getMaxSpawnDelay() - $tile->getMinSpawnDelay())));
+
+                for($i = 0; $i < $tile->getSpawnCount(); $i++){
+                    $x = ((mt_rand(-10, 10) / 10) * $tile->getSpawnRange()) + 0.5;
+                    $z = ((mt_rand(-10, 10) / 10) * $tile->getSpawnRange()) + 0.5;
+                    //TODO spawn an entity
+                    //  $entity = Entity::createEntity($tile->getEntityId(), $tile->getLevel(), Entity::createBaseNBT($tile->add($x, mt_rand(1, 3), $z)));
+
+//                    if($entity === null){
+//                        $tile->validEntity = false;
+//                        return true;
+//                    }
+                    // $entity->spawnToAll();
+                }
+            }
+        }
+        $this->pos->getWorld()->scheduleDelayedBlockUpdate($this->pos, 1);
+    }
 }

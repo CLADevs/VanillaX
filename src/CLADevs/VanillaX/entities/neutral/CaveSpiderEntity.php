@@ -2,6 +2,7 @@
 
 namespace CLADevs\VanillaX\entities\neutral;
 
+use CLADevs\VanillaX\entities\utils\interfaces\EntityClassification;
 use CLADevs\VanillaX\entities\VanillaEntity;
 use CLADevs\VanillaX\entities\utils\ItemHelper;
 use pocketmine\item\Item;
@@ -25,6 +26,10 @@ class CaveSpiderEntity extends VanillaEntity{
 
     public function getName(): string{
         return "Cave_Spider";
+    }
+
+    public function getClassification(): int{
+        return EntityClassification::ARTHROPODS;
     }
 
     protected function getInitialSizeInfo(): EntitySizeInfo{

@@ -2,6 +2,7 @@
 
 namespace CLADevs\VanillaX\blocks\tile;
 
+use CLADevs\VanillaX\blocks\BlockManager;
 use CLADevs\VanillaX\blocks\utils\TileVanilla;
 use pocketmine\block\BlockLegacyIds;
 use pocketmine\block\tile\Spawnable;
@@ -36,8 +37,7 @@ class MobSpawnerTile extends Spawnable{
     public function setEntityId(int $entityId): void{
         $this->entityId = $entityId;
         $this->validEntity = true;
-     //   $this->onChanged();
-        //TODO onChange
+        BlockManager::onChange($this);
     }
 
     public function getSpawnCount(): int{
@@ -64,6 +64,10 @@ class MobSpawnerTile extends Spawnable{
         $this->spawnDelay = $spawnDelay;
     }
 
+    public function decreaseSpawnDelay(): void{
+        $this->spawnDelay--;
+    }
+
     public function getMinSpawnDelay(): int{
         return $this->minSpawnDelay;
     }
@@ -80,6 +84,18 @@ class MobSpawnerTile extends Spawnable{
         $this->maxSpawnDelay = $maxSpawnDelay;
     }
 
+    public function getTick(): int{
+        return $this->tick;
+    }
+
+    public function setTick(int $tick): void{
+        $this->tick = $tick;
+    }
+
+    public function decreaseTick(): void{
+        $this->tick--;
+    }
+
     public function isValidEntity(): bool{
         return $this->validEntity;
     }
@@ -91,32 +107,6 @@ class MobSpawnerTile extends Spawnable{
             }
         }
         return false;
-    }
-
-    public function onUpdate(): bool{
-        if($this->tick > 0) $this->tick--;
-        if($this->validEntity && $this->canEntityGenerate() && $this->tick <= 0){
-            $this->tick = 20;
-            if($this->spawnDelay > 0){
-                $this->spawnDelay--;
-            }else{
-                $this->spawnDelay = $this->minSpawnDelay + mt_rand(0, min(0, $this->maxSpawnDelay - $this->minSpawnDelay));
-
-                for($i = 0; $i < $this->spawnCount; $i++){
-                    $x = ((mt_rand(-10, 10) / 10) * $this->spawnRange) + 0.5;
-                    $z = ((mt_rand(-10, 10) / 10) * $this->spawnRange) + 0.5;
-                    //TODO spawn an entity
-                  //  $entity = Entity::createEntity($this->getEntityId(), $this->getLevel(), Entity::createBaseNBT($this->add($x, mt_rand(1, 3), $z)));
-
-//                    if($entity === null){
-//                        $this->validEntity = false;
-//                        return true;
-//                    }
-                   // $entity->spawnToAll();
-                }
-            }
-        }
-        return true;
     }
 
     public function readSaveData(CompoundTag $nbt): void{
@@ -135,8 +125,6 @@ class MobSpawnerTile extends Spawnable{
         if(($tag = $nbt->getTag(self::TAG_MAX_SPAWN_DELAY)) !== null){
             $this->maxSpawnDelay = $nbt->getInt(self::TAG_MAX_SPAWN_DELAY);
         }
-       // $this->scheduleUpdate();
-        //TODO schedule
     }
 
     protected function writeSaveData(CompoundTag $nbt): void{

@@ -3,6 +3,7 @@
 namespace CLADevs\VanillaX\blocks\tile;
 
 use CLADevs\VanillaX\blocks\block\CommandBlock;
+use CLADevs\VanillaX\blocks\BlockManager;
 use CLADevs\VanillaX\blocks\utils\TileVanilla;
 use CLADevs\VanillaX\commands\sender\CommandBlockSender;
 use pocketmine\block\BlockFactory;
@@ -85,11 +86,11 @@ class CommandBlockTile extends Spawnable implements Nameable{
         if($pk->commandBlockMode !== $this->commandBlockMode){
             $this->commandBlockMode = $pk->commandBlockMode;
             $tileBlock = $this->getPos()->getWorld()->getBlock($this->getPos());
+            /** @var CommandBlock $block */
             $block = BlockFactory::getInstance()->get(CommandBlock::asCommandBlockFromMode($this->commandBlockMode), $tileBlock->getMeta());
 
             if($tileBlock instanceof CommandBlock){
-                //TODO facing
-              //  $block->setDamage($tileBlock->getMeta());
+                $block->setFacing($tileBlock->getFacing());
             }
             $this->getPos()->getWorld()->setBlock($this->getPos(), $block);
         }
@@ -116,18 +117,17 @@ class CommandBlockTile extends Spawnable implements Nameable{
         }
         if($pk->isConditional !== $this->conditionalMode){
             $this->conditionalMode = $pk->isConditional;
+            /** @var CommandBlock $tileBlock */
             $tileBlock = $this->getPos()->getWorld()->getBlock($this->getPos());
             $block = BlockFactory::getInstance()->get(CommandBlock::asCommandBlockFromMode($this->commandBlockMode), 0);
-          //TODO meta
-            //  $block->setDamage($tileBlock->getMeta() + ($pk->isConditional ? 8 : -8));
+            $block->setFacing($tileBlock->getFacing() + ($pk->isConditional ? 8 : -8));
             $this->getPos()->getWorld()->setBlock($this->getPos(), $block);
         }
         if($this->tickDelay == 0 && strlen($this->command) >= 1){
             $this->runCommand();
         }
         $this->pos->getWorld()->scheduleDelayedBlockUpdate($this->pos, 1);
-     //   $this->onChanged();
-        //TODO onChange
+        BlockManager::onChange($this);
     }
 
     protected function writeSaveData(CompoundTag $nbt): void{
@@ -176,8 +176,7 @@ class CommandBlockTile extends Spawnable implements Nameable{
         if(($tag = $nbt->getTag(self::TAG_CONDITIONAL_MODE)) !== null){
             $this->conditionalMode = boolval($tag->getValue());
         }
-       // $this->onChanged();
-        //TODO on change
+        BlockManager::onChange($this);
     }
 
     protected function addAdditionalSpawnData(CompoundTag $nbt): void{

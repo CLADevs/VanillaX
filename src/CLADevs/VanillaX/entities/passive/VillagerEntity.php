@@ -11,6 +11,7 @@ use CLADevs\VanillaX\inventories\types\TradeInventory;
 use CLADevs\VanillaX\VanillaX;
 use pocketmine\entity\EntitySizeInfo;
 use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\network\mcpe\protocol\types\entity\EntityIds;
 use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataProperties;
 use pocketmine\network\mcpe\protocol\types\entity\IntMetadataProperty;
 use pocketmine\player\Player;
@@ -22,10 +23,10 @@ class VillagerEntity extends VanillaEntity implements EntityInteractable{
     const TAG_TIER = "Tier";
     const TAG_EXPERIENCE = "Experience";
 
-    const NETWORK_ID = self::VILLAGER_V2;
+    const NETWORK_ID = EntityIds::VILLAGER_V2;
 
-    public $width = 0.6;
-    public $height = 1.9;
+    public float $width = 0.6;
+    public float $height = 1.9;
 
     private ?Player $customer = null;
     private TradeInventory $inventory;

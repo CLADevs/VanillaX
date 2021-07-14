@@ -6,22 +6,25 @@ use CLADevs\VanillaX\entities\utils\interfaces\EntityClassification;
 use CLADevs\VanillaX\entities\VanillaEntity;
 use pocketmine\entity\EntitySizeInfo;
 use pocketmine\nbt\tag\CompoundTag;
-use pocketmine\network\mcpe\protocol\types\entity\EntityIds;
 
-class TurtleEntity extends VanillaEntity{
+class AxolotlEntity extends VanillaEntity{
 
-    const NETWORK_ID = EntityIds::TURTLE;
+    const NETWORK_ID = self::LEGACY_ID_MAP_BC[self::AXOLOTL];
 
-    public float $width = 0.6;
-    public float $height = 1.9;
+    public float $width = 1.3;
+    public float $height = 0.6;
 
     protected function initEntity(CompoundTag $nbt): void{
         parent::initEntity($nbt);
-        $this->setMaxHealth(30);
+        $this->setMaxHealth(14);
     }
 
     public function getName(): string{
-        return "Turtle";
+        return "Axolotl";
+    }
+
+    public function getXpDropAmount(): int{
+        return $this->getLastHitByPlayer() ? mt_rand(1,3) : 0;
     }
 
     public function getClassification(): int{
@@ -34,9 +37,5 @@ class TurtleEntity extends VanillaEntity{
 
     public static function getNetworkTypeId(): string{
         return self::NETWORK_ID;
-    }
-    
-    public function getXpDropAmount(): int{
-        return $this->getLastHitByPlayer() ? mt_rand(1,3) : 0;
     }
 }

@@ -2,6 +2,7 @@
 
 namespace CLADevs\VanillaX\entities\passive;
 
+use CLADevs\VanillaX\entities\utils\interfaces\EntityClassification;
 use CLADevs\VanillaX\entities\VanillaEntity;
 use CLADevs\VanillaX\entities\utils\ItemHelper;
 use pocketmine\item\Item;
@@ -25,6 +26,10 @@ class ZombieHorseEntity extends VanillaEntity{
 
     public function getName(): string{
         return "Zombie_Horse";
+    }
+
+    public function getClassification(): int{
+        return EntityClassification::UNDEAD;
     }
 
     protected function getInitialSizeInfo(): EntitySizeInfo{

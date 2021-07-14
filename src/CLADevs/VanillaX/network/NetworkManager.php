@@ -10,7 +10,6 @@ use CLADevs\VanillaX\network\protocol\CommandBlockUpdatePacketX;
 use CLADevs\VanillaX\network\protocol\ContainerClosePacketX;
 use CLADevs\VanillaX\network\protocol\FilterTextPacketX;
 use CLADevs\VanillaX\network\protocol\InteractPacketX;
-use CLADevs\VanillaX\network\protocol\InventoryTransactionPacketX;
 use CLADevs\VanillaX\network\protocol\PlayerActionPacketX;
 use CLADevs\VanillaX\network\protocol\PlayerInputPacketX;
 use pocketmine\network\mcpe\protocol\PacketPool;
@@ -21,7 +20,6 @@ class NetworkManager{
         GameRule::init();
         GameRule::startup();
 
-      //  PacketPool::getInstance()->registerPacket(new InventoryTransactionPacketX());
         PacketPool::getInstance()->registerPacket(new FilterTextPacketX());
         PacketPool::getInstance()->registerPacket(new AnvilDamagePacketX());
         PacketPool::getInstance()->registerPacket(new ActorEventPacketX());

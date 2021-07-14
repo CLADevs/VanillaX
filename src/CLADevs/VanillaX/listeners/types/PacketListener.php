@@ -84,7 +84,10 @@ class PacketListener implements Listener{
             $session = $sessionManager->has($player) ? $sessionManager->get($player) : null;
             $window = $player->getCurrentWindow();
 
-            if($window instanceof FakeBlockInventory) $window->handlePacket($player, $packet);
+            if($window instanceof FakeBlockInventory && !$window->handlePacket($player, $packet)){
+                $event->cancel();
+                return;
+            }
             switch($packet::NETWORK_ID){
                 case ProtocolInfo::COMMAND_BLOCK_UPDATE_PACKET:
                     if($packet instanceof CommandBlockUpdatePacket && $player->hasPermission(DefaultPermissions::ROOT_OPERATOR)) $this->handleCommandBlock($player, $packet);

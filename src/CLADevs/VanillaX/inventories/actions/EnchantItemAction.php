@@ -7,6 +7,7 @@ use pocketmine\block\BlockLegacyIds;
 use pocketmine\inventory\transaction\action\InventoryAction;
 use pocketmine\inventory\transaction\TransactionValidationException;
 use pocketmine\item\Item;
+use pocketmine\network\mcpe\protocol\types\inventory\NetworkInventoryAction;
 use pocketmine\player\Player;
 
 class EnchantItemAction extends InventoryAction{
@@ -21,7 +22,7 @@ class EnchantItemAction extends InventoryAction{
     public function execute(Player $source): void{
         $inv = $source->getCurrentWindow();
 
-        if($inv instanceof EnchantInventory && $this->targetItem->getId() === BlockLegacyIds::AIR){
+        if($inv instanceof EnchantInventory && $this->targetItem->getId() === BlockLegacyIds::AIR && $this->sourceType === NetworkInventoryAction::SOURCE_TYPE_ENCHANT_OUTPUT){
             $inv->onSuccess($source, $this->sourceItem);
         }
     }

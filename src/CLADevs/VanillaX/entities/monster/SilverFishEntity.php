@@ -2,6 +2,7 @@
 
 namespace CLADevs\VanillaX\entities\monster;
 
+use CLADevs\VanillaX\entities\utils\interfaces\EntityClassification;
 use CLADevs\VanillaX\entities\VanillaEntity;
 use pocketmine\entity\EntitySizeInfo;
 use pocketmine\nbt\tag\CompoundTag;
@@ -21,6 +22,10 @@ class SilverfishEntity extends VanillaEntity{
 
     public function getName(): string{
         return "Silverfish";
+    }
+
+    public function getClassification(): int{
+        return EntityClassification::ARTHROPODS;
     }
 
     protected function getInitialSizeInfo(): EntitySizeInfo{

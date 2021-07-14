@@ -2,6 +2,7 @@
 
 namespace CLADevs\VanillaX\entities\monster;
 
+use CLADevs\VanillaX\entities\utils\interfaces\EntityClassification;
 use CLADevs\VanillaX\entities\VanillaEntity;
 use CLADevs\VanillaX\entities\utils\ItemHelper;
 use pocketmine\item\Item;
@@ -25,6 +26,10 @@ class ZoglinEntity extends VanillaEntity{
 
     public function getName(): string{
         return "Zoglin";
+    }
+
+    public function getClassification(): int{
+        return EntityClassification::UNDEAD;
     }
 
     protected function getInitialSizeInfo(): EntitySizeInfo{

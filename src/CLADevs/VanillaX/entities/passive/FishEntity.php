@@ -5,31 +5,47 @@ namespace CLADevs\VanillaX\entities\passive;
 use CLADevs\VanillaX\entities\utils\interfaces\EntityClassification;
 use CLADevs\VanillaX\entities\VanillaEntity;
 use CLADevs\VanillaX\entities\utils\ItemHelper;
+use pocketmine\entity\EntitySizeInfo;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
-use pocketmine\entity\EntitySizeInfo;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\network\mcpe\protocol\types\entity\EntityIds;
 
-class SkeletonHorseEntity extends VanillaEntity{
+class FishEntity extends VanillaEntity{
 
-    const NETWORK_ID = EntityIds::SKELETON_HORSE;
+    const NETWORK_ID = EntityIds::COD;
 
-    public float $width = 0.6;
-    public float $height = 1.9;
+    public $width = 0.6;
+    public $height = 0.3;
 
     protected function initEntity(CompoundTag $nbt): void{
         parent::initEntity($nbt);
-        $this->setMaxHealth(15);
+        $this->setMaxHealth(6);
     }
 
     public function getName(): string{
-        return "Skeleton_Horse";
+        return "Fish";
+    }
+ 
+    /**
+     * @return Item[]
+     */
+    public function getDrops(): array{
+        $fish = ItemFactory::getInstance()->get(ItemIds::RAW_FISH, 0, 1);
+        if($this->isOnFire()) ItemHelper::applyFurnaceSmelt($fish);
+         
+        $bone = ItemFactory::getInstance()->get(ItemIds::BONE, 0, 1);
+        ItemHelper::applyLootingEnchant($this, $bone);
+        return [$fish, $bone];
+    }
+    
+    public function getXpDropAmount(): int{
+        return $this->getLastHitByPlayer() ? mt_rand(1,3) : 0;
     }
 
     public function getClassification(): int{
-        return EntityClassification::UNDEAD;
+        return EntityClassification::AQUATIC;
     }
 
     protected function getInitialSizeInfo(): EntitySizeInfo{
@@ -38,19 +54,5 @@ class SkeletonHorseEntity extends VanillaEntity{
 
     public static function getNetworkTypeId(): string{
         return self::NETWORK_ID;
-    }
-    
-    public function getXpDropAmount(): int{
-        return $this->getLastHitByPlayer() ? mt_rand(1,3) : 0;
-    }
- 
-    /**
-     * @return Item[]
-     */
-    public function getDrops(): array{
-        $bone = ItemFactory::getInstance()->get(ItemIds::BONE, 0, 1);
-        ItemHelper::applySetCount($bone, 0, 2);
-        ItemHelper::applyLootingEnchant($this, $bone);
-        return [$bone];
     }
 }

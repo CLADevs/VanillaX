@@ -19,9 +19,9 @@ class VanillaX extends PluginBase{
 
     private static VanillaX $instance;
 
+    private EntityManager $entityManager;
     private ItemManager $itemManager;
     private EnchantmentManager $enchantmentManager;
-    private EntityManager $entityManager;
     private BlockManager $blockManager;
     private SessionManager $sessionManager;
     private CommandManager $commandManager;
@@ -33,9 +33,9 @@ class VanillaX extends PluginBase{
     public function onLoad(): void{
         $this->saveDefaultConfig();
         self::$instance = $this;
+        $this->entityManager = new EntityManager();
         $this->itemManager = new ItemManager();
         $this->enchantmentManager = new EnchantmentManager();
-        $this->entityManager = new EntityManager();
         $this->blockManager = new BlockManager();
         $this->sessionManager = new SessionManager();
         $this->commandManager = new CommandManager();
@@ -71,6 +71,10 @@ class VanillaX extends PluginBase{
         return self::$instance;
     }
 
+    public function getEntityManager(): EntityManager{
+        return $this->entityManager;
+    }
+
     public function getItemManager(): ItemManager{
         return $this->itemManager;
     }
@@ -85,10 +89,6 @@ class VanillaX extends PluginBase{
 
     public function getBlockManager(): BlockManager{
         return $this->blockManager;
-    }
-
-    public function getEntityManager(): EntityManager{
-        return $this->entityManager;
     }
 
     public function getNetworkManager(): NetworkManager{

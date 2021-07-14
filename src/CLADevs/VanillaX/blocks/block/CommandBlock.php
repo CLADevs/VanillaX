@@ -10,6 +10,8 @@ use pocketmine\block\BlockBreakInfo;
 use pocketmine\block\BlockIdentifier;
 use pocketmine\block\BlockLegacyIds;
 use pocketmine\block\BlockToolType;
+use pocketmine\block\utils\FacesOppositePlacingPlayerTrait;
+use pocketmine\block\utils\NormalHorizontalFacingInMetadataTrait;
 use pocketmine\item\Item;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\ContainerOpenPacket;
@@ -17,11 +19,11 @@ use pocketmine\network\mcpe\protocol\types\inventory\ContainerIds;
 use pocketmine\network\mcpe\protocol\types\inventory\WindowTypes;
 use pocketmine\permission\DefaultPermissions;
 use pocketmine\player\Player;
-use pocketmine\world\BlockTransaction;
 
 class CommandBlock extends Block implements NonAutomaticCallItemTrait, NonCreativeItemTrait{
+    use FacesOppositePlacingPlayerTrait;
+    use NormalHorizontalFacingInMetadataTrait;
 
-    //TODO tile
     public function __construct(int $id){
         parent::__construct(new BlockIdentifier($id, 0, $id, CommandBlockTile::class), self::asCommandBlockName($id), new BlockBreakInfo(-1, BlockToolType::NONE, 0, 3600000));
     }
@@ -51,20 +53,6 @@ class CommandBlock extends Block implements NonAutomaticCallItemTrait, NonCreati
             return BlockLegacyIds::CHAIN_COMMAND_BLOCK;
         }
         return BlockLegacyIds::COMMAND_BLOCK;
-    }
-
-    public function place(BlockTransaction $tx, Item $item, Block $blockReplace, Block $blockClicked, int $face, Vector3 $clickVector, ?Player $player = null): bool{
-//        $faces = [
-//            Facing::DOWN => 0,
-//            Facing::UP => 1,
-//            Facing::NORTH => 2,
-//            Facing::SOUTH => 3,
-//            Facing::WEST => 4,
-//            Facing::EAST => 5
-//        ];
-//        $this->facing = $faces[$face] ?? $face;
-        //TODO facing
-        return parent::place($tx, $item, $blockReplace, $blockClicked, $face, $clickVector, $player);
     }
 
     public function onInteract(Item $item, int $face, Vector3 $clickVector, ?Player $player = null): bool{

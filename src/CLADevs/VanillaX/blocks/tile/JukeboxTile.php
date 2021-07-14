@@ -10,7 +10,6 @@ use pocketmine\item\Item;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\network\mcpe\protocol\LevelSoundEventPacket;
 use pocketmine\player\Player;
-use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 use pocketmine\world\Position;
 
@@ -82,24 +81,6 @@ class JukeboxTile extends Tile{
         }
     }
 
-    public function onUpdate(): bool{
-        if($this->recordItem !== null && !$this->finishedPlaying){
-            if($this->recordMaxDuration === -1){
-                $this->recordMaxDuration = MusicDiscItem::getRecordLength($this->recordItem->getId()) * 20;
-            }
-            $this->recordDuration++;
-            $this->validateDuration();
-
-            if($this->finishedPlaying){
-                return true;
-            }
-            if(Server::getInstance()->getTick() % 30 === 0){
-                //TODO note particle
-            }
-        }
-        return true;
-    }
-
     public function close(): void{
         $this->removeTrack();
         parent::close();
@@ -113,8 +94,6 @@ class JukeboxTile extends Tile{
             $this->recordDuration = $tag->getValue();
         }
         $this->validateDuration();
-     //   $this->scheduleUpdate();
-        //TODO schedule
     }
 
     protected function writeSaveData(CompoundTag $nbt): void{

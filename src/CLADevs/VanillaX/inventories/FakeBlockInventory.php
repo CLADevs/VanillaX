@@ -9,8 +9,7 @@ use pocketmine\block\inventory\BlockInventory;
 use pocketmine\block\inventory\BlockInventoryTrait;
 use pocketmine\inventory\SimpleInventory;
 use pocketmine\math\Vector3;
-use pocketmine\network\mcpe\convert\RuntimeBlockMapping;;
-
+use pocketmine\network\mcpe\convert\RuntimeBlockMapping;
 use pocketmine\network\mcpe\protocol\ContainerOpenPacket;
 use pocketmine\network\mcpe\protocol\ServerboundPacket;
 use pocketmine\network\mcpe\protocol\types\inventory\WindowTypes;
@@ -42,6 +41,7 @@ class FakeBlockInventory extends SimpleInventory implements BlockInventory{
      * @param Player|null $owner
      */
     public function __construct(Position $holder, int $size = 27, $block = BlockLegacyIds::CHEST, int $windowType = WindowTypes::CONTAINER, callable $packetCallable = null, ?Player $owner = null){
+        parent::__construct($size);
         $holder->x = intval($holder->x);
         $holder->y = intval($holder->y);
         $holder->z = intval($holder->z);
@@ -54,7 +54,6 @@ class FakeBlockInventory extends SimpleInventory implements BlockInventory{
         $this->packetCallable = $packetCallable;
         $this->owner = $owner;
         $this->holder = $holder;
-        parent::__construct($size);
     }
 
     public function getOwner(): ?Player{

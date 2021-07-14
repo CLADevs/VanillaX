@@ -5,27 +5,40 @@ namespace CLADevs\VanillaX\entities\monster;
 use CLADevs\VanillaX\entities\utils\interfaces\EntityClassification;
 use CLADevs\VanillaX\entities\VanillaEntity;
 use pocketmine\entity\EntitySizeInfo;
+use pocketmine\item\Item;
+use pocketmine\item\ItemFactory;
+use pocketmine\item\ItemIds;
 use pocketmine\nbt\tag\CompoundTag;
-use pocketmine\network\mcpe\protocol\types\entity\EntityIds;
 
-class EndermiteEntity extends VanillaEntity{
+class RavagerEntity extends VanillaEntity{
 
-    const NETWORK_ID = EntityIds::ENDERMITE;
+    const NETWORK_ID = self::LEGACY_ID_MAP_BC[self::RAVAGER];
 
-    public float $width = 0.4;
-    public float $height = 0.3;
+    public $width = 1.9;
+    public $height = 1.2;
 
     protected function initEntity(CompoundTag $nbt): void{
         parent::initEntity($nbt);
-        $this->setMaxHealth(8);
+        $this->setMaxHealth(100);
     }
 
     public function getName(): string{
-        return "Endermite";
+        return "Ravager";
+    }
+
+    /**
+     * @return Item[]
+     */
+    public function getDrops(): array{
+        return [ItemFactory::getInstance()->get(ItemIds::SADDLE, 0, 1)];
+    }
+    
+    public function getXpDropAmount(): int{
+        return $this->getLastHitByPlayer() ? 20 : 0;
     }
 
     public function getClassification(): int{
-        return EntityClassification::ARTHROPODS;
+        return EntityClassification::ILLAGERS;
     }
 
     protected function getInitialSizeInfo(): EntitySizeInfo{
@@ -34,9 +47,5 @@ class EndermiteEntity extends VanillaEntity{
 
     public static function getNetworkTypeId(): string{
         return self::NETWORK_ID;
-    }
-    
-    public function getXpDropAmount(): int{
-        return $this->getLastHitByPlayer() ? 3 : 0;
     }
 }

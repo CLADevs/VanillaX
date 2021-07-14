@@ -2,9 +2,11 @@
 
 namespace CLADevs\VanillaX\inventories;
 
+use CLADevs\VanillaX\inventories\utils\TypeConverterX;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
+use pocketmine\network\mcpe\convert\TypeConverter;
 use pocketmine\network\mcpe\protocol\types\recipe\PotionContainerChangeRecipe;
 use pocketmine\network\mcpe\protocol\types\recipe\PotionTypeRecipe;
 use pocketmine\utils\SingletonTrait;
@@ -42,6 +44,7 @@ class InventoryManager{
 
     public function __construct(){
         self::setInstance($this);
+        TypeConverter::setInstance(new TypeConverterX());
     }
 
     /**

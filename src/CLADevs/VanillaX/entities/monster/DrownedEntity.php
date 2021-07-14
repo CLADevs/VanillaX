@@ -5,16 +5,16 @@ namespace CLADevs\VanillaX\entities\monster;
 use CLADevs\VanillaX\entities\utils\interfaces\EntityClassification;
 use CLADevs\VanillaX\entities\VanillaEntity;
 use CLADevs\VanillaX\entities\utils\ItemHelper;
+use pocketmine\entity\EntitySizeInfo;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
-use pocketmine\entity\EntitySizeInfo;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\network\mcpe\protocol\types\entity\EntityIds;
 
-class SkeletonEntity extends VanillaEntity{
+class DrownedEntity extends VanillaEntity{
 
-    const NETWORK_ID = EntityIds::SKELETON;
+    const NETWORK_ID = EntityIds::DROWNED;
 
     public float $width = 0.6;
     public float $height = 1.9;
@@ -25,7 +25,22 @@ class SkeletonEntity extends VanillaEntity{
     }
 
     public function getName(): string{
-        return "Skeleton";
+        return "Drowned";
+    }
+ 
+    /**
+     * @return Item[]
+     */
+    public function getDrops(): array{
+        //TODO Copper Ingot & other items
+        $rotten_flesh = ItemFactory::getInstance()->get(ItemIds::ROTTEN_FLESH, 0, 1);
+        ItemHelper::applySetCount($rotten_flesh, 0, 2);
+        ItemHelper::applyLootingEnchant($this, $rotten_flesh);
+        return [$rotten_flesh];
+    }
+    
+    public function getXpDropAmount(): int{
+        return $this->getLastHitByPlayer() ? 5 + (count($this->getArmorInventory()->getContents()) * mt_rand(1,3)) : 0;
     }
 
     public function getClassification(): int{
@@ -38,23 +53,5 @@ class SkeletonEntity extends VanillaEntity{
 
     public static function getNetworkTypeId(): string{
         return self::NETWORK_ID;
-    }
-    
-    public function getXpDropAmount(): int{
-        return $this->getLastHitByPlayer() ? 5 + (count($this->getArmorInventory()->getContents()) * mt_rand(1,3)) : 0;
-    }
- 
-    /**
-     * @return Item[]
-     */
-    public function getDrops(): array{
-        $arrow = ItemFactory::getInstance()->get(ItemIds::ARROW, 0, 1);
-        ItemHelper::applySetCount($arrow, 0, 2);
-        ItemHelper::applyLootingEnchant($this, $arrow);
-         
-        $bone = ItemFactory::getInstance()->get(ItemIds::BONE, 0, 1);
-        ItemHelper::applySetCount($bone, 0, 2);
-        ItemHelper::applyLootingEnchant($this, $bone);
-        return [$arrow, $bone];
     }
 }
