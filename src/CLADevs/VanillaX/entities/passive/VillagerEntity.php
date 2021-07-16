@@ -11,9 +11,11 @@ use CLADevs\VanillaX\inventories\types\TradeInventory;
 use CLADevs\VanillaX\VanillaX;
 use pocketmine\entity\EntitySizeInfo;
 use pocketmine\nbt\tag\CompoundTag;
-use pocketmine\network\mcpe\protocol\types\entity\EntityIds;
+use pocketmine\nbt\tag\IntTag;
+use pocketmine\nbt\tag\StringTag;
+use pocketmine\network\mcpe\protocol\serializer\NetworkNbtSerializer;
+use pocketmine\network\mcpe\protocol\types\CacheableNbt;
 use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataProperties;
-use pocketmine\network\mcpe\protocol\types\entity\IntMetadataProperty;
 use pocketmine\player\Player;
 
 class VillagerEntity extends VanillaEntity implements EntityInteractable{
@@ -23,45 +25,54 @@ class VillagerEntity extends VanillaEntity implements EntityInteractable{
     const TAG_TIER = "Tier";
     const TAG_EXPERIENCE = "Experience";
 
-    const NETWORK_ID = EntityIds::VILLAGER_V2;
+    const NETWORK_ID = self::LEGACY_ID_MAP_BC[self::VILLAGER_V2];
 
     public float $width = 0.6;
     public float $height = 1.9;
 
+    private int $tier;
+    private int $experience = 0;
+    private int $biomeType = VillagerProfession::BIOME_PLAINS;
+
     private ?Player $customer = null;
     private TradeInventory $inventory;
     private VillagerProfession $profession;
-
-    private int $tier;
-    private int $experience = 0;
-    private string $offerBuffer;
+    private CompoundTag $offers;
 
     protected function initEntity(CompoundTag $nbt): void{
         parent::initEntity($nbt);
         $this->setMaxHealth(20);
         $this->inventory = new TradeInventory($this);
         /** Tier */
-        if(($tag = $nbt->getTag(self::TAG_TIER)) !== null){
-            $this->tier = $nbt->getInt(self::TAG_TIER);
+        $tag = $nbt->getTag(self::TAG_TIER);
+        if($tag instanceof IntTag){
+            $this->tier = $tag->getValue();
         }else{
             $this->tier = VillagerProfession::TIER_NOVICE;
         }
         /** Experience */
-        if(($tag = $nbt->getTag(self::TAG_EXPERIENCE)) !== null){
-            $this->experience = $nbt->getInt(self::TAG_EXPERIENCE);
+        $tag = $nbt->getTag(self::TAG_TIER);
+        if($tag instanceof IntTag){
+            $this->experience = $tag->getValue();
         }
         /** Profession */
-        if(($tag = $nbt->getTag(self::TAG_PROFESSION)) !== null){
-            $profession = $nbt->getInt(self::TAG_PROFESSION);
+        $tag = $nbt->getTag(self::TAG_PROFESSION);
+        if($tag instanceof IntTag){
+            $profession = $tag->getValue();
         }else{
             $profession = mt_rand(VillagerProfession::UNEMPLOYED, VillagerProfession::NITWIT);
         }
         $this->profession = VillagerProfession::getProfession($profession);
 
-        if($hasOfferBuffer = ($tag = $nbt->getTag(self::TAG_OFFER_BUFFER)) !== null){
-            $this->offerBuffer = $nbt->getString(self::TAG_OFFER_BUFFER);
+        $hasOffers = false;
+        $tag = $nbt->getTag(self::TAG_OFFER_BUFFER);
+        if($tag instanceof StringTag){
+            /** @var CompoundTag $offers */
+            $offers = (new CacheableNbt((new NetworkNbtSerializer())->read($tag->getValue())->mustGetCompoundTag()))->getRoot();
+            $this->offers = $offers;
+            $hasOffers = true;
         }
-        $this->setProfession($this->profession, VillagerProfession::BIOME_PLAINS, $hasOfferBuffer);
+        $this->setProfession($this->profession, VillagerProfession::BIOME_PLAINS, $hasOffers);
         $this->setTier($this->tier);
         $this->setExperience($this->experience);
         $this->getNetworkProperties()->setInt(EntityMetadataProperties::MAX_TRADE_TIER, VillagerProfession::TIER_MASTER);
@@ -71,21 +82,13 @@ class VillagerEntity extends VanillaEntity implements EntityInteractable{
         return "Villager";
     }
 
-    protected function getInitialSizeInfo(): EntitySizeInfo{
-        return new EntitySizeInfo($this->height, $this->width);
-    }
-
-    public static function getNetworkTypeId(): string{
-        return self::NETWORK_ID;
-    }
-
     public function saveNBT(): CompoundTag{
         $nbt = parent::saveNBT();
         $nbt->setInt(self::TAG_PROFESSION, $this->profession->getId());
         if($this->profession->hasTrades()){
             $nbt->setInt(self::TAG_TIER, $this->tier);
             $nbt->setInt(self::TAG_EXPERIENCE, $this->experience);
-            $nbt->setString(self::TAG_OFFER_BUFFER, $this->offerBuffer);
+            $nbt->setString(self::TAG_OFFER_BUFFER, (new CacheableNbt($this->offers))->getEncodedNbt());
         }
         return $nbt;
     }
@@ -136,7 +139,9 @@ class VillagerEntity extends VanillaEntity implements EntityInteractable{
             $stream->addOffer(VillagerProfession::TIER_EXPERT, $profession->getExpert());
             $stream->addOffer(VillagerProfession::TIER_MASTER, $profession->getMaster());
             $stream->initialize();
-            $this->offerBuffer = $stream->getBuffer();
+            /** @var CompoundTag $offers */
+            $offers = $stream->getStream()->getRoot();
+            $this->offers = $offers;
         }
         $this->getNetworkProperties()->setInt(EntityMetadataProperties::VARIANT, $profession->getId());
         $this->setBiomeType($biomeId);
@@ -150,24 +155,20 @@ class VillagerEntity extends VanillaEntity implements EntityInteractable{
         if($type < VillagerProfession::BIOME_PLAINS || $type > VillagerProfession::BIOME_TAIGA){
             $type = VillagerProfession::BIOME_PLAINS;
         }
+        $this->biomeType = $type;
         $this->getNetworkProperties()->setInt(EntityMetadataProperties::MARK_VARIANT, $type);
     }
 
     public function getBiomeType(): int{
-        /** @var IntMetadataProperty $data */
-        $data = $this->getNetworkProperties()->getAll()[EntityMetadataProperties::MARK_VARIANT] ?? null;
-        if($data !== null){
-            $data = $data->getValue();
-        }
-        return $data ?? VillagerProfession::BIOME_PLAINS;
+        return $this->biomeType;
     }
 
-    public function setOfferBuffer(string $offerBuffer): void{
-        $this->offerBuffer = $offerBuffer;
+    public function setOffers(CompoundTag $offers): void{
+        $this->offers = $offers;
     }
 
-    public function getOfferBuffer(): string{
-        return $this->offerBuffer;
+    public function getOffers(): CompoundTag{
+        return $this->offers;
     }
 
     public function setCustomer(?Player $customer): void{
@@ -192,5 +193,13 @@ class VillagerEntity extends VanillaEntity implements EntityInteractable{
         if($this->customer !== null && $this->customer->isOnline()){
             VanillaX::getInstance()->getSessionManager()->get($this->customer)->setTradingEntity(null);
         }
+    }
+
+    protected function getInitialSizeInfo(): EntitySizeInfo{
+        return new EntitySizeInfo($this->height, $this->width);
+    }
+
+    public static function getNetworkTypeId(): string{
+        return self::NETWORK_ID;
     }
 }

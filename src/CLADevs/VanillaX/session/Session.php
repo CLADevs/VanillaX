@@ -10,12 +10,15 @@ use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\DataPacket;
 use pocketmine\network\mcpe\protocol\PlaySoundPacket;
 use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataFlags;
+use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataProperties;
 use pocketmine\player\Player;
 
 class Session{
 
     /** @var TridentEntity[] */
     private array $thrownTridents = [];
+
+    private string $interactiveText = "";
 
     private int $entityId;
 
@@ -33,6 +36,15 @@ class Session{
 
     public function getEntityId(): int{
         return $this->entityId;
+    }
+
+    public function getInteractiveText(): string{
+        return $this->interactiveText;
+    }
+
+    public function setInteractiveText(string $interactiveText): void{
+        $this->interactiveText = $interactiveText;
+        $this->player->getNetworkProperties()->setString(EntityMetadataProperties::INTERACTIVE_TAG, $interactiveText);
     }
 
     public function getPlayer(): Player{

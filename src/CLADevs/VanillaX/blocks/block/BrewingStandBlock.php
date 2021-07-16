@@ -10,6 +10,7 @@ use pocketmine\block\BlockIdentifier;
 use pocketmine\block\BlockLegacyIds;
 use pocketmine\block\BlockToolType;
 use pocketmine\block\BrewingStand;
+use pocketmine\block\utils\AnyFacingTrait;
 use pocketmine\item\Item;
 use pocketmine\item\ItemIds;
 use pocketmine\item\ToolTier;
@@ -18,6 +19,7 @@ use pocketmine\network\mcpe\protocol\LevelSoundEventPacket;
 use pocketmine\player\Player;
 
 class BrewingStandBlock extends BrewingStand{
+    use AnyFacingTrait;
 
     public function __construct(){
         parent::__construct(new BlockIdentifier(BlockLegacyIds::BREWING_STAND_BLOCK, 0, ItemIds::BREWING_STAND, BrewingStandTile::class), "Brewing Stand", new BlockBreakInfo(0.5, BlockToolType::PICKAXE, ToolTier::WOOD()->getHarvestLevel()));

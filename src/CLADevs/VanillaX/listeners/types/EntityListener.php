@@ -5,6 +5,7 @@ namespace CLADevs\VanillaX\listeners\types;
 use CLADevs\VanillaX\items\types\ShieldItem;
 use CLADevs\VanillaX\network\gamerules\GameRule;
 use CLADevs\VanillaX\VanillaX;
+use CLADevs\VanillaX\world\sounds\ShieldBlockSound;
 use pocketmine\entity\Entity;
 use pocketmine\entity\Living;
 use pocketmine\entity\object\PrimedTNT;
@@ -95,8 +96,7 @@ class EntityListener implements Listener{
                 }else{
                     $entity->getInventory()->setItemInHand($item);
                 }
-                //TODo shield broke sound
-               // $entity->getWorld()->broadcastLevelSoundEvent($entity, LevelSoundEventPacket::SOUND_ITEM_SHIELD_BLOCK);
+                $entity->getWorld()->addSound($entity->getPosition(), new ShieldBlockSound());
                 $entity->knockBack($damager->getPosition()->x - $entity->getPosition()->x, $damager->getPosition()->z - $entity->getPosition()->z, 0.5);
                 return true;
             }

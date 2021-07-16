@@ -7,6 +7,8 @@ use CLADevs\VanillaX\entities\neutral\GoatEntity;
 use CLADevs\VanillaX\entities\object\PaintingEntity;
 use CLADevs\VanillaX\entities\passive\AxolotlEntity;
 use CLADevs\VanillaX\entities\passive\GlowSquidEntity;
+use CLADevs\VanillaX\entities\passive\StriderEntity;
+use CLADevs\VanillaX\entities\passive\VillagerEntity;
 use CLADevs\VanillaX\entities\utils\EntityIdentifierX;
 use CLADevs\VanillaX\entities\utils\villager\VillagerProfession;
 use CLADevs\VanillaX\utils\item\NonAutomaticCallItemTrait;
@@ -41,9 +43,9 @@ class EntityManager{
         VillagerProfession::init();
         if(VanillaX::getInstance()->getConfig()->get("mobs", true)){
             foreach(["object", "projectile", "boss", "passive", "neutral", "monster"] as $path){
-                Utils::callDirectory("entities" . DIRECTORY_SEPARATOR . $path, function (string $namespace): void{
+                Utils::callDirectory("entities" . DIRECTORY_SEPARATOR . $path, function (string $namespace)use($path): void{
                     if(!isset(class_implements($namespace)[NonAutomaticCallItemTrait::class])){
-                        $this->registerEntity($namespace, [$namespace::NETWORK_ID]);
+                        $this->registerEntity($namespace, $path, [$namespace::NETWORK_ID]);
                     }
                 });
             }
@@ -51,7 +53,7 @@ class EntityManager{
         }
     }
 
-    private function initializeEntityIds(string $namespace): void{
+    private function initializeEntityIds(string $namespace, string $path): void{
         $entityIds = (new ReflectionClass(EntityIds::class))->getConstants();
         $entityLegacyIds = (new ReflectionClass(EntityLegacyIds::class))->getConstants();
         $networkId = $namespace::NETWORK_ID;
@@ -76,6 +78,14 @@ class EntityManager{
                     $key = "PIGLIN_BRUTE";
                     $id = VanillaEntity::PIGLIN_BRUTE;
                     break;
+                case StriderEntity::NETWORK_ID:
+                    $key = "STRIDER";
+                    $id = VanillaEntity::STRIDER;
+                    break;
+                case VillagerEntity::NETWORK_ID:
+                    $key = "VILLAGER";
+                    $id = VanillaEntity::VILLAGER_V2;
+                    break;
             }
         }
 
@@ -85,17 +95,17 @@ class EntityManager{
                 $entityName[] = ucfirst(strtolower($value));
             }
             $entityName = implode(" ", $entityName);
-            $this->entities[$networkId] = new EntityIdentifierX($networkId, $entityName, $namespace, $id);
+            $this->entities[$networkId] = new EntityIdentifierX($networkId, $entityName, $namespace, $path, $id);
         }
     }
 
-    public function registerEntity(string $namespace, array $saveNames = []): void{
+    public function registerEntity(string $namespace, string $path = "none", array $saveNames = []): void{
         $disabledMobs = VanillaX::getInstance()->getConfig()->getNested("disabled.mobs", []);
 
         if(in_array($namespace::NETWORK_ID, $disabledMobs)){
            return;
         }
-        $this->initializeEntityIds($namespace);
+        $this->initializeEntityIds($namespace, $path);
 
         if($namespace::NETWORK_ID === PaintingEntity::NETWORK_ID){
             EntityFactory::getInstance()->register(PaintingEntity::class, function(World $world, CompoundTag $nbt): PaintingEntity{

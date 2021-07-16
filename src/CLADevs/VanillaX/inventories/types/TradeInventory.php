@@ -3,11 +3,18 @@
 namespace CLADevs\VanillaX\inventories\types;
 
 use CLADevs\VanillaX\entities\passive\VillagerEntity;
+use CLADevs\VanillaX\entities\utils\villager\VillagerOffer;
+use CLADevs\VanillaX\entities\utils\villager\VillagerTradeNBTStream;
 use CLADevs\VanillaX\inventories\FakeBlockInventory;
 use CLADevs\VanillaX\VanillaX;
 use pocketmine\block\BlockLegacyIds;
 use pocketmine\item\Item;
+use pocketmine\item\ItemFactory;
+use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\nbt\tag\ListTag;
+use pocketmine\nbt\tag\Tag;
 use pocketmine\network\mcpe\protocol\ContainerClosePacket;
+use pocketmine\network\mcpe\protocol\types\CacheableNbt;
 use pocketmine\network\mcpe\protocol\types\inventory\WindowTypes;
 use pocketmine\network\mcpe\protocol\UpdateTradePacket;
 use pocketmine\player\Player;
@@ -65,46 +72,46 @@ class TradeInventory extends FakeBlockInventory{
         $pk->displayName = $this->villager->getProfession()->getName();
         $pk->isV2Trading = true;
         $pk->isWilling = false;
-        $pk->offers = $this->villager->getOfferBuffer();
+        $pk->offers = new CacheableNbt($this->villager->getOffers());
         $who->getNetworkSession()->sendDataPacket($pk);
     }
 
     public function onTrade(Player $player, Item $source, Item $target): void{
-//        if($this->buyAItem === null){
-//            $this->buyAItem = $source->isNull() ? $target : $source;
-//        }elseif($this->sellItem === null){
-//            $this->sellItem = $source->isNull() ? $target : $source;
-//        }
-//        if($this->buyAItem !== null && $this->sellItem !== null && !$this->buyAItem->isNull() && !$this->sellItem->isNull()){
-//            /** @var CompoundTag $nbt */
-//            $nbt = (new NetworkLittleEndianNBTStream())->read($this->villager->getOfferBuffer());
-//            $recipes = $nbt->getValue()[VillagerTradeNBTStream::TAG_RECIPES]->getValue();
-//
-//            /** @var ListTag $recipe */
-//            foreach($recipes as $key => $recipe){
-//                $value = $recipe->getValue();
-//                /** @var NamedTag $buyA */
-//                $buyA = $value[VillagerOffer::TAG_BUY_A]->getValue();
-//                $buyA = ItemFactory::getInstance()->get($buyA["id"]->getValue(), $buyA["Damage"]->getValue(), $buyA["Count"]->getValue());
-//                $sell = $value[VillagerOffer::TAG_SELL]->getValue();
-//                $sell = ItemFactory::getInstance()->get($sell["id"]->getValue(), $sell["Damage"]->getValue(), $sell["Count"]->getValue());
-//                $experience = $value[VillagerOffer::TAG_TRADER_EXP]->getValue();
-//
-//                if($this->buyAItem->equalsExact($buyA) && $this->sellItem->equalsExact($sell)){
-//                    $this->buyAItem = null;
-//                    $this->sellItem = null;
-//                    $value[VillagerOffer::TAG_USES] = new IntTag(VillagerOffer::TAG_USES, $value[VillagerOffer::TAG_USES]->getValue() + 1);
-//
-//                    $recipes[$key] = new CompoundTag($recipe->getName(), $value);
-//                    $nbt->setTag(new ListTag(VillagerTradeNBTStream::TAG_RECIPES, $recipes));
-//
-//                    if($experience > 0){
-//                        $this->villager->setExperience($this->villager->getExperience() + $experience);
-//                    }
-//                    $this->villager->setOfferBuffer((new NetworkLittleEndianNBTStream())->write($nbt));
-//                    break;
-//                }
-//            }
-//        }
+        if($this->buyAItem === null){
+            $this->buyAItem = $source->isNull() ? $target : $source;
+        }elseif($this->sellItem === null){
+            $this->sellItem = $source->isNull() ? $target : $source;
+        }
+        if($this->buyAItem !== null && $this->sellItem !== null && !$this->buyAItem->isNull() && !$this->sellItem->isNull()){
+            $nbt = $this->villager->getOffers();
+            $recipes = $nbt->getValue()[VillagerTradeNBTStream::TAG_RECIPES]->getValue();
+
+            /**
+             * @var int $key
+             * @var CompoundTag $recipe
+             */
+            foreach($recipes as $key => $recipe){
+                $value = $recipe->getValue();
+
+                /** @var Tag $buyA */
+                $buyA = $value[VillagerOffer::TAG_BUY_A]->getValue();
+                $buyA = ItemFactory::getInstance()->get($buyA["id"]->getValue(), $buyA["Damage"]->getValue(), $buyA["Count"]->getValue());
+                $sell = $value[VillagerOffer::TAG_SELL]->getValue();
+                $sell = ItemFactory::getInstance()->get($sell["id"]->getValue(), $sell["Damage"]->getValue(), $sell["Count"]->getValue());
+                $experience = $value[VillagerOffer::TAG_TRADER_EXP]->getValue();
+
+                if($this->buyAItem->equalsExact($buyA) && $this->sellItem->equalsExact($sell)){
+                    $this->buyAItem = null;
+                    $this->sellItem = null;
+                    $recipe->setInt(VillagerOffer::TAG_USES, $value[VillagerOffer::TAG_USES]->getValue() + 1);
+                    if($experience > 0){
+                        $this->villager->setExperience($this->villager->getExperience() + $experience);
+                    }
+                    $nbt->setTag(VillagerTradeNBTStream::TAG_RECIPES, new ListTag($recipes));
+                    $this->villager->setOffers($nbt);
+                    break;
+                }
+            }
+        }
     }
 }

@@ -9,10 +9,10 @@ use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
 use pocketmine\math\Vector3;
-use pocketmine\nbt\tag\ByteTag;
+use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\nbt\tag\StringTag;
 use pocketmine\network\mcpe\protocol\SetActorLinkPacket;
 use pocketmine\network\mcpe\protocol\types\entity\EntityLink;
-use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataCollection;
 use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataFlags;
 use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataProperties;
 use pocketmine\player\Player;
@@ -23,13 +23,9 @@ trait EntityRidableTrait{
     public ?Entity $rider = null;
     private bool $isSaddled = false;
 
-    protected function syncNetworkData(EntityMetadataCollection $properties): void{
-        parent::syncNetworkData($properties);
-        $properties->setGenericFlag(EntityMetadataFlags::RIDING, $this->rider !== null);
-    }
-
     public function linkRider(Entity $rider, Vector3 $pos, bool $immediate = true, bool $causedByRider = true): void{
         /** @var VanillaEntity $this */
+        $rider->getNetworkProperties()->setGenericFlag(EntityMetadataFlags::RIDING, true);
         $rider->getNetworkProperties()->setVector3(EntityMetadataProperties::RIDER_SEAT_POSITION, $pos);
 
         $pk = new SetActorLinkPacket();
@@ -46,12 +42,13 @@ trait EntityRidableTrait{
     }
 
     public function unlinkRider(Entity $rider, $immediate = true, bool $causedByRider = true): void{
-        $rider->getNetworkProperties()->setVector3(EntityMetadataProperties::DATA_RIDER_SEAT_POSITION, new Vector3(0, 0, 0));
+        $rider->getNetworkProperties()->setGenericFlag(EntityMetadataFlags::RIDING, false);
+        $rider->getNetworkProperties()->setVector3(EntityMetadataProperties::RIDER_SEAT_POSITION, new Vector3(0, 0, 0));
 
         /** @var VanillaEntity $this */
         $pk = new SetActorLinkPacket();
         $pk->link = new EntityLink($this->getId(), $rider->getId(), EntityLink::TYPE_REMOVE, $immediate, $causedByRider);
-        Server::getInstance()->broadcastPacket($this->getViewers(), $pk);
+        Server::getInstance()->broadcastPackets($this->getViewers(), [$pk]);
 
         $this->rider = null;
 
@@ -60,15 +57,17 @@ trait EntityRidableTrait{
         }
     }
 
-    public function readSaddle(): void{
-        if($this->namedtag->hasTag("Saddled", ByteTag::class)){
-            $this->isSaddled = boolval($this->namedtag->getByte("Saddled"));
-            $this->setGenericFlag(Entity::DATA_FLAG_SADDLED, $this->isSaddled);
+    public function readSaddle(CompoundTag $nbt): void{
+        $tag = $nbt->getTag("Saddled");
+
+        if($tag instanceof StringTag){
+            $this->isSaddled = boolval($tag->getValue());
+            $this->getNetworkProperties()->setGenericFlag(EntityMetadataFlags::SADDLED, $this->isSaddled);
         }
     }
 
-    public function writeSaddle(): void{
-        $this->namedtag->setByte("Saddled", intval($this->isSaddled));
+    public function writeSaddle(CompoundTag $nbt): void{
+        $nbt->setByte("Saddled", intval($this->isSaddled));
     }
 
     /**

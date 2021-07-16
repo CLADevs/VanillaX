@@ -3,6 +3,7 @@
 namespace CLADevs\VanillaX\items;
 
 use CLADevs\VanillaX\entities\EntityManager;
+use CLADevs\VanillaX\entities\utils\EntityIdentifierX;
 use CLADevs\VanillaX\entities\VanillaEntity;
 use CLADevs\VanillaX\items\types\HorseArmorItem;
 use CLADevs\VanillaX\items\types\MapItem;
@@ -90,18 +91,23 @@ class ItemManager{
 
         /** Spawn Egg */
         foreach(EntityManager::getInstance()->getEntities() as $entity){
-            ItemFactory::getInstance()->register(new class(new ItemIdentifier(ItemIds::SPAWN_EGG, $entity->getId()), $entity->getName() . " Spawn Egg", $entity->getNamespace()) extends SpawnEgg{
-                private string $namespace;
+            if(in_array($entity->getType(), [EntityIdentifierX::TYPE_MONSTER, EntityIdentifierX::TYPE_NEUTRAL, EntityIdentifierX::TYPE_PASSIVE])){
+                ItemFactory::getInstance()->register($item = new class(new ItemIdentifier(ItemIds::SPAWN_EGG, $entity->getId()), $entity->getName() . " Spawn Egg", $entity->getNamespace()) extends SpawnEgg{
+                    private string $namespace;
 
-                public function __construct(ItemIdentifier $identifier, string $name = "Unknown", string $namespace = ""){
-                    parent::__construct($identifier, $name);
-                    $this->namespace = $namespace;
-                }
+                    public function __construct(ItemIdentifier $identifier, string $name = "Unknown", string $namespace = ""){
+                        parent::__construct($identifier, $name);
+                        $this->namespace = $namespace;
+                    }
 
-                public function createEntity(World $world, Vector3 $pos, float $yaw, float $pitch): Entity{
-                    return new $this->namespace(Location::fromObject($pos, $world, $yaw, $pitch));
+                    public function createEntity(World $world, Vector3 $pos, float $yaw, float $pitch): Entity{
+                        return new $this->namespace(Location::fromObject($pos, $world, $yaw, $pitch));
+                    }
+                }, true);
+                if(!CreativeInventory::getInstance()->contains($item)){
+                    CreativeInventory::getInstance()->add($item);
                 }
-            }, true);
+            }
         }
         $this->initializeCreativeItems();
     }

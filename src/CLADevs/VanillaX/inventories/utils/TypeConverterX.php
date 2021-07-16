@@ -59,7 +59,7 @@ class TypeConverterX extends TypeConverter{
                                 }
                                 break;
                             case WindowTypes::TRADING:
-                                if($enchantingTableSlot !== null){
+                                if($tradeSlot !== null){
                                     $action->inventorySlot = $tradeSlot;
                                     $foundSlot = true;
                                 }

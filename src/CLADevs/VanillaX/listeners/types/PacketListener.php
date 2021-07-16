@@ -40,7 +40,6 @@ use pocketmine\network\mcpe\protocol\SetDefaultGameTypePacket;
 use pocketmine\network\mcpe\protocol\SetDifficultyPacket;
 use pocketmine\network\mcpe\protocol\SetPlayerGameTypePacket;
 use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataProperties;
-use pocketmine\network\mcpe\protocol\types\entity\StringMetadataProperty;
 use pocketmine\network\mcpe\protocol\types\inventory\UseItemOnEntityTransactionData;
 use pocketmine\network\mcpe\protocol\types\inventory\UseItemTransactionData;
 use pocketmine\network\mcpe\protocol\types\recipe\PotionContainerChangeRecipe;
@@ -179,16 +178,10 @@ class PacketListener implements Listener{
         if($packet->trData instanceof UseItemOnEntityTransactionData && $packet->trData->getActionType() === UseItemOnEntityTransactionData::ACTION_INTERACT){
             $entity = $player->getWorld()->getEntity($packet->trData->getEntityRuntimeId());
             $item = TypeConverter::getInstance()->netItemStackToCore($packet->trData->getItemInHand()->getItemStack());
-            /** @var StringMetadataProperty $currentButton */
-            $currentButton = $player->getNetworkProperties()->getAll()[EntityMetadataProperties::INTERACTIVE_TAG] ?? null;
+            $currentButton = VanillaX::getInstance()->getSessionManager()->get($player)->getInteractiveText();
             $clickPos = $packet->trData->getClickPos();
             $button = null;
 
-            if($currentButton !== null){
-             //   $currentButton = $currentButton->getValue();
-                $currentButton = null;
-                //TODO get value
-            }
             if(is_string($currentButton) && count($packet->trData->getActions()) < 1){
                 if($entity instanceof InteractButtonItemTrait){
                     /** Whenever a player interacts with interactable button for entity */
@@ -213,9 +206,7 @@ class PacketListener implements Listener{
         }elseif($packet->trData instanceof UseItemTransactionData && $packet->trData->getActionType() === UseItemTransactionData::ACTION_CLICK_AIR){
             $entity = VanillaX::getInstance()->getSessionManager()->get($player)->getRidingEntity();
             $item = TypeConverter::getInstance()->netItemStackToCore($packet->trData->getItemInHand()->getItemStack());
-            $currentButton = null;
-            //TODO get current block value
-         //   $currentButton = $player->getDataPropertyManager()->getString(Entity::DATA_INTERACTIVE_TAG);
+            $currentButton = VanillaX::getInstance()->getSessionManager()->get($player)->getInteractiveText();
 
             if(is_string($currentButton) && count($packet->trData->getActions()) < 1){
                 if($entity instanceof InteractButtonItemTrait){

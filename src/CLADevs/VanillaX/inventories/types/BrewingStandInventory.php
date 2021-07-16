@@ -97,6 +97,7 @@ class BrewingStandInventory extends FakeBlockInventory{
                         case self::FIRST_POTION_SLOT:
                         case self::SECOND_POTION_SLOT:
                         case self::THIRD_POTION_SLOT:
+                            /** @var BrewingStandBlock $block */
                             $block = $player->getWorld()->getBlock($this->getHolder());
 
                             if($block instanceof BrewingStandBlock){
@@ -114,10 +115,9 @@ class BrewingStandInventory extends FakeBlockInventory{
                                         $damage |= 1 << ($i - 1);
                                     }
                                 }
-                                //$block->setDamage($damage);
-                                //TODO facing
+                                $block->setFacing($damage);
                             }
-                            //$player->getWorld()->setBlock($block, $block); Facing related
+                            $player->getWorld()->setBlock($block->getPos(), $block);
                             break;
                         case self::FUEL_SLOT:
                             if(!$this->tile->isFueled() && $newItem->getId() === ItemIds::BLAZE_POWDER){
