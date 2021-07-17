@@ -2,6 +2,7 @@
 build-by-default: true
 branches:
 - master
+- 4.0
 projects:
   VanillaX:
     path: ""
