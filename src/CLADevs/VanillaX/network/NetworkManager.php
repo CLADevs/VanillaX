@@ -2,7 +2,6 @@
 
 namespace CLADevs\VanillaX\network;
 
-use CLADevs\VanillaX\network\gamerules\GameRule;
 use CLADevs\VanillaX\network\protocol\ActorEventPacketX;
 use CLADevs\VanillaX\network\protocol\ActorPickupRequestPacketX;
 use CLADevs\VanillaX\network\protocol\AnvilDamagePacketX;
@@ -17,9 +16,6 @@ use pocketmine\network\mcpe\protocol\PacketPool;
 class NetworkManager{
 
     public function startup(): void{
-        GameRule::init();
-        GameRule::startup();
-
         PacketPool::getInstance()->registerPacket(new FilterTextPacketX());
         PacketPool::getInstance()->registerPacket(new AnvilDamagePacketX());
         PacketPool::getInstance()->registerPacket(new ActorEventPacketX());

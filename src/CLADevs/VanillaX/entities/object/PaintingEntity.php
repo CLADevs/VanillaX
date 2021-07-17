@@ -2,7 +2,8 @@
 
 namespace CLADevs\VanillaX\entities\object;
 
-use CLADevs\VanillaX\network\gamerules\GameRule;
+use CLADevs\VanillaX\world\gamerule\GameRule;
+use CLADevs\VanillaX\world\gamerule\GameRuleManager;
 use CLADevs\VanillaX\utils\item\NonAutomaticCallItemTrait;
 use pocketmine\block\BlockFactory;
 use pocketmine\block\BlockLegacyIds;
@@ -33,7 +34,7 @@ class PaintingEntity extends Painting implements NonAutomaticCallItemTrait{
             }
         }
 
-        if($drops && GameRule::getGameRuleValue(GameRule::DO_ENTITY_DROPS, $this->getWorld())){
+        if($drops && GameRuleManager::getInstance()->getValue(GameRule::DO_ENTITY_DROPS, $this->getWorld())){
             $this->getWorld()->dropItem($this->getPosition(), ItemFactory::getInstance()->get(ItemIds::PAINTING));
         }
         $this->getWorld()->addParticle($this->getPosition()->add(0.5, 0.5, 0.5), new BlockBreakParticle(BlockFactory::getInstance()->get(BlockLegacyIds::PLANKS)));

@@ -5,6 +5,7 @@ namespace CLADevs\VanillaX\commands\types;
 use CLADevs\VanillaX\commands\Command;
 use CLADevs\VanillaX\commands\utils\CommandArgs;
 use CLADevs\VanillaX\VanillaX;
+use CLADevs\VanillaX\world\weather\WeatherManager;
 use pocketmine\command\CommandSender;
 use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
 use pocketmine\network\mcpe\protocol\types\PlayerPermissions;
@@ -38,7 +39,7 @@ class WeatherCommand extends Command{
         $duration = 6000;
         $weathers = [];
         foreach(Server::getInstance()->getWorldManager()->getWorlds() as $world){
-            if(($weather = VanillaX::getInstance()->getWeatherManager()->getWeather($world)) !== null){
+            if(($weather = WeatherManager::getInstance()->getWeather($world)) !== null){
                 $weathers[] = $weather;
             }
         }
@@ -57,7 +58,7 @@ class WeatherCommand extends Command{
                     return;
                 }
                 $state = "clear";
-                $weather = VanillaX::getInstance()->getWeatherManager()->getWeather($sender->getWorld());
+                $weather = WeatherManager::getInstance()->getWeather($sender->getWorld());
                 if($weather->isRaining()){
                     if($weather->isThundering()){
                         $state = "thunder";

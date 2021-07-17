@@ -3,7 +3,8 @@
 namespace CLADevs\VanillaX\listeners\types;
 
 use CLADevs\VanillaX\items\types\ShieldItem;
-use CLADevs\VanillaX\network\gamerules\GameRule;
+use CLADevs\VanillaX\world\gamerule\GameRule;
+use CLADevs\VanillaX\world\gamerule\GameRuleManager;
 use CLADevs\VanillaX\VanillaX;
 use CLADevs\VanillaX\world\sounds\ShieldBlockSound;
 use pocketmine\entity\Entity;
@@ -30,20 +31,20 @@ class EntityListener implements Listener{
                     break;
                 case EntityDamageEvent::CAUSE_DROWNING:
                     /** If gamerule 'drowningDamage' is not on then cancel it */
-                    if(!GameRule::getGameRuleValue(GameRule::DROWNING_DAMAGE, $entity->getWorld()())){
+                    if(!GameRuleManager::getInstance()->getValue(GameRule::DROWNING_DAMAGE, $entity->getWorld()())){
                         $event->cancel();
                     }
                     break;
                 case EntityDamageEvent::CAUSE_FIRE:
                     /** If gamerule 'fireDamage' is not on then cancel it */
-                    if(!GameRule::getGameRuleValue(GameRule::FIRE_DAMAGE, $entity->getWorld()())){
+                    if(!GameRuleManager::getInstance()->getValue(GameRule::FIRE_DAMAGE, $entity->getWorld()())){
                         $event->cancel();
                     }
                     break;
                 case EntityDamageEvent::CAUSE_ENTITY_ATTACK:
                     if($event instanceof EntityDamageByEntityEvent && $entity instanceof Player){
                         /** If gamerule 'pvp' is not on then cancel it */
-                        if(!GameRule::getGameRuleValue(GameRule::PVP, $entity->getWorld()())){
+                        if(!GameRuleManager::getInstance()->getValue(GameRule::PVP, $entity->getWorld()())){
                             $event->cancel();
                             return;
                         }
@@ -58,7 +59,7 @@ class EntityListener implements Listener{
     }
 
     public function onRegenerateHealth(EntityRegainHealthEvent $event): void{
-        if(!$event->isCancelled() && !GameRule::getGameRuleValue(GameRule::NATURAL_REGENERATION, $event->getEntity()->getWorld()())){
+        if(!$event->isCancelled() && !GameRuleManager::getInstance()->getValue(GameRule::NATURAL_REGENERATION, $event->getEntity()->getWorld()())){
             $event->cancel();
         }
     }
@@ -66,7 +67,7 @@ class EntityListener implements Listener{
     public function onEntitySpawn(EntitySpawnEvent $event): void{
         $entity = $event->getEntity();
 
-        if($entity instanceof PrimedTNT && !GameRule::getGameRuleValue(GameRule::TNT_EXPLODES, $entity->getWorld()())){
+        if($entity instanceof PrimedTNT && !GameRuleManager::getInstance()->getValue(GameRule::TNT_EXPLODES, $entity->getWorld()())){
             $entity->flagForDespawn();
         }
     }
@@ -108,7 +109,7 @@ class EntityListener implements Listener{
         $value = false;
 
         /** If gamerule 'fallDamage' is not on then cancel it */
-        if(!GameRule::getGameRuleValue(GameRule::FALL_DAMAGE, $entity->getWorld())){
+        if(!GameRuleManager::getInstance()->getValue(GameRule::FALL_DAMAGE, $entity->getWorld())){
             $value = true;
         }
         return $value;

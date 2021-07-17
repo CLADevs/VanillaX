@@ -8,8 +8,7 @@ use CLADevs\VanillaX\entities\utils\villager\VillagerProfession;
 use CLADevs\VanillaX\entities\utils\villager\VillagerTradeNBTStream;
 use CLADevs\VanillaX\entities\VanillaEntity;
 use CLADevs\VanillaX\inventories\types\TradeInventory;
-use CLADevs\VanillaX\VanillaX;
-use pocketmine\entity\EntitySizeInfo;
+use CLADevs\VanillaX\session\SessionManager;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\IntTag;
 use pocketmine\nbt\tag\StringTag;
@@ -183,7 +182,7 @@ class VillagerEntity extends VanillaEntity implements EntityInteractable{
         if($this->profession->hasTrades() && $this->customer === null){
             $player = $result->getPlayer();
             $this->customer = $player;
-            VanillaX::getInstance()->getSessionManager()->get($player)->setTradingEntity($this);
+            SessionManager::getInstance()->get($player)->setTradingEntity($this);
             $player->setCurrentWindow($this->inventory);
         }
     }
@@ -191,15 +190,7 @@ class VillagerEntity extends VanillaEntity implements EntityInteractable{
     public function flagForDespawn(): void{
         parent::flagForDespawn();
         if($this->customer !== null && $this->customer->isOnline()){
-            VanillaX::getInstance()->getSessionManager()->get($this->customer)->setTradingEntity(null);
+            SessionManager::getInstance()->get($this->customer)->setTradingEntity(null);
         }
-    }
-
-    protected function getInitialSizeInfo(): EntitySizeInfo{
-        return new EntitySizeInfo($this->height, $this->width);
-    }
-
-    public static function getNetworkTypeId(): string{
-        return self::NETWORK_ID;
     }
 }

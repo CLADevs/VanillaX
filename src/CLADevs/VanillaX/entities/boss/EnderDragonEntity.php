@@ -20,7 +20,7 @@ class EnderDragonEntity extends VanillaEntity{
     }
 
     public function getName(): string{
-        return "Ender_Dragon";
+        return "Ender Dragon";
     }
 
     protected function getInitialSizeInfo(): EntitySizeInfo{

@@ -11,7 +11,7 @@ use CLADevs\VanillaX\items\ItemManager;
 use CLADevs\VanillaX\listeners\ListenerManager;
 use CLADevs\VanillaX\network\NetworkManager;
 use CLADevs\VanillaX\session\SessionManager;
-use CLADevs\VanillaX\weather\WeatherManager;
+use CLADevs\VanillaX\world\WorldManager;
 use pocketmine\plugin\PluginBase;
 use ReflectionException;
 
@@ -27,8 +27,8 @@ class VanillaX extends PluginBase{
     private CommandManager $commandManager;
     private NetworkManager $networkManager;
     private InventoryManager $inventoryManager;
-    private WeatherManager $weatherManager;
     private ListenerManager $listenerManager;
+    private WorldManager $worldManager;
 
     public function onLoad(): void{
         $this->saveDefaultConfig();
@@ -41,8 +41,8 @@ class VanillaX extends PluginBase{
         $this->commandManager = new CommandManager();
         $this->networkManager = new NetworkManager();
         $this->inventoryManager = new InventoryManager();
-        $this->weatherManager = new WeatherManager();
         $this->listenerManager = new ListenerManager();
+        $this->worldManager = new WorldManager();
     }
 
     /**
@@ -55,8 +55,8 @@ class VanillaX extends PluginBase{
         $this->itemManager->startup();
         $this->commandManager->startup();
         $this->networkManager->startup();
-        $this->weatherManager->startup();
         $this->listenerManager->startup();
+        $this->worldManager->startup();
     }
 
     public function getFile(): string{
@@ -69,6 +69,10 @@ class VanillaX extends PluginBase{
 
     public static function getInstance(): VanillaX{
         return self::$instance;
+    }
+
+    public function getWorldManager(): WorldManager{
+        return $this->worldManager;
     }
 
     public function getEntityManager(): EntityManager{
@@ -101,9 +105,5 @@ class VanillaX extends PluginBase{
 
     public function getCommandManager(): CommandManager{
         return $this->commandManager;
-    }
-
-    public function getWeatherManager(): WeatherManager{
-        return $this->weatherManager;
     }
 }

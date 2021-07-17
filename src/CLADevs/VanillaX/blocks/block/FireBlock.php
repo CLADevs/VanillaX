@@ -2,7 +2,8 @@
 
 namespace CLADevs\VanillaX\blocks\block;
 
-use CLADevs\VanillaX\network\gamerules\GameRule;
+use CLADevs\VanillaX\world\gamerule\GameRule;
+use CLADevs\VanillaX\world\gamerule\GameRuleManager;
 use pocketmine\block\BlockBreakInfo;
 use pocketmine\block\BlockIdentifier;
 use pocketmine\block\BlockLegacyIds;
@@ -15,7 +16,7 @@ class FireBlock extends Fire{
     }
 
     public function onRandomTick(): void{
-        if(!GameRule::getGameRuleValue(GameRule::DO_FIRE_TICK, $this->getPos()->getWorld())){
+        if(!GameRuleManager::getInstance()->getValue(GameRule::DO_FIRE_TICK, $this->getPos()->getWorld())){
             return;
         }
         parent::onRandomTick();

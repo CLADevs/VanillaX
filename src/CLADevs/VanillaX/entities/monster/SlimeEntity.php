@@ -7,7 +7,6 @@ use CLADevs\VanillaX\entities\utils\ItemHelper;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
-use pocketmine\entity\EntitySizeInfo;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\network\mcpe\protocol\types\entity\EntityIds;
 
@@ -25,14 +24,6 @@ class SlimeEntity extends VanillaEntity{
 
     public function getName(): string{
         return "Slime";
-    }
-
-    protected function getInitialSizeInfo(): EntitySizeInfo{
-        return new EntitySizeInfo($this->height, $this->width);
-    }
-
-    public static function getNetworkTypeId(): string{
-        return self::NETWORK_ID;
     }
     
     public function getXpDropAmount(): int{

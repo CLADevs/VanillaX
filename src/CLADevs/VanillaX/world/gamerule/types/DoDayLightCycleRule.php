@@ -1,7 +1,8 @@
 <?php
 
-namespace CLADevs\VanillaX\network\gamerules;
+namespace CLADevs\VanillaX\world\gamerule\types;
 
+use CLADevs\VanillaX\world\gamerule\GameRule;
 use pocketmine\world\World;
 
 class DoDayLightCycleRule extends GameRule{

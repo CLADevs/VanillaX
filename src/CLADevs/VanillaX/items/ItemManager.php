@@ -4,7 +4,6 @@ namespace CLADevs\VanillaX\items;
 
 use CLADevs\VanillaX\entities\EntityManager;
 use CLADevs\VanillaX\entities\utils\EntityIdentifierX;
-use CLADevs\VanillaX\entities\VanillaEntity;
 use CLADevs\VanillaX\items\types\HorseArmorItem;
 use CLADevs\VanillaX\items\types\MapItem;
 use CLADevs\VanillaX\items\types\MinecartItem;
@@ -17,7 +16,6 @@ use CLADevs\VanillaX\VanillaX;
 use pocketmine\entity\Entity;
 use pocketmine\entity\Location;
 use pocketmine\inventory\CreativeInventory;
-use pocketmine\item\Armor;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIdentifier;
@@ -31,7 +29,6 @@ use const pocketmine\RESOURCE_PATH;
 class ItemManager{
 
     public function startup(): void{
-        $this->initializeOverwrite();
         Utils::callDirectory("items" . DIRECTORY_SEPARATOR . "types", function (string $namespace): void{
             if(!isset(class_implements($namespace)[NonAutomaticCallItemTrait::class])){
                 $class = new $namespace();
@@ -128,32 +125,6 @@ class ItemManager{
             if(!CreativeInventory::getInstance()->contains($item)) CreativeInventory::getInstance()->add($item);
         }
     }
-
-    private function initializeOverwrite(): void{
-        $this->addComplexItem("minecraft:glow_squid_spawn_egg", "minecraft:spawn_egg", VanillaEntity::GLOW_SQUID);
-        $this->addComplexItem("minecraft:axolotl_spawn_egg", "minecraft:spawn_egg", VanillaEntity::AXOLOTL);
-    }
-
-    private function addComplexItem(string $newId, string $oldId, int $meta): void{
-//        $runtimeBlockLegacyIds = json_decode(file_get_contents(RESOURCE_PATH . '/vanilla/required_item_list.json'), true);
-//        $legacyStringToIntMap = json_decode(file_get_contents(RESOURCE_PATH . '/vanilla/item_id_map.json'), true);
-//        $id = $legacyStringToIntMap[$oldId];
-//        $netId = $runtimeBlockLegacyIds[$newId]["runtime_id"];
-//
-//        /** complexCoreToNetMapping */
-//        $property = new ReflectionProperty(ItemTranslator::class, "complexCoreToNetMapping");
-//        $property->setAccessible(true);
-//        $value = $property->getValue(ItemTranslator::getInstance());
-//        $value[$id][$meta] = $netId;
-//        $property->setValue(ItemTranslator::getInstance(), $value);
-//
-//        /** complexNetToCoreMapping */
-//        $property = new ReflectionProperty(ItemTranslator::class, "complexNetToCoreMapping");
-//        $property->setAccessible(true);
-//        $value = $property->getValue(ItemTranslator::getInstance());
-//        $value[$netId] = [$id, $meta];
-//        $property->setValue(ItemTranslator::getInstance(), $value);
-    }
     
     public static function register(Item $item, bool $creative = false, bool $overwrite = true): bool{
         if(in_array($item->getId(), VanillaX::getInstance()->getConfig()->getNested("disabled.items", []))){
@@ -162,35 +133,5 @@ class ItemManager{
         ItemFactory::getInstance()->register($item, $overwrite);
         if($creative && !CreativeInventory::getInstance()->contains($item)) CreativeInventory::getInstance()->add($item);
         return true;
-    }
-
-    public static function getArmorSlot(Item $item, bool $includeElytra = false): ?int{
-        if($item instanceof Armor){
-            if(in_array($item->getId(), self::getHelmetList())) return 0;
-            if(in_array($item->getId(), self::getChestplateList($includeElytra))) return 1;
-            if(in_array($item->getId(), self::getLeggingsList())) return 2;
-            if(in_array($item->getId(), self::getBootsList())) return 3;
-        }
-        return null;
-    }
-
-    public static function getHelmetList(): array{
-        return [ItemIds::TURTLE_HELMET, ItemIds::LEATHER_HELMET, ItemIds::CHAIN_HELMET, ItemIds::IRON_HELMET, ItemIds::GOLD_HELMET, ItemIds::DIAMOND_HELMET, ItemIdentifiers::NETHERITE_HELMET];
-    }
-
-    public static function getChestplateList(bool $elytra = false): array{
-        $items = [ItemIds::LEATHER_CHESTPLATE, ItemIds::CHAIN_CHESTPLATE, ItemIds::IRON_CHESTPLATE, ItemIds::GOLD_CHESTPLATE, ItemIds::DIAMOND_CHESTPLATE, ItemIdentifiers::NETHERITE_CHESTPLATE];
-        if($elytra){
-            $items[] = ItemIds::ELYTRA;
-        }
-        return $items;
-    }
-
-    public static function getLeggingsList(): array{
-        return [ItemIds::LEATHER_LEGGINGS, ItemIds::CHAIN_LEGGINGS, ItemIds::IRON_LEGGINGS, ItemIds::GOLD_LEGGINGS, ItemIds::DIAMOND_LEGGINGS, ItemIdentifiers::NETHERITE_LEGGINGS];
-    }
-
-    public static function getBootsList(): array{
-        return [ItemIds::LEATHER_BOOTS, ItemIds::CHAIN_BOOTS, ItemIds::IRON_BOOTS, ItemIds::GOLD_BOOTS, ItemIds::DIAMOND_BOOTS, ItemIdentifiers::NETHERITE_BOOTS];
     }
 }

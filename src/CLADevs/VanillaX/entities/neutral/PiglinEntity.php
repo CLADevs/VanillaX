@@ -3,7 +3,6 @@
 namespace CLADevs\VanillaX\entities\neutral;
 
 use CLADevs\VanillaX\entities\VanillaEntity;
-use pocketmine\entity\EntitySizeInfo;
 use pocketmine\nbt\tag\CompoundTag;
 
 class PiglinEntity extends VanillaEntity{
@@ -25,14 +24,6 @@ class PiglinEntity extends VanillaEntity{
     //TODO drops
     
     public function getXpDropAmount(): int{
-        return $this->getLastHitByPlayer() ? 5 + (count($this->getArmorInventory()->getContents()) * mt_rand(1,3)) : 0;
-    }
-
-    protected function getInitialSizeInfo(): EntitySizeInfo{
-        return new EntitySizeInfo($this->height, $this->width);
-    }
-
-    public static function getNetworkTypeId(): string{
-        return self::NETWORK_ID;
+        return $this->getLastHitByPlayer() ? 5 + (count($this->getArmorInventory()->getContents()) * mt_rand(1, 3)) : 0;
     }
 }

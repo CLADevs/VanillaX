@@ -4,7 +4,6 @@ namespace CLADevs\VanillaX\entities\neutral;
 
 use CLADevs\VanillaX\entities\utils\ItemHelper;
 use CLADevs\VanillaX\entities\VanillaEntity;
-use pocketmine\entity\EntitySizeInfo;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
@@ -38,14 +37,6 @@ class LlamaEntity extends VanillaEntity{
     }
     
     public function getXpDropAmount(): int{
-        return $this->getLastHitByPlayer() ? mt_rand(1,3) : 0;
-    }
-
-    protected function getInitialSizeInfo(): EntitySizeInfo{
-        return new EntitySizeInfo($this->height, $this->width);
-    }
-
-    public static function getNetworkTypeId(): string{
-        return self::NETWORK_ID;
+        return $this->getLastHitByPlayer() ? mt_rand(1, 3) : 0;
     }
 }

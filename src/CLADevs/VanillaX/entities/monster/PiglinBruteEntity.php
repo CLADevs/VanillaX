@@ -3,7 +3,6 @@
 namespace CLADevs\VanillaX\entities\monster;
 
 use CLADevs\VanillaX\entities\VanillaEntity;
-use pocketmine\entity\EntitySizeInfo;
 use pocketmine\nbt\tag\CompoundTag;
 
 class PiglinBruteEntity extends VanillaEntity{
@@ -26,13 +25,5 @@ class PiglinBruteEntity extends VanillaEntity{
     
     public function getXpDropAmount(): int{
         return $this->getLastHitByPlayer() ? 20 : 0;
-    }
-
-    protected function getInitialSizeInfo(): EntitySizeInfo{
-        return new EntitySizeInfo($this->height, $this->width);
-    }
-
-    public static function getNetworkTypeId(): string{
-        return self::NETWORK_ID;
     }
 }

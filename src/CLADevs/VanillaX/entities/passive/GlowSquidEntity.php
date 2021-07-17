@@ -7,7 +7,6 @@ use CLADevs\VanillaX\entities\utils\ItemHelper;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
-use pocketmine\entity\EntitySizeInfo;
 use pocketmine\nbt\tag\CompoundTag;
 
 class GlowSquidEntity extends VanillaEntity{
@@ -23,19 +22,11 @@ class GlowSquidEntity extends VanillaEntity{
     }
 
     public function getName(): string{
-        return "Glow_Squid";
+        return "Glow Squid";
     }
 
-    protected function getInitialSizeInfo(): EntitySizeInfo{
-        return new EntitySizeInfo($this->height, $this->width);
-    }
-
-    public static function getNetworkTypeId(): string{
-        return self::NETWORK_ID;
-    }
-    
     public function getXpDropAmount(): int{
-        return !$this->isBaby() && $this->getLastHitByPlayer() ? mt_rand(1,3) : 0;
+        return !$this->isBaby() && $this->getLastHitByPlayer() ? mt_rand(1, 3) : 0;
     }
  
     /**

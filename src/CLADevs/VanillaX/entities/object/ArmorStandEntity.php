@@ -2,8 +2,8 @@
 
 namespace CLADevs\VanillaX\entities\object;
 
-use CLADevs\VanillaX\items\ItemManager;
-use CLADevs\VanillaX\network\gamerules\GameRule;
+use CLADevs\VanillaX\world\gamerule\GameRule;
+use CLADevs\VanillaX\world\gamerule\GameRuleManager;
 use CLADevs\VanillaX\session\Session;
 use CLADevs\VanillaX\utils\instances\InteractButtonResult;
 use CLADevs\VanillaX\utils\item\InteractButtonItemTrait;
@@ -157,7 +157,7 @@ class ArmorStandEntity extends Living implements InteractButtonItemTrait{
         if(!$this->isFlaggedForDespawn()){
             $this->flagForDespawn();
 
-            if(GameRule::getGameRuleValue(GameRule::DO_TILE_DROPS, $this->getWorld())){
+            if(GameRuleManager::getInstance()->getValue(GameRule::DO_TILE_DROPS, $this->getWorld())){
                 $items = array_merge([ItemFactory::getInstance()->get(ItemIds::ARMOR_STAND)], $this->getArmorInventory()->getContents());
                 if(!$this->mainHand->isNull()){
                     $items[] = $this->mainHand;
@@ -190,7 +190,7 @@ class ArmorStandEntity extends Living implements InteractButtonItemTrait{
                 if(($clickpos = $result->getClickPos()) !== null){
                     $slot = $this->getClickedPosSlot($clickpos->y - $this->getPosition()->y);
                 }else{
-                    $slot = $item instanceof Armor ? ItemManager::getArmorSlot($item, true) + 1 : self::EQUIPMENT_MAINHAND;
+                    $slot = $item instanceof Armor ? $item->getArmorSlot() + 1 : self::EQUIPMENT_MAINHAND;
                 }
 
                 /** Remove Item From Armor Stand */
@@ -221,7 +221,7 @@ class ArmorStandEntity extends Living implements InteractButtonItemTrait{
 
                 /** Add Item to Armor Stand */
                 if($item instanceof Armor){
-                    $slot = ItemManager::getArmorSlot($item, true);
+                    $slot = $item->getArmorSlot();
                     $this->handleArmorItem($player, $this->getArmorInventory()->getItem($slot), $item, $slot);
                 }elseif($item->getId() !== ItemIds::AIR){
                     $this->handleMainHandItem($player, $this->getMainHand(), $item);

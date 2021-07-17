@@ -4,7 +4,8 @@ namespace CLADevs\VanillaX\listeners\types;
 
 use CLADevs\VanillaX\blocks\tile\FurnaceTile;
 use CLADevs\VanillaX\inventories\InventoryManager;
-use CLADevs\VanillaX\network\gamerules\GameRule;
+use CLADevs\VanillaX\world\gamerule\GameRule;
+use CLADevs\VanillaX\world\gamerule\GameRuleManager;
 use CLADevs\VanillaX\session\Session;
 use pocketmine\block\BlockLegacyIds;
 use pocketmine\entity\object\FallingBlock;
@@ -19,7 +20,7 @@ class BlockListener implements Listener{
         if(!$event->isCancelled()){
             $block = $event->getBlock();
 
-            if(!GameRule::getGameRuleValue(GameRule::DO_TILE_DROPS, $block->getPos()->getWorld())){
+            if(!GameRuleManager::getInstance()->getValue(GameRule::DO_TILE_DROPS, $block->getPos()->getWorld())){
                 $event->setDrops([]);
                 return;
             }

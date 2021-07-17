@@ -7,6 +7,7 @@ use CLADevs\VanillaX\blocks\block\redstone\RedstoneComparator;
 use CLADevs\VanillaX\blocks\block\redstone\RedstoneLamp;
 use CLADevs\VanillaX\blocks\block\redstone\RedstoneRepeater;
 use CLADevs\VanillaX\blocks\utils\TileVanilla;
+use CLADevs\VanillaX\items\ItemManager;
 use CLADevs\VanillaX\utils\item\NonAutomaticCallItemTrait;
 use CLADevs\VanillaX\utils\item\NonCreativeItemTrait;
 use CLADevs\VanillaX\utils\Utils;
@@ -18,7 +19,8 @@ use pocketmine\block\BlockIdentifier;
 use pocketmine\block\BlockLegacyIds;
 use pocketmine\block\tile\Spawnable;
 use pocketmine\block\tile\TileFactory;
-use pocketmine\inventory\CreativeInventory;
+use pocketmine\item\Item;
+use pocketmine\item\ItemIdentifier;
 use pocketmine\Server;
 use ReflectionClass;
 use ReflectionException;
@@ -91,8 +93,22 @@ class BlockManager{
             return false;
         }
         BlockFactory::getInstance()->register($block, $override);
-        if($creativeItem && !CreativeInventory::getInstance()->contains($item = $block->asItem())){
-            CreativeInventory::getInstance()->add($item);
+        $item = $block->asItem();
+        $itemBlock = $item->getBlock();
+
+        if($itemBlock->getId() !== $block->getId() || $itemBlock->getMeta() !== $block->getMeta()){
+            ItemManager::register(new class(new ItemIdentifier($item->getId(), $item->getMeta()), $block->getName(), $block) extends Item{
+
+                private Block $block;
+                public function __construct(ItemIdentifier $identifier, string $name, Block $block){
+                    parent::__construct($identifier, $name);
+                    $this->block = $block;
+                }
+
+                public function getBlock(?int $clickedFace = null): Block{
+                    return $this->block;
+                }
+            }, $creativeItem, true);
         }
         return true;
     }

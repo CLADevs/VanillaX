@@ -3,11 +3,17 @@
 namespace CLADevs\VanillaX\session;
 
 use pocketmine\player\Player;
+use pocketmine\utils\SingletonTrait;
 
 class SessionManager{
+    use SingletonTrait;
 
     /** @var Session[] */
     private array $sessions = [];
+
+    public function __construct(){
+        self::setInstance($this);
+    }
 
     /**
      * @param string|Player $player

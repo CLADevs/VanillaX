@@ -3,8 +3,9 @@
 namespace CLADevs\VanillaX\enchantments\armors\boots;
 
 use CLADevs\VanillaX\enchantments\utils\EnchantmentTrait;
-use CLADevs\VanillaX\items\ItemManager;
 use pocketmine\data\bedrock\EnchantmentIds;
+use pocketmine\inventory\ArmorInventory;
+use pocketmine\item\Armor;
 use pocketmine\item\enchantment\Enchantment;
 use pocketmine\item\enchantment\ItemFlags;
 use pocketmine\item\enchantment\Rarity;
@@ -22,6 +23,6 @@ class DepthStriderEnchantment extends Enchantment{
     }
 
     public function isItemCompatible(Item $item): bool{
-        return in_array($item->getId(), ItemManager::getBootsList());
+        return $item instanceof Armor && $item->getArmorSlot() === ArmorInventory::SLOT_FEET;
     }
 }

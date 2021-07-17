@@ -1,6 +1,6 @@
 <?php
 
-namespace CLADevs\VanillaX\weather;
+namespace CLADevs\VanillaX\world\weather;
 
 use CLADevs\VanillaX\VanillaX;
 use pocketmine\nbt\tag\CompoundTag;
@@ -100,7 +100,7 @@ class Weather{
     }
 
     public function startStorm(bool $thunder = false, int $duration = null): void{
-        VanillaX::getInstance()->getWeatherManager()->sendWeather(null, $thunder);
+        WeatherManager::getInstance()->sendWeather(null, $thunder);
         $this->duration = $duration == null ? mt_rand(600, 1200) : $duration;
         $this->raining = true;
         $this->thundering = $thunder;
@@ -108,7 +108,7 @@ class Weather{
     }
 
     public function stopStorm(): void{
-        VanillaX::getInstance()->getWeatherManager()->sendClear(null, $this->thundering);
+        WeatherManager::getInstance()->sendClear(null, $this->thundering);
         $this->recalculateDelayDuration();
         $this->duration = 0;
         $this->raining = false;

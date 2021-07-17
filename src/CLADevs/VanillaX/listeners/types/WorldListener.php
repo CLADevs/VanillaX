@@ -2,8 +2,8 @@
 
 namespace CLADevs\VanillaX\listeners\types;
 
-use CLADevs\VanillaX\network\gamerules\GameRule;
-use CLADevs\VanillaX\VanillaX;
+use CLADevs\VanillaX\world\gamerule\GameRuleManager;
+use CLADevs\VanillaX\world\weather\WeatherManager;
 use pocketmine\event\entity\EntityTeleportEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\world\WorldLoadEvent;
@@ -13,12 +13,12 @@ use pocketmine\player\Player;
 class WorldListener implements Listener{
 
     public function onLevelLoad(WorldLoadEvent $event): void{
-        VanillaX::getInstance()->getWeatherManager()->addWeather($event->getWorld());
+        WeatherManager::getInstance()->addWeather($event->getWorld());
     }
 
     public function onLevelUnload(WorldUnloadEvent $event): void{
         if(!$event->isCancelled()){
-            VanillaX::getInstance()->getWeatherManager()->removeWeather($event->getWorld());
+            WeatherManager::getInstance()->removeWeather($event->getWorld());
         }
     }
 
@@ -28,12 +28,12 @@ class WorldListener implements Listener{
 
         if(!$event->isCancelled() && $from->getWorld()->getFolderName() !== $to->getWorld()->getFolderName()){
             $entity = $event->getEntity();
-            $weather = VanillaX::getInstance()->getWeatherManager();
+            $weather = WeatherManager::getInstance();
             $previousWeather = $weather->getWeather($from->getWorld());
             $targetWeather = $weather->getWeather($to->getWorld());
 
             if($entity instanceof Player){
-                GameRule::fixGameRule($entity, $to->getWorld());
+                GameRuleManager::getInstance()->sendChanges($entity, $to->getWorld());
                 if($previousWeather !== null && $targetWeather !== null && $previousWeather->isRaining() && !$targetWeather->isRaining()){
                     $weather->sendClear($entity);
                 }

@@ -1,28 +1,35 @@
 <?php
 
-namespace CLADevs\VanillaX\weather;
+namespace CLADevs\VanillaX\world\weather;
 
 use CLADevs\VanillaX\entities\object\LightningBoltEntity;
-use CLADevs\VanillaX\network\gamerules\GameRule;
+use CLADevs\VanillaX\world\gamerule\GameRule;
+use CLADevs\VanillaX\world\gamerule\GameRuleManager;
 use CLADevs\VanillaX\VanillaX;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\LevelEventPacket;
 use pocketmine\player\Player;
 use pocketmine\scheduler\ClosureTask;
 use pocketmine\Server;
+use pocketmine\utils\SingletonTrait;
 use pocketmine\world\World;
 
 class WeatherManager{
+    use SingletonTrait;
 
     /** @var Weather[] */
     private array $weathers = [];
+
+    public function __construct(){
+        self::setInstance($this);
+    }
 
     public function startup(): void{
         if(!VanillaX::getInstance()->getConfig()->getNested("features.weather", true)){
             return;
         }
         foreach(Server::getInstance()->getWorldManager()->getWorlds() as $world){
-            if(!GameRule::getGameRuleValue(GameRule::DO_WEATHER_CYCLE, $world)){
+            if(!GameRuleManager::getInstance()->getValue(GameRule::DO_WEATHER_CYCLE, $world)){
                 continue;
             }
             $this->addWeather($world);

@@ -2,13 +2,14 @@
 
 namespace CLADevs\VanillaX\listeners\types;
 
-use CLADevs\VanillaX\items\ItemManager;
 use CLADevs\VanillaX\items\types\ElytraItem;
 use CLADevs\VanillaX\items\types\ShieldItem;
 use CLADevs\VanillaX\listeners\ListenerManager;
-use CLADevs\VanillaX\network\gamerules\GameRule;
+use CLADevs\VanillaX\world\gamerule\GameRule;
+use CLADevs\VanillaX\world\gamerule\GameRuleManager;
 use CLADevs\VanillaX\utils\item\HeldItemChangeTrait;
 use CLADevs\VanillaX\VanillaX;
+use CLADevs\VanillaX\world\weather\WeatherManager;
 use pocketmine\block\BlockFactory;
 use pocketmine\block\BlockLegacyIds;
 use pocketmine\block\Water;
@@ -24,6 +25,7 @@ use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\player\PlayerMoveEvent;
 use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\event\player\PlayerToggleSneakEvent;
+use pocketmine\item\Armor;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataFlags;
 use pocketmine\scheduler\ClosureTask;
@@ -40,9 +42,9 @@ class PlayerListener implements Listener{
 
     public function onJoin(PlayerJoinEvent $event): void{
         $player = $event->getPlayer();
-        $weather = VanillaX::getInstance()->getWeatherManager();
+        $weather = WeatherManager::getInstance();
 
-        GameRule::fixGameRule($player);
+        GameRuleManager::getInstance()->sendChanges($player);
         if($weather->isRaining($player->getWorld())) $weather->sendWeather($player, $weather->isThundering($player->getWorld()));
         VanillaX::getInstance()->getSessionManager()->add($player);
     }
@@ -66,7 +68,7 @@ class PlayerListener implements Listener{
             $player = $event->getPlayer();
             $item = $event->getItem();
 
-            if(($slot = ItemManager::getArmorSlot($item, true)) !== null && $player->getArmorInventory()->getItem($slot)->isNull()){
+            if($item instanceof Armor && $player->getArmorInventory()->getItem($slot = $item->getArmorSlot())->isNull()){
                 $player->getArmorInventory()->setItem($slot, $item);
                 $item->pop();
                 $player->getInventory()->setItemInHand($item);
@@ -115,10 +117,10 @@ class PlayerListener implements Listener{
     public function onDeath(PlayerDeathEvent $event): void{
         $player = $event->getPlayer();
 
-        if(!GameRule::getGameRuleValue(GameRule::KEEP_INVENTORY, ($level = $player->getWorld()))){
+        if(!GameRuleManager::getInstance()->getValue(GameRule::KEEP_INVENTORY, ($level = $player->getWorld()))){
             $event->setKeepInventory(true);
         }
-        if(!GameRule::getGameRuleValue(GameRule::SHOW_DEATH_MESSAGES, $level)){
+        if(!GameRuleManager::getInstance()->getValue(GameRule::SHOW_DEATH_MESSAGES, $level)){
             $event->setDeathMessage("");
         }
     }
@@ -127,8 +129,7 @@ class PlayerListener implements Listener{
         $player = $event->getPlayer();
 
         if(count(Server::getInstance()->getOnlinePlayers()) === 1 && $player->getWorld()->getTime() === World::TIME_FULL){
-            $weather = VanillaX::getInstance()->getWeatherManager()->getWeather($player->getWorld());
-            $weather->stopStorm();
+            WeatherManager::getInstance()->getWeather($player->getWorld())->stopStorm();
         }
     }
 

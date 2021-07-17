@@ -3,8 +3,10 @@
 namespace CLADevs\VanillaX\entities;
 
 use CLADevs\VanillaX\entities\utils\interfaces\EntityClassification;
-use CLADevs\VanillaX\network\gamerules\GameRule;
+use CLADevs\VanillaX\world\gamerule\GameRule;
+use CLADevs\VanillaX\world\gamerule\GameRuleManager;
 use pocketmine\entity\Attribute;
+use pocketmine\entity\EntitySizeInfo;
 use pocketmine\entity\Living;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDeathEvent;
@@ -70,6 +72,14 @@ abstract class VanillaEntity extends Living{
         return EntityClassification::NONE;
     }
 
+    protected function getInitialSizeInfo(): EntitySizeInfo{
+        return new EntitySizeInfo($this->height, $this->width);
+    }
+
+    public static function getNetworkTypeId(): string{
+        return static::NETWORK_ID;
+    }
+
     public function getLastHitByPlayer(): bool{
         $cause = $this->getLastDamageCause();
         return $cause instanceof EntityDamageByEntityEvent && $cause->getDamager() instanceof Player;
@@ -83,7 +93,7 @@ abstract class VanillaEntity extends Living{
     protected function onDeath(): void{
         $ev = new EntityDeathEvent($this, $this->getDrops(), $this->getXpDropAmount());
         $ev->call();
-        if(GameRule::getGameRuleValue(GameRule::DO_MOB_LOOT, $this->getWorld())){
+        if(GameRuleManager::getInstance()->getValue(GameRule::DO_MOB_LOOT, $this->getWorld())){
             foreach($ev->getDrops() as $item){
                 $this->getWorld()->dropItem($this->getPosition(), $item);
             }

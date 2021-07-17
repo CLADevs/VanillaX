@@ -4,8 +4,9 @@ namespace CLADevs\VanillaX\commands\types;
 
 use CLADevs\VanillaX\commands\Command;
 use CLADevs\VanillaX\commands\utils\CommandArgs;
-use CLADevs\VanillaX\network\gamerules\GameRule;
 use CLADevs\VanillaX\VanillaX;
+use CLADevs\VanillaX\world\gamerule\GameRule;
+use CLADevs\VanillaX\world\gamerule\GameRuleManager;
 use pocketmine\command\CommandSender;
 use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
 use pocketmine\network\mcpe\protocol\GameRulesChangedPacket;
@@ -42,15 +43,16 @@ class GameruleCommand extends Command{
             $this->sendSyntaxError($sender, "", "/$commandLabel");
             return;
         }
+        $instance = GameRuleManager::getInstance();
         if(!isset($args[0]) && $sender instanceof Player){
             $values = [];
-            foreach(GameRule::$gameRules as $key => $rule){
-                $values[] = $key . " = " . GameRule::getGameRuleValue($rule->getName(), $sender->getWorld(), true);
+            foreach($instance->getAll() as $key => $rule){
+                $values[] = $key . " = " . $instance->getValue($rule->getName(), $sender->getWorld(), true);
             }
             $sender->sendMessage(implode(", ", $values));
             return;
         }
-        $gameRule = GameRule::$gameRules[strtolower($args[0])] ?? null;
+        $gameRule = $instance->getByName($args[0]);
         if($gameRule === null){
             $errorArg = $args;
             array_shift($errorArg);
@@ -58,7 +60,7 @@ class GameruleCommand extends Command{
             return;
         }
         if(!isset($args[1]) && $sender instanceof Player){
-            $sender->sendMessage(strtolower($gameRule->getName()) . " = " . GameRule::getGameRuleValue($gameRule->getName(), $sender->getWorld(), true));
+            $sender->sendMessage(strtolower($gameRule->getName()) . " = " . $instance->getValue($gameRule->getName(), $sender->getWorld(), true));
             return;
         }
         $pk = new GameRulesChangedPacket();
@@ -85,7 +87,7 @@ class GameruleCommand extends Command{
             foreach($world->getPlayers() as $player){
                 $player->getNetworkSession()->sendDataPacket($pk);
             }
-            GameRule::setGameRule($world, $gameRule, $value);
+            $instance->set($world, $gameRule, $value);
             $gameRule->handleValue($value, $world);
         }
         $sender->sendMessage("Game rule " . strtolower($gameRule->getName()) . " has been updated to " . $args[1]);

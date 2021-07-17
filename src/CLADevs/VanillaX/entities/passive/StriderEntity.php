@@ -8,12 +8,11 @@ use CLADevs\VanillaX\entities\utils\interfaces\EntityRidable;
 use CLADevs\VanillaX\entities\utils\traits\EntityRidableTrait;
 use CLADevs\VanillaX\entities\VanillaEntity;
 use CLADevs\VanillaX\entities\utils\ItemHelper;
+use CLADevs\VanillaX\session\SessionManager;
 use CLADevs\VanillaX\utils\instances\InteractButtonResult;
 use CLADevs\VanillaX\utils\item\HeldItemChangeTrait;
 use CLADevs\VanillaX\utils\item\InteractButtonItemTrait;
-use CLADevs\VanillaX\VanillaX;
 use CLADevs\VanillaX\world\sounds\SaddledSound;
-use pocketmine\entity\EntitySizeInfo;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
@@ -54,7 +53,7 @@ class StriderEntity extends VanillaEntity implements EntityInteractable, Interac
     }
 
     public function getXpDropAmount(): int{
-        return $this->getLastHitByPlayer() ? mt_rand(1,3) : 0;
+        return $this->getLastHitByPlayer() ? mt_rand(1, 3) : 0;
     }
 
     public function saveNBT(): CompoundTag{
@@ -63,10 +62,9 @@ class StriderEntity extends VanillaEntity implements EntityInteractable, Interac
         return $nbt;
     }
 
-
     public function onInteract(EntityInteractResult $result): void{
         $player = $result->getPlayer();
-        $interactiveText = VanillaX::getInstance()->getSessionManager()->get($player)->getInteractiveText();
+        $interactiveText = SessionManager::getInstance()->get($player)->getInteractiveText();
         $this->onButtonPressed(new InteractButtonResult($player, $result->getItem(), $interactiveText));
     }
 
@@ -87,7 +85,7 @@ class StriderEntity extends VanillaEntity implements EntityInteractable, Interac
 
     public function onLeftRide(Player $player): void{
         $this->unlinkRider($player);
-        VanillaX::getInstance()->getSessionManager()->get($player)->setInteractiveText("");
+        SessionManager::getInstance()->get($player)->setInteractiveText("");
     }
 
     public function onButtonPressed(InteractButtonResult $result): void{
@@ -132,14 +130,6 @@ class StriderEntity extends VanillaEntity implements EntityInteractable, Interac
         }elseif($this->isSaddled && $this->rider === $player && $item->getId() === ItemIds::CARROT_ON_A_STICK){
             $tag = self::BUTTON_BOOST;
         }
-        VanillaX::getInstance()->getSessionManager()->get($player)->setInteractiveText($tag);
-    }
-
-    protected function getInitialSizeInfo(): EntitySizeInfo{
-        return new EntitySizeInfo($this->height, $this->width);
-    }
-
-    public static function getNetworkTypeId(): string{
-        return self::NETWORK_ID;
+        SessionManager::getInstance()->get($player)->setInteractiveText($tag);
     }
 }

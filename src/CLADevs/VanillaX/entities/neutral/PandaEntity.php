@@ -3,7 +3,6 @@
 namespace CLADevs\VanillaX\entities\neutral;
 
 use CLADevs\VanillaX\entities\VanillaEntity;
-use pocketmine\entity\EntitySizeInfo;
 use pocketmine\item\Item;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\network\mcpe\protocol\types\entity\EntityIds;
@@ -36,14 +35,6 @@ class PandaEntity extends VanillaEntity{
     }
     
     public function getXpDropAmount(): int{
-        return $this->getLastHitByPlayer() ? mt_rand(1,3) : 0;
-    }
-
-    protected function getInitialSizeInfo(): EntitySizeInfo{
-        return new EntitySizeInfo($this->height, $this->width);
-    }
-
-    public static function getNetworkTypeId(): string{
-        return self::NETWORK_ID;
+        return $this->getLastHitByPlayer() ? mt_rand(1, 3) : 0;
     }
 }

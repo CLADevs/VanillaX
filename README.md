@@ -12,24 +12,17 @@
 - Enchantment Table
 - Anvil
 - Brewing Stand
-- Shulker Box
 - Hopper
 - Command Block (80% done)
 
 #### TODO Blocks:
+- Magma Block(pmmp collision box)
 - Ancient Debris
-- Bamboo
-- Barrel
-- Barrier
 - Basalt
 - Bee Hive
 - Bee Nest
 - Bell
-- Bubble Coral
-- Bubble Coral Block
-- Bubble Coral Fan
 - Campfire (Soul Too)
-- Pumpkins
 - Chain
 - Chiseled Blocks (every)
 - Cracked Blocks (every)
@@ -53,7 +46,6 @@
 - Stripped Blocks (every)
 - Sweet Berry (every)
 - Turtle Egg
-- Twisting Vines
 - 1.17 Blocks
 
 #### Entities:

@@ -4,7 +4,6 @@ namespace CLADevs\VanillaX\entities\monster;
 
 use CLADevs\VanillaX\entities\utils\interfaces\EntityClassification;
 use CLADevs\VanillaX\entities\VanillaEntity;
-use pocketmine\entity\EntitySizeInfo;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
@@ -39,13 +38,5 @@ class RavagerEntity extends VanillaEntity{
 
     public function getClassification(): int{
         return EntityClassification::ILLAGERS;
-    }
-
-    protected function getInitialSizeInfo(): EntitySizeInfo{
-        return new EntitySizeInfo($this->height, $this->width);
-    }
-
-    public static function getNetworkTypeId(): string{
-        return self::NETWORK_ID;
     }
 }

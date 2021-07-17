@@ -1,8 +1,9 @@
 <?php
 
-namespace CLADevs\VanillaX\network\gamerules;
+namespace CLADevs\VanillaX\world\gamerule\types;
 
-use CLADevs\VanillaX\VanillaX;
+use CLADevs\VanillaX\world\gamerule\GameRule;
+use CLADevs\VanillaX\world\weather\WeatherManager;
 use pocketmine\world\World;
 
 class DoWeatherCycleRule extends GameRule{
@@ -13,9 +14,9 @@ class DoWeatherCycleRule extends GameRule{
 
     public function handleValue($value, World $world): void{
         if($value){
-            VanillaX::getInstance()->getWeatherManager()->addWeather($world);
+            WeatherManager::getInstance()->addWeather($world);
         }else{
-            VanillaX::getInstance()->getWeatherManager()->removeWeather($world);
+            WeatherManager::getInstance()->removeWeather($world);
         }
     }
 }

@@ -5,7 +5,6 @@ namespace CLADevs\VanillaX\entities\passive;
 use CLADevs\VanillaX\entities\utils\interfaces\EntityClassification;
 use CLADevs\VanillaX\entities\VanillaEntity;
 use CLADevs\VanillaX\entities\utils\ItemHelper;
-use pocketmine\entity\EntitySizeInfo;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
@@ -16,8 +15,8 @@ class FishEntity extends VanillaEntity{
 
     const NETWORK_ID = EntityIds::COD;
 
-    public $width = 0.6;
-    public $height = 0.3;
+    public float $width = 0.6;
+    public float $height = 0.3;
 
     protected function initEntity(CompoundTag $nbt): void{
         parent::initEntity($nbt);
@@ -41,18 +40,10 @@ class FishEntity extends VanillaEntity{
     }
     
     public function getXpDropAmount(): int{
-        return $this->getLastHitByPlayer() ? mt_rand(1,3) : 0;
+        return $this->getLastHitByPlayer() ? mt_rand(1, 3) : 0;
     }
 
     public function getClassification(): int{
         return EntityClassification::AQUATIC;
-    }
-
-    protected function getInitialSizeInfo(): EntitySizeInfo{
-        return new EntitySizeInfo($this->height, $this->width);
-    }
-
-    public static function getNetworkTypeId(): string{
-        return self::NETWORK_ID;
     }
 }
