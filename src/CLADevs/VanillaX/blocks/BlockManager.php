@@ -6,7 +6,9 @@ use CLADevs\VanillaX\blocks\block\CommandBlock;
 use CLADevs\VanillaX\blocks\block\redstone\RedstoneComparator;
 use CLADevs\VanillaX\blocks\block\redstone\RedstoneLamp;
 use CLADevs\VanillaX\blocks\block\redstone\RedstoneRepeater;
+use CLADevs\VanillaX\blocks\utils\BlockVanilla;
 use CLADevs\VanillaX\blocks\utils\TileVanilla;
+use CLADevs\VanillaX\items\ItemIdentifiers;
 use CLADevs\VanillaX\items\ItemManager;
 use CLADevs\VanillaX\utils\item\NonAutomaticCallItemTrait;
 use CLADevs\VanillaX\utils\item\NonCreativeItemTrait;
@@ -17,11 +19,14 @@ use pocketmine\block\BlockBreakInfo;
 use pocketmine\block\BlockFactory;
 use pocketmine\block\BlockIdentifier;
 use pocketmine\block\BlockLegacyIds;
+use pocketmine\block\BlockToolType;
 use pocketmine\block\tile\Spawnable;
 use pocketmine\block\tile\TileFactory;
 use pocketmine\item\Item;
 use pocketmine\item\ItemIdentifier;
+use pocketmine\item\ToolTier;
 use pocketmine\network\mcpe\convert\RuntimeBlockMapping;
+use pocketmine\scheduler\AsyncTask;
 use pocketmine\Server;
 use pocketmine\utils\SingletonTrait;
 use ReflectionClass;
@@ -43,6 +48,15 @@ class BlockManager{
         $this->initializeRuntimeIds();
         $this->initializeBlocks();
         $this->initializeTiles();
+
+        Server::getInstance()->getAsyncPool()->addWorkerStartHook(function(int $worker): void{
+            Server::getInstance()->getAsyncPool()->submitTaskToWorker(new class() extends AsyncTask{
+
+                public function onRun(): void{
+                    BlockManager::getInstance()->initializeRuntimeIds();
+                }
+            }, $worker);
+        });
     }
 
     public function initializeRuntimeIds(): void{
@@ -85,6 +99,7 @@ class BlockManager{
             self::registerBlock(new CommandBlock($block), true);
         }
         self::registerBlock(new Block(new BlockIdentifier(BlockLegacyIds::SLIME_BLOCK, 0), "Slime", new BlockBreakInfo(0)));
+        self::registerBlock(new Block(new BlockIdentifier(BlockVanilla::ANCIENT_DEBRIS, 0, ItemIdentifiers::ANCIENT_DEBRIS), "Ancient", new BlockBreakInfo(5.0, BlockToolType::PICKAXE, ToolTier::WOOD()->getHarvestLevel(), 6000.0)));
     }
 
     /**

@@ -3,11 +3,10 @@
 namespace CLADevs\VanillaX\items\types;
 
 use CLADevs\VanillaX\items\ItemIdentifiers;
-use pocketmine\entity\Effect;
-use pocketmine\entity\EffectInstance;
+use pocketmine\entity\effect\EffectInstance;
+use pocketmine\entity\effect\VanillaEffects;
 use pocketmine\item\Food;
 use pocketmine\item\ItemIdentifier;
-use pocketmine\item\ItemIds;
 
 class SuspiciousStewItem extends Food{
 
@@ -28,25 +27,25 @@ class SuspiciousStewItem extends Food{
     }
 
     public function getAdditionalEffects(): array{
-        switch($this->meta){
+        switch($this->getMeta()){
             case 0:
-                return [new EffectInstance(Effect::getEffect(Effect::NIGHT_VISION))];
+                return [new EffectInstance(VanillaEffects::NIGHT_VISION())];
             case 1:
-                return [new EffectInstance(Effect::getEffect(Effect::JUMP_BOOST))];
+                return [new EffectInstance(VanillaEffects::JUMP_BOOST())];
             case 2:
-                return [new EffectInstance(Effect::getEffect(Effect::WEAKNESS))];
+                return [new EffectInstance(VanillaEffects::WEAKNESS())];
             case 3:
-                return [new EffectInstance(Effect::getEffect(Effect::BLINDNESS))];
+                return [new EffectInstance(VanillaEffects::BLINDNESS())];
             case 4:
-                return [new EffectInstance(Effect::getEffect(Effect::POISON))];
+                return [new EffectInstance(VanillaEffects::POISON())];
             case 6:
-                return [new EffectInstance(Effect::getEffect(Effect::SATURATION))];
+                return [new EffectInstance(VanillaEffects::SATURATION())];
             case 7:
-                return [new EffectInstance(Effect::getEffect(Effect::FIRE_RESISTANCE))];
+                return [new EffectInstance(VanillaEffects::FIRE_RESISTANCE())];
             case 8:
-                return [new EffectInstance(Effect::getEffect(Effect::REGENERATION))];
+                return [VanillaEffects::REGENERATION()];
             case 9:
-                return [new EffectInstance(Effect::getEffect(Effect::WITHER))];
+                return [VanillaEffects::WITHER()];
         }
         return [];
     }
