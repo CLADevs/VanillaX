@@ -21,18 +21,47 @@ use pocketmine\block\tile\Spawnable;
 use pocketmine\block\tile\TileFactory;
 use pocketmine\item\Item;
 use pocketmine\item\ItemIdentifier;
+use pocketmine\network\mcpe\convert\RuntimeBlockMapping;
 use pocketmine\Server;
+use pocketmine\utils\SingletonTrait;
 use ReflectionClass;
 use ReflectionException;
+use ReflectionMethod;
+use const pocketmine\RESOURCE_PATH;
 
 class BlockManager{
+    use SingletonTrait;
+
+    public function __construct(){
+        self::setInstance($this);
+    }
 
     /**
      * @throws ReflectionException
      */
     public function startup(): void{
+        $this->initializeRuntimeIds();
         $this->initializeBlocks();
         $this->initializeTiles();
+    }
+
+    public function initializeRuntimeIds(): void{
+        $instance = RuntimeBlockMapping::getInstance();
+        $method = new ReflectionMethod(RuntimeBlockMapping::class, "registerMapping");
+        $method->setAccessible(true);
+
+        $blockIdMap = json_decode(file_get_contents(RESOURCE_PATH . 'vanilla/block_id_map.json'), true);
+        $metaMap = [];
+        foreach($instance->getBedrockKnownStates() as $runtimeId => $nbt){
+            $mcpeName = $nbt->getString("name");
+            $meta = isset($metaMap[$mcpeName]) ? ($metaMap[$mcpeName] + 1) : 0;
+            $id = $blockIdMap[$mcpeName] ?? BlockLegacyIds::AIR;
+
+            if($id !== BlockLegacyIds::AIR && !BlockFactory::getInstance()->isRegistered($id, $meta)){
+                $metaMap[$mcpeName] = $meta;
+                $method->invoke($instance, $runtimeId, $id, $meta);
+            }
+        }
     }
 
     private function initializeBlocks(): void{

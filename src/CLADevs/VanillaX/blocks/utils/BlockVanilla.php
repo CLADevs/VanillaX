@@ -15,4 +15,5 @@ interface BlockVanilla{
     const SMITHING_TABLE = 457;
     const BARREL = 458;
     const LOOM = 459;
+    const ANCIENT_DEBRIS = 526;
 }

@@ -14,10 +14,10 @@
 - Brewing Stand
 - Hopper
 - Command Block (80% done)
+- Ancient Debris
 
 #### TODO Blocks:
 - Magma Block(pmmp collision box)
-- Ancient Debris
 - Basalt
 - Bee Hive
 - Bee Nest

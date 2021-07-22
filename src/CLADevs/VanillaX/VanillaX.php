@@ -10,9 +10,12 @@ use CLADevs\VanillaX\inventories\InventoryManager;
 use CLADevs\VanillaX\items\ItemManager;
 use CLADevs\VanillaX\listeners\ListenerManager;
 use CLADevs\VanillaX\network\NetworkManager;
+use CLADevs\VanillaX\network\raklib\RakLibInterfaceX;
 use CLADevs\VanillaX\session\SessionManager;
 use CLADevs\VanillaX\world\WorldManager;
+use pocketmine\network\mcpe\raklib\RakLibInterface;
 use pocketmine\plugin\PluginBase;
+use pocketmine\scheduler\ClosureTask;
 use ReflectionException;
 
 class VanillaX extends PluginBase{
@@ -57,6 +60,17 @@ class VanillaX extends PluginBase{
         $this->networkManager->startup();
         $this->listenerManager->startup();
         $this->worldManager->startup();
+        $this->getScheduler()->scheduleRepeatingTask($task = new ClosureTask(function ()use(&$task): void{
+            $network = $this->getServer()->getNetwork();
+
+            foreach($network->getInterfaces() as $interface){
+                if($interface instanceof RakLibInterface){
+                    $network->unregisterInterface($interface);
+                    $network->registerInterface(new RakLibInterfaceX($this->getServer()));
+                    $task->getHandler()->cancel();
+                }
+            }
+        }), 20);
     }
 
     public function getFile(): string{

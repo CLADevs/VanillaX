@@ -24,6 +24,7 @@ interface ItemIdentifiers{
     const BELL = -206;
     const LANTERN = -208;
     const DRIED_KELP_BLOCK = -139;
+    const ANCIENT_DEBRIS = -271;
 
     const TIER_NETHERITE = 6;
 }
