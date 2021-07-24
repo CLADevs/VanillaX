@@ -73,7 +73,7 @@ class BlockManager{
         }
         self::registerBlock(new ShulkerBoxBlock(BlockIds::SHULKER_BOX), true, true);
         self::registerBlock(new ShulkerBoxBlock(BlockIds::UNDYED_SHULKER_BOX, 0, "Shulker Box"), true, true);
-        self::registerBlock(new Block(BlockIds::SLIME_BLOCK, 0, "Slime"));
+        self::registerBlock(new Block(BlockIds::SLIME_BLOCK, 0, "Slime"), true);
     }
 
     /**
