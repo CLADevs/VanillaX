@@ -88,18 +88,25 @@ class BlockManager{
                 }
             }
         });
+        $this->registerRedstone();
+        $this->registerCommandBlock();
 
-        self::registerBlock(new RedstoneComparator(true), true);
-        self::registerBlock(new RedstoneComparator(false), true);
-        self::registerBlock(new RedstoneRepeater(true), true);
-        self::registerBlock(new RedstoneRepeater(false), true);
-        self::registerBlock(new RedstoneLamp(), true);
-
-        foreach([BlockLegacyIds::COMMAND_BLOCK, BlockLegacyIds::REPEATING_COMMAND_BLOCK, BlockLegacyIds::CHAIN_COMMAND_BLOCK] as $block){
-            self::registerBlock(new CommandBlock($block), true);
-        }
         self::registerBlock(new Block(new BlockIdentifier(BlockLegacyIds::SLIME_BLOCK, 0), "Slime", new BlockBreakInfo(0)));
-        self::registerBlock(new Block(new BlockIdentifier(BlockVanilla::ANCIENT_DEBRIS, 0, ItemIdentifiers::ANCIENT_DEBRIS), "Ancient", new BlockBreakInfo(5.0, BlockToolType::PICKAXE, ToolTier::WOOD()->getHarvestLevel(), 6000.0)));
+        self::registerBlock(new Block(new BlockIdentifier(BlockVanilla::ANCIENT_DEBRIS, 0, ItemIdentifiers::ANCIENT_DEBRIS), "Ancient Debris", new BlockBreakInfo(5.0, BlockToolType::PICKAXE, ToolTier::WOOD()->getHarvestLevel(), 6000.0)));
+    }
+
+    private function registerRedstone(): void{
+        self::registerBlock(new RedstoneComparator(true));
+        self::registerBlock(new RedstoneComparator(false));
+        self::registerBlock(new RedstoneRepeater(true));
+        self::registerBlock(new RedstoneRepeater(false));
+        self::registerBlock(new RedstoneLamp());
+    }
+
+    private function registerCommandBlock(): void{
+        self::registerBlock(new CommandBlock(BlockLegacyIds::COMMAND_BLOCK));
+        self::registerBlock(new CommandBlock(BlockLegacyIds::REPEATING_COMMAND_BLOCK));
+        self::registerBlock(new CommandBlock(BlockLegacyIds::CHAIN_COMMAND_BLOCK));
     }
 
     /**
@@ -132,7 +139,7 @@ class BlockManager{
         });
     }
 
-    public function registerBlock(Block $block, bool $override = false, bool $creativeItem = false): bool{
+    public function registerBlock(Block $block, bool $override = true, bool $creativeItem = false): bool{
         if(in_array($block->getId(), VanillaX::getInstance()->getConfig()->getNested("disabled.blocks", []))){
             return false;
         }

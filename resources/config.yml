@@ -6,13 +6,13 @@ mobs: true
 #If you would like all of these to be registered, delete the disabled section from the config.yml
 #item. or you would want enchantments to be registered, but other to not be registered,
 #simpily delete the enchantments section and you should be set.
-#disabled:
+disabled:
 #  #Mobs includes armor stand, zombies, etc.
 #  mobs:
-#    - 43 #this would be blaze entity Id
+#    - "minecraft:blaze" #this would be blaze entity Id
 #
 #  #List of blocks that wont be registered
-#  blocks:
+  blocks:
 #    - 145 #This would be anvil block Id
 #
 #  #Items includes Firework, Armor Stand and so on
@@ -20,7 +20,7 @@ mobs: true
 #    - 513 #This would be shield item Id
 #
 #  #Commands that wont be registered, they must be all lowercase.
-#  commands:
+  commands:
 #    - "gamerule"
 #
 #  #Enchantments that wont be register
@@ -34,6 +34,6 @@ features:
   #Disables gamerule and removes command /gamerule
   gamerule: true
 
-#if this is true and gamerule feature is off, it will delete previous game rule.
+#if this is true and gamerule feature is off, it will delete previous game rule from the world data.
 gamerule-remove-cache: true
 ...
