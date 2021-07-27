@@ -27,10 +27,20 @@ class OffhandInventory extends BaseInventory{
     private Player $player;
 
     public function __construct(Player $player){
-        parent::__construct();
-        $player->getDataPropertyManager()->setByte(Entity::DATA_COLOR, self::COLOR_NORMAL);
-        $player->addWindow($this, ContainerIds::OFFHAND, true);
         $this->player = $player;
+        parent::__construct();
+        $addWindow = true;
+
+        if(($offhand = $player->getWindow(ContainerIds::OFFHAND)) !== null){
+
+            if(!$offhand instanceof OffhandInventory){
+                $player->removeWindow($offhand);
+            }else{
+                $addWindow = false;
+            }
+        }
+        if($addWindow) $player->addWindow($this, ContainerIds::OFFHAND, true);
+        $player->getDataPropertyManager()->setByte(Entity::DATA_COLOR, self::COLOR_NORMAL);
         if($player->namedtag->hasTag(self::TAG_OFF_HAND_ITEM)){
             $this->setItem(0, Item::nbtDeserialize($player->namedtag->getCompoundTag(self::TAG_OFF_HAND_ITEM)), true);
         }
