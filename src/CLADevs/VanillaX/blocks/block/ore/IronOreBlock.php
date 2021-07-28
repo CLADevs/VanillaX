@@ -14,6 +14,6 @@ class IronOreBlock extends IronOre{
      * @return Item[]
      */
     public function getDropsForCompatibleTool(Item $item): array{
-        return [ItemFactory::get(Item::IRON_ORE, 0, 1 + mt_rand(0, $item->getEnchantmentLevel(Enchantment::FORTUNE)))];
+        return [ItemFactory::get(Item::IRON_INGOT, 0, 1 + mt_rand(0, $item->getEnchantmentLevel(Enchantment::FORTUNE)))];
     }
 }
