@@ -149,7 +149,11 @@ class TridentEntity extends Projectile{
     }
 
     public function flagForDespawn(): void{
+        if($this->closed){
+            return;
+        }
         $owner = $this->getOwningEntity();
+        
         if($owner instanceof Player){
             $session = VanillaX::getInstance()->getSessionManager()->get($owner);
             $session->removeTrident($this);
