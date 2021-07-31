@@ -85,6 +85,7 @@ use ContainerTrait;
         //Thanks to nukkit for bounding box code
         //Collect dropped items
         $bb = $this->getBlock()->getBoundingBox();
+        if($bb === null) return true;
         $bb->maxY += 1;
         foreach($this->getLevel()->getNearbyEntities($bb) as $entity){
             if(!$entity->isClosed() && !$entity->isFlaggedForDespawn() && $entity instanceof ItemEntity){
