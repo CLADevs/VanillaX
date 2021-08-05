@@ -11,7 +11,7 @@ use pocketmine\block\Opaque;
 
 class WarpedWartBlock extends Opaque{
 
-    //TODO functionality
+    //TODO placable in Composter
     public function __construct(){
         parent::__construct(new BlockIdentifier(BlockVanilla::WARPED_WART_BLOCK, 0, ItemIdentifiers::WARPED_WART_BLOCK), "Warped Wart Block", new BlockBreakInfo(1, BlockToolType::HOE));
     }
