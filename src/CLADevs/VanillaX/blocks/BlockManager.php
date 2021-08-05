@@ -74,7 +74,6 @@ class BlockManager{
             $id = $blockIdMap[$mcpeName] ?? BlockLegacyIds::AIR;
 
             if($id !== BlockLegacyIds::AIR && !BlockFactory::getInstance()->isRegistered($id, $meta)){
-                var_dump("Runtime: $runtimeId Id: $id Name: $mcpeName Meta $meta");
                 $metaMap[$mcpeName] = $meta;
                 $method->invoke($instance, $runtimeId, $id, $meta);
             }
