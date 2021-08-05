@@ -11,7 +11,7 @@ use pocketmine\block\Opaque;
 
 class BeeHiveBlock extends Opaque{
 
-    //TODO facing and actual bee thing LOL
+    //TODO functionality
     public function __construct(){
         parent::__construct(new BlockIdentifier(BlockVanilla::BEEHIVE, 0, ItemIdentifiers::BEEHIVE), "BeeHive", new BlockBreakInfo(0.6, BlockToolType::PICKAXE, 0, 0.6));
     }

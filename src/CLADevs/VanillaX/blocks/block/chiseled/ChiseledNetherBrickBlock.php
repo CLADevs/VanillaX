@@ -1,6 +1,6 @@
 <?php
 
-namespace CLADevs\VanillaX\blocks\block\basalt;
+namespace CLADevs\VanillaX\blocks\block\chiseled;
 
 use CLADevs\VanillaX\blocks\utils\BlockVanilla;
 use CLADevs\VanillaX\items\ItemIdentifiers;
@@ -9,10 +9,10 @@ use pocketmine\block\BlockIdentifier;
 use pocketmine\block\BlockToolType;
 use pocketmine\block\Opaque;
 
-class BasaltBlock extends Opaque{
+class ChiseledNetherBrickBlock extends Opaque{
 
     //TODO functionality
     public function __construct(){
-        parent::__construct(new BlockIdentifier(BlockVanilla::BASALT, 0, ItemIdentifiers::BASALT), "Basalt", new BlockBreakInfo(1.25, BlockToolType::PICKAXE, 0, 4.2));
+        parent::__construct(new BlockIdentifier(BlockVanilla::CHISELED_NETHER_BRICKS, 0, ItemIdentifiers::CHISELED_NETHER_BRICKS), "Chiseled Nether Bricks", new BlockBreakInfo(2, BlockToolType::PICKAXE, 0, 6));
     }
 }

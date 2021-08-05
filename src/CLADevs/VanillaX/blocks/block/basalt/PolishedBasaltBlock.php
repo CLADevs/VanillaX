@@ -11,7 +11,7 @@ use pocketmine\block\Opaque;
 
 class PolishedBasaltBlock extends Opaque{
 
-    //TODO facing
+    //TODO functionality
     public function __construct(){
         parent::__construct(new BlockIdentifier(BlockVanilla::POLISHED_BASALT, 0, ItemIdentifiers::POLISHED_BASALT), "Polished Basalt", new BlockBreakInfo(1.25, BlockToolType::PICKAXE, 0, 4.2));
     }

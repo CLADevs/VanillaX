@@ -1,18 +1,18 @@
 <?php
 
-namespace CLADevs\VanillaX\blocks\block\basalt;
+namespace CLADevs\VanillaX\blocks\block;
 
 use CLADevs\VanillaX\blocks\utils\BlockVanilla;
 use CLADevs\VanillaX\items\ItemIdentifiers;
 use pocketmine\block\BlockBreakInfo;
 use pocketmine\block\BlockIdentifier;
 use pocketmine\block\BlockToolType;
-use pocketmine\block\Opaque;
+use pocketmine\block\Transparent;
 
-class BasaltBlock extends Opaque{
+class ChainBlock extends Transparent{
 
     //TODO functionality
     public function __construct(){
-        parent::__construct(new BlockIdentifier(BlockVanilla::BASALT, 0, ItemIdentifiers::BASALT), "Basalt", new BlockBreakInfo(1.25, BlockToolType::PICKAXE, 0, 4.2));
+        parent::__construct(new BlockIdentifier(BlockVanilla::CHAIN, 0, ItemIdentifiers::CHAIN), "Chain", new BlockBreakInfo(5, BlockToolType::PICKAXE, 0, 6));
     }
 }
