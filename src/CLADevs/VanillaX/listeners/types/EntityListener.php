@@ -2,6 +2,7 @@
 
 namespace CLADevs\VanillaX\listeners\types;
 
+use CLADevs\VanillaX\blocks\block\TwistingVinesBlock;
 use CLADevs\VanillaX\items\types\ShieldItem;
 use CLADevs\VanillaX\world\gamerule\GameRule;
 use CLADevs\VanillaX\world\gamerule\GameRuleManager;
@@ -59,7 +60,7 @@ class EntityListener implements Listener{
     }
 
     public function onRegenerateHealth(EntityRegainHealthEvent $event): void{
-        if(!$event->isCancelled() && !GameRuleManager::getInstance()->getValue(GameRule::NATURAL_REGENERATION, $event->getEntity()->getWorld()())){
+        if(!$event->isCancelled() && !GameRuleManager::getInstance()->getValue(GameRule::NATURAL_REGENERATION, $event->getEntity()->getWorld())){
             $event->cancel();
         }
     }
@@ -106,12 +107,14 @@ class EntityListener implements Listener{
     }
 
     private function handleFallDamage(Entity $entity): bool{
-        $value = false;
+        $cancel = false;
 
         /** If gamerule 'fallDamage' is not on then cancel it */
         if(!GameRuleManager::getInstance()->getValue(GameRule::FALL_DAMAGE, $entity->getWorld())){
-            $value = true;
+            $cancel = true;
+        }elseif($entity instanceof Player && $entity->getPosition()->getWorld()->getBlock($entity->getPosition()->subtract(0, 1, 0)) instanceof TwistingVinesBlock){
+            $cancel = true;
         }
-        return $value;
+        return $cancel;
     }
 }
