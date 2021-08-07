@@ -6,6 +6,8 @@ interface ItemIdentifiers{
 
     const RECORD_PIGSTEP = 759;
     const WARPED_FUNGUS_ON_A_STICK = 757;
+    const WARPED_DOOR = 756;
+    const CRIMSON_DOOR = 755;
     const WARPED_SIGN = 754;
     const CRIMSON_SIGN = 753;
     const NETHERITE_SCRAP = 752;
@@ -59,8 +61,6 @@ interface ItemIdentifiers{
     const STRIPPED_WARPED_STEM = -241;
     const CRIMSON_PLANKS = -242;
     const WARPED_PLANKS = -243;
-    const CRIMSON_DOOR = -244;
-    const WARPED_DOOR = -245;
     const CRIMSON_TRAPDOOR = -246;
     const WARPED_TRAPDOOR = -247;
     const CRIMSON_STANDING_SIGN = -250;

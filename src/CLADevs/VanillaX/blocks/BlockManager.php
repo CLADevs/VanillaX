@@ -3,6 +3,7 @@
 namespace CLADevs\VanillaX\blocks;
 
 use CLADevs\VanillaX\blocks\block\CommandBlock;
+use CLADevs\VanillaX\blocks\block\fungus\Fungus;
 use CLADevs\VanillaX\blocks\block\redstone\RedstoneComparator;
 use CLADevs\VanillaX\blocks\block\redstone\RedstoneLamp;
 use CLADevs\VanillaX\blocks\block\redstone\RedstoneRepeater;
@@ -20,10 +21,13 @@ use pocketmine\block\BlockFactory;
 use pocketmine\block\BlockIdentifier;
 use pocketmine\block\BlockLegacyIds;
 use pocketmine\block\BlockToolType;
-use pocketmine\block\FloorSign;
+use pocketmine\block\Door;
+use pocketmine\block\Fence;
+use pocketmine\block\FenceGate;
+use pocketmine\block\Planks;
+use pocketmine\block\Stair;
 use pocketmine\block\tile\Spawnable;
 use pocketmine\block\tile\TileFactory;
-use pocketmine\block\WallSign;
 use pocketmine\item\Item;
 use pocketmine\item\ItemIdentifier;
 use pocketmine\item\ToolTier;
@@ -91,11 +95,48 @@ class BlockManager{
                 }
             }
         });
+        $this->registerPlanks();
+        $this->registerFungus();
+        $this->registerDoors();
+        $this->registerFence();
+        $this->registerStairs();
         $this->registerRedstone();
         $this->registerCommandBlock();
 
         self::registerBlock(new Block(new BlockIdentifier(BlockLegacyIds::SLIME_BLOCK, 0), "Slime", new BlockBreakInfo(0)));
         self::registerBlock(new Block(new BlockIdentifier(BlockVanilla::ANCIENT_DEBRIS, 0, ItemIdentifiers::ANCIENT_DEBRIS), "Ancient Debris", new BlockBreakInfo(5.0, BlockToolType::PICKAXE, ToolTier::WOOD()->getHarvestLevel(), 6000.0)));
+    }
+
+    private function registerPlanks(): void{
+        self::registerBlock(new Planks(new BlockIdentifier(BlockVanilla::CRIMSON_PLANKS, 0, ItemIdentifiers::CRIMSON_PLANKS), "Crimson Planks", new BlockBreakInfo(2, BlockToolType::AXE, 0, 3)));
+        self::registerBlock(new Planks(new BlockIdentifier(BlockVanilla::WARPED_PLANKS, 0, ItemIdentifiers::WARPED_PLANKS), "Warped Planks", new BlockBreakInfo(2, BlockToolType::AXE, 0, 3)));
+    }
+
+    private function registerFungus(): void{
+        self::registerBlock(new Fungus(BlockVanilla::CRIMSON_NYLIUM, new BlockIdentifier(BlockVanilla::CRIMSON_FUNGUS, 0, ItemIdentifiers::CRIMSON_FUNGUS), "Crimson Fungus", BlockBreakInfo::instant()));
+        self::registerBlock(new Fungus(BlockVanilla::WARPED_NYLIUM, new BlockIdentifier(BlockVanilla::WARPED_FUNGUS, 0, ItemIdentifiers::WARPED_FUNGUS), "Warped Fungus", BlockBreakInfo::instant()));
+    }
+
+    private function registerDoors(): void{
+        self::registerBlock(new Door(new BlockIdentifier(BlockVanilla::CRIMSON_DOOR, 0, ItemIdentifiers::CRIMSON_DOOR), "Crimson Door", new BlockBreakInfo(3, BlockToolType::AXE)));
+        self::registerBlock(new Door(new BlockIdentifier(BlockVanilla::WARPED_DOOR, 0, ItemIdentifiers::WARPED_DOOR), "Warped Door", new BlockBreakInfo(3, BlockToolType::AXE)));
+    }
+
+    private function registerFence(): void{
+        //fences
+        self::registerBlock(new Fence(new BlockIdentifier(BlockVanilla::CRIMSON_FENCE, 0, ItemIdentifiers::CRIMSON_FENCE), "Crimson Fence", new BlockBreakInfo(2, BlockToolType::AXE, 0, 3)));
+        self::registerBlock(new Fence(new BlockIdentifier(BlockVanilla::WARPED_FENCE, 0, ItemIdentifiers::WARPED_FENCE), "Warped Fence", new BlockBreakInfo(2, BlockToolType::AXE, 0, 3)));
+        //gates
+        self::registerBlock(new FenceGate(new BlockIdentifier(BlockVanilla::CRIMSON_FENCE_GATE, 0, ItemIdentifiers::CRIMSON_FENCE_GATE), "Crimson Fence Gate", new BlockBreakInfo(2, BlockToolType::AXE, 0, 3)));
+        self::registerBlock(new FenceGate(new BlockIdentifier(BlockVanilla::WARPED_FENCE_GATE, 0, ItemIdentifiers::WARPED_FENCE_GATE), "Warped Fence Gate", new BlockBreakInfo(2, BlockToolType::AXE, 0, 3)));
+    }
+
+    private function registerStairs(): void{
+        self::registerBlock(new Stair(new BlockIdentifier(BlockVanilla::BLACKSTONE_STAIRS, 0, ItemIdentifiers::BLACKSTONE_STAIRS), "Blackstone Stairs", new BlockBreakInfo(3, BlockToolType::AXE, 0, 6)));
+        self::registerBlock(new Stair(new BlockIdentifier(BlockVanilla::CRIMSON_STAIRS, 0, ItemIdentifiers::CRIMSON_STAIRS), "Crimson Stairs", new BlockBreakInfo(3, BlockToolType::AXE, 0, 6)));
+        self::registerBlock(new Stair(new BlockIdentifier(BlockVanilla::POLISHED_BLACKSTONE_BRICK_STAIRS, 0, ItemIdentifiers::POLISHED_BLACKSTONE_BRICK_STAIRS), "Polished Blackstone Brick Stairs", new BlockBreakInfo(3, BlockToolType::AXE, 0, 6)));
+        self::registerBlock(new Stair(new BlockIdentifier(BlockVanilla::POLISHED_BLACKSTONE_STAIRS, 0, ItemIdentifiers::POLISHED_BLACKSTONE_STAIRS), "Polished Blackstone Stairs", new BlockBreakInfo(3, BlockToolType::AXE, 0, 6)));
+        self::registerBlock(new Stair(new BlockIdentifier(BlockVanilla::WARPED_STAIRS, 0, ItemIdentifiers::WARPED_STAIRS), "Warped Stairs", new BlockBreakInfo(3, BlockToolType::AXE, 0, 6)));
     }
 
     private function registerRedstone(): void{

@@ -51,7 +51,6 @@ class WeepingVinesBlock extends Transparent{
                 }
             }
             if(($lowestY - 1) < 0){
-                var_dump('Cancelled');
                 return true;
             }
             $lowestBlock = $this->pos->getWorld()->getBlockAt($this->pos->x, $lowestY, $this->pos->z);
