@@ -15,6 +15,11 @@
 - Hopper
 - Command Block (80% done)
 - Ancient Debris
+- Basalt
+- Bee Hive
+- Bee Nest
+- Bell
+- Chain
 - Warped Wart Block
 - Twisting Vines
 - Weeping Vines
@@ -22,19 +27,16 @@
 - Fence (Warped & Crimson)
 - Fence Gate (Warped & Crimson)
 - Doors (Warped & Crimson)
-- Fungus (Warped & Crimson)
 - Roots (Warped & Crimson)
+- Fungus (Warped & Crimson)
 - Planks (Warped & Crimson)
-- Nylium (Warped)
+- Nylium (Warped & Crimson)
+- Chiseled (Polished Blackstone & Nether Bricks)
+- Cracked (Polished Blackstone & Nether Bricks)
 
 #### TODO Blocks Functionality:
 - Magma Block(pmmp collision box)
-- Basalt
-- Bee Hive
-- Bee Nest
-- Bell
 - Campfire (Soul Too)
-- Chain
 - Chiseled Blocks (every)
 - Cracked Blocks (every)
 - Warped Blocks (every)

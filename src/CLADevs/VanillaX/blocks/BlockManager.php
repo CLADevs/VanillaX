@@ -3,10 +3,12 @@
 namespace CLADevs\VanillaX\blocks;
 
 use CLADevs\VanillaX\blocks\block\CommandBlock;
+use CLADevs\VanillaX\blocks\block\FlowerPotBlock;
 use CLADevs\VanillaX\blocks\block\fungus\Fungus;
 use CLADevs\VanillaX\blocks\block\redstone\RedstoneComparator;
 use CLADevs\VanillaX\blocks\block\redstone\RedstoneLamp;
 use CLADevs\VanillaX\blocks\block\redstone\RedstoneRepeater;
+use CLADevs\VanillaX\blocks\tile\FlowerPotTile;
 use CLADevs\VanillaX\blocks\utils\BlockVanilla;
 use CLADevs\VanillaX\blocks\utils\TileVanilla;
 use CLADevs\VanillaX\items\ItemIdentifiers;
@@ -24,12 +26,15 @@ use pocketmine\block\BlockToolType;
 use pocketmine\block\Door;
 use pocketmine\block\Fence;
 use pocketmine\block\FenceGate;
+use pocketmine\block\Opaque;
 use pocketmine\block\Planks;
 use pocketmine\block\Stair;
 use pocketmine\block\tile\Spawnable;
 use pocketmine\block\tile\TileFactory;
+use pocketmine\block\Transparent;
 use pocketmine\item\Item;
 use pocketmine\item\ItemIdentifier;
+use pocketmine\item\ItemIds;
 use pocketmine\item\ToolTier;
 use pocketmine\network\mcpe\convert\RuntimeBlockMapping;
 use pocketmine\scheduler\AsyncTask;
@@ -72,12 +77,13 @@ class BlockManager{
 
         $blockIdMap = json_decode(file_get_contents(RESOURCE_PATH . 'vanilla/block_id_map.json'), true);
         $metaMap = [];
+
         foreach($instance->getBedrockKnownStates() as $runtimeId => $nbt){
             $mcpeName = $nbt->getString("name");
             $meta = isset($metaMap[$mcpeName]) ? ($metaMap[$mcpeName] + 1) : 0;
             $id = $blockIdMap[$mcpeName] ?? BlockLegacyIds::AIR;
 
-            if($id !== BlockLegacyIds::AIR && !BlockFactory::getInstance()->isRegistered($id, $meta)){
+            if($id !== BlockLegacyIds::AIR && $meta <= 15){
                 //var_dump("Runtime: $runtimeId Id: $id Name: $mcpeName Meta $meta");
                 $metaMap[$mcpeName] = $meta;
                 $method->invoke($instance, $runtimeId, $id, $meta);
@@ -95,6 +101,11 @@ class BlockManager{
                 }
             }
         });
+        $this->registerFlowerPot();
+        $this->registerNylium();
+        $this->registerRoots();
+        $this->registerChiseled();
+        $this->registerCracked();
         $this->registerPlanks();
         $this->registerFungus();
         $this->registerDoors();
@@ -105,6 +116,34 @@ class BlockManager{
 
         self::registerBlock(new Block(new BlockIdentifier(BlockLegacyIds::SLIME_BLOCK, 0), "Slime", new BlockBreakInfo(0)));
         self::registerBlock(new Block(new BlockIdentifier(BlockVanilla::ANCIENT_DEBRIS, 0, ItemIdentifiers::ANCIENT_DEBRIS), "Ancient Debris", new BlockBreakInfo(5.0, BlockToolType::PICKAXE, ToolTier::WOOD()->getHarvestLevel(), 6000.0)));
+    }
+
+    private function registerFlowerPot(): void{
+        $flowerPot = new FlowerPotBlock(new BlockIdentifier(BlockLegacyIds::FLOWER_POT_BLOCK, 0, ItemIds::FLOWER_POT, FlowerPotTile::class), "Flower Pot", BlockBreakInfo::instant());
+        self::registerBlock($flowerPot);
+        for($meta = 1; $meta < 16; ++$meta){
+            BlockFactory::getInstance()->remap(BlockLegacyIds::FLOWER_POT_BLOCK, $meta, $flowerPot);
+        }
+    }
+
+    private function registerNylium(): void{
+        self::registerBlock(new Block(new BlockIdentifier(BlockVanilla::CRIMSON_NYLIUM, 0, ItemIdentifiers::CRIMSON_NYLIUM), "Crimson Nylium", new BlockBreakInfo(0.4, BlockToolType::PICKAXE, 0, 1)));
+        self::registerBlock(new Block(new BlockIdentifier(BlockVanilla::WARPED_NYLIUM, 0, ItemIdentifiers::WARPED_NYLIUM), "Warped Nylium", new BlockBreakInfo(0.4, BlockToolType::PICKAXE, 0, 1)));
+    }
+
+    private function registerRoots(): void{
+        self::registerBlock(new Transparent(new BlockIdentifier(BlockVanilla::CRIMSON_ROOTS, 0, ItemIdentifiers::CRIMSON_ROOTS), "Crimson Roots", BlockBreakInfo::instant()));
+        self::registerBlock(new Transparent(new BlockIdentifier(BlockVanilla::WARPED_ROOTS, 0, ItemIdentifiers::WARPED_ROOTS), "Warped Roots", BlockBreakInfo::instant()));
+    }
+
+    private function registerChiseled(): void{
+        self::registerBlock(new Opaque(new BlockIdentifier(BlockVanilla::CHISELED_NETHER_BRICKS, 0, ItemIdentifiers::CHISELED_NETHER_BRICKS), "Chiseled Nether Bricks", new BlockBreakInfo(2, BlockToolType::PICKAXE, 0, 6)));
+        self::registerBlock(new Opaque(new BlockIdentifier(BlockVanilla::CHISELED_POLISHED_BLACKSTONE, 0, ItemIdentifiers::CHISELED_POLISHED_BLACKSTONE), "Chiseled Polished Blackstone", new BlockBreakInfo(1.5, BlockToolType::PICKAXE, 0, 6)));
+    }
+
+    private function registerCracked(): void{
+        self::registerBlock(new Opaque(new BlockIdentifier(BlockVanilla::CRACKED_NETHER_BRICKS, 0, ItemIdentifiers::CRACKED_NETHER_BRICKS), "Cracked Nether Bricks", new BlockBreakInfo(2, BlockToolType::PICKAXE, 0, 6)));
+        self::registerBlock(new Opaque(new BlockIdentifier(BlockVanilla::CRACKED_POLISHED_BLACKSTONE_BRICKS, 0, ItemIdentifiers::CRACKED_POLISHED_BLACKSTONE_BRICKS), "Cracked Polished Blackstone Bricks", new BlockBreakInfo(1.5, BlockToolType::PICKAXE, 0, 6)));
     }
 
     private function registerPlanks(): void{
