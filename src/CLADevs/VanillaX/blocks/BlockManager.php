@@ -2,19 +2,21 @@
 
 namespace CLADevs\VanillaX\blocks;
 
+use CLADevs\VanillaX\blocks\block\campfire\Campfire;
 use CLADevs\VanillaX\blocks\block\CommandBlock;
 use CLADevs\VanillaX\blocks\block\FlowerPotBlock;
 use CLADevs\VanillaX\blocks\block\fungus\Fungus;
 use CLADevs\VanillaX\blocks\block\redstone\RedstoneComparator;
 use CLADevs\VanillaX\blocks\block\redstone\RedstoneLamp;
 use CLADevs\VanillaX\blocks\block\redstone\RedstoneRepeater;
+use CLADevs\VanillaX\blocks\tile\campfire\RegularCampfireTile;
+use CLADevs\VanillaX\blocks\tile\campfire\SoulCampfireTile;
 use CLADevs\VanillaX\blocks\tile\FlowerPotTile;
 use CLADevs\VanillaX\blocks\utils\BlockVanilla;
 use CLADevs\VanillaX\blocks\utils\TileVanilla;
 use CLADevs\VanillaX\items\ItemIdentifiers;
 use CLADevs\VanillaX\items\ItemManager;
 use CLADevs\VanillaX\utils\item\NonAutomaticCallItemTrait;
-use CLADevs\VanillaX\utils\item\NonCreativeItemTrait;
 use CLADevs\VanillaX\utils\Utils;
 use CLADevs\VanillaX\VanillaX;
 use pocketmine\block\Block;
@@ -29,9 +31,9 @@ use pocketmine\block\FenceGate;
 use pocketmine\block\Opaque;
 use pocketmine\block\Planks;
 use pocketmine\block\Stair;
-use pocketmine\block\tile\Spawnable;
 use pocketmine\block\tile\TileFactory;
 use pocketmine\block\Transparent;
+use pocketmine\inventory\CreativeInventory;
 use pocketmine\item\Item;
 use pocketmine\item\ItemIdentifier;
 use pocketmine\item\ItemIds;
@@ -83,7 +85,7 @@ class BlockManager{
             $meta = isset($metaMap[$mcpeName]) ? ($metaMap[$mcpeName] + 1) : 0;
             $id = $blockIdMap[$mcpeName] ?? BlockLegacyIds::AIR;
 
-            if($id !== BlockLegacyIds::AIR && $meta <= 15){
+            if($id !== BlockLegacyIds::AIR && $meta <= 15 && !BlockFactory::getInstance()->isRegistered($id, $meta)){
                 //var_dump("Runtime: $runtimeId Id: $id Name: $mcpeName Meta $meta");
                 $metaMap[$mcpeName] = $meta;
                 $method->invoke($instance, $runtimeId, $id, $meta);
@@ -91,10 +93,60 @@ class BlockManager{
         }
     }
 
+    /**
+     * @throws ReflectionException
+     */
+    private function initializeTiles(): void{
+        $tileConst = [];
+        foreach((new ReflectionClass(TileVanilla::class))->getConstants() as $id => $value){
+            $tileConst[$value] = $id;
+        }
+
+        Utils::callDirectory("blocks" . DIRECTORY_SEPARATOR . "tile", function (string $namespace)use($tileConst): void{
+            $rc = new ReflectionClass($namespace);
+
+            if(!$rc->isAbstract()){
+                if($rc->implementsInterface(NonAutomaticCallItemTrait::class)){
+                    $diff = array_diff($rc->getInterfaceNames(), class_implements($rc->getParentClass()->getName()));
+
+                    if(in_array(NonAutomaticCallItemTrait::class, $diff)){
+                        return;
+                    }
+                }
+                $tileID = $rc->getConstant("TILE_ID");
+                $tileBlock = $rc->getConstant("TILE_BLOCK");
+
+                if($tileID !== false){
+                    $saveNames = [$tileID];
+                    $constID = $tileConst[$tileID] ?? null;
+
+                    if($constID !== null){
+                        $saveNames[] = "minecraft:" . strtolower($constID);
+                    }
+                    self::registerTile($namespace, $saveNames, $tileBlock === false ? BlockLegacyIds::AIR : $tileBlock);
+                }else{
+                    VanillaX::getInstance()->getLogger()->error("Tile ID could not be found for '$namespace'");
+                }
+            }
+        });
+    }
+
+    /**
+     * @throws ReflectionException
+     */
     private function initializeBlocks(): void{
         Utils::callDirectory("blocks" . DIRECTORY_SEPARATOR . "block", function (string $namespace): void{
-            if(!isset(class_implements($namespace)[NonAutomaticCallItemTrait::class])){
-                if(self::registerBlock(($class = new $namespace()), true, !$class instanceof NonCreativeItemTrait) && $class instanceof Block && $class->ticksRandomly()){
+            $rc = new ReflectionClass($namespace);
+
+            if(!$rc->isAbstract()){
+                if($rc->implementsInterface(NonAutomaticCallItemTrait::class)){
+                    $diff = array_diff($rc->getInterfaceNames(), class_implements($rc->getParentClass()->getName()));
+
+                    if(in_array(NonAutomaticCallItemTrait::class, $diff)){
+                        return;
+                    }
+                }
+                if(self::registerBlock(($class = new $namespace()), true, !$rc->implementsInterface(NonAutomaticCallItemTrait::class)) && $class instanceof Block && $class->ticksRandomly()){
                     foreach(Server::getInstance()->getWorldManager()->getWorlds() as $world){
                         $world->addRandomTickedBlock($class);
                     }
@@ -102,6 +154,7 @@ class BlockManager{
             }
         });
         $this->registerFlowerPot();
+        $this->registerCampfire();
         $this->registerNylium();
         $this->registerRoots();
         $this->registerChiseled();
@@ -124,6 +177,11 @@ class BlockManager{
         for($meta = 1; $meta < 16; ++$meta){
             BlockFactory::getInstance()->remap(BlockLegacyIds::FLOWER_POT_BLOCK, $meta, $flowerPot);
         }
+    }
+
+    private function registerCampfire(): void{
+        self::registerBlock(new Campfire(new BlockIdentifier(BlockLegacyIds::CAMPFIRE, 0, ItemIdentifiers::CAMPFIRE, RegularCampfireTile::class), "Campfire", new BlockBreakInfo(2, BlockToolType::AXE, 0, 2)));
+        self::registerBlock(new Campfire(new BlockIdentifier(BlockVanilla::SOUL_CAMPFIRE, 0, ItemIdentifiers::SOUL_CAMPFIRE, SoulCampfireTile::class), "Soul Campfire", new BlockBreakInfo(2, BlockToolType::AXE, 0, 2)));
     }
 
     private function registerNylium(): void{
@@ -192,36 +250,6 @@ class BlockManager{
         self::registerBlock(new CommandBlock(BlockLegacyIds::CHAIN_COMMAND_BLOCK));
     }
 
-    /**
-     * @throws ReflectionException
-     */
-    private function initializeTiles(): void{
-        $tileConst = [];
-        foreach((new ReflectionClass(TileVanilla::class))->getConstants() as $id => $value){
-            $tileConst[$value] = $id;
-        }
-
-        Utils::callDirectory("blocks" . DIRECTORY_SEPARATOR . "tile", function (string $namespace)use($tileConst): void{
-            if(!isset(class_implements($namespace)[NonAutomaticCallItemTrait::class])){
-                $rc = new ReflectionClass($namespace);
-                $tileID = $rc->getConstant("TILE_ID");
-                $tileBlock = $rc->getConstant("TILE_BLOCK");
-
-                if($tileID !== false){
-                    $saveNames = [$tileID];
-                    $constID = $tileConst[$tileID] ?? null;
-
-                    if($constID !== null){
-                        $saveNames[] = "minecraft:" . strtolower($constID);
-                    }
-                    self::registerTile($namespace, $saveNames, $tileBlock === false ? BlockLegacyIds::AIR : $tileBlock);
-                }else{
-                    VanillaX::getInstance()->getLogger()->error("Tile ID could not be found for '$namespace'");
-                }
-            }
-        });
-    }
-
     public function registerBlock(Block $block, bool $override = true, bool $creativeItem = false): bool{
         if(in_array($block->getId(), VanillaX::getInstance()->getConfig()->getNested("disabled.blocks", []))){
             return false;
@@ -243,6 +271,8 @@ class BlockManager{
                     return $this->block;
                 }
             }, $creativeItem, true);
+        }elseif(!CreativeInventory::getInstance()->contains($item)){
+            CreativeInventory::getInstance()->add($item);
         }
         return true;
     }
@@ -264,11 +294,5 @@ class BlockManager{
         }
         TileFactory::getInstance()->register($namespace, $names);
         return true;
-    }
-
-    public static function onChange(Spawnable $tile): void{
-        foreach($tile->getPos()->getWorld()->createBlockUpdatePackets([$tile->getPos()]) as $pk){
-            $tile->getPos()->getWorld()->broadcastPacketToViewers($tile->getPos(), $pk);
-        }
     }
 }

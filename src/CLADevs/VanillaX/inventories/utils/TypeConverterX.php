@@ -2,10 +2,12 @@
 
 namespace CLADevs\VanillaX\inventories\utils;
 
+use CLADevs\VanillaX\inventories\actions\BeaconPaymentAction;
 use CLADevs\VanillaX\inventories\actions\EnchantItemAction;
 use CLADevs\VanillaX\inventories\actions\RepairItemAction;
 use CLADevs\VanillaX\inventories\actions\TradeItemAction;
 use CLADevs\VanillaX\inventories\FakeBlockInventory;
+use CLADevs\VanillaX\inventories\types\BeaconInventory;
 use pocketmine\inventory\transaction\action\InventoryAction;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
 use pocketmine\network\mcpe\convert\TypeConverter;
@@ -44,6 +46,7 @@ class TypeConverterX extends TypeConverter{
                         $anvilSlot = UIInventorySlotOffset::ANVIL[$action->inventorySlot] ?? null;
                         $enchantingTableSlot = UIInventorySlotOffset::ENCHANTING_TABLE[$action->inventorySlot] ?? null;
                         $tradeSlot = UIInventorySlotOffset::TRADE2_INGREDIENT[$action->inventorySlot] ?? null;
+                        $beaconPaymentSlot = $action->inventorySlot === UIInventorySlotOffset::BEACON_PAYMENT ? 0 : null;
 
                         switch($currentWindow->getNetworkType()){
                             case WindowTypes::ANVIL:
@@ -64,6 +67,12 @@ class TypeConverterX extends TypeConverter{
                                     $foundSlot = true;
                                 }
                                 break;
+                            case WindowTypes::BEACON:
+                                if($beaconPaymentSlot !== null){
+                                    $action->inventorySlot = $beaconPaymentSlot;
+                                    $foundSlot = true;
+                                }
+                                break;
                         }
                         if($foundSlot){
                             return new SlotChangeAction($currentWindow, $action->inventorySlot, $oldItem, $newItem);
@@ -73,7 +82,14 @@ class TypeConverterX extends TypeConverter{
                 case NetworkInventoryAction::SOURCE_TODO:
                 case self::SOURCE_CRAFT_SLOT:
                     /** Results */
+                    if($action->windowId === self::SOURCE_TYPE_ANVIL_INPUT && $currentWindow instanceof BeaconInventory){
+                        $action->windowId = NetworkInventoryAction::SOURCE_TYPE_BEACON;
+                    }
+
                     switch($action->windowId){
+                        case NetworkInventoryAction::SOURCE_TYPE_BEACON:
+                            return new BeaconPaymentAction($oldItem, $newItem);
+
                         case NetworkInventoryAction::SOURCE_TYPE_ANVIL_OUTPUT:
                         case NetworkInventoryAction::SOURCE_TYPE_ANVIL_RESULT:
                         case self::SOURCE_TYPE_ANVIL_MATERIAL:
@@ -82,6 +98,7 @@ class TypeConverterX extends TypeConverter{
                                 return new RepairItemAction($oldItem, $newItem, $action->windowId);
                             }
                             return new SlotChangeAction($currentWindow, $action->inventorySlot, $oldItem, $newItem);
+
                         case NetworkInventoryAction::SOURCE_TYPE_ENCHANT_OUTPUT:
                         case self::SOURCE_TYPE_ENCHANT_MATERIAL:
                         case self::SOURCE_TYPE_ENCHANT_INPUT:

@@ -2,7 +2,6 @@
 
 namespace CLADevs\VanillaX\blocks\tile;
 
-use CLADevs\VanillaX\blocks\BlockManager;
 use CLADevs\VanillaX\blocks\utils\TileVanilla;
 use CLADevs\VanillaX\entities\EntityManager;
 use CLADevs\VanillaX\entities\utils\EntityIdentifierX;
@@ -51,7 +50,6 @@ class MobSpawnerTile extends Spawnable{
         $this->entityId = $entityId;
         $this->validEntity = true;
         $this->setDirty();
-        BlockManager::onChange($this);
         if($previousEntity === null && $this->entity !== null){
             $this->pos->getWorld()->scheduleDelayedBlockUpdate($this->pos, 1);
         }

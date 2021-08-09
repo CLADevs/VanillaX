@@ -200,7 +200,7 @@ class PacketListener implements Listener{
                 }
             }
             if($item instanceof EntityInteractable){
-                /** If a player interacts with entity with a item that has EntityInteractable trait */
+                /** If a player interacts with entity with a item that has EntityInteractable traits */
                 $item->onInteract(new EntityInteractResult($player, null, $entity));
             }
         }elseif($packet->trData instanceof UseItemTransactionData && $packet->trData->getActionType() === UseItemTransactionData::ACTION_CLICK_AIR){

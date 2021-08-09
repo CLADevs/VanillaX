@@ -4,6 +4,7 @@ namespace CLADevs\VanillaX\items;
 
 interface ItemIdentifiers{
 
+    const SOUL_CAMPFIRE = 801;
     const RECORD_PIGSTEP = 759;
     const WARPED_FUNGUS_ON_A_STICK = 757;
     const WARPED_DOOR = 756;
@@ -103,7 +104,6 @@ interface ItemIdentifiers{
     const TWISTING_VINES = -287;
     const NETHER_GOLD_ORE = -288;
     const CRYING_OBSIDIAN = -289;
-    const SOUL_CAMPFIRE = -290;
     const POLISHED_BLACKSTONE = -291;
     const POLISHED_BLACKSTONE_STAIRS = -292;
     const POLISHED_BLACKSTONE_SLAB = -293;

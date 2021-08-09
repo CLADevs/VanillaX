@@ -19,11 +19,13 @@ interface TileVanilla{
     const MOB_SPAWNER = "MobSpawner";
     const CAULDRON = "Cauldron";
     const STRUCTURE_BLOCK = "StructureBlock";
-    public const BED = "Bed";
-    public const CHEST = "Chest";
-    public const FLOWER_POT = "FlowerPot";
-    public const FURNACE = "Furnace";
-    public const ITEM_FRAME = "ItemFrame";
-    public const SIGN = "Sign";
-    public const SKULL = "Skull";
+    const BED = "Bed";
+    const CHEST = "Chest";
+    const FLOWER_POT = "FlowerPot";
+    const FURNACE = "Furnace";
+    const ITEM_FRAME = "ItemFrame";
+    const SIGN = "Sign";
+    const SKULL = "Skull";
+    const CAMPFIRE = "Campfire";
+    const SOUL_CAMPFIRE = "SoulCampfire";
 }

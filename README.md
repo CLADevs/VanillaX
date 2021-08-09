@@ -14,6 +14,7 @@
 - Brewing Stand
 - Hopper
 - Command Block (80% done)
+- Beacon
 - Ancient Debris
 - Basalt
 - Bee Hive
@@ -23,6 +24,7 @@
 - Warped Wart Block
 - Twisting Vines
 - Weeping Vines
+- Campfire (Soul & Regular)
 - Stairs (Warped, Blackstone & Crimson)
 - Fence (Warped & Crimson)
 - Fence Gate (Warped & Crimson)
@@ -30,13 +32,15 @@
 - Roots (Warped & Crimson)
 - Fungus (Warped & Crimson)
 - Planks (Warped & Crimson)
+- Trap Doors (Warped & Crimson)
 - Nylium (Warped & Crimson)
 - Chiseled (Polished Blackstone & Nether Bricks)
 - Cracked (Polished Blackstone & Nether Bricks)
 
 #### TODO Blocks Functionality:
 - Magma Block(pmmp collision box)
-- Campfire (Soul Too)
+- Beacon
+- Structure Block
 - Chiseled Blocks (every)
 - Cracked Blocks (every)
 - Warped Blocks (every)

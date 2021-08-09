@@ -43,6 +43,7 @@ class MobSpawnerBlock extends MonsterSpawner{
 
             if($tile instanceof MobSpawnerTile && $tile->getEntityId() !== ($newId = $item->getMeta())){
                 $tile->setEntityId($newId);
+                $this->pos->getWorld()->setBlock($this->pos, $this);
                 if(!$player->isCreative()) $item->pop();
                 return true;
             }

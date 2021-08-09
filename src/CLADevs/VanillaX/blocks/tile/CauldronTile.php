@@ -2,7 +2,6 @@
 
 namespace CLADevs\VanillaX\blocks\tile;
 
-use CLADevs\VanillaX\blocks\BlockManager;
 use CLADevs\VanillaX\blocks\utils\TileVanilla;
 use pocketmine\block\BlockLegacyIds;
 use pocketmine\block\tile\Spawnable;
@@ -32,7 +31,6 @@ class CauldronTile extends Spawnable{
             $this->customColor = $tag->getValue();
         }
         $this->setDirty();
-        BlockManager::onChange($this);
     }
 
     protected function writeSaveData(CompoundTag $nbt): void{

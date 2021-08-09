@@ -137,7 +137,7 @@ class CommandBlockTile extends Spawnable implements Nameable{
         }
         $this->pos->getWorld()->scheduleDelayedBlockUpdate($this->pos, 1);
         $this->setDirty();
-        BlockManager::onChange($this);
+        $this->pos->getWorld()->setBlock($this->pos, $this->getBlock());
     }
 
     protected function writeSaveData(CompoundTag $nbt): void{
@@ -191,7 +191,7 @@ class CommandBlockTile extends Spawnable implements Nameable{
             $this->ranCommand = boolval($tag->getValue());
         }
         $this->setDirty();
-        BlockManager::onChange($this);
+        $this->pos->getWorld()->setBlock($this->pos, $this->getBlock());
     }
 
     protected function addAdditionalSpawnData(CompoundTag $nbt): void{
