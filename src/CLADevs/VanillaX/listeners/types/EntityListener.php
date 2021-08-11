@@ -3,6 +3,7 @@
 namespace CLADevs\VanillaX\listeners\types;
 
 use CLADevs\VanillaX\blocks\block\TwistingVinesBlock;
+use CLADevs\VanillaX\items\ItemIdentifiers;
 use CLADevs\VanillaX\items\types\ShieldItem;
 use CLADevs\VanillaX\world\gamerule\GameRule;
 use CLADevs\VanillaX\world\gamerule\GameRuleManager;
@@ -32,20 +33,20 @@ class EntityListener implements Listener{
                     break;
                 case EntityDamageEvent::CAUSE_DROWNING:
                     /** If gamerule 'drowningDamage' is not on then cancel it */
-                    if(!GameRuleManager::getInstance()->getValue(GameRule::DROWNING_DAMAGE, $entity->getWorld()())){
+                    if(!GameRuleManager::getInstance()->getValue(GameRule::DROWNING_DAMAGE, $entity->getWorld())){
                         $event->cancel();
                     }
                     break;
                 case EntityDamageEvent::CAUSE_FIRE:
                     /** If gamerule 'fireDamage' is not on then cancel it */
-                    if(!GameRuleManager::getInstance()->getValue(GameRule::FIRE_DAMAGE, $entity->getWorld()())){
+                    if(!GameRuleManager::getInstance()->getValue(GameRule::FIRE_DAMAGE, $entity->getWorld())){
                         $event->cancel();
                     }
                     break;
                 case EntityDamageEvent::CAUSE_ENTITY_ATTACK:
                     if($event instanceof EntityDamageByEntityEvent && $entity instanceof Player){
                         /** If gamerule 'pvp' is not on then cancel it */
-                        if(!GameRuleManager::getInstance()->getValue(GameRule::PVP, $entity->getWorld()())){
+                        if(!GameRuleManager::getInstance()->getValue(GameRule::PVP, $entity->getWorld())){
                             $event->cancel();
                             return;
                         }
@@ -55,6 +56,21 @@ class EntityListener implements Listener{
                         }
                     }
                     break;
+            }
+            if($event instanceof EntityDamageByEntityEvent && $entity instanceof Player){
+                $resist = 1;
+
+                foreach($entity->getArmorInventory()->getContents(true) as $item){
+                    if(in_array($item->getId(), [ItemIdentifiers::NETHERITE_HELMET, ItemIdentifiers::NETHERITE_CHESTPLATE, ItemIdentifiers::NETHERITE_LEGGINGS, ItemIdentifiers::NETHERITE_BOOTS])){
+                        $resist += 2;
+                    }
+                }
+                if($resist < 0){
+                    $resist = 1;
+                }elseif($resist > 1){
+                    $resist -= 1;
+                }
+                $event->setKnockBack($event->getKnockBack() / $resist);
             }
         }
     }
@@ -68,7 +84,7 @@ class EntityListener implements Listener{
     public function onEntitySpawn(EntitySpawnEvent $event): void{
         $entity = $event->getEntity();
 
-        if($entity instanceof PrimedTNT && !GameRuleManager::getInstance()->getValue(GameRule::TNT_EXPLODES, $entity->getWorld()())){
+        if($entity instanceof PrimedTNT && !GameRuleManager::getInstance()->getValue(GameRule::TNT_EXPLODES, $entity->getWorld())){
             $entity->flagForDespawn();
         }
     }

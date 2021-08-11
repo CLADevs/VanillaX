@@ -39,7 +39,6 @@
 
 #### TODO Blocks Functionality:
 - Magma Block(pmmp collision box)
-- Beacon
 - Structure Block
 - Chiseled Blocks (every)
 - Cracked Blocks (every)
