@@ -114,7 +114,7 @@ class PlayerListener implements Listener{
     public function onDeath(PlayerDeathEvent $event): void{
         $player = $event->getPlayer();
 
-        if(!GameRule::getGameRuleValue(GameRule::KEEP_INVENTORY, ($level = $player->getLevel()))){
+        if(GameRule::getGameRuleValue(GameRule::KEEP_INVENTORY, ($level = $player->getLevel()))){
             $event->setKeepInventory(true);
         }else{
             $offhand = VanillaX::getInstance()->getSessionManager()->get($player)->getOffHandInventory();
