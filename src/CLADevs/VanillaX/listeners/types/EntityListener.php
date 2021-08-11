@@ -2,6 +2,7 @@
 
 namespace CLADevs\VanillaX\listeners\types;
 
+use CLADevs\VanillaX\items\ItemIdentifiers;
 use CLADevs\VanillaX\items\types\ShieldItem;
 use CLADevs\VanillaX\network\gamerules\GameRule;
 use CLADevs\VanillaX\VanillaX;
@@ -89,6 +90,21 @@ class EntityListener implements Listener{
                     $item->pop();
                     $inventory->setItem($itemIndex, $item);
                 }
+            }
+            if($event instanceof EntityDamageByEntityEvent && $entity instanceof Player){
+                $resist = 1;
+
+                foreach($entity->getArmorInventory()->getContents(true) as $item){
+                    if(in_array($item->getId(), [ItemIdentifiers::NETHERITE_HELMET, ItemIdentifiers::NETHERITE_CHESTPLATE, ItemIdentifiers::NETHERITE_LEGGINGS, ItemIdentifiers::NETHERITE_BOOTS])){
+                        $resist += 2;
+                    }
+                }
+                if($resist < 0){
+                    $resist = 1;
+                }elseif($resist > 1){
+                    $resist -= 1;
+                }
+                $event->setKnockBack($event->getKnockBack() / $resist);
             }
         }
     }
