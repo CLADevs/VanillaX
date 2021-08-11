@@ -118,7 +118,12 @@ class PlayerListener implements Listener{
             $event->setKeepInventory(true);
         }else{
             $offhand = VanillaX::getInstance()->getSessionManager()->get($player)->getOffHandInventory();
-            $event->setDrops(array_merge($event->getDrops(), [$offhand->getContents()]));
+
+            if(!($item = $offhand->getItem(0))->isNull()){
+                $offhand->clearAll();
+                $offhand->saveContents();
+                $event->setDrops(array_merge($event->getDrops(), [$item]));
+            }
         }
         if(!GameRule::getGameRuleValue(GameRule::SHOW_DEATH_MESSAGES, $level)){
             $event->setDeathMessage("");
