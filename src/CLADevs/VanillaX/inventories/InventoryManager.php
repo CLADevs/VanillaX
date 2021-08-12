@@ -2,10 +2,10 @@
 
 namespace CLADevs\VanillaX\inventories;
 
-use CLADevs\VanillaX\utils\Utils;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
+use pocketmine\network\mcpe\convert\ItemTranslator;
 use pocketmine\network\mcpe\protocol\BatchPacket;
 use pocketmine\network\mcpe\protocol\CraftingDataPacket;
 use pocketmine\network\mcpe\protocol\types\PotionContainerChangeRecipe;
@@ -14,31 +14,9 @@ use pocketmine\Server;
 use pocketmine\timings\Timings;
 use ReflectionException;
 use ReflectionProperty;
+use const pocketmine\RESOURCE_PATH;
 
 class InventoryManager{
-
-    const BREW_CONVERSATION = [
-        426 => ItemIds::POTION,
-        394 => ItemIds::GLOWSTONE_DUST,
-        561 => ItemIds::SPLASH_POTION,
-        562 => ItemIds::LINGERING_POTION,
-        428 => ItemIds::FERMENTED_SPIDER_EYE,
-        429 => ItemIds::BLAZE_POWDER,
-        424 => ItemIds::GHAST_TEAR,
-        283 => ItemIds::GOLDEN_CARROT,
-        430 => ItemIds::MAGMA_CREAM,
-        574 => ItemIds::PHANTOM_MEMBRANE,
-        267 => ItemIds::PUFFERFISH,
-        528 => ItemIds::RABBIT_FOOT,
-        434 => ItemIds::REDSTONE_DUST,
-        278 => ItemIds::GLISTERING_MELON,
-        573 => ItemIds::TURTLE_HELMET,
-        373 => ItemIds::REDSTONE_DUST,
-        294 => ItemIds::NETHER_WART,
-        328 => ItemIds::GUNPOWDER,
-        560 => ItemIds::DRAGON_BREATH,
-        416 => ItemIds::SUGAR
-    ];
 
     /** @var PotionTypeRecipe[] */
     private array $potionTypeRecipes = [];
@@ -65,6 +43,7 @@ class InventoryManager{
                 $pk->addShapelessRecipe($recipe);
             }
         }
+
         foreach($manager->getShapedRecipes() as $list){
             foreach($list as $recipe){
                 $pk->addShapedRecipe($recipe);
@@ -75,16 +54,26 @@ class InventoryManager{
             $pk->addFurnaceRecipe($recipe);
         }
 
-        foreach(json_decode(file_get_contents(Utils::getResourceFile("brewing_recipes.json")), true) as $key => $i){
-            $pk->potionTypeRecipes[] = new PotionTypeRecipe($i[0], $i[1], $i[2], $i[3], $i[4], $i[5]);
-            $potion = new PotionTypeRecipe(self::convertPotionId($i[0]), self::convertPotionId($i[1]), self::convertPotionId($i[2]), self::convertPotionId($i[3]), self::convertPotionId($i[4]), self::convertPotionId($i[5]));
-            $this->potionTypeRecipes[$potion->getInputItemId() . ":" . $potion->getInputItemMeta() . ":" . $potion->getIngredientItemId() . ":" . $potion->getIngredientItemMeta()] = clone $potion;
+        $recipes = json_decode(file_get_contents(RESOURCE_PATH . "vanilla" . DIRECTORY_SEPARATOR . "recipes.json"), true);
+
+        foreach($recipes["potion_type"] as $recipe){
+            [$inputNetId, $inputNetDamage] = ItemTranslator::getInstance()->toNetworkId($recipe["input"]["id"], $recipe["input"]["damage"] ?? 0);
+            [$ingredientNetId, $ingredientNetDamage] = ItemTranslator::getInstance()->toNetworkId($recipe["ingredient"]["id"], $recipe["ingredient"]["damage"] ?? 0);
+            [$outputNetId, $outputNetDamage] = ItemTranslator::getInstance()->toNetworkId($recipe["output"]["id"], $recipe["output"]["damage"] ?? 0);
+            $potion = new PotionTypeRecipe($inputNetId, $inputNetDamage, $ingredientNetId, $ingredientNetDamage, $outputNetId, $outputNetDamage);
+            $pk->potionTypeRecipes[] = $potion;
+            $potion = $this->internalPotionTypeRecipe(clone $potion);
+            $this->potionTypeRecipes[self::hashPotionType($potion)] = $potion;
         }
 
-        foreach([[426, 328, 561], [561, 560, 562]] as $key => $i){
-            $pk->potionContainerRecipes[] = new PotionContainerChangeRecipe($i[0], $i[1], $i[2]);
-            $potion = new PotionContainerChangeRecipe(self::convertPotionId($i[0]), self::convertPotionId($i[1]), self::convertPotionId($i[2]));
-            $this->potionContainerRecipes[$potion->getInputItemId() . ":" . $potion->getIngredientItemId()] = clone $potion;
+        foreach($recipes["potion_container_change"] as $recipe){
+            $inputNetId = ItemTranslator::getInstance()->toNetworkId($recipe["input_item_id"], 0)[0];
+            $ingredientNetId = ItemTranslator::getInstance()->toNetworkId($recipe["ingredient"]["id"], 0)[0];
+            $outputNetId = ItemTranslator::getInstance()->toNetworkId($recipe["output_item_id"], 0)[0];
+            $potion = new PotionContainerChangeRecipe($inputNetId, $ingredientNetId, $outputNetId);
+            $pk->potionContainerRecipes[] = $potion;
+            $potion = $this->internalPotionContainerRecipe(clone $potion);
+            $this->potionContainerRecipes[self::hashPotionContainer($potion)] = $potion;
         }
         $pk->encode();
 
@@ -97,7 +86,7 @@ class InventoryManager{
     }
 
     public function getBrewingOutput(Item $input, Item $ingredient): ?Item{
-        $potion = $this->potionTypeRecipes[$input->getId() . ":" . $input->getDamage() . ":" . $ingredient->getId() . ":" . $ingredient->getDamage()] ?? null;
+        $potion = $this->potionTypeRecipes[self::hashPotionType($ingredient->getId(), $ingredient->getDamage(), $input->getId(), $input->getDamage())] ?? null;
 
         if($potion instanceof PotionTypeRecipe){
             return ItemFactory::get($potion->getOutputItemId(), $potion->getOutputItemMeta(), $input->getCount());
@@ -106,7 +95,7 @@ class InventoryManager{
     }
 
     public function getBrewingContainerOutput(Item $input, Item $ingredient): ?Item{
-        $potion = $this->potionContainerRecipes[$input->getId() . ":" . $ingredient->getId()] ?? null;
+        $potion = $this->potionContainerRecipes[self::hashPotionContainer($ingredient->getId(), $input->getId())] ?? null;
 
         if($potion instanceof PotionContainerChangeRecipe){
             return ItemFactory::get($potion->getOutputItemId(), $input->getDamage(), $input->getCount());
@@ -114,15 +103,59 @@ class InventoryManager{
         return null;
     }
 
-    private static function convertPotionId(int $value): int{
-        return self::BREW_CONVERSATION[$value] ?? $value;
+    private function internalPotionTypeRecipe(PotionTypeRecipe $recipe): PotionTypeRecipe{
+        [$inputId, $inputMeta] = ItemTranslator::getInstance()->fromNetworkId($recipe->getInputItemId(), $recipe->getInputItemMeta());
+        [$ingredientId, $ingredientMeta] = ItemTranslator::getInstance()->fromNetworkId($recipe->getIngredientItemId(), $recipe->getIngredientItemMeta());
+        [$outputId, $outputMeta] = ItemTranslator::getInstance()->fromNetworkId($recipe->getOutputItemId(), $recipe->getOutputItemMeta());
+        return new PotionTypeRecipe($inputId, $inputMeta, $ingredientId, $ingredientMeta, $outputId, $outputMeta);
+    }
+
+    private function internalPotionContainerRecipe(PotionContainerChangeRecipe $recipe): PotionContainerChangeRecipe{
+        $inputId = ItemTranslator::getInstance()->fromNetworkId($recipe->getInputItemId(), 0)[0];
+        $ingredientId = ItemTranslator::getInstance()->fromNetworkId($recipe->getIngredientItemId(), 0)[0];
+        $outputId = ItemTranslator::getInstance()->fromNetworkId($recipe->getOutputItemId(), 0)[0];
+        return new PotionContainerChangeRecipe($inputId, $ingredientId, $outputId);
+    }
+
+    /**
+     * @param PotionTypeRecipe|int $ingredientId
+     * @param int $ingredientMeta
+     * @param int $inputId
+     * @param int $inputMeta
+     * @return string
+     */
+    public function hashPotionType($ingredientId, int $ingredientMeta = 0, int $inputId = 0, int $inputMeta = 0): string{
+        $recipe = $ingredientId;
+
+        if($recipe instanceof PotionTypeRecipe){
+            $ingredientId = $recipe->getIngredientItemId();
+            $ingredientMeta = $recipe->getIngredientItemMeta();
+            $inputId = $recipe->getInputItemId();
+            $inputMeta = $recipe->getInputItemMeta();
+        }
+        return $ingredientId + $ingredientMeta + $inputId + $inputMeta;
+    }
+
+    /**
+     * @param PotionContainerChangeRecipe|int $ingredientId
+     * @param int $inputId
+     * @return string
+     */
+    public function hashPotionContainer($ingredientId, int $inputId = 0): string{
+        $recipe = $ingredientId;
+        
+        if($recipe instanceof PotionContainerChangeRecipe){
+            $ingredientId = $recipe->getIngredientItemId();
+            $inputId = $recipe->getInputItemId();
+        }
+        return $ingredientId + $inputId;
     }
 
     public static function getExpForFurnace(Item $ingredient): float{
         switch($ingredient->getId()){
             case ItemIds::DIAMOND_ORE:
             case ItemIds::GOLD_ORE:
-                case ItemIds::EMERALD_ORE;
+            case ItemIds::EMERALD_ORE;
                 return 1;
             case ItemIds::IRON_ORE:
                 return 0.7;
