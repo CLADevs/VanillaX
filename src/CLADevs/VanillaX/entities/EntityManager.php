@@ -13,8 +13,13 @@ class EntityManager{
 
     public function startup(): void{
         VillagerProfession::init();
-        if(VanillaX::getInstance()->getConfig()->get("mobs", true)){
-            foreach(["object", "boss", "passive", "neutral", "monster", "projectile"] as $path){
+        if(VanillaX::getInstance()->getConfig()->get("entities", true)){
+            $pathList = ["object", "projectile"];
+
+            if(VanillaX::getInstance()->getConfig()->get("mobs", true)){
+                $pathList = array_merge($pathList, ["boss", "passive", "neutral", "monster"]);
+            }
+            foreach($pathList as $path){
                 Utils::callDirectory("entities" . DIRECTORY_SEPARATOR . $path, function (string $namespace): void{
                     if(!isset(class_implements($namespace)[NonAutomaticCallItemTrait::class])){
                         self::registerEntity($namespace);
