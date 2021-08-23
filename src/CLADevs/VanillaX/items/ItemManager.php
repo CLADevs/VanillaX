@@ -8,6 +8,7 @@ use CLADevs\VanillaX\items\types\HorseArmorItem;
 use CLADevs\VanillaX\items\types\MapItem;
 use CLADevs\VanillaX\items\types\MinecartItem;
 use CLADevs\VanillaX\items\types\MusicDiscItem;
+use CLADevs\VanillaX\items\utils\RecipeItemTrait;
 use CLADevs\VanillaX\utils\item\NonAutomaticCallItemTrait;
 use CLADevs\VanillaX\utils\item\NonCreativeItemTrait;
 use CLADevs\VanillaX\utils\item\NonOverwriteItemTrait;
@@ -23,6 +24,7 @@ use pocketmine\item\ItemIds;
 use pocketmine\item\SpawnEgg;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\LevelSoundEventPacket;
+use pocketmine\Server;
 use pocketmine\world\World;
 use const pocketmine\RESOURCE_PATH;
 
@@ -128,6 +130,18 @@ class ItemManager{
     public static function register(Item $item, bool $creative = false, bool $overwrite = true): bool{
         if(in_array($item->getId(), VanillaX::getInstance()->getConfig()->getNested("disabled.items", []))){
             return false;
+        }
+        if(isset(class_uses($item)[RecipeItemTrait::class])){
+            /** @var RecipeItemTrait $item */
+            $shapeless = $item->getShapelessRecipe();
+            $shaped = $item->getShapedRecipe();
+
+            if($shapeless !== null){
+                Server::getInstance()->getCraftingManager()->registerShapelessRecipe($shapeless);
+            }
+            if($shaped !== null){
+                Server::getInstance()->getCraftingManager()->registerShapedRecipe($shaped);
+            }
         }
         ItemFactory::getInstance()->register($item, $overwrite);
         if($creative && !CreativeInventory::getInstance()->contains($item)) CreativeInventory::getInstance()->add($item);
