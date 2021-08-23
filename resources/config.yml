@@ -1,5 +1,7 @@
 ---
-#If this is false mobs will not register through VanillaX plugin
+#If this is false entities(mobs, trident, fireworks, etc) will not register through VanillaX plugin
+entities: true
+#If this is false mobs(zombies, pig, etc) will not register through VanillaX plugin
 mobs: true
 
 #Anything listed here, would not be registered from this plugin.

@@ -2,7 +2,6 @@
 
 namespace CLADevs\VanillaX\world\weather;
 
-use CLADevs\VanillaX\VanillaX;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\Tag;
 use pocketmine\world\format\io\data\BedrockWorldData;

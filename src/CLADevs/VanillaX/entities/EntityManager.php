@@ -41,8 +41,14 @@ class EntityManager{
 
     public function startup(): void{
         VillagerProfession::init();
-        if(VanillaX::getInstance()->getConfig()->get("mobs", true)){
-            foreach(["object", "projectile", "boss", "passive", "neutral", "monster"] as $path){
+
+        if(VanillaX::getInstance()->getConfig()->get("entities", true)){
+            $pathList = ["object", "projectile"];
+
+            if(VanillaX::getInstance()->getConfig()->get("mobs", true)){
+                $pathList = array_merge($pathList, ["boss", "passive", "neutral", "monster"]);
+            }
+            foreach($pathList as $path){
                 Utils::callDirectory("entities" . DIRECTORY_SEPARATOR . $path, function (string $namespace)use($path): void{
                     if(!isset(class_implements($namespace)[NonAutomaticCallItemTrait::class])){
                         $this->registerEntity($namespace, $path, [$namespace::NETWORK_ID]);

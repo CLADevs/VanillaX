@@ -117,7 +117,7 @@ class PlayerListener implements Listener{
     public function onDeath(PlayerDeathEvent $event): void{
         $player = $event->getPlayer();
 
-        if(!GameRuleManager::getInstance()->getValue(GameRule::KEEP_INVENTORY, ($level = $player->getWorld()))){
+        if(GameRuleManager::getInstance()->getValue(GameRule::KEEP_INVENTORY, ($level = $player->getWorld()))){
             $event->setKeepInventory(true);
         }
         if(!GameRuleManager::getInstance()->getValue(GameRule::SHOW_DEATH_MESSAGES, $level)){

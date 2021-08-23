@@ -12,7 +12,6 @@ use CLADevs\VanillaX\inventories\types\TradeInventory;
 use CLADevs\VanillaX\listeners\ListenerManager;
 use CLADevs\VanillaX\utils\instances\InteractButtonResult;
 use CLADevs\VanillaX\utils\item\InteractButtonItemTrait;
-use CLADevs\VanillaX\utils\Utils;
 use CLADevs\VanillaX\VanillaX;
 use pocketmine\block\VanillaBlocks;
 use pocketmine\data\java\GameModeIdMap;
@@ -25,6 +24,7 @@ use pocketmine\event\server\DataPacketReceiveEvent;
 use pocketmine\event\server\DataPacketSendEvent;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
+use pocketmine\network\mcpe\convert\ItemTranslator;
 use pocketmine\network\mcpe\convert\TypeConverter;
 use pocketmine\network\mcpe\protocol\ActorPickRequestPacket;
 use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
@@ -48,6 +48,7 @@ use pocketmine\permission\DefaultPermissions;
 use pocketmine\player\Player;
 use pocketmine\Server;
 use pocketmine\world\Position;
+use const pocketmine\RESOURCE_PATH;
 
 class PacketListener implements Listener{
 
@@ -285,19 +286,32 @@ class PacketListener implements Listener{
      * called whenever player joins to send recipes for brewing, crafting, etc
      */
     private function handleCraftingData(CraftingDataPacket $packet): void{
+        $manager = InventoryManager::getInstance();
+        $translator = ItemTranslator::getInstance();
+        $recipes = json_decode(file_get_contents(RESOURCE_PATH . "vanilla" . DIRECTORY_SEPARATOR . "recipes.json"), true);
+
         $potionTypeRecipes = [];
-        foreach(json_decode(file_get_contents(Utils::getResourceFile("brewing_recipes.json")), true) as $key => $i){
-            $packet->potionTypeRecipes[] = new PotionTypeRecipe($i[0], $i[1], $i[2], $i[3], $i[4], $i[5]);
-            $potion = new PotionTypeRecipe(InventoryManager::convertPotionId($i[0]), InventoryManager::convertPotionId($i[1]), InventoryManager::convertPotionId($i[2]), InventoryManager::convertPotionId($i[3]), InventoryManager::convertPotionId($i[4]), InventoryManager::convertPotionId($i[5]));
-            $potionTypeRecipes[$potion->getInputItemId() . ":" . $potion->getInputItemMeta() . ":" . $potion->getIngredientItemId() . ":" . $potion->getIngredientItemMeta()] = clone $potion;
+        foreach($recipes["potion_type"] as $recipe){
+            [$inputNetId, $inputNetDamage] = $translator->toNetworkId($recipe["input"]["id"], $recipe["input"]["damage"] ?? 0);
+            [$ingredientNetId, $ingredientNetDamage] = $translator->toNetworkId($recipe["ingredient"]["id"], $recipe["ingredient"]["damage"] ?? 0);
+            [$outputNetId, $outputNetDamage] = $translator->toNetworkId($recipe["output"]["id"], $recipe["output"]["damage"] ?? 0);
+            $potion = new PotionTypeRecipe($inputNetId, $inputNetDamage, $ingredientNetId, $ingredientNetDamage, $outputNetId, $outputNetDamage);
+            $packet->potionTypeRecipes[] = $potion;
+            $potion = $manager->internalPotionTypeRecipe(clone $potion);
+            $potionTypeRecipes[$manager->hashPotionType($potion)] = $potion;
         }
 
         $potionContainerRecipes = [];
-        foreach([[426, 328, 561], [561, 560, 562]] as $key => $i){
-            $packet->potionContainerRecipes[] = new PotionContainerChangeRecipe($i[0], $i[1], $i[2]);
-            $potion = new PotionContainerChangeRecipe(InventoryManager::convertPotionId($i[0]), InventoryManager::convertPotionId($i[1]), InventoryManager::convertPotionId($i[2]));
-            $potionContainerRecipes[$potion->getInputItemId() . ":" . $potion->getIngredientItemId()] = clone $potion;
+        foreach($recipes["potion_container_change"] as $recipe){
+            $inputNetId = $translator->toNetworkId($recipe["input_item_id"], 0)[0];
+            $ingredientNetId = $translator->toNetworkId($recipe["ingredient"]["id"], 0)[0];
+            $outputNetId = $translator->toNetworkId($recipe["output_item_id"], 0)[0];
+            $potion = new PotionContainerChangeRecipe($inputNetId, $ingredientNetId, $outputNetId);
+            $packet->potionContainerRecipes[] = $potion;
+            $potion = $manager->internalPotionContainerRecipe(clone $potion);
+            $potionContainerRecipes[$manager->hashPotionContainer($potion)] = $potion;
         }
+
         InventoryManager::getInstance()->setPotionTypeRecipes($potionTypeRecipes);
         InventoryManager::getInstance()->setPotionContainerRecipes($potionContainerRecipes);
     }

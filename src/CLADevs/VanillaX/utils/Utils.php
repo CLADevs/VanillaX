@@ -10,62 +10,25 @@ class Utils{
         return str_replace(["\\utils", "/utils"], DIRECTORY_SEPARATOR . "resources", __DIR__) . DIRECTORY_SEPARATOR . $file;
     }
 
-    public static function getMinecraftDataPath(): string{
-        return VanillaX::getInstance()->getDataFolder() . "data" . DIRECTORY_SEPARATOR;
-    }
-
-    public static function getVanillaXPath(): string{
-        if(VanillaX::getInstance()->isPhar()){
-            $path = self::removeLastDirectory(VanillaX::getInstance()->getDescription()->getMain());
-            $path = VanillaX::getInstance()->getFile() . "src" . DIRECTORY_SEPARATOR . $path;
-            return $path;
-        }else{
-            return (self::removeLastDirectory( __DIR__));
-        }
-    }
-
     public static function callDirectory(string $directory, callable $callable): void{
-        $dirname = self::getVanillaXPath();
-        $path = $dirname . DIRECTORY_SEPARATOR . $directory;
-        $path = str_replace(["phar:///", "phar://", "//", "phar:\\\\", "\\"], ["phar:\\\\/", "phar:\\\\", "/", "phar://", "/"], $path);
-        $phar = VanillaX::getInstance()->isPhar();
+        $main = explode("\\", VanillaX::getInstance()->getDescription()->getMain());
+        unset($main[array_key_last($main)]);
+        $main = implode("/", $main);
+        $directory = rtrim(str_replace(DIRECTORY_SEPARATOR, "/", $directory), "/");
+        $dir = VanillaX::getInstance()->getFile() . "src/$main/" . $directory;
 
-        foreach(array_diff(scandir($path), [".", ".."]) as $file){
-            if(is_dir($path . DIRECTORY_SEPARATOR . $file)){
-                self::callDirectory($directory . DIRECTORY_SEPARATOR . $file, $callable);
-            }else{
-                $i = explode(".", $file);
-                $extension = $i[count($i) - 1];
+        foreach(array_diff(scandir($dir), [".", ".."]) as $file){
+            $path = $dir . "/$file";
+            $extension = pathinfo($path)["extension"] ?? null;
 
-                if($extension === "php"){
-                    $name = $i[0];
-                    $namespace = "";
-                    $i = explode(DIRECTORY_SEPARATOR, str_replace(getcwd() . DIRECTORY_SEPARATOR, "", $dirname));
-                    for($v = 0; $v <= ($phar ? 1 : 2); $v++){
-                        unset($i[$v]);
-                    }
-                    foreach($i as $key => $string){
-                        $namespace .= $string . DIRECTORY_SEPARATOR;
-                    }
-                    $namespace .= $directory . DIRECTORY_SEPARATOR . $name;
-                    $namespace = str_replace("/", "\\", $namespace);
-                    if(($pos = strpos($namespace, "src\\")) !== false){
-                        $namespace = substr($namespace, $pos + 4);
-                    }
-                    $callable($namespace);
-                }
+            if($extension === null){
+                self::callDirectory($directory . "/" . $file, $callable);
+            }elseif($extension === "php"){
+                $namespaceDirectory = str_replace("/", "\\", $directory);
+                $namespaceMain = str_replace("/", "\\", $main);
+                $namespace = $namespaceMain . "\\$namespaceDirectory\\" . basename($file, ".php");
+                $callable($namespace);
             }
         }
-    }
-
-    private static function removeLastDirectory(string $str, int $loop = 1): string{
-        $delimiter = strpos($str, DIRECTORY_SEPARATOR) ? DIRECTORY_SEPARATOR : "\\";
-
-        for($i = 0; $i < $loop; $i++){
-            $exp = explode($delimiter, $str);
-            unset($exp[array_key_last($exp)]);
-            $str = implode($delimiter, $exp);
-        }
-        return $str;
     }
 }
