@@ -11,8 +11,8 @@ class Utils{
     }
 
     public static function callDirectory(string $directory, callable $callable): void{
-        $main = explode("\\", VanillaX::getInstance()->getDescription()->getMain());
-        unset($main[array_key_last($main)]);
+        $main= explode("\\", VanillaX::getInstance()->getDescription()->getMain());
+        unset( $main[array_key_last($main)]);
         $main = implode("/", $main);
         $directory = rtrim(str_replace(DIRECTORY_SEPARATOR, "/", $directory), "/");
         $dir = VanillaX::getInstance()->getFile() . "src/$main/" . $directory;

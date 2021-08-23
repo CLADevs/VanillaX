@@ -3,9 +3,6 @@
 namespace CLADevs\VanillaX\blocks;
 
 use CLADevs\VanillaX\blocks\block\CommandBlock;
-use CLADevs\VanillaX\blocks\block\redstone\RedstoneComparator;
-use CLADevs\VanillaX\blocks\block\redstone\RedstoneLamp;
-use CLADevs\VanillaX\blocks\block\redstone\RedstoneRepeater;
 use CLADevs\VanillaX\blocks\block\ShulkerBoxBlock;
 use CLADevs\VanillaX\blocks\utils\TileVanilla;
 use CLADevs\VanillaX\utils\item\NonAutomaticCallItemTrait;
@@ -52,6 +49,9 @@ class BlockManager{
 
     private function initializeBlocks(): void{
         Utils::callDirectory("blocks" . DIRECTORY_SEPARATOR . "block", function (string $namespace): void{
+            if(strpos($namespace, "redstone") !== false){
+                return;
+            }
             if(!isset(class_implements($namespace)[NonAutomaticCallItemTrait::class])){
                 if(self::registerBlock(($class = new $namespace()), true, !$class instanceof NonCreativeItemTrait) && $class instanceof Block && $class->ticksRandomly()){
                     foreach(Server::getInstance()->getLevels() as $level){
@@ -61,12 +61,12 @@ class BlockManager{
             }
         });
 
-        self::registerBlock(new RedstoneComparator(true), true);
-        self::registerBlock(new RedstoneComparator(false), true);
-        self::registerBlock(new RedstoneRepeater(true), true);
-        self::registerBlock(new RedstoneRepeater(false), true);
-        self::registerBlock(new RedstoneLamp(true), true);
-        self::registerBlock(new RedstoneLamp(false), true);
+//        self::registerBlock(new RedstoneComparator(true), true);
+//        self::registerBlock(new RedstoneComparator(false), true);
+//        self::registerBlock(new RedstoneRepeater(true), true);
+//        self::registerBlock(new RedstoneRepeater(false), true);
+//        self::registerBlock(new RedstoneLamp(true), true);
+//        self::registerBlock(new RedstoneLamp(false), true);
 
         foreach([BlockIds::COMMAND_BLOCK, BlockIds::REPEATING_COMMAND_BLOCK, BlockIds::CHAIN_COMMAND_BLOCK] as $block){
             self::registerBlock(new CommandBlock($block), true);

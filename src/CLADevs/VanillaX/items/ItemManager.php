@@ -43,7 +43,6 @@ class ItemManager{
         self::register(new Item(ItemIdentifiers::DRIED_KELP_BLOCK, 0, "Dried kelp")); //ITEM
         self::register(new Item(ItemIds::KELP, 0, "Kelp")); //ITEM
         self::register(new Item(ItemIds::DRIED_KELP, 0, "Dried Kelp")); //ITEM
-        self::register(new Item(ItemIds::NETHER_WART, 0, "Nether Wart")); //ITEM
         self::register(new Item(ItemIds::TURTLE_SHELL_PIECE, 0, "Turtle Shell")); //ITEM
         self::register(new Item(ItemIds::PHANTOM_MEMBRANE, 0, "Phantom Membrane")); //ITEM
         self::register(new Item(ItemIds::FIREWORKS_CHARGE, 0, "Fireworks Charge")); //ITEM
