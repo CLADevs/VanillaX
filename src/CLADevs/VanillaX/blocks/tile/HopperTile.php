@@ -30,7 +30,7 @@ use ContainerTrait;
 
     public function __construct(World $world, Vector3 $pos){
         parent::__construct($world, $pos);
-        $this->inventory = new HopperInventory($this->getPos());
+        $this->inventory = new HopperInventory($this->getPosition());
     }
 
     public function getInventory(): HopperInventory{
@@ -42,7 +42,7 @@ use ContainerTrait;
     }
 
     public function getFacingBlock(): Block{
-        return $this->getPos()->getWorld()->getBlock($this->getPos())->getSide($this->facing);
+        return $this->getPosition()->getWorld()->getBlock($this->getPosition())->getSide($this->facing);
     }
 
     public function transferItems(): void{
@@ -50,10 +50,10 @@ use ContainerTrait;
 
         if(in_array($block->getId(), [BlockLegacyIds::HOPPER_BLOCK, BlockLegacyIds::FURNACE, BlockLegacyIds::BREWING_STAND_BLOCK, BlockLegacyIds::CHEST])){
             /** @var HopperTile|Furnace|BrewingStandTile|Chest $tile */
-            $tile = $this->getPos()->getWorld()->getTile($block->getPos());
+            $tile = $this->getPosition()->getWorld()->getTile($block->getPosition());
             $inventory = $tile->getInventory();
 
-            if($tile instanceof HopperTile && $tile->getFacingBlock()->getPos()->equals($this->getPos())){
+            if($tile instanceof HopperTile && $tile->getFacingBlock()->getPosition()->equals($this->getPosition())){
                 //Stops infinite loop
                 return;
             }
@@ -91,7 +91,7 @@ use ContainerTrait;
     }
 
     public function readSaveData(CompoundTag $nbt): void{
-        $this->facing = $this->getPos()->getWorld()->getBlock($this->pos)->getMeta();
+        $this->facing = $this->getPosition()->getWorld()->getBlock($this->position)->getMeta();
         $this->loadItems($nbt);
     }
 

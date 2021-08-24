@@ -31,7 +31,7 @@ class JukeboxBlock extends Opaque{
     }
 
     public function onInteract(Item $item, int $face, Vector3 $clickVector, ?Player $player = null): bool{
-        $tile = $player->getWorld()->getTile($this->getPos());
+        $tile = $player->getWorld()->getTile($this->getPosition());
 
         if($player !== null && $tile instanceof JukeboxTile){
             if($item instanceof MusicDiscItem && $tile->getRecordItem() === null){
@@ -44,7 +44,7 @@ class JukeboxBlock extends Opaque{
     }
     
     public function onScheduledUpdate(): void{
-        $tile = $this->pos->getWorld()->getTile($this->pos);
+        $tile = $this->position->getWorld()->getTile($this->position);
 
         if($tile->isClosed() || !$tile instanceof JukeboxTile){
             return;
@@ -60,12 +60,12 @@ class JukeboxBlock extends Opaque{
                 if(Server::getInstance()->getTick() % 30 === 0){
                     $pk = new LevelEventPacket();
                     $pk->evid = LevelEventPacket::EVENT_ADD_PARTICLE_MASK | ParticleIds::NOTE;
-                    $pk->position = $this->pos->add(0.5, 1.25, 0.5);
+                    $pk->position = $this->position->add(0.5, 1.25, 0.5);
                     $pk->data = 0;
-                    $this->pos->getWorld()->broadcastPacketToViewers($pk->position, $pk);
+                    $this->position->getWorld()->broadcastPacketToViewers($pk->position, $pk);
                 }
             }
         }
-        $this->pos->getWorld()->scheduleDelayedBlockUpdate($this->pos, 1);
+        $this->position->getWorld()->scheduleDelayedBlockUpdate($this->position, 1);
     }
 }

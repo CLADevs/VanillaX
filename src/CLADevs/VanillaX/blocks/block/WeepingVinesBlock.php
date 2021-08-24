@@ -31,7 +31,7 @@ class WeepingVinesBlock extends Transparent{
     }
 
     public function place(BlockTransaction $tx, Item $item, Block $blockReplace, Block $blockClicked, int $face, Vector3 $clickVector, ?Player $player = null): bool{
-        if($blockReplace->pos->getWorld()->getBlock($blockReplace->pos->add(0, 1, 0)) instanceof Air){
+        if($blockReplace->position->getWorld()->getBlock($blockReplace->position->add(0, 1, 0)) instanceof Air){
             return false;
         }
         return parent::place($tx, $item, $blockReplace, $blockClicked, $face, $clickVector, $player);
@@ -42,8 +42,8 @@ class WeepingVinesBlock extends Transparent{
             $item->pop();
             $lowestY = 0;
 
-            for($y = 0; $y <= $this->pos->y; $y++){
-                $block = $this->pos->getWorld()->getBlockAt($this->pos->x, $y, $this->pos->z);
+            for($y = 0; $y <= $this->position->y; $y++){
+                $block = $this->position->getWorld()->getBlockAt($this->position->x, $y, $this->position->z);
 
                 if($block instanceof WeepingVinesBlock){
                     $lowestY = $y;
@@ -53,14 +53,14 @@ class WeepingVinesBlock extends Transparent{
             if(($lowestY - 1) < 0){
                 return true;
             }
-            $lowestBlock = $this->pos->getWorld()->getBlockAt($this->pos->x, $lowestY, $this->pos->z);
+            $lowestBlock = $this->position->getWorld()->getBlockAt($this->position->x, $lowestY, $this->position->z);
 
             if($lowestBlock instanceof WeepingVinesBlock){
                 $lastAge = $lowestBlock->getAge();
                 $size = mt_rand(1, 6);
 
                 for($i = 1; $i <= $size; $i++){
-                    $b = $this->pos->getWorld()->getBlockAt($this->pos->x, $lowestY - $i, $this->pos->z);
+                    $b = $this->position->getWorld()->getBlockAt($this->position->x, $lowestY - $i, $this->position->z);
 
                     if($b instanceof Air && ($lowestY - $i) >= 0){
                         if($lastAge > 15){
@@ -68,7 +68,7 @@ class WeepingVinesBlock extends Transparent{
                         }else{
                             $lastAge++;
                         }
-                        $this->pos->getWorld()->setBlock($b->pos, BlockFactory::getInstance()->get(BlockVanilla::WEEPING_VINES, $lastAge > 15 ? 15 : $lastAge));
+                        $this->position->getWorld()->setBlock($b->position, BlockFactory::getInstance()->get(BlockVanilla::WEEPING_VINES, $lastAge > 15 ? 15 : $lastAge));
                     }
                 }
             }
@@ -81,17 +81,17 @@ class WeepingVinesBlock extends Transparent{
         $parent = parent::onBreak($item, $player);
         $started = false;
 
-        for($y = 0; $y < $this->pos->getWorld()->getMaxY(); $y++){
-            $block = $this->pos->getWorld()->getBlockAt($this->pos->x, $y, $this->pos->z);
+        for($y = 0; $y < $this->position->getWorld()->getMaxY(); $y++){
+            $block = $this->position->getWorld()->getBlockAt($this->position->x, $y, $this->position->z);
 
-            if($this->pos->y === $y){
+            if($this->position->y === $y){
                 break;
             }
             if(!$block instanceof WeepingVinesBlock && $started){
                 break;
             }
             $started = true;
-            $this->pos->getWorld()->useBreakOn($block->pos);
+            $this->position->getWorld()->useBreakOn($block->position);
         }
         return $parent;
     }
@@ -100,17 +100,17 @@ class WeepingVinesBlock extends Transparent{
         $block = $this->getSide(Facing::UP);
 
         if($block instanceof Air){
-            $this->pos->getWorld()->useBreakOn($this->pos);
+            $this->position->getWorld()->useBreakOn($this->position);
         }
     }
 
     public function onRandomTick(): void{
         if($this->age !== 15){
-            if($this->pos->y === 0){
+            if($this->position->y === 0){
                 $this->age = 15;
                 return;
             }
-            $b = $this->pos->getWorld()->getBlockAt($this->pos->x, $this->pos->y - 1, $this->pos->z);
+            $b = $this->position->getWorld()->getBlockAt($this->position->x, $this->position->y - 1, $this->position->z);
 
             if($b->getId() === BlockLegacyIds::AIR){
                 $newAge = $this->age + 1;
@@ -120,7 +120,7 @@ class WeepingVinesBlock extends Transparent{
                 if($ev->isCancelled()){
                     return;
                 }
-                $this->pos->getWorld()->setBlock($b->pos, $ev->getNewState());
+                $this->position->getWorld()->setBlock($b->position, $ev->getNewState());
             }
         }
     }

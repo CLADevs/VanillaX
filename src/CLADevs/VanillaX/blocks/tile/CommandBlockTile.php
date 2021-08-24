@@ -3,7 +3,6 @@
 namespace CLADevs\VanillaX\blocks\tile;
 
 use CLADevs\VanillaX\blocks\block\CommandBlock;
-use CLADevs\VanillaX\blocks\BlockManager;
 use CLADevs\VanillaX\blocks\utils\TileVanilla;
 use CLADevs\VanillaX\commands\sender\CommandBlockSender;
 use pocketmine\block\BlockFactory;
@@ -94,14 +93,14 @@ class CommandBlockTile extends Spawnable implements Nameable{
         if($pk->commandBlockMode !== $this->commandBlockMode){
             $this->ranCommand = false;
             $this->commandBlockMode = $pk->commandBlockMode;
-            $tileBlock = $this->getPos()->getWorld()->getBlock($this->getPos());
+            $tileBlock = $this->getPosition()->getWorld()->getBlock($this->getPosition());
             /** @var CommandBlock $block */
             $block = BlockFactory::getInstance()->get(CommandBlock::asCommandBlockFromMode($this->commandBlockMode), $tileBlock->getMeta());
 
             if($tileBlock instanceof CommandBlock){
                 $block->setFacing($tileBlock->getFacing());
             }
-            $this->getPos()->getWorld()->setBlock($this->getPos(), $block);
+            $this->getPosition()->getWorld()->setBlock($this->getPosition(), $block);
         }
         if($pk->name !== $this->getName()){
             $this->setName($pk->name);
@@ -127,17 +126,17 @@ class CommandBlockTile extends Spawnable implements Nameable{
         if($pk->isConditional !== $this->conditionalMode){
             $this->conditionalMode = $pk->isConditional;
             /** @var CommandBlock $tileBlock */
-            $tileBlock = $this->getPos()->getWorld()->getBlock($this->getPos());
+            $tileBlock = $this->getPosition()->getWorld()->getBlock($this->getPosition());
             $block = BlockFactory::getInstance()->get(CommandBlock::asCommandBlockFromMode($this->commandBlockMode), 0);
             $block->setFacing($tileBlock->getFacing() + ($pk->isConditional ? 8 : -8));
-            $this->getPos()->getWorld()->setBlock($this->getPos(), $block);
+            $this->getPosition()->getWorld()->setBlock($this->getPosition(), $block);
         }
         if($this->tickDelay == 0 && strlen($this->command) >= 1){
             $this->runCommand();
         }
-        $this->pos->getWorld()->scheduleDelayedBlockUpdate($this->pos, 1);
+        $this->position->getWorld()->scheduleDelayedBlockUpdate($this->position, 1);
         $this->setDirty();
-        $this->pos->getWorld()->setBlock($this->pos, $this->getBlock());
+        $this->position->getWorld()->setBlock($this->position, $this->getBlock());
     }
 
     protected function writeSaveData(CompoundTag $nbt): void{
@@ -191,7 +190,7 @@ class CommandBlockTile extends Spawnable implements Nameable{
             $this->ranCommand = boolval($tag->getValue());
         }
         $this->setDirty();
-        $this->pos->getWorld()->setBlock($this->pos, $this->getBlock());
+        $this->position->getWorld()->setBlock($this->position, $this->getBlock());
     }
 
     protected function addAdditionalSpawnData(CompoundTag $nbt): void{

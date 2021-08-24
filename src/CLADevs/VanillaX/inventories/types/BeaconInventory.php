@@ -32,7 +32,7 @@ class BeaconInventory extends FakeBlockInventory{
                     if($tile instanceof BeaconTile){
                         $tile->setPrimary($nbt->getInt(BeaconTile::TAG_PRIMARY));
                         $tile->setSecondary($nbt->getInt(BeaconTile::TAG_SECONDARY));
-                        $tile->getPos()->getWorld()->scheduleDelayedBlockUpdate($tile->getPos(), 20);
+                        $tile->getPosition()->getWorld()->scheduleDelayedBlockUpdate($tile->getPosition(), 20);
                     }
                     return false;
                 }

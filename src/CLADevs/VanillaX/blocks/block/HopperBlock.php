@@ -27,7 +27,7 @@ class HopperBlock extends Transparent{
 
     public function onInteract(Item $item, int $face, Vector3 $clickVector, ?Player $player = null): bool{
         if($player !== null){
-            $tile = $this->getPos()->getWorld()->getTile($this->getPos());
+            $tile = $this->getPosition()->getWorld()->getTile($this->getPosition());
 
             if($tile instanceof HopperTile){
                 $player->setCurrentWindow($tile->getInventory());
@@ -37,7 +37,7 @@ class HopperBlock extends Transparent{
     }
 
     public function onScheduledUpdate(): void{
-        $tile = $this->pos->getWorld()->getTile($this->pos);
+        $tile = $this->position->getWorld()->getTile($this->position);
 
         if($tile->isClosed() || !$tile instanceof HopperTile){
             return;
@@ -54,9 +54,9 @@ class HopperBlock extends Transparent{
 
         //Thanks to nukkit for bounding box code
         //Collect dropped items
-        $bb = new AxisAlignedBB($this->pos->x, $this->pos->y, $this->pos->z, $this->pos->x + 1, $this->pos->y +2, $this->pos->z + 1);
+        $bb = new AxisAlignedBB($this->position->x, $this->position->y, $this->position->z, $this->position->x + 1, $this->position->y +2, $this->position->z + 1);
 
-        foreach($this->pos->getWorld()->getNearbyEntities($bb) as $entity){
+        foreach($this->position->getWorld()->getNearbyEntities($bb) as $entity){
             if(!$entity->isClosed() && !$entity->isFlaggedForDespawn() && $entity instanceof ItemEntity){
                 $item = $entity->getItem();
 
@@ -66,6 +66,6 @@ class HopperBlock extends Transparent{
                 }
             }
         }
-        $this->pos->getWorld()->scheduleDelayedBlockUpdate($this->pos, 1);
+        $this->position->getWorld()->scheduleDelayedBlockUpdate($this->position, 1);
     }
 }

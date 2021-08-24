@@ -2,13 +2,12 @@
 
 namespace CLADevs\VanillaX\entities\passive;
 
-use CLADevs\VanillaX\entities\utils\EntityInteractResult;
-use CLADevs\VanillaX\entities\utils\interfaces\EntityInteractable;
 use CLADevs\VanillaX\entities\utils\villager\VillagerProfession;
 use CLADevs\VanillaX\entities\utils\villager\VillagerTradeNBTStream;
 use CLADevs\VanillaX\entities\VanillaEntity;
 use CLADevs\VanillaX\inventories\types\TradeInventory;
 use CLADevs\VanillaX\session\SessionManager;
+use pocketmine\math\Vector3;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\IntTag;
 use pocketmine\nbt\tag\StringTag;
@@ -17,7 +16,7 @@ use pocketmine\network\mcpe\protocol\types\CacheableNbt;
 use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataProperties;
 use pocketmine\player\Player;
 
-class VillagerEntity extends VanillaEntity implements EntityInteractable{
+class VillagerEntity extends VanillaEntity{
 
     const TAG_PROFESSION = "Profession";
     const TAG_OFFER_BUFFER = "OfferBuffer";
@@ -178,13 +177,14 @@ class VillagerEntity extends VanillaEntity implements EntityInteractable{
         return $this->customer;
     }
 
-    public function onInteract(EntityInteractResult $result): void{
+    public function onInteract(Player $player, Vector3 $clickPos): bool{
         if($this->profession->hasTrades() && $this->customer === null){
-            $player = $result->getPlayer();
             $this->customer = $player;
             SessionManager::getInstance()->get($player)->setTradingEntity($this);
             $player->setCurrentWindow($this->inventory);
+            return true;
         }
+        return false;
     }
 
     public function flagForDespawn(): void{

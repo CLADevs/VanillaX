@@ -33,30 +33,30 @@ class TwistingVinesBlock extends Transparent{
            $item->pop();
            $height = 0;
 
-           for($y = 1; $y < $this->pos->getWorld()->getMaxY(); $y++){
-               $block = $this->pos->getWorld()->getBlock($this->pos->add(0, $y, 0));
+           for($y = 1; $y < $this->position->getWorld()->getMaxY(); $y++){
+               $block = $this->position->getWorld()->getBlock($this->position->add(0, $y, 0));
 
                if(!$block instanceof TwistingVinesBlock){
                    continue;
                }
                $height++;
            }
-            $lastBlock = $this->pos->getWorld()->getBlock($this->pos->add(0, $height, 0));
+            $lastBlock = $this->position->getWorld()->getBlock($this->position->add(0, $height, 0));
 
            if($lastBlock instanceof TwistingVinesBlock){
                $lastAge = $lastBlock->getAge();
                $size = mt_rand(1, 6);
 
                for($i = 1; $i <= $size; $i++){
-                   $b = $this->pos->getWorld()->getBlock($this->pos->add(0, $height + $i, 0));
+                   $b = $this->position->getWorld()->getBlock($this->position->add(0, $height + $i, 0));
 
-                   if($b instanceof Air && $b->pos->getY() < $b->pos->getWorld()->getMaxY()){
+                   if($b instanceof Air && $b->position->getY() < $b->position->getWorld()->getMaxY()){
                        if($lastAge > 15){
                            $lastAge = 15;
                        }else{
                            $lastAge++;
                        }
-                       $this->pos->getWorld()->setBlock($b->pos, BlockFactory::getInstance()->get(BlockVanilla::TWISTING_VINES, $lastAge > 15 ? 15 : $lastAge));
+                       $this->position->getWorld()->setBlock($b->position, BlockFactory::getInstance()->get(BlockVanilla::TWISTING_VINES, $lastAge > 15 ? 15 : $lastAge));
                    }else{
                        break;
                    }
@@ -70,13 +70,13 @@ class TwistingVinesBlock extends Transparent{
     public function onBreak(Item $item, ?Player $player = null): bool{
         $parent = parent::onBreak($item, $player);
 
-        for($y = 1; $y < $this->pos->getWorld()->getMaxY(); $y++){
-            $block = $this->pos->getWorld()->getBlock($this->pos->add(0, $y, 0));
+        for($y = 1; $y < $this->position->getWorld()->getMaxY(); $y++){
+            $block = $this->position->getWorld()->getBlock($this->position->add(0, $y, 0));
 
             if(!$block instanceof TwistingVinesBlock){
                 break;
             }
-            $this->pos->getWorld()->useBreakOn($block->pos);
+            $this->position->getWorld()->useBreakOn($block->position);
         }
         return $parent;
     }
@@ -85,17 +85,17 @@ class TwistingVinesBlock extends Transparent{
         $block = $this->getSide(Facing::DOWN);
 
         if($block instanceof Air){
-            $this->pos->getWorld()->useBreakOn($this->pos);
+            $this->position->getWorld()->useBreakOn($this->position);
         }
     }
 
     public function onRandomTick(): void{
         if($this->age !== 15){
-            if($this->pos->y === ($this->pos->getWorld()->getMaxY() - 1)){
+            if($this->position->y === ($this->position->getWorld()->getMaxY() - 1)){
                 $this->age = 15;
                 return;
             }
-            $b = $this->pos->getWorld()->getBlockAt($this->pos->x, $this->pos->y + 1, $this->pos->z);
+            $b = $this->position->getWorld()->getBlockAt($this->position->x, $this->position->y + 1, $this->position->z);
 
             if($b->getId() === BlockLegacyIds::AIR){
                 $newAge = $this->age + 1;
@@ -105,7 +105,7 @@ class TwistingVinesBlock extends Transparent{
                 if($ev->isCancelled()){
                     return;
                 }
-                $this->pos->getWorld()->setBlock($b->pos, $ev->getNewState());
+                $this->position->getWorld()->setBlock($b->position, $ev->getNewState());
             }
         }
     }

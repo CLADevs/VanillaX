@@ -11,7 +11,7 @@ class Nylium extends Block implements NonAutomaticCallItemTrait{
 
     public function onRandomTick(): void{
         if($this->getSide(Facing::UP)->isSolid()){
-           $this->pos->getWorld()->setBlock($this->pos, VanillaBlocks::NETHERRACK());
+           $this->position->getWorld()->setBlock($this->position, VanillaBlocks::NETHERRACK());
         }
     }
 

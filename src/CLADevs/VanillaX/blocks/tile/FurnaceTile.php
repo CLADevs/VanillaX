@@ -5,6 +5,7 @@ namespace CLADevs\VanillaX\blocks\tile;
 use CLADevs\VanillaX\blocks\utils\TileVanilla;
 use pocketmine\block\BlockLegacyIds;
 use pocketmine\block\tile\Furnace;
+use pocketmine\crafting\FurnaceType;
 use pocketmine\inventory\CallbackInventoryListener;
 use pocketmine\inventory\Inventory;
 use pocketmine\item\Item;
@@ -35,7 +36,7 @@ class FurnaceTile extends Furnace{
                 $newItem = $this->inventory->getItem($slot);
 
                 if($slot === 2 && $oldItem->getId() !== ItemIds::AIR && $newItem->getId() === ItemIds::AIR){
-                    $this->dropXpHolder($this->getPos());
+                    $this->dropXpHolder($this->getPosition());
                 }
             },
             null
@@ -57,5 +58,9 @@ class FurnaceTile extends Furnace{
             $position->getWorld()->dropExperience($position, intval($xpHolder * 10));
             $this->xpHolder = 0.0;
         }
+    }
+
+    public function getFurnaceType(): FurnaceType{
+        return FurnaceType::FURNACE();
     }
 }

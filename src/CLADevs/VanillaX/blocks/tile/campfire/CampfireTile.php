@@ -38,7 +38,7 @@ abstract class CampfireTile extends Spawnable implements NonAutomaticCallItemTra
 
     public function close(): void{
         foreach($this->items as $item){
-            $this->pos->getWorld()->dropItem($this->pos->add(0, 1, 0), $item);
+            $this->position->getWorld()->dropItem($this->position->add(0, 1, 0), $item);
         }
         $this->items = [];
         parent::close();
@@ -107,9 +107,10 @@ abstract class CampfireTile extends Spawnable implements NonAutomaticCallItemTra
     }
 
     /**
+     * @param bool $includeEmpty
      * @return Item[]
      */
-    public function getContents(): array{
+    public function getContents(bool $includeEmpty = false): array{
         return $this->items;
     }
 

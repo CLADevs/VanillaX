@@ -33,7 +33,7 @@ class BeaconBlock extends Transparent{
      */
     public function onInteract(Item $item, int $face, Vector3 $clickVector, ?Player $player = null): bool{
         if($player instanceof Player){
-            $player->setCurrentWindow(new BeaconInventory($this->pos));
+            $player->setCurrentWindow(new BeaconInventory($this->position));
         }
         return true;
     }
@@ -42,7 +42,7 @@ class BeaconBlock extends Transparent{
      * @throws Exception
      */
     public function onScheduledUpdate(): void{
-        $tile = $this->pos->getWorld()->getTile($this->pos);
+        $tile = $this->position->getWorld()->getTile($this->position);
 
         if(!$tile instanceof BeaconTile){
             return;
@@ -66,7 +66,7 @@ class BeaconBlock extends Transparent{
             $effectDuration = 20 * (9 + (2 * $level));
 
             foreach(Server::getInstance()->getOnlinePlayers() as $p){
-                if($p->getPosition()->distance($this->getPos()) < $radius){
+                if($p->getPosition()->distance($this->getPosition()) < $radius){
                     foreach([$primary, $secondary] as $effectId){
                         if($effectId !== 0){
                             $p->getEffects()->add(new EffectInstance(EffectIdMap::getInstance()->fromId($effectId), $effectDuration));
@@ -75,7 +75,7 @@ class BeaconBlock extends Transparent{
                 }
             }
         }
-        $this->pos->getWorld()->scheduleDelayedBlockUpdate($this->pos, 20 * 3);
+        $this->position->getWorld()->scheduleDelayedBlockUpdate($this->position, 20 * 3);
     }
 
     /**
@@ -91,7 +91,7 @@ class BeaconBlock extends Transparent{
         $i = 0;
         for($x = -$level; $x <= $level; $x++){
             for($z = -$level; $z <= $level; $z++){
-                $block = $this->pos->getWorld()->getBlock($this->pos->add($x, 0, $z)->subtract(0, $level, 0));
+                $block = $this->position->getWorld()->getBlock($this->position->add($x, 0, $z)->subtract(0, $level, 0));
 
                 if(!in_array($block->getId(), [BlockLegacyIds::IRON_BLOCK, BlockLegacyIds::GOLD_BLOCK, BlockLegacyIds::DIAMOND_BLOCK, BlockLegacyIds::EMERALD_BLOCK, BlockVanilla::NETHERITE_BLOCK])){
                     return false;

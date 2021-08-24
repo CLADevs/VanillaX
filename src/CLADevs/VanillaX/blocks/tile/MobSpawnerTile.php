@@ -51,7 +51,7 @@ class MobSpawnerTile extends Spawnable{
         $this->validEntity = true;
         $this->setDirty();
         if($previousEntity === null && $this->entity !== null){
-            $this->pos->getWorld()->scheduleDelayedBlockUpdate($this->pos, 1);
+            $this->position->getWorld()->scheduleDelayedBlockUpdate($this->position, 1);
         }
     }
 
@@ -121,7 +121,7 @@ class MobSpawnerTile extends Spawnable{
 
     public function canEntityGenerate(): bool{
         foreach(Server::getInstance()->getOnlinePlayers() as $player){
-            if($player->getPosition()->distance($this->getPos()) < 16){
+            if($player->getPosition()->distance($this->getPosition()) < 16){
                 return true;
             }
         }

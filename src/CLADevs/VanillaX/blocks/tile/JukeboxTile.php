@@ -63,14 +63,14 @@ class JukeboxTile extends Tile{
         $this->recordItem = clone $disc;
         $disc->pop();
         $inserter->sendPopup(TextFormat::LIGHT_PURPLE . "Now playing: " . MusicDiscItem::getRecordName($disc->getId()));
-        $this->broadcastLevelSoundEvent($this->getPos(), $disc->getSoundId());
+        $this->broadcastLevelSoundEvent($this->getPosition(), $disc->getSoundId());
     }
 
     public function removeTrack(): void{
         if($this->recordItem !== null){
             $this->recordDuration = 0;
-            $this->broadcastLevelSoundEvent($this->getPos(), LevelSoundEventPacket::SOUND_STOP_RECORD);
-            $this->getPos()->getWorld()->dropItem($this->getPos()->add(0, 1, 0), $this->recordItem);
+            $this->broadcastLevelSoundEvent($this->getPosition(), LevelSoundEventPacket::SOUND_STOP_RECORD);
+            $this->getPosition()->getWorld()->dropItem($this->getPosition()->add(0, 1, 0), $this->recordItem);
             $this->recordItem = null;
         }
     }

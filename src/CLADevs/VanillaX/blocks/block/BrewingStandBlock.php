@@ -27,7 +27,7 @@ class BrewingStandBlock extends BrewingStand{
 
     public function onInteract(Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
         if($player !== null){
-            $tile = $this->pos->getWorld()->getTile($this->pos);
+            $tile = $this->position->getWorld()->getTile($this->position);
 
             if($tile instanceof BrewingStandTile){
                 $player->setCurrentWindow($tile->getInventory());
@@ -37,7 +37,7 @@ class BrewingStandBlock extends BrewingStand{
     }
 
     public function onScheduledUpdate(): void{
-        $tile = $this->pos->getWorld()->getTile($this->pos);
+        $tile = $this->position->getWorld()->getTile($this->position);
 
         if($tile->isClosed() || !$tile instanceof BrewingStandTile){
             return;
@@ -70,7 +70,7 @@ class BrewingStandBlock extends BrewingStand{
                 }
                 $inventory->decreaseIngredient();
                 $tile->setFuelAmount($tile->getFuelAmount() - 1, true);
-                $tile->getPos()->getWorld()->broadcastPacketToViewers($tile->getPos(), LevelSoundEventPacket::create(LevelSoundEventPacket::SOUND_POTION_BREWED, $tile->getPos()));
+                $tile->getPosition()->getWorld()->broadcastPacketToViewers($tile->getPosition(), LevelSoundEventPacket::create(LevelSoundEventPacket::SOUND_POTION_BREWED, $tile->getPosition()));
 
                 if($tile->getFuelAmount() <= 0 && !$inventory->getFuel()->isNull()){
                     $inventory->decreaseFuel();
@@ -78,6 +78,6 @@ class BrewingStandBlock extends BrewingStand{
                 }
             }
         }
-        $this->pos->getWorld()->scheduleDelayedBlockUpdate($this->pos, 1);
+        $this->position->getWorld()->scheduleDelayedBlockUpdate($this->position, 1);
     }
 }

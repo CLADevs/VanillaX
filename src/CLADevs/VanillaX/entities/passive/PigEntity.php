@@ -2,8 +2,6 @@
 
 namespace CLADevs\VanillaX\entities\passive;
 
-use CLADevs\VanillaX\entities\utils\EntityInteractResult;
-use CLADevs\VanillaX\entities\utils\interfaces\EntityInteractable;
 use CLADevs\VanillaX\entities\utils\interfaces\EntityRidable;
 use CLADevs\VanillaX\entities\utils\traits\EntityRidableTrait;
 use CLADevs\VanillaX\entities\VanillaEntity;
@@ -22,7 +20,7 @@ use pocketmine\network\mcpe\protocol\types\entity\EntityIds;
 use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataFlags;
 use pocketmine\player\Player;
 
-class PigEntity extends VanillaEntity implements EntityInteractable, InteractButtonItemTrait, EntityRidable, HeldItemChangeTrait{
+class PigEntity extends VanillaEntity implements InteractButtonItemTrait, EntityRidable, HeldItemChangeTrait{
     use EntityRidableTrait;
 
     const TAG_SADDLED = "Saddled";
@@ -67,9 +65,10 @@ class PigEntity extends VanillaEntity implements EntityInteractable, InteractBut
         return $nbt;
     }
 
-    public function onInteract(EntityInteractResult $result): void{
-        $player = $result->getPlayer();
-        $this->onButtonPressed(new InteractButtonResult($player, $result->getItem(), $player->getDataPropertyManager()->getString(self::DATA_INTERACTIVE_TAG)));
+    public function onInteract(Player $player, Vector3 $clickPos): bool{
+        $interactiveText = SessionManager::getInstance()->get($player)->getInteractiveText();
+        $this->onButtonPressed(new InteractButtonResult($player, $player->getInventory()->getItemInHand(), $interactiveText));
+        return true;
     }
 
     public function onMouseHover(Player $player): void{

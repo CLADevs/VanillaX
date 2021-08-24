@@ -2,8 +2,6 @@
 
 namespace CLADevs\VanillaX\entities\passive;
 
-use CLADevs\VanillaX\entities\utils\EntityInteractResult;
-use CLADevs\VanillaX\entities\utils\interfaces\EntityInteractable;
 use CLADevs\VanillaX\entities\utils\interfaces\EntityRidable;
 use CLADevs\VanillaX\entities\utils\traits\EntityRidableTrait;
 use CLADevs\VanillaX\entities\VanillaEntity;
@@ -21,7 +19,7 @@ use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataFlags;
 use pocketmine\player\Player;
 
-class StriderEntity extends VanillaEntity implements EntityInteractable, InteractButtonItemTrait, EntityRidable, HeldItemChangeTrait{
+class StriderEntity extends VanillaEntity implements InteractButtonItemTrait, EntityRidable, HeldItemChangeTrait{
     use EntityRidableTrait;
 
     const BUTTON_SADDLE = "Saddle";
@@ -62,10 +60,10 @@ class StriderEntity extends VanillaEntity implements EntityInteractable, Interac
         return $nbt;
     }
 
-    public function onInteract(EntityInteractResult $result): void{
-        $player = $result->getPlayer();
+    public function onInteract(Player $player, Vector3 $clickPos): bool{
         $interactiveText = SessionManager::getInstance()->get($player)->getInteractiveText();
-        $this->onButtonPressed(new InteractButtonResult($player, $result->getItem(), $interactiveText));
+        $this->onButtonPressed(new InteractButtonResult($player, $player->getInventory()->getItemInHand(), $interactiveText));
+        return true;
     }
 
     public function onMouseHover(Player $player): void{

@@ -140,7 +140,7 @@ class BrewingStandTile extends Spawnable implements Container, Nameable{
 
     public function close(): void{
         foreach($this->inventory->getContents() as $item){
-            $this->getPos()->getWorld()->dropItem($this->getPos(), $item);
+            $this->getPosition()->getWorld()->dropItem($this->getPosition(), $item);
         }
         $this->inventory->clearAll();
         parent::close();

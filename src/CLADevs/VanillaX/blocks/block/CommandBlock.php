@@ -57,21 +57,21 @@ class CommandBlock extends Block implements NonAutomaticCallItemTrait, NonCreati
 
     public function onInteract(Item $item, int $face, Vector3 $clickVector, ?Player $player = null): bool{
         if($player !== null && $player->hasPermission(DefaultPermissions::ROOT_OPERATOR)){
-            $tile = $this->getPos()->getWorld()->getTile($this->getPos());
+            $tile = $this->getPosition()->getWorld()->getTile($this->getPosition());
 
             $pk = new ContainerOpenPacket();
             $pk->type = WindowTypes::COMMAND_BLOCK;
             $pk->windowId = ContainerIds::NONE;
-            $pk->x = $tile->getPos()->x;
-            $pk->y = $tile->getPos()->y;
-            $pk->z = $tile->getPos()->z;
+            $pk->x = $tile->getPosition()->x;
+            $pk->y = $tile->getPosition()->y;
+            $pk->z = $tile->getPosition()->z;
             $player->getNetworkSession()->sendDataPacket($pk);
         }
         return true;
     }
 
     public function onScheduledUpdate(): void{
-        $tile = $this->pos->getWorld()->getTile($this->pos);
+        $tile = $this->position->getWorld()->getTile($this->position);
 
         if($tile->isClosed() || !$tile instanceof CommandBlockTile){
             return;
@@ -82,7 +82,7 @@ class CommandBlock extends Block implements NonAutomaticCallItemTrait, NonCreati
             $tile->runCommand();
             if($tile->getCommandBlockMode() === CommandBlockTile::TYPE_REPEAT){
                 $tile->setCountDelayTick($tile->getTickDelay());
-                $this->pos->getWorld()->scheduleDelayedBlockUpdate($this->pos, 1);
+                $this->position->getWorld()->scheduleDelayedBlockUpdate($this->position, 1);
             }
         }
     }

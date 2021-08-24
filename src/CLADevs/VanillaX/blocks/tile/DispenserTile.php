@@ -22,7 +22,7 @@ class DispenserTile extends Spawnable implements Container{
 
     public function __construct(World $world, Vector3 $pos){
         parent::__construct($world, $pos);
-        $this->inventory = new DispenserInventory($this->getPos());
+        $this->inventory = new DispenserInventory($this->getPosition());
     }
 
     public function getInventory(): DispenserInventory{

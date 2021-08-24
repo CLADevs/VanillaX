@@ -2,8 +2,6 @@
 
 namespace CLADevs\VanillaX\entities\object;
 
-use CLADevs\VanillaX\entities\utils\EntityInteractResult;
-use CLADevs\VanillaX\entities\utils\interfaces\EntityInteractable;
 use CLADevs\VanillaX\entities\utils\traits\EntityContainer;
 use CLADevs\VanillaX\inventories\FakeBlockInventory;
 use CLADevs\VanillaX\world\gamerule\GameRule;
@@ -11,10 +9,12 @@ use CLADevs\VanillaX\world\gamerule\GameRuleManager;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
+use pocketmine\math\Vector3;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\network\mcpe\protocol\types\entity\EntityIds;
+use pocketmine\player\Player;
 
-class ChestMinecartEntity extends MinecartEntity implements EntityInteractable{
+class ChestMinecartEntity extends MinecartEntity{
 use EntityContainer;
 
     const NETWORK_ID = EntityIds::CHEST_MINECART;
@@ -44,8 +44,9 @@ use EntityContainer;
         parent::kill();
     }
 
-    public function onInteract(EntityInteractResult $result): void{
-        $result->getPlayer()->setCurrentWindow($this->inventory);
+    public function onInteract(Player $player, Vector3 $clickPos): bool{
+        $player->setCurrentWindow($this->inventory);
+        return true;
     }
 
     public function getContainerSaveName(): string{

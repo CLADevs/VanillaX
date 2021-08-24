@@ -22,7 +22,7 @@ class DropperTile extends Spawnable implements Container{
 
     public function __construct(World $world, Vector3 $pos){
         parent::__construct($world, $pos);
-        $this->inventory = new DropperInventory($this->getPos());
+        $this->inventory = new DropperInventory($this->getPosition());
     }
 
     public function getInventory(): DropperInventory{

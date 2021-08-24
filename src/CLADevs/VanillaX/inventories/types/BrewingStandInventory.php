@@ -30,7 +30,7 @@ class BrewingStandInventory extends FakeBlockInventory{
     private BrewingStandTile $tile;
 
     public function __construct(BrewingStandTile $tile){
-        parent::__construct($tile->getPos(), 5, BlockLegacyIds::AIR, WindowTypes::BREWING_STAND);
+        parent::__construct($tile->getPosition(), 5, BlockLegacyIds::AIR, WindowTypes::BREWING_STAND);
         $this->tile = $tile;
     }
 
@@ -117,7 +117,7 @@ class BrewingStandInventory extends FakeBlockInventory{
                                 }
                                 $block->setFacing($damage);
                             }
-                            $player->getWorld()->setBlock($block->getPos(), $block);
+                            $player->getWorld()->setBlock($block->getPosition(), $block);
                             break;
                         case self::FUEL_SLOT:
                             if(!$this->tile->isFueled() && $newItem->getId() === ItemIds::BLAZE_POWDER){
