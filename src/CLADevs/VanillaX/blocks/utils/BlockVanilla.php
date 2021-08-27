@@ -7,6 +7,14 @@ interface BlockVanilla{
     public const ALLOW = 210;
     public const DENY = 211;
     public const BORDER_BLOCK = 212;
+    public const STRUCTURE_VOID = 217;
+    public const CAMERA = 242;
+    public const LIGHT_BLOCK = 470;
+    public const WITHER_ROSE = 471;
+    public const STICKYPISTONARMCOLLISION = 472;
+    public const BEE_NEST = 473;
+    public const BEEHIVE = 474;
+    public const HONEY_BLOCK = 475;
     public const HONEYCOMB_BLOCK = 476;
     public const LODESTONE = 477;
     public const CRIMSON_ROOTS = 478;
