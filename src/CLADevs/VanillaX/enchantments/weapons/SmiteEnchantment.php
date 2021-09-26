@@ -10,12 +10,21 @@ use pocketmine\item\enchantment\ItemFlags;
 use pocketmine\item\enchantment\Rarity;
 use pocketmine\item\Item;
 use pocketmine\item\Sword;
+use pocketmine\lang\KnownTranslationFactory;
 
 class SmiteEnchantment extends Enchantment{
     use EnchantmentTrait;
 
     public function __construct(){
-        parent::__construct(EnchantmentIds::SMITE, "%enchantment.damage.undead", Rarity::UNCOMMON, ItemFlags::SWORD, ItemFlags::AXE, 5);
+        parent::__construct(KnownTranslationFactory::enchantment_damage_undead(), Rarity::UNCOMMON, ItemFlags::SWORD, ItemFlags::AXE, 5);
+    }
+
+    public function getId(): string{
+        return "smite";
+    }
+
+    public function getMcpeId(): int{
+        return EnchantmentIds::SMITE;
     }
 
     public function getIncompatibles(): array{

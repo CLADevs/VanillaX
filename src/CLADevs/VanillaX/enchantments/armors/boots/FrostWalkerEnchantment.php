@@ -10,12 +10,21 @@ use pocketmine\item\enchantment\Enchantment;
 use pocketmine\item\enchantment\ItemFlags;
 use pocketmine\item\enchantment\Rarity;
 use pocketmine\item\Item;
+use pocketmine\lang\KnownTranslationFactory;
 
 class FrostWalkerEnchantment extends Enchantment{
     use EnchantmentTrait;
 
     public function __construct(){
-        parent::__construct(EnchantmentIds::FROST_WALKER, "%enchantment.frostwalker", Rarity::MYTHIC, ItemFlags::FEET, ItemFlags::NONE, 2);
+        parent::__construct(KnownTranslationFactory::enchantment_frostwalker(), Rarity::MYTHIC, ItemFlags::FEET, ItemFlags::NONE, 2);
+    }
+
+    public function getId(): string{
+        return "frost_walker";
+    }
+
+    public function getMcpeId(): int{
+        return EnchantmentIds::FROST_WALKER;
     }
 
     public function isTreasure(): bool{

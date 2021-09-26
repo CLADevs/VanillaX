@@ -10,16 +10,25 @@ use pocketmine\item\enchantment\ItemFlags;
 use pocketmine\item\enchantment\ProtectionEnchantment;
 use pocketmine\item\enchantment\Rarity;
 use pocketmine\item\Item;
+use pocketmine\lang\KnownTranslationFactory;
 
 class FireProtectionEnchantment extends ProtectionEnchantment{
     use EnchantmentTrait;
 
     public function __construct(){
-        parent::__construct(EnchantmentIds::FIRE_PROTECTION, "%enchantment.protect.fire", Rarity::UNCOMMON, ItemFlags::ARMOR, ItemFlags::NONE, 4, 1.25, [
+        parent::__construct(KnownTranslationFactory::enchantment_protect_fire(), Rarity::UNCOMMON, ItemFlags::ARMOR, ItemFlags::NONE, 4, 1.25, [
             EntityDamageEvent::CAUSE_FIRE,
             EntityDamageEvent::CAUSE_FIRE_TICK,
             EntityDamageEvent::CAUSE_LAVA
         ]);
+    }
+
+    public function getId(): string{
+        return "fire_protection";
+    }
+
+    public function getMcpeId(): int{
+        return EnchantmentIds::FIRE_PROTECTION;
     }
 
     public function getIncompatibles(): array{

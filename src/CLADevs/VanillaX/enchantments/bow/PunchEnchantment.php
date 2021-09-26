@@ -9,12 +9,21 @@ use pocketmine\item\enchantment\ItemFlags;
 use pocketmine\item\enchantment\Rarity;
 use pocketmine\item\Item;
 use pocketmine\item\ItemIds;
+use pocketmine\lang\KnownTranslationFactory;
 
 class PunchEnchantment extends Enchantment{
     use EnchantmentTrait;
 
     public function __construct(){
-        parent::__construct(EnchantmentIds::PUNCH, "%enchantment.arrowKnockback", Rarity::RARE, ItemFlags::BOW, ItemFlags::NONE, 2);
+        parent::__construct(KnownTranslationFactory::enchantment_arrowKnockback(), Rarity::RARE, ItemFlags::BOW, ItemFlags::NONE, 2);
+    }
+
+    public function getId(): string{
+        return "punch";
+    }
+
+    public function getMcpeId(): int{
+        return EnchantmentIds::PUNCH;
     }
 
     public function isItemCompatible(Item $item): bool{

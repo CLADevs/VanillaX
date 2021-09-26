@@ -3,7 +3,6 @@
 namespace CLADevs\VanillaX\blocks\utils\traits;
 
 use pocketmine\block\Block;
-use pocketmine\block\utils\HorizontalFacingTrait;
 use pocketmine\item\Item;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;

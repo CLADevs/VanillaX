@@ -8,6 +8,7 @@ use CLADevs\VanillaX\entities\utils\EntityIdentifierX;
 use pocketmine\block\BlockLegacyIds;
 use pocketmine\block\tile\Spawnable;
 use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\nbt\tag\IntTag;
 use pocketmine\Server;
 
 class MobSpawnerTile extends Spawnable{
@@ -133,25 +134,30 @@ class MobSpawnerTile extends Spawnable{
             $this->setEntityId($nbt->getInt(self::TAG_ENTITY_ID));
         }
         if(($tag = $nbt->getTag(self::TAG_SPAWN_COUNT)) !== null){
-            $this->spawnCount = $nbt->getInt(self::TAG_SPAWN_COUNT);
+            $this->spawnCount = (int)$nbt->getTag(self::TAG_SPAWN_COUNT)->getValue();
         }
         if(($tag = $nbt->getTag(self::TAG_SPAWN_RANGE)) !== null){
-            $this->spawnRange = $nbt->getInt(self::TAG_SPAWN_RANGE);
+            $this->spawnRange = (int)$nbt->getTag(self::TAG_SPAWN_RANGE)->getValue();
         }
         if(($tag = $nbt->getTag(self::TAG_MIN_SPAWN_DELAY)) !== null){
-            $this->minSpawnDelay = $nbt->getInt(self::TAG_MIN_SPAWN_DELAY);
+            $this->minSpawnDelay = (int)$nbt->getTag(self::TAG_MIN_SPAWN_DELAY)->getValue();
         }
         if(($tag = $nbt->getTag(self::TAG_MAX_SPAWN_DELAY)) !== null){
-            $this->maxSpawnDelay = $nbt->getInt(self::TAG_MAX_SPAWN_DELAY);
+            $this->maxSpawnDelay = (int)$nbt->getTag(self::TAG_MAX_SPAWN_DELAY)->getValue();
         }
     }
 
     protected function writeSaveData(CompoundTag $nbt): void{
+        foreach([self::TAG_SPAWN_COUNT, self::TAG_SPAWN_RANGE, self::TAG_MIN_SPAWN_DELAY, self::TAG_MAX_SPAWN_DELAY] as $id){
+            if($nbt->getTag($id) instanceof IntTag){
+                $nbt->removeTag($id);
+            }
+        }
         $nbt->setInt(self::TAG_ENTITY_ID, $this->entityId);
-        $nbt->setInt(self::TAG_SPAWN_COUNT, $this->spawnCount);
-        $nbt->setInt(self::TAG_SPAWN_RANGE, $this->spawnRange);
-        $nbt->setInt(self::TAG_MIN_SPAWN_DELAY, $this->minSpawnDelay);
-        $nbt->setInt(self::TAG_MAX_SPAWN_DELAY, $this->maxSpawnDelay);
+        $nbt->setShort(self::TAG_SPAWN_COUNT, $this->spawnCount);
+        $nbt->setShort(self::TAG_SPAWN_RANGE, $this->spawnRange);
+        $nbt->setShort(self::TAG_MIN_SPAWN_DELAY, $this->minSpawnDelay);
+        $nbt->setShort(self::TAG_MAX_SPAWN_DELAY, $this->maxSpawnDelay);
     }
 
     protected function addAdditionalSpawnData(CompoundTag $nbt): void{

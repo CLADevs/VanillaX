@@ -9,12 +9,21 @@ use pocketmine\item\enchantment\ItemFlags;
 use pocketmine\item\enchantment\Rarity;
 use pocketmine\item\Item;
 use pocketmine\item\ItemIds;
+use pocketmine\lang\KnownTranslationFactory;
 
 class RiptideEnchantment extends Enchantment{
     use EnchantmentTrait;
 
     public function __construct(){
-        parent::__construct(EnchantmentIds::RIPTIDE, "%enchantment.tridentRiptide", Rarity::RARE, ItemFlags::TRIDENT, ItemFlags::NONE, 3);
+        parent::__construct(KnownTranslationFactory::enchantment_tridentRiptide(), Rarity::RARE, ItemFlags::TRIDENT, ItemFlags::NONE, 3);
+    }
+
+    public function getId(): string{
+        return "riptide";
+    }
+
+    public function getMcpeId(): int{
+        return EnchantmentIds::RIPTIDE;
     }
 
     public function getIncompatibles(): array{

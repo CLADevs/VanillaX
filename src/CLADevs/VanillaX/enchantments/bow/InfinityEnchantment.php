@@ -9,12 +9,21 @@ use pocketmine\item\enchantment\ItemFlags;
 use pocketmine\item\enchantment\Rarity;
 use pocketmine\item\Item;
 use pocketmine\item\ItemIds;
+use pocketmine\lang\KnownTranslationFactory;
 
 class InfinityEnchantment extends Enchantment{
     use EnchantmentTrait;
 
     public function __construct(){
-        parent::__construct(EnchantmentIds::INFINITY, "%enchantment.arrowInfinite", Rarity::MYTHIC, ItemFlags::BOW, ItemFlags::NONE, 1);
+        parent::__construct(KnownTranslationFactory::enchantment_arrowInfinite(), Rarity::MYTHIC, ItemFlags::BOW, ItemFlags::NONE, 1);
+    }
+
+    public function getId(): string{
+        return "infinity";
+    }
+
+    public function getMcpeId(): int{
+        return EnchantmentIds::INFINITY;
     }
 
     public function getIncompatibles(): array{

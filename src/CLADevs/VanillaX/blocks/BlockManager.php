@@ -5,10 +5,6 @@ namespace CLADevs\VanillaX\blocks;
 use CLADevs\VanillaX\blocks\block\campfire\Campfire;
 use CLADevs\VanillaX\blocks\block\CommandBlock;
 use CLADevs\VanillaX\blocks\block\FlowerPotBlock;
-use CLADevs\VanillaX\blocks\block\fungus\Fungus;
-use CLADevs\VanillaX\blocks\block\redstone\RedstoneComparator;
-use CLADevs\VanillaX\blocks\block\redstone\RedstoneLamp;
-use CLADevs\VanillaX\blocks\block\redstone\RedstoneRepeater;
 use CLADevs\VanillaX\blocks\tile\campfire\RegularCampfireTile;
 use CLADevs\VanillaX\blocks\tile\campfire\SoulCampfireTile;
 use CLADevs\VanillaX\blocks\tile\FlowerPotTile;
@@ -160,11 +156,9 @@ class BlockManager{
         $this->registerChiseled();
         $this->registerCracked();
         $this->registerPlanks();
-        $this->registerFungus();
         $this->registerDoors();
         $this->registerFence();
         $this->registerStairs();
-        $this->registerRedstone();
         $this->registerCommandBlock();
 
         self::registerBlock(new Block(new BlockIdentifier(BlockLegacyIds::SLIME_BLOCK, 0), "Slime", new BlockBreakInfo(0)));
@@ -209,11 +203,6 @@ class BlockManager{
         self::registerBlock(new Planks(new BlockIdentifier(BlockVanilla::WARPED_PLANKS, 0, ItemIdentifiers::WARPED_PLANKS), "Warped Planks", new BlockBreakInfo(2, BlockToolType::AXE, 0, 3)));
     }
 
-    private function registerFungus(): void{
-        self::registerBlock(new Fungus(BlockVanilla::CRIMSON_NYLIUM, new BlockIdentifier(BlockVanilla::CRIMSON_FUNGUS, 0, ItemIdentifiers::CRIMSON_FUNGUS), "Crimson Fungus", BlockBreakInfo::instant()));
-        self::registerBlock(new Fungus(BlockVanilla::WARPED_NYLIUM, new BlockIdentifier(BlockVanilla::WARPED_FUNGUS, 0, ItemIdentifiers::WARPED_FUNGUS), "Warped Fungus", BlockBreakInfo::instant()));
-    }
-
     private function registerDoors(): void{
         self::registerBlock(new Door(new BlockIdentifier(BlockVanilla::CRIMSON_DOOR, 0, ItemIdentifiers::CRIMSON_DOOR), "Crimson Door", new BlockBreakInfo(3, BlockToolType::AXE)));
         self::registerBlock(new Door(new BlockIdentifier(BlockVanilla::WARPED_DOOR, 0, ItemIdentifiers::WARPED_DOOR), "Warped Door", new BlockBreakInfo(3, BlockToolType::AXE)));
@@ -234,14 +223,6 @@ class BlockManager{
         self::registerBlock(new Stair(new BlockIdentifier(BlockVanilla::POLISHED_BLACKSTONE_BRICK_STAIRS, 0, ItemIdentifiers::POLISHED_BLACKSTONE_BRICK_STAIRS), "Polished Blackstone Brick Stairs", new BlockBreakInfo(3, BlockToolType::AXE, 0, 6)));
         self::registerBlock(new Stair(new BlockIdentifier(BlockVanilla::POLISHED_BLACKSTONE_STAIRS, 0, ItemIdentifiers::POLISHED_BLACKSTONE_STAIRS), "Polished Blackstone Stairs", new BlockBreakInfo(3, BlockToolType::AXE, 0, 6)));
         self::registerBlock(new Stair(new BlockIdentifier(BlockVanilla::WARPED_STAIRS, 0, ItemIdentifiers::WARPED_STAIRS), "Warped Stairs", new BlockBreakInfo(3, BlockToolType::AXE, 0, 6)));
-    }
-
-    private function registerRedstone(): void{
-        self::registerBlock(new RedstoneComparator(true));
-        self::registerBlock(new RedstoneComparator(false));
-        self::registerBlock(new RedstoneRepeater(true));
-        self::registerBlock(new RedstoneRepeater(false));
-        self::registerBlock(new RedstoneLamp());
     }
 
     private function registerCommandBlock(): void{

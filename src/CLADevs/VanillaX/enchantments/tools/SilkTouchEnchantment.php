@@ -9,12 +9,21 @@ use pocketmine\item\enchantment\ItemFlags;
 use pocketmine\item\enchantment\Rarity;
 use pocketmine\item\Item;
 use pocketmine\item\Tool;
+use pocketmine\lang\KnownTranslationFactory;
 
 class SilkTouchEnchantment extends Enchantment{
     use EnchantmentTrait;
 
     public function __construct(){
-        parent::__construct(EnchantmentIds::SILK_TOUCH, "%enchantment.untouching", Rarity::MYTHIC, ItemFlags::DIG, ItemFlags::SHEARS, 1);
+        parent::__construct(KnownTranslationFactory::enchantment_untouching(), Rarity::MYTHIC, ItemFlags::DIG, ItemFlags::SHEARS, 1);
+    }
+
+    public function getId(): string{
+        return "silk_touch";
+    }
+
+    public function getMcpeId(): int{
+        return EnchantmentIds::SILK_TOUCH;
     }
 
     public function getIncompatibles(): array{

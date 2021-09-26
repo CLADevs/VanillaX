@@ -9,12 +9,21 @@ use pocketmine\item\enchantment\ItemFlags;
 use pocketmine\item\enchantment\Rarity;
 use pocketmine\item\Item;
 use pocketmine\item\ItemIds;
+use pocketmine\lang\KnownTranslationFactory;
 
 class LoyaltyEnchantment extends Enchantment{
     use EnchantmentTrait;
 
     public function __construct(){
-        parent::__construct(EnchantmentIds::LOYALTY, "%enchantment.tridentLoyalty", Rarity::RARE, ItemFlags::TRIDENT, ItemFlags::NONE, 5);
+        parent::__construct(KnownTranslationFactory::enchantment_tridentLoyalty(), Rarity::RARE, ItemFlags::TRIDENT, ItemFlags::NONE, 5);
+    }
+
+    public function getId(): string{
+        return "loyalty";
+    }
+
+    public function getMcpeId(): int{
+        return EnchantmentIds::LOYALTY;
     }
 
     public function getIncompatibles(): array{

@@ -38,11 +38,17 @@
 - Cracked (Polished Blackstone & Nether Bricks)
 
 #### TODO Blocks Functionality:
+- Cauldron
+- Dispenser
+- Dropper
+- Dragon Egg
 - Magma Block(pmmp collision box)
-- Structure Block
 - Chiseled Blocks (every)
 - Cracked Blocks (every)
 - Warped Blocks (every)
+- Slabs (every)
+- Trap Doors(every)
+- Stems (every)
 - Crimson (every)
 - Kelp (every)
 - Blackstone (every)
@@ -61,6 +67,8 @@
 - Stonecutter Block
 - Stripped Blocks (every)
 - Sweet Berry (every)
+- Structure Block
+- Structure Void
 - Turtle Egg
 - 1.17 Blocks
 
@@ -82,7 +90,6 @@
 - ArmorStand
 - Shield
 - Firework Rocket
-- Crossbow (TODO: Fireworks functionality)
 
 #### TODO Items:
 - Fishing Rod
@@ -90,7 +97,12 @@
 - Lead
 - Lingering Potion
 - Map
+- Crossbow
 - 1.17 Items
+
+### TODO Enchantments
+- Crossbow Enchantments
+- Fishing Rod Enchantments
 
 #### Features:
 - Weather

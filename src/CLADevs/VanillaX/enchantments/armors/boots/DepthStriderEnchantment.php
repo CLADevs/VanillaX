@@ -10,12 +10,21 @@ use pocketmine\item\enchantment\Enchantment;
 use pocketmine\item\enchantment\ItemFlags;
 use pocketmine\item\enchantment\Rarity;
 use pocketmine\item\Item;
+use pocketmine\lang\KnownTranslationFactory;
 
 class DepthStriderEnchantment extends Enchantment{
     use EnchantmentTrait;
 
     public function __construct(){
-        parent::__construct(EnchantmentIds::DEPTH_STRIDER, "%enchantment.waterWalker", Rarity::RARE, ItemFlags::FEET, ItemFlags::NONE, 3);
+        parent::__construct(KnownTranslationFactory::enchantment_waterWalker(), Rarity::RARE, ItemFlags::FEET, ItemFlags::NONE, 3);
+    }
+
+    public function getId(): string{
+        return "death_strider";
+    }
+
+    public function getMcpeId(): int{
+        return EnchantmentIds::DEPTH_STRIDER;
     }
 
     public function getIncompatibles(): array{

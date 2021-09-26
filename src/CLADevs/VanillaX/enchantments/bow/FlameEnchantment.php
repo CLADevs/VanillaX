@@ -9,12 +9,21 @@ use pocketmine\item\enchantment\ItemFlags;
 use pocketmine\item\enchantment\Rarity;
 use pocketmine\item\Item;
 use pocketmine\item\ItemIds;
+use pocketmine\lang\KnownTranslationFactory;
 
 class FlameEnchantment extends Enchantment{
     use EnchantmentTrait;
 
     public function __construct(){
-        parent::__construct(EnchantmentIds::FLAME, "%enchantment.arrowFire", Rarity::RARE, ItemFlags::BOW, ItemFlags::NONE, 1);
+        parent::__construct(KnownTranslationFactory::enchantment_arrowFire(), Rarity::RARE, ItemFlags::BOW, ItemFlags::NONE, 1);
+    }
+
+    public function getId(): string{
+        return "flame";
+    }
+
+    public function getMcpeId(): int{
+        return EnchantmentIds::FLAME;
     }
 
     public function isItemCompatible(Item $item): bool{

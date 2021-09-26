@@ -10,12 +10,21 @@ use pocketmine\item\enchantment\Enchantment;
 use pocketmine\item\enchantment\ItemFlags;
 use pocketmine\item\enchantment\Rarity;
 use pocketmine\item\Item;
+use pocketmine\lang\KnownTranslationFactory;
 
 class RespirationEnchantment extends Enchantment{
     use EnchantmentTrait;
 
     public function __construct(){
-        parent::__construct(EnchantmentIds::RESPIRATION, "%enchantment.oxygen", Rarity::RARE, ItemFlags::HEAD, ItemFlags::NONE, 3);
+        parent::__construct(KnownTranslationFactory::enchantment_oxygen(), Rarity::RARE, ItemFlags::HEAD, ItemFlags::NONE, 3);
+    }
+
+    public function getId(): string{
+        return "respiration";
+    }
+
+    public function getMcpeId(): int{
+        return EnchantmentIds::RESPIRATION;
     }
 
     public function isItemCompatible(Item $item): bool{

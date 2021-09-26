@@ -14,6 +14,7 @@ use pocketmine\inventory\CallbackInventoryListener;
 use pocketmine\item\Item;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\nbt\tag\IntTag;
 use pocketmine\world\World;
 
 class BrewingStandTile extends Spawnable implements Container, Nameable{
@@ -161,11 +162,16 @@ class BrewingStandTile extends Spawnable implements Container, Nameable{
     }
 
     protected function writeSaveData(CompoundTag $nbt): void{
+        foreach([self::TAG_BREW_TIME, self::TAG_FUEL_AMOUNT, self::TAG_FUEL_TOTAL] as $id){
+            if($nbt->getTag($id) instanceof IntTag){
+                $nbt->removeTag($id);
+            }
+        }
         $this->saveItems($nbt);
         $this->saveName($nbt);
-        $nbt->setInt(self::TAG_BREW_TIME, $this->brewTime);
-        $nbt->setInt(self::TAG_FUEL_AMOUNT, $this->fuelAmount);
-        $nbt->setInt(self::TAG_FUEL_TOTAL, $this->fuelTotal);
+        $nbt->setShort(self::TAG_BREW_TIME, $this->brewTime);
+        $nbt->setShort(self::TAG_FUEL_AMOUNT, $this->fuelAmount);
+        $nbt->setShort(self::TAG_FUEL_TOTAL, $this->fuelTotal);
     }
 
     protected function addAdditionalSpawnData(CompoundTag $nbt): void{

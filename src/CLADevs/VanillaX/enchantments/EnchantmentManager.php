@@ -42,9 +42,10 @@ class EnchantmentManager{
     }
 
     public function registerEnchantment(Enchantment $enchantment): void{
-        $this->enchantments[$enchantment->getRuntimeId()] = $enchantment;
-        if(!in_array($enchantment->getRuntimeId(), VanillaX::getInstance()->getConfig()->getNested("disabled.enchantments", []))){
-            EnchantmentIdMap::getInstance()->register($enchantment->getRuntimeId(), $enchantment);
+        /** @var EnchantmentTrait $enchantment */
+        $this->enchantments[$enchantment->getId()] = $enchantment;
+        if(!in_array($enchantment->getId(), VanillaX::getInstance()->getConfig()->getNested("disabled.enchantments", []))){
+            EnchantmentIdMap::getInstance()->register($enchantment->getMcpeId(), $enchantment);
         }
     }
 

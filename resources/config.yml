@@ -18,7 +18,7 @@ disabled:
 #    - 145 #This would be anvil block Id
 #
 #  #Items includes Firework, Armor Stand and so on
-#  items:
+  items:
 #    - 513 #This would be shield item Id
 #
 #  #Commands that wont be registered, they must be all lowercase.
@@ -26,7 +26,7 @@ disabled:
 #    - "gamerule"
 #
 #  #Enchantments that wont be register
-#  enchantments:
+  enchantments:
 #    - 25 #ID of the Frost Walker Enchantment
 
 #Features you can disable

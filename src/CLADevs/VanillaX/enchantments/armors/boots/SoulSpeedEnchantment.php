@@ -10,12 +10,21 @@ use pocketmine\item\enchantment\Enchantment;
 use pocketmine\item\enchantment\ItemFlags;
 use pocketmine\item\enchantment\Rarity;
 use pocketmine\item\Item;
+use pocketmine\lang\KnownTranslationFactory;
 
 class SoulSpeedEnchantment extends Enchantment{
     use EnchantmentTrait;
 
     public function __construct(){
-        parent::__construct(EnchantmentIds::SOUL_SPEED, "%enchantment.soul_speed", Rarity::MYTHIC, ItemFlags::FEET, ItemFlags::NONE, 3);
+        parent::__construct(KnownTranslationFactory::enchantment_soul_speed(), Rarity::MYTHIC, ItemFlags::FEET, ItemFlags::NONE, 3);
+    }
+
+    public function getId(): string{
+        return "soul_speed";
+    }
+
+    public function getMcpeId(): int{
+        return EnchantmentIds::SOUL_SPEED;
     }
 
     public function isItemCompatible(Item $item): bool{

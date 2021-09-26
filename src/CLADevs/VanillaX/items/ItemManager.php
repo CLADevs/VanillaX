@@ -5,8 +5,6 @@ namespace CLADevs\VanillaX\items;
 use CLADevs\VanillaX\entities\EntityManager;
 use CLADevs\VanillaX\entities\utils\EntityIdentifierX;
 use CLADevs\VanillaX\items\types\HorseArmorItem;
-use CLADevs\VanillaX\items\types\MapItem;
-use CLADevs\VanillaX\items\types\MinecartItem;
 use CLADevs\VanillaX\items\types\MusicDiscItem;
 use CLADevs\VanillaX\items\utils\RecipeItemTrait;
 use CLADevs\VanillaX\utils\item\NonAutomaticCallItemTrait;
@@ -45,19 +43,11 @@ class ItemManager{
         self::register(new Item(new ItemIdentifier(ItemIds::DRIED_KELP_BLOCK, 0), "Dried Kelp")); //ITEM
         self::register(new Item(new ItemIdentifier(ItemIds::KELP, 0), "Kelp")); //ITEM
         self::register(new Item(new ItemIdentifier(ItemIds::DRIED_KELP, 0), "Dried Kelp")); //ITEM
-        self::register(new Item(new ItemIdentifier(ItemIds::NETHER_WART, 0), "Nether Wart")); //ITEM
         self::register(new Item(new ItemIdentifier(ItemIds::TURTLE_SHELL_PIECE, 0), "Turtle Shell")); //ITEM
         self::register(new Item(new ItemIdentifier(ItemIds::PHANTOM_MEMBRANE, 0), "Phantom Membrane")); //ITEM
         self::register(new Item(new ItemIdentifier(ItemIds::FIREWORKS_CHARGE, 0), "Fireworks Charge")); //ITEM
         self::register(new Item(new ItemIdentifier(ItemIds::ENCHANTED_BOOK, 0), "Enchanted Book")); //ITEM
         self::register(new Item(new ItemIdentifier(ItemIds::CARROT_ON_A_STICK, 0), "Carrot on a Stick")); //ITEM
-        self::register(new MinecartItem(ItemIds::MINECART));
-        self::register(new MinecartItem(ItemIds::MINECART_WITH_CHEST, "Chest"));
-        self::register(new MinecartItem(ItemIds::MINECART_WITH_TNT, "TNT"));
-        self::register(new MinecartItem(ItemIds::MINECART_WITH_HOPPER, "Hopper"));
-        self::register(new MinecartItem(ItemIds::MINECART_WITH_COMMAND_BLOCK, "Command Block"));
-        self::register(new MapItem(MapItem::MAP_FILLED));
-        self::register(new MapItem(MapItem::MAP_EMPTY), true);
         for($i = 416; $i <= 419; $i++){
             self::register(new HorseArmorItem($i), true);
         }

@@ -19,6 +19,9 @@ trait EnchantmentTrait{
      */
     public static int $SLOT_CROSSBOW = 0x10000;
 
+    abstract public function getId(): string;
+    abstract public function getMcpeId(): int;
+
     public function isTreasure(): bool{
         return false;
     }

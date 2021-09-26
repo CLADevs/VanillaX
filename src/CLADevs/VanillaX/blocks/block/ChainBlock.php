@@ -18,7 +18,6 @@ class ChainBlock extends Transparent{
 
     private int $facing = 0;
 
-    //TODO functionality
     public function __construct(){
         parent::__construct(new BlockIdentifier(BlockVanilla::CHAIN, 0, ItemIdentifiers::CHAIN), "Chain", new BlockBreakInfo(5, BlockToolType::PICKAXE, 0, 6));
     }

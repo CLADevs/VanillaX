@@ -9,12 +9,21 @@ use pocketmine\item\enchantment\Rarity;
 use pocketmine\item\Item;
 use pocketmine\item\Sword;
 use pocketmine\item\enchantment\FireAspectEnchantment as PMFireAspectEnchantment;
+use pocketmine\lang\KnownTranslationFactory;
 
 class FireAspectEnchantment extends PMFireAspectEnchantment{
     use EnchantmentTrait;
 
     public function __construct(){
-        parent::__construct(EnchantmentIds::FIRE_ASPECT, "%enchantment.fire", Rarity::RARE, ItemFlags::SWORD, ItemFlags::NONE, 2);
+        parent::__construct(KnownTranslationFactory::enchantment_fire(), Rarity::RARE, ItemFlags::SWORD, ItemFlags::NONE, 2);
+    }
+
+    public function getId(): string{
+        return "fire_aspect";
+    }
+
+    public function getMcpeId(): int{
+        return EnchantmentIds::FIRE_ASPECT;
     }
 
     public function isItemCompatible(Item $item): bool{
