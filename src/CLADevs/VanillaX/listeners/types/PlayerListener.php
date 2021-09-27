@@ -17,7 +17,6 @@ use pocketmine\data\bedrock\EnchantmentIdMap;
 use pocketmine\data\bedrock\EnchantmentIds;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerBedLeaveEvent;
-use pocketmine\event\player\PlayerBlockPickEvent;
 use pocketmine\event\player\PlayerDeathEvent;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\event\player\PlayerItemHeldEvent;
@@ -72,33 +71,6 @@ class PlayerListener implements Listener{
                 $player->getArmorInventory()->setItem($slot, $item);
                 $item->pop();
                 $player->getInventory()->setItemInHand($item);
-            }
-        }
-    }
-
-    public function onBlockPick(PlayerBlockPickEvent $event): void{
-        if(!$event->isCancelled()){
-            $player = $event->getPlayer();
-            $inventory = $player->getInventory();
-            $result = $event->getResultItem();
-            $freeIndex = null;
-            $existIndex = null;
-
-            for($i = 0; $i <= 8; $i++){
-                if($inventory->isSlotEmpty($i) && $freeIndex === null){
-                    $freeIndex = $i;
-                }elseif($inventory->getItem($i)->equals($result)){
-                    $existIndex = $i;
-                    break;
-                }
-            }
-            if($existIndex !== null){
-                $inventory->setHeldItemIndex($existIndex);
-                return;
-            }
-            if(!$inventory->getItemInHand()->isNull() && $freeIndex !== null){
-                $event->cancel();
-                $inventory->setItem($freeIndex, $event->getResultItem());
             }
         }
     }
