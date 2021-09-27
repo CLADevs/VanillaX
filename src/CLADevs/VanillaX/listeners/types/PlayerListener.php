@@ -77,7 +77,10 @@ class PlayerListener implements Listener{
     }
 
     public function onBlockPick(PlayerBlockPickEvent $event): void{
+        if($event->isCancelled()) return;
+
         $event->cancel();
+
         $player = $event->getPlayer();
         $inventory = $player->getInventory();
         $resultItem = $event->getResultItem();
