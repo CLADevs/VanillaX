@@ -23,6 +23,7 @@ class Session{
     private int $entityId;
 
     private bool $gliding = false;
+    private bool $swimming = false;
 
     private Player $player;
 
@@ -82,6 +83,15 @@ class Session{
         $this->gliding = $gliding;
     }
 
+    public function isSwimming(): bool{
+        return $this->swimming;
+    }
+
+    public function setSwimming(bool $value): void{
+        $this->player->getNetworkProperties()->setGenericFlag(EntityMetadataFlags::SWIMMING, $value);
+        $this->swimming = $value;
+    }
+
     /**
      * @return TridentEntity[]
      */
@@ -105,12 +115,13 @@ class Session{
      * @param bool $packet
      * @return PlaySoundPacket|null
      */
-    public static function playSound($player, string $sound, float $pitch = 1, float $volume = 1, bool $packet = false): ?DataPacket{
+    public static function playSound(Player|Vector3 $player, string $sound, float $pitch = 1, float $volume = 1, bool $packet = false): ?DataPacket{
+        $pos = $player instanceof Player ? $player->getPosition() : $player;
         $pk = new PlaySoundPacket();
         $pk->soundName = $sound;
-        $pk->x = $player->x;
-        $pk->y = $player->y;
-        $pk->z = $player->z;
+        $pk->x = $pos->x;
+        $pk->y = $pos->y;
+        $pk->z = $pos->z;
         $pk->pitch = $pitch;
         $pk->volume = $volume;
         if($packet){

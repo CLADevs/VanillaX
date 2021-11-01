@@ -33,6 +33,7 @@ interface ItemIdentifiers{
     const DENY = 211;
     const ALLOW = 210;
     const AIR = -158;
+    const SMITHING_TABLE = -202;
     const LIGHT_BLOCK = -215;
     const WITHER_ROSE = -216;
     const STICKYPISTONARMCOLLISION = -217;

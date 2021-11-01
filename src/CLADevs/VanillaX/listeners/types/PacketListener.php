@@ -10,6 +10,7 @@ use CLADevs\VanillaX\inventories\FakeBlockInventory;
 use CLADevs\VanillaX\inventories\InventoryManager;
 use CLADevs\VanillaX\inventories\types\TradeInventory;
 use CLADevs\VanillaX\listeners\ListenerManager;
+use CLADevs\VanillaX\session\Session;
 use CLADevs\VanillaX\utils\instances\InteractButtonResult;
 use CLADevs\VanillaX\utils\item\InteractButtonItemTrait;
 use CLADevs\VanillaX\VanillaX;
@@ -93,9 +94,7 @@ class PacketListener implements Listener{
                     if($packet instanceof CommandBlockUpdatePacket && $player->hasPermission(DefaultPermissions::ROOT_OPERATOR)) $this->handleCommandBlock($player, $packet);
                     break;
                 case ProtocolInfo::PLAYER_ACTION_PACKET:
-                    if($packet instanceof PlayerActionPacket && in_array($packet->action, [PlayerActionPacket::ACTION_START_GLIDE, PlayerActionPacket::ACTION_STOP_GLIDE])){
-                        $session->setGliding($packet->action === PlayerActionPacket::ACTION_START_GLIDE);
-                    }
+                    if($packet instanceof PlayerActionPacket) $this->handlePlayerAction($session, $packet);
                     break;
                 case ProtocolInfo::INVENTORY_TRANSACTION_PACKET:
                     if($packet instanceof InventoryTransactionPacket) $this->handleInventoryTransaction($player, $packet);
@@ -314,5 +313,19 @@ class PacketListener implements Listener{
 
         InventoryManager::getInstance()->setPotionTypeRecipes($potionTypeRecipes);
         InventoryManager::getInstance()->setPotionContainerRecipes($potionContainerRecipes);
+    }
+
+    /**
+     * @param Session $session
+     * @param PlayerActionPacket $packet
+     * this packet is sent by player whenever they want to swim, jump, break, use elytra, etc
+     */
+    private function handlePlayerAction(Session $session, PlayerActionPacket $packet): void{
+        if($packet instanceof PlayerActionPacket && in_array($packet->action, [PlayerActionPacket::ACTION_START_GLIDE, PlayerActionPacket::ACTION_STOP_GLIDE])){
+            $session->setGliding($packet->action === PlayerActionPacket::ACTION_START_GLIDE);
+        }
+        if($packet instanceof PlayerActionPacket && in_array($packet->action, [PlayerActionPacket::ACTION_START_SWIMMING, PlayerActionPacket::ACTION_STOP_SWIMMING])){
+            $session->setSwimming($packet->action === PlayerActionPacket::ACTION_START_SWIMMING);
+        }
     }
 }

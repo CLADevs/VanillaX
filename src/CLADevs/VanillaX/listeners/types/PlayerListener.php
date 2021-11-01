@@ -140,41 +140,37 @@ class PlayerListener implements Listener{
             $to = $event->getTo();
             $chestplate = $player->getArmorInventory()->getChestplate();
             $boots = $player->getArmorInventory()->getBoots();
+            $session = VanillaX::getInstance()->getSessionManager()->get($player);
+            $belowBlock = $player->getWorld()->getBlock($player->getPosition()->subtract(0, 1, 0));
 
+            //frost walker
             if($boots->hasEnchantment($enchantment = EnchantmentIdMap::getInstance()->fromId(EnchantmentIds::FROST_WALKER)) && !$player->isOnGround() && (intval($to->x) !== intval($from->x) || intval($to->y) !== intval($from->y) || intval($to->z) !== intval($from->z))){
                 $block = $player->getWorld()->getBlock($player->getPosition());
                 $aboveBlock = $player->getWorld()->getBlock($player->getPosition()->add(0, 1, 0));
 
-                if($block->getId() === BlockLegacyIds::AIR && $aboveBlock->getId() === BlockLegacyIds::AIR){
-                    $belowBlock = $player->getWorld()->getBlock($player->getPosition()->subtract(0, 1, 0));
+                if($block->getId() === BlockLegacyIds::AIR && $aboveBlock->getId() === BlockLegacyIds::AIR && $belowBlock instanceof Water){
+                    $size = 2 + min($boots->getEnchantmentLevel($enchantment), 2);
+                    $ice = BlockFactory::getInstance()->get(BlockLegacyIds::FROSTED_ICE, 0);
 
-                    if($belowBlock instanceof Water){
-                        $size = 2 + min($boots->getEnchantmentLevel($enchantment), 2);
-                        $ice = BlockFactory::getInstance()->get(BlockLegacyIds::FROSTED_ICE, 0);
+                    for($x = intval($player->getPosition()->x) - $size; $x <= intval($player->getPosition()->x) + $size; $x++){
+                        for($z = intval($player->getPosition()->z) - $size; $z <= intval($player->getPosition()->z) + $size; $z++){
+                            $pos = new Vector3($x, intval($player->getPosition()->y - 1), $z);
 
-                        for($x = intval($player->getPosition()->x) - $size; $x <= intval($player->getPosition()->x) + $size; $x++){
-                            for($z = intval($player->getPosition()->z) - $size; $z <= intval($player->getPosition()->z) + $size; $z++){
-                                $pos = new Vector3($x, intval($player->getPosition()->y - 1), $z);
-
-                                if(in_array($player->getWorld()->getBlock($pos)->getId(), [BlockLegacyIds::AIR, BlockLegacyIds::STILL_WATER, BlockLegacyIds::FROSTED_ICE])){
-                                    $player->getWorld()->setBlock($pos, $ice, true);
-                                }
+                            if(in_array($player->getWorld()->getBlock($pos)->getId(), [BlockLegacyIds::AIR, BlockLegacyIds::STILL_WATER, BlockLegacyIds::FROSTED_ICE])){
+                                $player->getWorld()->setBlock($pos, $ice, true);
                             }
                         }
                     }
                 }
             }
-            if($chestplate instanceof ElytraItem){
-                $session = VanillaX::getInstance()->getSessionManager()->get($player);
-
-                if($session->isGliding()){
-                    if(Server::getInstance()->getTick() % 20 == 0){
-                        $chestplate->applyDamage(1);
-                        $player->getArmorInventory()->setChestplate($chestplate);
-                    }
-                    if($player->getLocation()->pitch >= -40 && $player->getLocation()->pitch <= 30){
-                        $player->resetFallDistance();
-                    }
+            //Elytra
+            if($chestplate instanceof ElytraItem && $session->isGliding()){
+                if(Server::getInstance()->getTick() % 20 == 0){
+                    $chestplate->applyDamage(1);
+                    $player->getArmorInventory()->setChestplate($chestplate);
+                }
+                if($player->getLocation()->pitch >= -40 && $player->getLocation()->pitch <= 30){
+                    $player->resetFallDistance();
                 }
             }
         }

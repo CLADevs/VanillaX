@@ -2,7 +2,10 @@
 
 namespace CLADevs\VanillaX\entities\object;
 
+use CLADevs\VanillaX\utils\entity\CustomRegisterEntityTrait;
+use Closure;
 use pocketmine\entity\Entity;
+use pocketmine\entity\EntityDataHelper;
 use pocketmine\entity\EntitySizeInfo;
 use pocketmine\entity\Location;
 use pocketmine\entity\projectile\Projectile;
@@ -10,17 +13,24 @@ use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\network\mcpe\protocol\ActorEventPacket;
 use pocketmine\network\mcpe\protocol\types\entity\EntityIds;
 use pocketmine\Server;
+use pocketmine\world\World;
 
-class FireworkRocketEntity extends Projectile{
+class FireworkRocketEntity extends Projectile implements CustomRegisterEntityTrait{
+
+    const NETWORK_ID = EntityIds::FIREWORKS_ROCKET;
 
     public float $width = 0.25;
     public float $height = 0.25;
 
-    const NETWORK_ID = EntityIds::FIREWORKS_ROCKET;
-
     private int $age;
 
     private bool $straight = true;
+
+    public static function getRegisterClosure(): Closure{
+        return function(World $world, CompoundTag $nbt): Entity{
+            return new FireworkRocketEntity(EntityDataHelper::parseLocation($nbt, $world), null, $nbt);
+        };
+    }
 
     public function __construct(Location $location, ?Entity $shootingEntity, ?CompoundTag $nbt = null){
         parent::__construct($location, $shootingEntity, $nbt);

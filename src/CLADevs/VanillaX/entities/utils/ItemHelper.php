@@ -6,6 +6,7 @@ use CLADevs\VanillaX\enchantments\utils\EnchantmentTrait;
 use CLADevs\VanillaX\entities\VanillaEntity;
 use CLADevs\VanillaX\VanillaX;
 use pocketmine\color\Color;
+use pocketmine\crafting\FurnaceType;
 use pocketmine\data\bedrock\EnchantmentIdMap;
 use pocketmine\data\bedrock\EnchantmentIds;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
@@ -59,7 +60,7 @@ class ItemHelper{
             /** @var EnchantmentTrait|Enchantment $enchantment */
             foreach(VanillaX::getInstance()->getEnchantmentManager()->getEnchantments() as $enchantment){
                 if($enchantment->isTreasure()){
-                    $enchantments[] = $enchantment->getRuntimeId();
+                    $enchantments[] = $enchantment->getMcpeId();
                 }
             }
         }else{
@@ -85,7 +86,7 @@ class ItemHelper{
     }
 
     public static function applyFurnaceSmelt(Item &$item): void{
-        foreach(Server::getInstance()->getCraftingManager()->getFurnaceRecipeManager()->getAll() as $furnace){
+        foreach(Server::getInstance()->getCraftingManager()->getFurnaceRecipeManager(FurnaceType::FURNACE())->getAll() as $furnace){
             if($furnace->getInput()->getId() === $item->getId()){
                 $item = $furnace->getResult();
             }

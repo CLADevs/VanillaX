@@ -11,23 +11,21 @@ use CLADevs\VanillaX\entities\passive\StriderEntity;
 use CLADevs\VanillaX\entities\passive\VillagerEntity;
 use CLADevs\VanillaX\entities\utils\EntityIdentifierX;
 use CLADevs\VanillaX\entities\utils\villager\VillagerProfession;
+use CLADevs\VanillaX\utils\entity\CustomRegisterEntityNamesTrait;
+use CLADevs\VanillaX\utils\entity\CustomRegisterEntityTrait;
 use CLADevs\VanillaX\utils\item\NonAutomaticCallItemTrait;
 use CLADevs\VanillaX\utils\Utils;
 use CLADevs\VanillaX\VanillaX;
+use Closure;
 use pocketmine\data\bedrock\EntityLegacyIds;
 use pocketmine\entity\Entity;
 use pocketmine\entity\EntityDataHelper;
 use pocketmine\entity\EntityFactory;
-use pocketmine\entity\object\PaintingMotive;
-use pocketmine\math\Facing;
-use pocketmine\math\Vector3;
-use pocketmine\nbt\tag\ByteTag;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\network\mcpe\protocol\types\entity\EntityIds;
 use pocketmine\utils\SingletonTrait;
 use pocketmine\world\World;
 use ReflectionClass;
-use UnexpectedValueException;
 
 class EntityManager{
     use SingletonTrait;
@@ -50,12 +48,26 @@ class EntityManager{
             }
             foreach($pathList as $path){
                 Utils::callDirectory("entities" . DIRECTORY_SEPARATOR . $path, function (string $namespace)use($path): void{
-                    if(!isset(class_implements($namespace)[NonAutomaticCallItemTrait::class])){
-                        $this->registerEntity($namespace, $path, [$namespace::NETWORK_ID]);
+                    $implements = class_implements($namespace);
+
+                    if(!isset($implements[NonAutomaticCallItemTrait::class])){
+                        $closure = null;
+                        $saveNames = [$namespace::NETWORK_ID];
+                        $saveId = null;
+
+                        if(isset($implements[CustomRegisterEntityTrait::class])){
+                            /** @var CustomRegisterEntityTrait $namespace */
+                            $closure = $namespace::getRegisterClosure();
+                        }
+                        if(isset($implements[CustomRegisterEntityNamesTrait::class])){
+                            /** @var CustomRegisterEntityNamesTrait $namespace */
+                            $saveNames = $namespace::getRegisterSaveNames();
+                            $saveId = $namespace::getSaveId();
+                        }
+                        $this->registerEntity($namespace, $path, $saveNames, $saveId, $closure);
                     }
                 });
             }
-            $this->registerEntity(PaintingEntity::class);
         }
     }
 
@@ -105,7 +117,7 @@ class EntityManager{
         }
     }
 
-    public function registerEntity(string $namespace, string $path = "none", array $saveNames = []): void{
+    public function registerEntity(string $namespace, string $path = "none", array $saveNames = [], ?int $saveId = null, ?Closure $closure = null): void{
         $disabledMobs = VanillaX::getInstance()->getConfig()->getNested("disabled.mobs", []);
 
         if(in_array($namespace::NETWORK_ID, $disabledMobs)){
@@ -113,28 +125,9 @@ class EntityManager{
         }
         $this->initializeEntityIds($namespace, $path);
 
-        if($namespace::NETWORK_ID === PaintingEntity::NETWORK_ID){
-            EntityFactory::getInstance()->register(PaintingEntity::class, function(World $world, CompoundTag $nbt): PaintingEntity{
-                $motive = PaintingMotive::getMotiveByName($nbt->getString("Motive"));
-                if($motive === null){
-                    throw new UnexpectedValueException("Unknown painting motive");
-                }
-                $blockIn = new Vector3($nbt->getInt("TileX"), $nbt->getInt("TileY"), $nbt->getInt("TileZ"));
-                if(($directionTag = $nbt->getTag("Direction")) instanceof ByteTag){
-                    $facing = PaintingEntity::DATA_TO_FACING[$directionTag->getValue()] ?? Facing::NORTH;
-                }elseif(($facingTag = $nbt->getTag("Facing")) instanceof ByteTag){
-                    $facing = PaintingEntity::DATA_TO_FACING[$facingTag->getValue()] ?? Facing::NORTH;
-                }else{
-                    throw new UnexpectedValueException("Missing facing info");
-                }
-
-                return new PaintingEntity(EntityDataHelper::parseLocation($nbt, $world), $blockIn, $facing, $motive, $nbt);
-            }, ['Painting', 'minecraft:painting'], EntityLegacyIds::PAINTING);
-            return;
-        }
-        EntityFactory::getInstance()->register($namespace, function(World $world, CompoundTag $nbt)use($namespace): Entity{
+        EntityFactory::getInstance()->register($namespace, $closure ? $closure : function(World $world, CompoundTag $nbt)use($namespace): Entity{
             return new $namespace(EntityDataHelper::parseLocation($nbt, $world), $nbt);
-        }, $saveNames);
+        }, $saveNames, $saveId);
     }
 
     /**
