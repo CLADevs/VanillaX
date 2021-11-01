@@ -16,6 +16,7 @@
 - Command Block (80% done)
 - Beacon
 - Ancient Debris
+- Smithing Table
 - Basalt
 - Bee Hive
 - Bee Nest
@@ -108,8 +109,8 @@
 - Weather
 - GameRules
 - Enchantments
-- Offhand
 - Emotes
+- Swimming
 
 #### TODO Features:
 - More Biomes in Normal World
