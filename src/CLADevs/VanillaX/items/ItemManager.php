@@ -46,7 +46,6 @@ class ItemManager{
         self::register(new Item(ItemIds::TURTLE_SHELL_PIECE, 0, "Turtle Shell")); //ITEM
         self::register(new Item(ItemIds::PHANTOM_MEMBRANE, 0, "Phantom Membrane")); //ITEM
         self::register(new Item(ItemIds::FIREWORKS_CHARGE, 0, "Fireworks Charge")); //ITEM
-        self::register(new Item(ItemIds::ENCHANTED_BOOK, 0, "Enchanted Book")); //ITEM
         self::register(new Item(ItemIds::CARROT_ON_A_STICK, 0, "Carrot on a Stick")); //ITEM
         self::register(new MinecartItem(ItemIds::MINECART));
         self::register(new MinecartItem(ItemIds::MINECART_WITH_CHEST, 0, "Chest"));

@@ -40,6 +40,7 @@ class FireworkRocketItem extends Item{
 
         if($player->getArmorInventory()->getChestplate() instanceof ElytraItem && $session->isGliding()){
             $player->setMotion($player->getDirectionVector()->multiply(1.6));
+            $this->pop();
             return true;
         }
         return false;

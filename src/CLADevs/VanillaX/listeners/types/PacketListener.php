@@ -83,7 +83,7 @@ class PacketListener implements Listener{
             $player = $event->getPlayer();
             $sessionManager = VanillaX::getInstance()->getSessionManager();
             $session = $sessionManager->has($player) ? $sessionManager->get($player) : null;
-
+            
             if($session !== null && ($window = $session->getCurrentWindow()) !== null) $window->handlePacket($player, $packet);
             switch($packet::NETWORK_ID){
                 case ProtocolInfo::COMMAND_BLOCK_UPDATE_PACKET:
