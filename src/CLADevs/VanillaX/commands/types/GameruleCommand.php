@@ -13,7 +13,7 @@ use pocketmine\network\mcpe\protocol\types\PlayerPermissions;
 use pocketmine\Player;
 use pocketmine\Server;
 
-class GameruleCommand extends Command{
+class GameruleCommand extends Command {
 
     public function __construct(){
         parent::__construct("gamerule", "Set or queries a game rule value.");
