@@ -41,6 +41,7 @@ use pocketmine\utils\SingletonTrait;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
+use const pocketmine\BEDROCK_DATA_PATH;
 use const pocketmine\RESOURCE_PATH;
 
 class BlockManager{
@@ -73,7 +74,7 @@ class BlockManager{
         $method = new ReflectionMethod(RuntimeBlockMapping::class, "registerMapping");
         $method->setAccessible(true);
 
-        $blockIdMap = json_decode(file_get_contents(RESOURCE_PATH . 'vanilla/block_id_map.json'), true);
+        $blockIdMap = json_decode(file_get_contents(BEDROCK_DATA_PATH . 'block_id_map.json'), true);
         $metaMap = [];
 
         foreach($instance->getBedrockKnownStates() as $runtimeId => $nbt){
