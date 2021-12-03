@@ -10,12 +10,7 @@ class ListenerManager{
 
     public function startup(): void{
         Utils::callDirectory("listeners" . DIRECTORY_SEPARATOR . "types", function (string $namespace): void{
-            if(strpos($namespace, "PacketListener") !== false || strpos($namespace, "PlayerListener") !== false){
-                $class = new $namespace($this);
-            }else{
-                $class = new $namespace();
-            }
-            Server::getInstance()->getPluginManager()->registerEvents($class, VanillaX::getInstance());
+            Server::getInstance()->getPluginManager()->registerEvents(new $namespace(), VanillaX::getInstance());
         });
     }
 }

@@ -12,6 +12,7 @@ use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\convert\RuntimeBlockMapping;
 use pocketmine\network\mcpe\protocol\ContainerOpenPacket;
 use pocketmine\network\mcpe\protocol\ServerboundPacket;
+use pocketmine\network\mcpe\protocol\types\BlockPosition;
 use pocketmine\network\mcpe\protocol\types\inventory\WindowTypes;
 use pocketmine\network\mcpe\protocol\UpdateBlockPacket;
 use pocketmine\player\Player;
@@ -85,7 +86,7 @@ class FakeBlockInventory extends SimpleInventory implements BlockInventory{
             $block = clone $this->block;
             $this->sendBlock($who, $this->holder, $block->getId(), $block->getMeta());
         }
-        $who->getNetworkSession()->sendDataPacket(ContainerOpenPacket::blockInvVec3($who->getNetworkSession()->getInvManager()->getCurrentWindowId(), $this->windowType, $this->holder));
+        $who->getNetworkSession()->sendDataPacket(ContainerOpenPacket::blockInv($who->getNetworkSession()->getInvManager()->getCurrentWindowId(), $this->windowType, BlockPosition::fromVector3($this->holder)));
         $who->getNetworkSession()->getInvManager()->syncContents($this);
         parent::onOpen($who);
     }
@@ -119,9 +120,7 @@ class FakeBlockInventory extends SimpleInventory implements BlockInventory{
     public function sendBlock(Player $player, Vector3 $pos, int $blockId, int $blockMeta = 0): void{
         $block = BlockFactory::getInstance()->get($blockId ,$blockMeta);
         $pk = new UpdateBlockPacket();
-        $pk->x = $pos->x;
-        $pk->y = $pos->y;
-        $pk->z = $pos->z;
+        $pk->blockPosition = BlockPosition::fromVector3($pos);
         $pk->blockRuntimeId = RuntimeBlockMapping::getInstance()->toRuntimeId($block->getFullId());
         $player->getNetworkSession()->sendDataPacket($pk);
     }

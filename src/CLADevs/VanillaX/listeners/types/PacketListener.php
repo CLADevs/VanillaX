@@ -3,24 +3,22 @@
 namespace CLADevs\VanillaX\listeners\types;
 
 use CLADevs\VanillaX\blocks\tile\CommandBlockTile;
+use CLADevs\VanillaX\entities\EntityManager;
 use CLADevs\VanillaX\entities\utils\EntityInteractResult;
 use CLADevs\VanillaX\entities\utils\interfaces\EntityInteractable;
 use CLADevs\VanillaX\entities\utils\interfaces\EntityRidable;
+use CLADevs\VanillaX\entities\VanillaEntity;
+use CLADevs\VanillaX\event\player\PlayerEntityPickEvent;
 use CLADevs\VanillaX\inventories\FakeBlockInventory;
 use CLADevs\VanillaX\inventories\InventoryManager;
 use CLADevs\VanillaX\inventories\types\TradeInventory;
-use CLADevs\VanillaX\listeners\ListenerManager;
 use CLADevs\VanillaX\session\Session;
 use CLADevs\VanillaX\utils\instances\InteractButtonResult;
 use CLADevs\VanillaX\utils\item\InteractButtonItemTrait;
 use CLADevs\VanillaX\VanillaX;
-use pocketmine\block\VanillaBlocks;
 use pocketmine\data\java\GameModeIdMap;
-use pocketmine\entity\Entity;
-use pocketmine\entity\Human;
 use pocketmine\event\inventory\InventoryTransactionEvent;
 use pocketmine\event\Listener;
-use pocketmine\event\player\PlayerBlockPickEvent;
 use pocketmine\event\server\DataPacketReceiveEvent;
 use pocketmine\event\server\DataPacketSendEvent;
 use pocketmine\item\ItemFactory;
@@ -43,21 +41,16 @@ use pocketmine\network\mcpe\protocol\SetPlayerGameTypePacket;
 use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataProperties;
 use pocketmine\network\mcpe\protocol\types\inventory\UseItemOnEntityTransactionData;
 use pocketmine\network\mcpe\protocol\types\inventory\UseItemTransactionData;
+use pocketmine\network\mcpe\protocol\types\PlayerAction;
 use pocketmine\network\mcpe\protocol\types\recipe\PotionContainerChangeRecipe;
 use pocketmine\network\mcpe\protocol\types\recipe\PotionTypeRecipe;
 use pocketmine\permission\DefaultPermissions;
 use pocketmine\player\Player;
 use pocketmine\Server;
 use pocketmine\world\Position;
-use const pocketmine\RESOURCE_PATH;
+use const pocketmine\BEDROCK_DATA_PATH;
 
 class PacketListener implements Listener{
-
-    private ListenerManager $manager;
-
-    public function __construct(ListenerManager $manager){
-        $this->manager = $manager;
-    }
 
     public function onInventoryTransaction(InventoryTransactionEvent $event): void{
         VanillaX::getInstance()->getEnchantmentManager()->handleInventoryTransaction($event);
@@ -161,7 +154,7 @@ class PacketListener implements Listener{
      * Changes server sided command block tile data
      */
     private function handleCommandBlock(Player $player, CommandBlockUpdatePacket $packet): void{
-        $position = new Position($packet->x, $packet->y, $packet->z, $player->getWorld());
+        $position = new Position($packet->blockPosition->getX(), $packet->blockPosition->getY(), $packet->blockPosition->getZ(), $player->getWorld());
         $tile = $position->getWorld()->getTile($position);
 
         if($tile instanceof CommandBlockTile){
@@ -176,10 +169,10 @@ class PacketListener implements Listener{
      */
     private function handleInventoryTransaction(Player $player, InventoryTransactionPacket $packet): void{
         if($packet->trData instanceof UseItemOnEntityTransactionData && $packet->trData->getActionType() === UseItemOnEntityTransactionData::ACTION_INTERACT){
-            $entity = $player->getWorld()->getEntity($packet->trData->getEntityRuntimeId());
+            $entity = $player->getWorld()->getEntity($packet->trData->getActorRuntimeId());
             $item = TypeConverter::getInstance()->netItemStackToCore($packet->trData->getItemInHand()->getItemStack());
             $currentButton = VanillaX::getInstance()->getSessionManager()->get($player)->getInteractiveText();
-            $clickPos = $packet->trData->getClickPos();
+            $clickPos = $packet->trData->getClickPosition();
             $button = null;
 
             if(is_string($currentButton) && count($packet->trData->getActions()) < 1){
@@ -211,11 +204,11 @@ class PacketListener implements Listener{
             if(is_string($currentButton) && count($packet->trData->getActions()) < 1){
                 if($entity instanceof InteractButtonItemTrait){
                     /** Whenever a player interacts with interactable button for entity */
-                    $entity->onButtonPressed($button = new InteractButtonResult($player, $item, $currentButton));
+                    $entity->onButtonPressed(new InteractButtonResult($player, $item, $currentButton));
                 }
                 if($item instanceof InteractButtonItemTrait){
                     /** Whenever a player interacts with interactable button for item */
-                    $item->onButtonPressed($button = new InteractButtonResult($player, $item, $currentButton));
+                    $item->onButtonPressed(new InteractButtonResult($player, $item, $currentButton));
                 }
             }
         }
@@ -228,11 +221,11 @@ class PacketListener implements Listener{
      * or once you leave your ride
      */
     private function handleInteract(Player $player, InteractPacket $packet): void{
-        $entity = $player->getWorld()->getEntity($packet->target);
+        $entity = $player->getWorld()->getEntity($packet->targetActorRuntimeId);
         $session = VanillaX::getInstance()->getSessionManager()->get($player);
 
         if($packet->action === InteractPacket::ACTION_MOUSEOVER){
-            if($packet->target == 0 && $packet->x == 0 && $packet->y == 0 && $packet->z == 0){
+            if($packet->targetActorRuntimeId == 0 && $packet->x == 0 && $packet->y == 0 && $packet->z == 0){
                 $entity = $session->getRidingEntity();
 
                 if($entity === null){
@@ -246,7 +239,7 @@ class PacketListener implements Listener{
         }
         /** fixes not being able to open inventory while riding entities */
         if($packet->action === InteractPacket::ACTION_OPEN_INVENTORY && ($entity = $session->getRidingEntity()) !== null){
-            $packet->target = $session->getEntityId();
+            $packet->targetActorRuntimeId = $session->getEntityId();
         }
     }
 
@@ -256,11 +249,11 @@ class PacketListener implements Listener{
      * This is called whenever you middle click on an entity
      */
     private function handleActorPickRequest(Player $player, ActorPickRequestPacket $packet): void{
-        $entity = $player->getWorld()->getEntity($packet->entityUniqueId);
+        $entity = $player->getWorld()->getEntity($packet->actorUniqueId);
 
-        if($entity instanceof Entity && !$entity instanceof Human){
-            $result = ItemFactory::getInstance()->get(ItemIds::SPAWN_EGG, $entity::NETWORK_ID);
-            $ev = new PlayerBlockPickEvent($player, VanillaBlocks::AIR(), $result);
+        if($entity instanceof VanillaEntity && $player->hasPermission(DefaultPermissions::ROOT_OPERATOR)){
+            $result = ItemFactory::getInstance()->get(ItemIds::SPAWN_EGG, EntityManager::getInstance()->getEntity($entity->getNetworkTypeId())->getId());
+            $ev = new PlayerEntityPickEvent($player, $entity, $result);
             $ev->call();
 
             if(!$ev->isCancelled()){
@@ -287,7 +280,7 @@ class PacketListener implements Listener{
     private function handleCraftingData(CraftingDataPacket $packet): void{
         $manager = InventoryManager::getInstance();
         $translator = ItemTranslator::getInstance();
-        $recipes = json_decode(file_get_contents(RESOURCE_PATH . "vanilla" . DIRECTORY_SEPARATOR . "recipes.json"), true);
+        $recipes = json_decode(file_get_contents(BEDROCK_DATA_PATH . "recipes.json"), true);
 
         $potionTypeRecipes = [];
         foreach($recipes["potion_type"] as $recipe){
@@ -321,11 +314,11 @@ class PacketListener implements Listener{
      * this packet is sent by player whenever they want to swim, jump, break, use elytra, etc
      */
     private function handlePlayerAction(Session $session, PlayerActionPacket $packet): void{
-        if($packet instanceof PlayerActionPacket && in_array($packet->action, [PlayerActionPacket::ACTION_START_GLIDE, PlayerActionPacket::ACTION_STOP_GLIDE])){
-            $session->setGliding($packet->action === PlayerActionPacket::ACTION_START_GLIDE);
+        if(in_array($packet->action, [PlayerAction::START_GLIDE, PlayerAction::STOP_GLIDE])){
+            $session->setGliding($packet->action === PlayerAction::START_GLIDE);
         }
-        if($packet instanceof PlayerActionPacket && in_array($packet->action, [PlayerActionPacket::ACTION_START_SWIMMING, PlayerActionPacket::ACTION_STOP_SWIMMING])){
-            $session->setSwimming($packet->action === PlayerActionPacket::ACTION_START_SWIMMING);
+        if(in_array($packet->action, [PlayerAction::START_SWIMMING, PlayerAction::STOP_SWIMMING])){
+            $session->setSwimming($packet->action === PlayerAction::START_SWIMMING);
         }
     }
 }

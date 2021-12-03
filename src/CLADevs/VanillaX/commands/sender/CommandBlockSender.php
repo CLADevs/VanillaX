@@ -3,14 +3,14 @@
 namespace CLADevs\VanillaX\commands\sender;
 
 use pocketmine\console\ConsoleCommandSender;
-use pocketmine\lang\TranslationContainer;
+use pocketmine\lang\Translatable;
 
 class CommandBlockSender extends ConsoleCommandSender{
 
     private string $messages = "";
 
-    public function sendMessage($message): void{
-        if($message instanceof TranslationContainer){
+    public function sendMessage(Translatable|string $message): void{
+        if($message instanceof Translatable){
             $message = $this->getLanguage()->translate($message);
         }else{
             $message = $this->getLanguage()->translateString($message);

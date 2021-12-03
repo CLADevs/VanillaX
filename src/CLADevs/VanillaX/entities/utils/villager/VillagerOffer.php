@@ -116,11 +116,7 @@ class VillagerOffer{
         $this->rewardExp = $rewardExp;
     }
 
-    /**
-     * @param Item|int $input
-     * @param Item|int|null $input2
-     */
-    public function setInput($input, $input2 = null): void{
+    public function setInput(int|Item $input, int|Item $input2 = null): void{
         if(is_numeric($input)){
             $input = ItemFactory::getInstance()->get($input);
         }
@@ -135,10 +131,7 @@ class VillagerOffer{
         return $this->result;
     }
 
-    /**
-     * @param Item|int $result
-     */
-    public function setResult($result): void{
+    public function setResult(int|Item $result): void{
         if(is_numeric($result)){
             $result = ItemFactory::getInstance()->get($result);
         }

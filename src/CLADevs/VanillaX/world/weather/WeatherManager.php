@@ -8,6 +8,7 @@ use CLADevs\VanillaX\world\gamerule\GameRuleManager;
 use CLADevs\VanillaX\VanillaX;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\LevelEventPacket;
+use pocketmine\network\mcpe\protocol\types\LevelEvent;
 use pocketmine\player\Player;
 use pocketmine\scheduler\ClosureTask;
 use pocketmine\Server;
@@ -75,11 +76,7 @@ class WeatherManager{
         }
     }
 
-    /**
-     * @param World|string $world
-     * @return Weather|null
-     */
-    public function getWeather($world): ?Weather{
+    public function getWeather(World|string $world): ?Weather{
         $worldName = $world;
 
         if($world instanceof World){
@@ -111,10 +108,10 @@ class WeatherManager{
     }
 
     /**
-     * @param Player[]|Player|null $player
+     * @param Player|Player[]|null $player
      * @param bool $thunder
      */
-    public function sendClear($player = null, bool $thunder = false): void{
+    public function sendClear(null|Player|array $player = null, bool $thunder = false): void{
         if($player === null){
             $player = Server::getInstance()->getOnlinePlayers();
         }elseif($player instanceof Player){
@@ -122,15 +119,15 @@ class WeatherManager{
         }
         foreach($player as $p){
             $pk = new LevelEventPacket();
-            $pk->evid = LevelEventPacket::EVENT_STOP_RAIN;
-            $pk->data = 0;
+            $pk->eventId = LevelEvent::STOP_RAIN;
+            $pk->eventData = 0;
             $pk->position = new Vector3(0, 0, 0);
             $p->getNetworkSession()->sendDataPacket($pk);
 
             if($thunder){
                 $pk = new LevelEventPacket();
-                $pk->evid = LevelEventPacket::EVENT_STOP_THUNDER;
-                $pk->data = 0;
+                $pk->eventData = LevelEvent::STOP_THUNDER;
+                $pk->eventId = 0;
                 $pk->position = new Vector3(0, 0, 0);
                 $p->getNetworkSession()->sendDataPacket($pk);
             }
@@ -138,10 +135,10 @@ class WeatherManager{
     }
 
     /**
-     * @param Player[]|Player|null $player
+     * @param Player|Player[]|null $player
      * @param bool $thunder
      */
-    public function sendWeather($player = null, bool $thunder = false): void{
+    public function sendWeather(Player|array $player = null, bool $thunder = false): void{
         if($player === null){
             $player = Server::getInstance()->getOnlinePlayers();
         }elseif($player instanceof Player){
@@ -149,15 +146,15 @@ class WeatherManager{
         }
         foreach($player as $p){
             $pk = new LevelEventPacket();
-            $pk->evid = LevelEventPacket::EVENT_START_RAIN;
-            $pk->data = 65535;
+            $pk->eventId = LevelEvent::START_RAIN;
+            $pk->eventData = 65535;
             $pk->position = new Vector3(0, 0, 0);
             $p->getNetworkSession()->sendDataPacket($pk);
 
             if($thunder){
                 $pk = new LevelEventPacket();
-                $pk->evid = LevelEventPacket::EVENT_START_THUNDER;
-                $pk->data = 65535;
+                $pk->eventId = LevelEvent::START_THUNDER;
+                $pk->eventData = 65535;
                 $pk->position = new Vector3(0, 0, 0);
                 $p->getNetworkSession()->sendDataPacket($pk);
             }

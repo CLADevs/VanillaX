@@ -12,6 +12,7 @@ use pocketmine\item\ItemIdentifier;
 use pocketmine\item\ItemIds;
 use pocketmine\item\ItemUseResult;
 use pocketmine\math\Vector3;
+use pocketmine\network\mcpe\protocol\types\CacheableNbt;
 use pocketmine\player\Player;
 
 class FireworkRocketItem extends Item{
@@ -30,7 +31,7 @@ class FireworkRocketItem extends Item{
             $location = Location::fromObject($blockReplace->getPosition()->add(0.5, 0, 0.5), $blockClicked->getPosition()->getWorld());
             $entity = new FireworkRocketEntity($location, $player);
             if(($tag = $this->getNamedTag()->getTag("Fireworks")) !== null){
-                $entity->getNetworkProperties()->setCompoundTag(16, $this->getNamedTag());
+                $entity->getNetworkProperties()->setCompoundTag(16, new CacheableNbt($this->getNamedTag()));
             }
             $entity->spawnToAll();
         }

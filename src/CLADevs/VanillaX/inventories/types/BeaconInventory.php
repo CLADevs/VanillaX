@@ -21,17 +21,17 @@ class BeaconInventory extends FakeBlockInventory{
 
     public function handlePacket(Player $player, ServerboundPacket $packet): bool{
         if($packet instanceof BlockActorDataPacket){
-            $nbt = $packet->namedtag->getRoot();
+            $root = $packet->nbt->getRoot();
 
-            if($nbt instanceof CompoundTag){
-                $id = $nbt->getTag("id");
+            if($root instanceof CompoundTag){
+                $id = $root->getTag("id");
 
                 if($id instanceof StringTag && $id->getValue() === "Beacon"){
-                    $tile = $player->getWorld()->getTileAt($nbt->getInt("x"), $nbt->getInt("y"), $nbt->getInt("z"));
+                    $tile = $player->getWorld()->getTileAt($root->getInt("x"), $root->getInt("y"), $root->getInt("z"));
 
                     if($tile instanceof BeaconTile){
-                        $tile->setPrimary($nbt->getInt(BeaconTile::TAG_PRIMARY));
-                        $tile->setSecondary($nbt->getInt(BeaconTile::TAG_SECONDARY));
+                        $tile->setPrimary($root->getInt(BeaconTile::TAG_PRIMARY));
+                        $tile->setSecondary($root->getInt(BeaconTile::TAG_SECONDARY));
                         $tile->getPosition()->getWorld()->scheduleDelayedBlockUpdate($tile->getPosition(), 20);
                     }
                     return false;

@@ -114,6 +114,7 @@ class EntityManager{
             }
             $entityName = implode(" ", $entityName);
             $this->entities[$networkId] = new EntityIdentifierX($networkId, $entityName, $namespace, $path, $id);
+            $this->entities[$id] = $this->entities[$networkId];
         }
     }
 
@@ -131,11 +132,11 @@ class EntityManager{
     }
 
     /**
-     * @param string $entity
+     * @param string|int $entity
      * @return EntityIdentifierX|null
      * returns namespace of the entity or null if not found
      */
-    public function getEntity(string $entity): ?string{
+    public function getEntity(string|int $entity): ?EntityIdentifierX{
         return $this->entities[$entity] ?? null;
     }
 

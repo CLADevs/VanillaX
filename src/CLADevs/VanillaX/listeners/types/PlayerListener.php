@@ -4,7 +4,6 @@ namespace CLADevs\VanillaX\listeners\types;
 
 use CLADevs\VanillaX\items\types\ElytraItem;
 use CLADevs\VanillaX\items\types\ShieldItem;
-use CLADevs\VanillaX\listeners\ListenerManager;
 use CLADevs\VanillaX\world\gamerule\GameRule;
 use CLADevs\VanillaX\world\gamerule\GameRuleManager;
 use CLADevs\VanillaX\utils\item\HeldItemChangeTrait;
@@ -33,12 +32,6 @@ use pocketmine\Server;
 use pocketmine\world\World;
 
 class PlayerListener implements Listener{
-
-    private ListenerManager $manager;
-
-    public function __construct(ListenerManager $manager){
-        $this->manager = $manager;
-    }
 
     public function onJoin(PlayerJoinEvent $event): void{
         $player = $event->getPlayer();

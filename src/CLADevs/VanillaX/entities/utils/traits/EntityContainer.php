@@ -2,6 +2,7 @@
 
 namespace CLADevs\VanillaX\entities\utils\traits;
 
+use Exception;
 use pocketmine\block\tile\Container;
 use pocketmine\item\Item;
 use pocketmine\nbt\NBT;
@@ -14,6 +15,10 @@ trait EntityContainer{
         return Container::TAG_ITEMS;
     }
 
+    /**
+     * @param CompoundTag $nbt
+     * @throws Exception
+     */
     protected function loadItems(CompoundTag $nbt): void{
         if(($tag = $nbt->getTag($this->getContainerSaveName())) !== null){
             $inventoryTag = $tag->getValue();

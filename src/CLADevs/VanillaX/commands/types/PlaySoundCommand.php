@@ -7,11 +7,12 @@ use CLADevs\VanillaX\commands\utils\CommandArgs;
 use CLADevs\VanillaX\commands\utils\CommandHelper;
 use CLADevs\VanillaX\commands\utils\CommandTargetSelector;
 use pocketmine\command\CommandSender;
-use pocketmine\command\ConsoleCommandSender;
+use pocketmine\console\ConsoleCommandSender;
 use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
 use pocketmine\network\mcpe\protocol\PlaySoundPacket;
 use pocketmine\network\mcpe\protocol\types\PlayerPermissions;
 use pocketmine\player\Player;
+
 class PlaySoundCommand extends Command{
 
     public function __construct(){

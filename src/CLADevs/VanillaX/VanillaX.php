@@ -63,10 +63,6 @@ class VanillaX extends PluginBase{
         return parent::getFile();
     }
 
-    public function isPhar(): bool{
-        return strpos($this->getFile(), "phar://") === 0;
-    }
-
     public static function getInstance(): VanillaX{
         return self::$instance;
     }

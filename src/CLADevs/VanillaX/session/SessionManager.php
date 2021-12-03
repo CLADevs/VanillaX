@@ -15,19 +15,11 @@ class SessionManager{
         self::setInstance($this);
     }
 
-    /**
-     * @param string|Player $player
-     * @return bool
-     */
-    public function has($player): bool{
+    public function has(Player|string $player): bool{
         return isset($this->sessions[$player instanceof Player ? $player->getName() : $player]);
     }
 
-    /**
-     * @param Player|string $player
-     * @return null|Session
-     */
-    public function get($player): ?Session{
+    public function get(Player|string $player): ?Session{
         if($player instanceof Player) $this->add($player);
         return $this->sessions[$player instanceof Player ? $player->getName() : $player] ?? null;
     }
@@ -39,10 +31,7 @@ class SessionManager{
         return $this->sessions[$player->getName()];
     }
 
-    /**
-     * @param string|Player $player
-     */
-    public function remove($player): void{
+    public function remove(Player|string $player): void{
         if($this->has($player)){
             unset($this->sessions[$player instanceof Player ? $player->getName() : $player]);
         }

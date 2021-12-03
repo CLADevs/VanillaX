@@ -5,6 +5,7 @@ namespace CLADevs\VanillaX\items\types;
 use CLADevs\VanillaX\entities\projectile\TridentEntity;
 use CLADevs\VanillaX\session\Session;
 use pocketmine\entity\Entity;
+use pocketmine\entity\Location;
 use pocketmine\item\Durable;
 use pocketmine\item\ItemIdentifier;
 use pocketmine\item\ItemIds;
@@ -26,17 +27,16 @@ class TridentItem extends Durable{
 
     public function spawnTride(Player $player): void{
         $this->applyDamage(1);
-        $nbt = Entity::createBaseNBT(
-            $player->add(0, $player->getEyeHeight(), 0),
-            $player->getDirectionVector(),
-            ($player->yaw > 180 ? 360 : 0) - $player->yaw,
-            -$player->pitch
-        );
+        $location = $player->getLocation();
+        $location->y += $player->getEyeHeight();
+        $location->yaw = ($location->getYaw() > 180 ? 360 : 0) - $location->getYaw();
+        $location->pitch = -$location->getPitch();
 
         $diff = $player->getItemUseDuration();
         $p = $diff / 20;
         $baseForce = min((($p ** 2) + $p * 2) / 2, 1);
-        $entity = new TridentEntity($player->getLevel(), $nbt);
+        $entity = new TridentEntity($location, $player);
+        $entity->setMotion($player->getDirectionVector());
         $entity->setParent(clone $this);
         $entity->setOwningEntity($player);
         $entity->setMotion($entity->getMotion()->multiply($baseForce * 2));

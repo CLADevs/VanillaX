@@ -34,6 +34,7 @@ class TridentEntity extends Projectile{
 
     const NETWORK_ID = EntityIds::THROWN_TRIDENT;
 
+
     private Item $parent;
     private bool $hasLoyalty = false;
     private bool $canReturn = false;

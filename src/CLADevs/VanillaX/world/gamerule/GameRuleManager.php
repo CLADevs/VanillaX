@@ -98,13 +98,7 @@ class GameRuleManager{
     }
 
 
-    /**
-     * @param World $World
-     * @param GameRule $rule
-     * @param int|bool $value
-     * @param bool $force
-     */
-    public function set(World $World, GameRule $rule, $value, bool $force = false): void{
+    public function set(World $World, GameRule $rule, bool|int $value, bool $force = false): void{
         if(!$force && !$this->isEnabled()){
             return;
         }
@@ -158,13 +152,7 @@ class GameRuleManager{
         }
     }
 
-    /**
-     * @param string $name
-     * @param World $World
-     * @param bool $stringify
-     * @return bool|int|string|null
-     */
-    public function getValue(string $name, World $World, bool $stringify = false){
+    public function getValue(string $name, World $World, bool $stringify = false): bool|int|string|null{
         $name = strtolower($name);
         $rule = $this->gameRules[$name] ?? null;
         $provider = $World->getProvider();
@@ -180,7 +168,7 @@ class GameRuleManager{
 
                 if($tag instanceof Tag){
                     if($stringify && $tag instanceof ByteTag){
-                        return boolval($tag->getValue()) ? "true" : "false";
+                        return $tag->getValue() ? "true" : "false";
                     }
                     return $tag instanceof ByteTag ? boolval($tag->getValue()) : intval($tag->getValue());
                 }
@@ -189,7 +177,7 @@ class GameRuleManager{
         if($stringify && is_bool($rule->getDefaultValue())){
             return $rule->getDefaultValue() ? "true" : "false";
         }
-        return $rule === null ? null : $rule->getDefaultValue();
+        return $rule?->getDefaultValue();
     }
 
     /**

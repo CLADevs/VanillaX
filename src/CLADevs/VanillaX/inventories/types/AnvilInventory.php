@@ -8,6 +8,7 @@ use pocketmine\block\BlockLegacyIds;
 use pocketmine\item\Item;
 use pocketmine\network\mcpe\protocol\ActorEventPacket;
 use pocketmine\network\mcpe\protocol\ServerboundPacket;
+use pocketmine\network\mcpe\protocol\types\ActorEvent;
 use pocketmine\network\mcpe\protocol\types\inventory\WindowTypes;
 use pocketmine\player\Player;
 use pocketmine\world\Position;
@@ -20,9 +21,9 @@ class AnvilInventory extends FakeBlockInventory{
     }
 
     public function handlePacket(Player $player, ServerboundPacket $packet): bool{
-        if($packet instanceof ActorEventPacket && $packet->event === ActorEventPacket::PLAYER_ADD_XP_LEVELS){
+        if($packet instanceof ActorEventPacket && $packet->eventId === ActorEvent::PLAYER_ADD_XP_LEVELS){
             if(!$player->isCreative()){
-                $player->getXpManager()->setXpLevel($player->getXpManager()->getXpLevel() - abs($packet->data));
+                $player->getXpManager()->setXpLevel($player->getXpManager()->getXpLevel() - abs($packet->eventData));
             }
         }elseif($packet instanceof FilterTextPacketX){
             $player->getNetworkSession()->sendDataPacket(FilterTextPacketX::create($packet->getText(), true));

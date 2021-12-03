@@ -67,11 +67,11 @@ class TradeInventory extends FakeBlockInventory{
         $pk->windowType = WindowTypes::TRADING;
         $pk->windowSlotCount = 0;
         $pk->tradeTier = 0;
-        $pk->traderEid = $this->villager->getId();
-        $pk->playerEid = $who->getId();
+        $pk->traderActorUniqueId = $this->villager->getId();
+        $pk->playerActorUniqueId = $who->getId();
         $pk->displayName = $this->villager->getProfession()->getName();
         $pk->isV2Trading = true;
-        $pk->isWilling = false;
+        $pk->isEconomyTrading = false;
         $pk->offers = new CacheableNbt($this->villager->getOffers());
         $who->getNetworkSession()->sendDataPacket($pk);
     }
@@ -86,11 +86,8 @@ class TradeInventory extends FakeBlockInventory{
             $nbt = $this->villager->getOffers();
             $recipes = $nbt->getValue()[VillagerTradeNBTStream::TAG_RECIPES]->getValue();
 
-            /**
-             * @var int $key
-             * @var CompoundTag $recipe
-             */
-            foreach($recipes as $key => $recipe){
+            /* @var CompoundTag $recipe */
+            foreach($recipes as $recipe){
                 $value = $recipe->getValue();
 
                 /** @var Tag $buyA */

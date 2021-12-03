@@ -103,7 +103,8 @@ abstract class VanillaEntity extends Living{
 
     protected function sendSpawnPacket(Player $player): void{
         $pk = new AddActorPacket();
-        $pk->entityRuntimeId = $this->getId();
+        $pk->actorRuntimeId = $this->getId();
+        $pk->actorUniqueId = $this->getId();
         $pk->type = static::NETWORK_ID;
         $pk->position = $this->getPosition();
         $pk->motion = $this->getMotion();

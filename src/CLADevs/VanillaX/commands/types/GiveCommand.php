@@ -6,6 +6,7 @@ use CLADevs\VanillaX\commands\Command;
 use CLADevs\VanillaX\commands\utils\CommandArgs;
 use CLADevs\VanillaX\commands\utils\CommandTargetSelector;
 use CLADevs\VanillaX\utils\Utils;
+use CLADevs\VanillaX\VanillaX;
 use Exception;
 use pocketmine\command\CommandSender;
 use pocketmine\item\LegacyStringToItemParser;
@@ -61,11 +62,11 @@ class GiveCommand extends Command{
                         $itemName->setDamage(intval($args[3]));
 
                         if(isset($args[4])){
-                            $tags = null;
                             $data = implode(" ", array_slice($args, 4));
                             try{
                                 $tags = JsonNbtParser::parseJson($data);
                             }catch(Exception $ex){
+                                VanillaX::getInstance()->getLogger()->logException($ex);
                                 $this->sendSyntaxError($sender, $args[4], "/$commandLabel", $args[4], [$args[0], $args[1], $args[2], $args[3]]);
                                 return;
                             }

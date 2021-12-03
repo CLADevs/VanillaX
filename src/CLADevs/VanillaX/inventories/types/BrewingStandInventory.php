@@ -58,7 +58,7 @@ class BrewingStandInventory extends FakeBlockInventory{
 
     public function decreaseFuel(): void{
         $item = $this->getFuel();
-        $item->setCount($count = $item->getCount() - 1);
+        $item->setCount($item->getCount() - 1);
         $this->setFuel($item);
     }
 
