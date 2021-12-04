@@ -15,6 +15,7 @@ use pocketmine\block\utils\NormalHorizontalFacingInMetadataTrait;
 use pocketmine\item\Item;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\ContainerOpenPacket;
+use pocketmine\network\mcpe\protocol\types\BlockPosition;
 use pocketmine\network\mcpe\protocol\types\inventory\ContainerIds;
 use pocketmine\network\mcpe\protocol\types\inventory\WindowTypes;
 use pocketmine\permission\DefaultPermissions;
@@ -60,11 +61,12 @@ class CommandBlock extends Block implements NonAutomaticCallItemTrait, NonCreati
             $tile = $this->getPosition()->getWorld()->getTile($this->getPosition());
 
             $pk = new ContainerOpenPacket();
-            $pk->type = WindowTypes::COMMAND_BLOCK;
+            $pk->windowType = WindowTypes::COMMAND_BLOCK;
             $pk->windowId = ContainerIds::NONE;
-            $pk->x = $tile->getPosition()->x;
-            $pk->y = $tile->getPosition()->y;
-            $pk->z = $tile->getPosition()->z;
+            $x = $tile->getPosition()->x;
+            $y = $tile->getPosition()->y;
+            $z = $tile->getPosition()->z;
+            $pk->blockPosition = new BlockPosition($x, $y, $z);
             $player->getNetworkSession()->sendDataPacket($pk);
         }
         return true;
