@@ -12,6 +12,7 @@ use pocketmine\block\Opaque;
 use pocketmine\item\Item;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\LevelEventPacket;
+use pocketmine\network\mcpe\protocol\types\LevelEvent;
 use pocketmine\network\mcpe\protocol\types\ParticleIds;
 use pocketmine\player\Player;
 use pocketmine\Server;
@@ -59,7 +60,7 @@ class JukeboxBlock extends Opaque{
             if(!$tile->isFinishedPlaying()){
                 if(Server::getInstance()->getTick() % 30 === 0){
                     $pk = new LevelEventPacket();
-                    $pk->evid = LevelEventPacket::EVENT_ADD_PARTICLE_MASK | ParticleIds::NOTE;
+                    $pk->evid = LevelEvent::ADD_PARTICLE_MASK | ParticleIds::NOTE;
                     $pk->position = $this->position->add(0.5, 1.25, 0.5);
                     $pk->data = 0;
                     $this->position->getWorld()->broadcastPacketToViewers($pk->position, $pk);
