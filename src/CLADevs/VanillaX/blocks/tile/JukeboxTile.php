@@ -9,6 +9,7 @@ use pocketmine\block\tile\Tile;
 use pocketmine\item\Item;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\network\mcpe\protocol\LevelSoundEventPacket;
+use pocketmine\network\mcpe\protocol\types\LevelSoundEvent;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 use pocketmine\world\Position;
@@ -69,7 +70,7 @@ class JukeboxTile extends Tile{
     public function removeTrack(): void{
         if($this->recordItem !== null){
             $this->recordDuration = 0;
-            $this->broadcastLevelSoundEvent($this->getPosition(), LevelSoundEventPacket::SOUND_STOP_RECORD);
+            $this->broadcastLevelSoundEvent($this->getPosition(), LevelSoundEvent::STOP_RECORD);
             $this->getPosition()->getWorld()->dropItem($this->getPosition()->add(0, 1, 0), $this->recordItem);
             $this->recordItem = null;
         }
