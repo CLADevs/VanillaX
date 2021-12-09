@@ -102,7 +102,7 @@ class PlayerListener implements Listener{
 
         if($player->getInventory()->getItemInHand() instanceof ShieldItem || $offhandItem instanceof ShieldItem){
             VanillaX::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function ()use($player): void{
-                if($player->isOnline()) $player->getNetworkProperties()->setGenericFlag(EntityMetadataFlags::BLOCKED_USING_SHIELD, $player->isSneaking());
+                if($player->isOnline()) $player->getNetworkProperties()->setGenericFlag(EntityMetadataFlags::BLOCKING, $player->isSneaking());
             }), 5);
         }
     }
