@@ -63,10 +63,7 @@ class CommandBlock extends Block implements NonAutomaticCallItemTrait, NonCreati
             $pk = new ContainerOpenPacket();
             $pk->windowType = WindowTypes::COMMAND_BLOCK;
             $pk->windowId = ContainerIds::NONE;
-            $x = $tile->getPosition()->x;
-            $y = $tile->getPosition()->y;
-            $z = $tile->getPosition()->z;
-            $pk->blockPosition = new BlockPosition($x, $y, $z);
+            $pk->blockPosition = BlockPosition::fromVector3($tile->getPosition());
             $player->getNetworkSession()->sendDataPacket($pk);
         }
         return true;
