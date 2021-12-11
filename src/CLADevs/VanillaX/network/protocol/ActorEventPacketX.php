@@ -9,11 +9,9 @@ use pocketmine\network\mcpe\protocol\types\ActorEvent;
 class ActorEventPacketX extends ActorEventPacket{
 
     public function handle(PacketHandlerInterface $handler): bool{
-        $parent = parent::handle($handler);
-
         if($this->eventId === ActorEvent::PLAYER_ADD_XP_LEVELS || $this->eventId === ActorEvent::COMPLETE_TRADE){
             return true; //ignores debug
         }
-        return $parent;
+        return parent::handle($handler);
     }
 }
