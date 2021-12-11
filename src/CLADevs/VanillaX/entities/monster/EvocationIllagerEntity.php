@@ -36,7 +36,6 @@ class EvocationIllagerEntity extends VanillaEntity{
         ItemHelper::applyLootingEnchant($this, $emerald);
          
         $totem = ItemFactory::getInstance()->get(ItemIds::TOTEM, 0, 1);
-        ItemHelper::applySetCount($totem, 1, 1);
         return [$emerald, $totem];
     }
     
