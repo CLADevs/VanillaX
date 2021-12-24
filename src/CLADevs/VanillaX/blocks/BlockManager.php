@@ -227,9 +227,11 @@ class BlockManager{
     }
 
     private function registerCommandBlock(): void{
-        self::registerBlock(new CommandBlock(BlockLegacyIds::COMMAND_BLOCK));
-        self::registerBlock(new CommandBlock(BlockLegacyIds::REPEATING_COMMAND_BLOCK));
-        self::registerBlock(new CommandBlock(BlockLegacyIds::CHAIN_COMMAND_BLOCK));
+        for($i = 0; $i < 6; $i++){
+            self::registerBlock(new CommandBlock(BlockLegacyIds::COMMAND_BLOCK, $i));
+            self::registerBlock(new CommandBlock(BlockLegacyIds::REPEATING_COMMAND_BLOCK, $i));
+            self::registerBlock(new CommandBlock(BlockLegacyIds::CHAIN_COMMAND_BLOCK, $i));
+        }
     }
 
     public function registerBlock(Block $block, bool $override = true, bool $creativeItem = false): bool{

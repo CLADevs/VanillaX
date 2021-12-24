@@ -70,7 +70,7 @@ class CommandBlockTile extends Spawnable implements Nameable{
     private bool $ranCommand = false;
 
     public function getDefaultName(): string{
-        return "Command Block";
+        return "";
     }
 
     public function runCommand(): void{

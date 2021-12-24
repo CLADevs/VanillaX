@@ -20,9 +20,7 @@ class SmithingTableBlock extends Transparent{
     }
 
     public function onInteract(Item $item, int $face, Vector3 $clickVector, ?Player $player = null): bool{
-        if($player !== null){
-            $player->setCurrentWindow(new SmithingTableInventory($this->getPosition()));
-        }
+        $player?->setCurrentWindow(new SmithingTableInventory($this->getPosition()));
         return true;
     }
 }

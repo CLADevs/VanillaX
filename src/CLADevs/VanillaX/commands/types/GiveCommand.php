@@ -5,10 +5,10 @@ namespace CLADevs\VanillaX\commands\types;
 use CLADevs\VanillaX\commands\Command;
 use CLADevs\VanillaX\commands\utils\CommandArgs;
 use CLADevs\VanillaX\commands\utils\CommandTargetSelector;
-use CLADevs\VanillaX\utils\Utils;
 use CLADevs\VanillaX\VanillaX;
 use Exception;
 use pocketmine\command\CommandSender;
+use pocketmine\item\Durable;
 use pocketmine\item\LegacyStringToItemParser;
 use pocketmine\nbt\JsonNbtParser;
 use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
@@ -22,7 +22,7 @@ class GiveCommand extends Command{
         $this->setPermission("give.command");
         $this->commandArg = new CommandArgs(CommandArgs::FLAG_NORMAL, PlayerPermissions::MEMBER);
         $this->commandArg->addParameter(0, "player", AvailableCommandsPacket::ARG_TYPE_TARGET);
-        $this->commandArg->addParameter(0, "itemName", AvailableCommandsPacket::ARG_FLAG_ENUM | 0x9, true, "Item", json_decode(file_get_contents(Utils::getResourceFile("command_items.json"))));
+        $this->commandArg->addParameter(0, "itemName", AvailableCommandsPacket::ARG_FLAG_ENUM | 0x9, true, "Item", []);
         $this->commandArg->addParameter(0, "amount", AvailableCommandsPacket::ARG_TYPE_INT);
         $this->commandArg->addParameter(0, "data", AvailableCommandsPacket::ARG_TYPE_INT);
         $this->commandArg->addParameter(0, "components", AvailableCommandsPacket::ARG_TYPE_JSON);
@@ -42,7 +42,7 @@ class GiveCommand extends Command{
             if(isset($args[1])){
                 try{
                     $itemName = LegacyStringToItemParser::getInstance()->parse($args[1]);
-                }catch (Exception $e){
+                }catch (Exception){
                     $this->sendSyntaxError($sender, $args[1], "/$commandLabel", $args[1]);
                     return;
                 }
@@ -54,7 +54,7 @@ class GiveCommand extends Command{
                     }
                     $itemName->setCount(intval($args[2]));
 
-                    if(isset($args[3])){
+                    if(isset($args[3]) && $itemName instanceof Durable){
                         if(!is_numeric($args[3])){
                             $this->sendSyntaxError($sender, $args[3], "/$commandLabel", $args[3], [$args[0], $args[1], $args[2]]);
                             return;

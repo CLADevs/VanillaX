@@ -70,7 +70,7 @@ class MobSpawnerBlock extends MonsterSpawner{
                     $x = ((mt_rand(-10, 10) / 10) * $tile->getSpawnRange()) + 0.5;
                     $z = ((mt_rand(-10, 10) / 10) * $tile->getSpawnRange()) + 0.5;
                     $pos = $tile->getPosition();
-                    $pos = new Location($pos->x + $x, $pos->y + mt_rand(1, 3), $pos->z + $z, 0, 0, $pos->world);
+                    $pos = new Location($pos->x + $x, $pos->y + mt_rand(1, 3), $pos->z + $z, $pos->getWorld(), 0, 0);
                     /** @var VanillaEntity $entity */
                     $entity = new $namespace($pos);
                     $entity->spawnToAll();

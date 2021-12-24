@@ -20,9 +20,7 @@ class AnvilBlock extends Anvil{
     }
 
     public function onInteract(Item $item, int $face, Vector3 $clickVector, ?Player $player = null): bool{
-        if($player instanceof Player){
-            $player->setCurrentWindow(new AnvilInventory($this->position));
-        }
+        $player?->setCurrentWindow(new AnvilInventory($this->getPosition()));
         return true;
     }
 }

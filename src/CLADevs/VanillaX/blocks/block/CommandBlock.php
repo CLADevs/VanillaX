@@ -3,6 +3,7 @@
 namespace CLADevs\VanillaX\blocks\block;
 
 use CLADevs\VanillaX\blocks\tile\CommandBlockTile;
+use CLADevs\VanillaX\blocks\utils\facing\AnyFacingTrait;
 use CLADevs\VanillaX\utils\item\NonAutomaticCallItemTrait;
 use CLADevs\VanillaX\utils\item\NonCreativeItemTrait;
 use pocketmine\block\Block;
@@ -10,22 +11,44 @@ use pocketmine\block\BlockBreakInfo;
 use pocketmine\block\BlockIdentifier;
 use pocketmine\block\BlockLegacyIds;
 use pocketmine\block\BlockToolType;
-use pocketmine\block\utils\FacesOppositePlacingPlayerTrait;
-use pocketmine\block\utils\NormalHorizontalFacingInMetadataTrait;
 use pocketmine\item\Item;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\ContainerOpenPacket;
+use pocketmine\network\mcpe\protocol\types\BlockPosition;
 use pocketmine\network\mcpe\protocol\types\inventory\ContainerIds;
 use pocketmine\network\mcpe\protocol\types\inventory\WindowTypes;
 use pocketmine\permission\DefaultPermissions;
 use pocketmine\player\Player;
 
 class CommandBlock extends Block implements NonAutomaticCallItemTrait, NonCreativeItemTrait{
-    use FacesOppositePlacingPlayerTrait;
-    use NormalHorizontalFacingInMetadataTrait;
+    use AnyFacingTrait;
 
-    public function __construct(int $id){
-        parent::__construct(new BlockIdentifier($id, 0, $id, CommandBlockTile::class), self::asCommandBlockName($id), new BlockBreakInfo(-1, BlockToolType::NONE, 0, 3600000));
+    public function __construct(int $id, int $meta){
+        parent::__construct(new BlockIdentifier($id, $meta, $id, CommandBlockTile::class), self::asCommandBlockName($id), new BlockBreakInfo(-1, BlockToolType::NONE, 0, 3600000));
+    }
+
+    public function onInteract(Item $item, int $face, Vector3 $clickVector, ?Player $player = null): bool{
+        if($player !== null && $player->hasPermission(DefaultPermissions::ROOT_OPERATOR)){
+            $player->getNetworkSession()->sendDataPacket(ContainerOpenPacket::blockInv(ContainerIds::NONE, WindowTypes::COMMAND_BLOCK, BlockPosition::fromVector3($this->getPosition())));
+        }
+        return true;
+    }
+
+    public function onScheduledUpdate(): void{
+        $tile = $this->position->getWorld()->getTile($this->position);
+
+        if(!$tile instanceof CommandBlockTile || $tile->isClosed()){
+            return;
+        }
+        if($tile->getTickDelay() > 0 && $tile->getCountDelayTick() > 0){
+            $tile->decreaseCountDelayTick();
+        }else{;
+            $tile->runCommand();
+            if($tile->getCommandBlockMode() === CommandBlockTile::TYPE_REPEAT){
+                $tile->setCountDelayTick($tile->getTickDelay());
+                $this->position->getWorld()->scheduleDelayedBlockUpdate($this->position, 1);
+            }
+        }
     }
 
     public function getMode(): int{
@@ -53,37 +76,5 @@ class CommandBlock extends Block implements NonAutomaticCallItemTrait, NonCreati
             return BlockLegacyIds::CHAIN_COMMAND_BLOCK;
         }
         return BlockLegacyIds::COMMAND_BLOCK;
-    }
-
-    public function onInteract(Item $item, int $face, Vector3 $clickVector, ?Player $player = null): bool{
-        if($player !== null && $player->hasPermission(DefaultPermissions::ROOT_OPERATOR)){
-            $tile = $this->getPosition()->getWorld()->getTile($this->getPosition());
-
-            $pk = new ContainerOpenPacket();
-            $pk->type = WindowTypes::COMMAND_BLOCK;
-            $pk->windowId = ContainerIds::NONE;
-            $pk->x = $tile->getPosition()->x;
-            $pk->y = $tile->getPosition()->y;
-            $pk->z = $tile->getPosition()->z;
-            $player->getNetworkSession()->sendDataPacket($pk);
-        }
-        return true;
-    }
-
-    public function onScheduledUpdate(): void{
-        $tile = $this->position->getWorld()->getTile($this->position);
-
-        if($tile->isClosed() || !$tile instanceof CommandBlockTile){
-            return;
-        }
-        if($tile->getTickDelay() > 0 && $tile->getCountDelayTick() > 0){
-            $tile->decreaseCountDelayTick();
-        }else{;
-            $tile->runCommand();
-            if($tile->getCommandBlockMode() === CommandBlockTile::TYPE_REPEAT){
-                $tile->setCountDelayTick($tile->getTickDelay());
-                $this->position->getWorld()->scheduleDelayedBlockUpdate($this->position, 1);
-            }
-        }
     }
 }

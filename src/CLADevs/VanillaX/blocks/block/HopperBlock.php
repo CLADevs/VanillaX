@@ -3,26 +3,42 @@
 namespace CLADevs\VanillaX\blocks\block;
 
 use CLADevs\VanillaX\blocks\tile\HopperTile;
+use pocketmine\block\Block;
 use pocketmine\block\BlockBreakInfo;
 use pocketmine\block\BlockIdentifier;
 use pocketmine\block\BlockLegacyIds;
 use pocketmine\block\BlockToolType;
 use pocketmine\block\Transparent;
-use pocketmine\block\utils\FacesOppositePlacingPlayerTrait;
-use pocketmine\block\utils\NormalHorizontalFacingInMetadataTrait;
+use pocketmine\block\utils\AnyFacingTrait;
 use pocketmine\entity\object\ItemEntity;
 use pocketmine\item\Item;
 use pocketmine\item\ItemIds;
 use pocketmine\math\AxisAlignedBB;
+use pocketmine\math\Facing;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
+use pocketmine\world\BlockTransaction;
 
 class HopperBlock extends Transparent{
-    use FacesOppositePlacingPlayerTrait;
-    use NormalHorizontalFacingInMetadataTrait;
+    use AnyFacingTrait;
 
     public function __construct(){
         parent::__construct(new BlockIdentifier(BlockLegacyIds::HOPPER_BLOCK, 0, ItemIds::HOPPER, HopperTile::class), "Hopper", new BlockBreakInfo(3, BlockToolType::PICKAXE, 0, 4.8));
+    }
+
+    public function place(BlockTransaction $tx, Item $item, Block $blockReplace, Block $blockClicked, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
+        $this->facing = match($face){
+            Facing::UP => Facing::DOWN,
+            Facing::NORTH => Facing::SOUTH,
+            Facing::SOUTH => Facing::NORTH,
+            Facing::WEST => Facing::EAST,
+            Facing::EAST => Facing::WEST,
+        };
+        return parent::place($tx, $item, $blockReplace, $blockClicked, $face, $clickVector, $player);
+    }
+
+    protected function writeStateToMeta(): int{
+        return $this->facing;
     }
 
     public function onInteract(Item $item, int $face, Vector3 $clickVector, ?Player $player = null): bool{

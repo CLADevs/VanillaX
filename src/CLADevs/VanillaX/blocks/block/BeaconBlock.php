@@ -32,9 +32,7 @@ class BeaconBlock extends Transparent{
      * @throws Exception
      */
     public function onInteract(Item $item, int $face, Vector3 $clickVector, ?Player $player = null): bool{
-        if($player instanceof Player){
-            $player->setCurrentWindow(new BeaconInventory($this->position));
-        }
+        $player?->setCurrentWindow(new BeaconInventory($this->getPosition()));
         return true;
     }
 

@@ -131,19 +131,19 @@ class MobSpawnerTile extends Spawnable{
 
     public function readSaveData(CompoundTag $nbt): void{
         if(($tag = $nbt->getTag(self::TAG_ENTITY_ID)) !== null){
-            $this->setEntityId($nbt->getInt(self::TAG_ENTITY_ID));
+            $this->setEntityId($tag->getValue());
         }
         if(($tag = $nbt->getTag(self::TAG_SPAWN_COUNT)) !== null){
-            $this->spawnCount = (int)$nbt->getTag(self::TAG_SPAWN_COUNT)->getValue();
+            $this->spawnCount = (int)$tag->getValue();
         }
         if(($tag = $nbt->getTag(self::TAG_SPAWN_RANGE)) !== null){
-            $this->spawnRange = (int)$nbt->getTag(self::TAG_SPAWN_RANGE)->getValue();
+            $this->spawnRange = (int)$tag->getValue();
         }
         if(($tag = $nbt->getTag(self::TAG_MIN_SPAWN_DELAY)) !== null){
-            $this->minSpawnDelay = (int)$nbt->getTag(self::TAG_MIN_SPAWN_DELAY)->getValue();
+            $this->minSpawnDelay = (int)$tag->getValue();
         }
         if(($tag = $nbt->getTag(self::TAG_MAX_SPAWN_DELAY)) !== null){
-            $this->maxSpawnDelay = (int)$nbt->getTag(self::TAG_MAX_SPAWN_DELAY)->getValue();
+            $this->maxSpawnDelay = (int)$tag->getValue();
         }
     }
 

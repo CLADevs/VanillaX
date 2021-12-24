@@ -1,26 +1,24 @@
 <?php
 
-namespace CLADevs\VanillaX\blocks\utils\traits;
+namespace CLADevs\VanillaX\blocks\utils\facing;
 
 use pocketmine\block\Block;
 use pocketmine\item\Item;
+use pocketmine\math\Facing;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
 use pocketmine\world\BlockTransaction;
 
-trait BlockFacingPlayerTrait{
-
-    private int $facing = 0;
+trait FacingPlayerHorizontallyTrait{
+    use \pocketmine\block\utils\AnyFacingTrait;
 
     public function place(BlockTransaction $tx, Item $item, Block $blockReplace, Block $blockClicked, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
         if($player !== null){
-            $facing = [
-                4 => 3,
-                3 => 2,
-                2 => 0,
-                5 => 1
-            ];
-            $this->facing = $facing[$player->getHorizontalFacing()];
+            $this->facing = match($player->getHorizontalFacing()){
+                Facing::DOWN, Facing::EAST, Facing::WEST => Facing::UP,
+                Facing::SOUTH => Facing::NORTH,
+                default => $player->getHorizontalFacing()
+            };
         }
         return parent::place($tx, $item, $blockReplace, $blockClicked, $face, $clickVector, $player);
     }

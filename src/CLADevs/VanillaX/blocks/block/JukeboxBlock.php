@@ -33,7 +33,7 @@ class JukeboxBlock extends Opaque{
     public function onInteract(Item $item, int $face, Vector3 $clickVector, ?Player $player = null): bool{
         $tile = $player->getWorld()->getTile($this->getPosition());
 
-        if($player !== null && $tile instanceof JukeboxTile){
+        if($player instanceof Player && $tile instanceof JukeboxTile){
             if($item instanceof MusicDiscItem && $tile->getRecordItem() === null){
                 $tile->insertTrack($player, $item);
             }else{
@@ -58,11 +58,8 @@ class JukeboxBlock extends Opaque{
 
             if(!$tile->isFinishedPlaying()){
                 if(Server::getInstance()->getTick() % 30 === 0){
-                    $pk = new LevelEventPacket();
-                    $pk->evid = LevelEventPacket::EVENT_ADD_PARTICLE_MASK | ParticleIds::NOTE;
-                    $pk->position = $this->position->add(0.5, 1.25, 0.5);
-                    $pk->data = 0;
-                    $this->position->getWorld()->broadcastPacketToViewers($pk->position, $pk);
+                    $position = $this->position->add(0.5, 1.25, 0.5);
+                    $this->position->getWorld()->broadcastPacketToViewers($position, LevelEventPacket::standardParticle(ParticleIds::NOTE, 0, $position));
                 }
             }
         }

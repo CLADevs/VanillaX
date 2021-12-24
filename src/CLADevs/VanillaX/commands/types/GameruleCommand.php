@@ -21,15 +21,24 @@ class GameruleCommand extends Command{
     public function __construct(){
         parent::__construct("gamerule", "Set or queries a game rule value.");
         $this->setPermission("gamerule.command");
+        $intGameRules = [];
+        $boolGameRules = [];
+        foreach(GameRuleManager::getInstance()->getAll() as $rule){
+            if($rule->getType() === GameRule::TYPE_INT){
+                $intGameRules[] = strtolower($rule->getName());
+            }else{
+                $boolGameRules[] = strtolower($rule->getName());
+            }
+        }
         $this->commandArg = new CommandArgs(CommandArgs::FLAG_NORMAL, PlayerPermissions::MEMBER);
         /** First Column */
         $key = $this->commandArg->addParameter(0, "rule", AvailableCommandsPacket::ARG_FLAG_ENUM | AvailableCommandsPacket::ARG_TYPE_STRING, false);
-        $this->commandArg->setEnum(0, $key, "BoolGameRule", ["commandblockoutput", "dodaylightcycle", "doentitydrops", "dofiretick", "domobloot", "domobspawning", "dotiledrops", "doweathercycle", "drowningdamage", "falldamage", "firedamage", "keepinventory", "mobgriefing", "pvp", "showcoordinates", "naturalregeneration", "tntexplodes", "sendcommandfeedback", "doinsomnia", "commandblocksenabled", "doimmediaterespawn", "showdeathmessages", "showtags"]);
+        $this->commandArg->setEnum(0, $key, "BoolGameRule", $boolGameRules);
 
         $this->commandArg->addParameter(0, "value", AvailableCommandsPacket::ARG_FLAG_ENUM | AvailableCommandsPacket::ARG_TYPE_WILDCARD_INT, true, "Boolean", ["true", "false"]);
 
         /** Second Column */
-        $this->commandArg->addParameter(1, "rule", AvailableCommandsPacket::ARG_FLAG_ENUM | 0x21, false, "IntGameRule", ["maxcommandchainlength", "randomtickspeed", "functioncommandlimit", "spawnradius"]);
+        $this->commandArg->addParameter(1, "rule", AvailableCommandsPacket::ARG_FLAG_ENUM | 0x21, false, "IntGameRule", $intGameRules);
         $this->commandArg->addParameter(1, "value", AvailableCommandsPacket::ARG_TYPE_INT);
     }
 
@@ -65,7 +74,6 @@ class GameruleCommand extends Command{
         }
         $pk = new GameRulesChangedPacket();
         $value = $args[1];
-        $gameruleClass = null;
 
         if($gameRule->getType() === GameRule::TYPE_INT){
             if(!is_numeric($value)){

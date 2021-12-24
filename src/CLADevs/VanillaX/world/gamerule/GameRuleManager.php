@@ -23,7 +23,7 @@ class GameRuleManager{
     use SingletonTrait;
 
     /** @var GameRule[] */
-    public array $gameRules = [];
+    private array $gameRules = [];
     
     public function __construct(){
         self::setInstance($this);

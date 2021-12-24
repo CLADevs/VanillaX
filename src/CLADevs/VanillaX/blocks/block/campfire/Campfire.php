@@ -3,7 +3,7 @@
 namespace CLADevs\VanillaX\blocks\block\campfire;
 
 use CLADevs\VanillaX\blocks\tile\campfire\CampfireTile;
-use CLADevs\VanillaX\blocks\utils\traits\BlockFacingPlayerTrait;
+use CLADevs\VanillaX\blocks\utils\facing\FacingPlayerTrait;
 use CLADevs\VanillaX\utils\item\NonAutomaticCallItemTrait;
 use Exception;
 use pocketmine\block\Opaque;
@@ -14,7 +14,7 @@ use pocketmine\math\Vector3;
 use pocketmine\player\Player;
 
 class Campfire extends Opaque implements NonAutomaticCallItemTrait{
-    use BlockFacingPlayerTrait;
+    use FacingPlayerTrait;
 
     /**
      * @param Item $item

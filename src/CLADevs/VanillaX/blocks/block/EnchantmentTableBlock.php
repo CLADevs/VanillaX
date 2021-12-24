@@ -20,9 +20,7 @@ class EnchantmentTableBlock extends Transparent{
     }
 
     public function onInteract(Item $item, int $face, Vector3 $clickVector, ?Player $player = null): bool{
-        if($player !== null){
-            $player->setCurrentWindow(new EnchantInventory($this->getPosition()));
-        }
+        $player?->setCurrentWindow(new EnchantInventory($this->getPosition()));
         return true;
     }
 }
