@@ -16,7 +16,6 @@
 - Command Block (80% done)
 - Beacon
 - Ancient Debris
-- Smithing Table
 - Basalt
 - Bee Hive
 - Bee Nest
@@ -54,6 +53,7 @@
 - Kelp (every)
 - Blackstone (every)
 - Conduit
+- Smithing Table
 - Crying Obsidian
 - Cartography
 - Fletching

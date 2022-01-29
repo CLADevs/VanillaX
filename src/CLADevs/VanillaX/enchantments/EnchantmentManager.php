@@ -54,7 +54,6 @@ class EnchantmentManager{
         }
     }
 
-
     public function handleInventoryTransaction(InventoryTransactionEvent $event): void{
         if(!$event->isCancelled()){
             $tr = $event->getTransaction();
@@ -65,7 +64,7 @@ class EnchantmentManager{
                     $source = $act->getSourceItem();
                     $inv = $act->getInventory();
 
-                    if(!$player->isCreative() && $source->hasEnchantment(EnchantmentIdMap::getInstance()->fromId(EnchantmentIds::BINDING)) && ($inv instanceof PlayerInventory || $inv instanceof ArmorInventory)){
+                    if(EnchantmentFeature::getInstance()->isEnchantmentEnabled("binding") && !$player->isCreative() && $source->hasEnchantment(EnchantmentIdMap::getInstance()->fromId(EnchantmentIds::BINDING)) && ($inv instanceof PlayerInventory || $inv instanceof ArmorInventory)){
                         $event->cancel();
                     }
                 }

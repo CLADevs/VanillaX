@@ -2,6 +2,8 @@
 
 namespace CLADevs\VanillaX\listeners\types;
 
+use CLADevs\VanillaX\configuration\features\EnchantmentFeature;
+use CLADevs\VanillaX\configuration\features\ItemFeature;
 use CLADevs\VanillaX\items\types\ElytraItem;
 use CLADevs\VanillaX\items\types\ShieldItem;
 use CLADevs\VanillaX\network\InGamePacketHandlerX;
@@ -28,6 +30,7 @@ use pocketmine\event\player\PlayerRespawnEvent;
 use pocketmine\event\player\PlayerToggleSneakEvent;
 use pocketmine\item\Armor;
 use pocketmine\item\GlassBottle;
+use pocketmine\item\ItemIds;
 use pocketmine\item\VanillaItems;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataFlags;
@@ -164,7 +167,7 @@ class PlayerListener implements Listener{
             $belowBlock = $player->getWorld()->getBlock($player->getPosition()->subtract(0, 1, 0));
 
             //frost walker
-            if($boots->hasEnchantment($enchantment = EnchantmentIdMap::getInstance()->fromId(EnchantmentIds::FROST_WALKER)) && !$player->isOnGround() && (intval($to->x) !== intval($from->x) || intval($to->y) !== intval($from->y) || intval($to->z) !== intval($from->z))){
+            if(EnchantmentFeature::getInstance()->isEnchantmentEnabled("frost_walker") && $boots->hasEnchantment($enchantment = EnchantmentIdMap::getInstance()->fromId(EnchantmentIds::FROST_WALKER)) && !$player->isOnGround() && (intval($to->x) !== intval($from->x) || intval($to->y) !== intval($from->y) || intval($to->z) !== intval($from->z))){
                 $block = $player->getWorld()->getBlock($player->getPosition());
                 $aboveBlock = $player->getWorld()->getBlock($player->getPosition()->add(0, 1, 0));
 
@@ -184,7 +187,7 @@ class PlayerListener implements Listener{
                 }
             }
             //Elytra
-            if($chestplate instanceof ElytraItem && $session->isGliding()){
+            if($chestplate instanceof ElytraItem && $session->isGliding() && ItemFeature::getInstance()->isItemEnabled(ItemIds::ELYTRA)){
                 if(Server::getInstance()->getTick() % 20 == 0){
                     $chestplate->applyDamage(1);
                     $player->getArmorInventory()->setChestplate($chestplate);
