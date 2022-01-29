@@ -7,7 +7,6 @@ use CLADevs\VanillaX\enchantments\utils\EnchantmentTrait;
 use CLADevs\VanillaX\entities\utils\interfaces\EntityClassification;
 use CLADevs\VanillaX\entities\VanillaEntity;
 use CLADevs\VanillaX\utils\Utils;
-use CLADevs\VanillaX\VanillaX;
 use pocketmine\entity\effect\EffectInstance;
 use pocketmine\entity\effect\VanillaEffects;
 use pocketmine\event\entity\EntityDamageByEntityEvent;

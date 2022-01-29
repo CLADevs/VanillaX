@@ -9,6 +9,7 @@ use CLADevs\VanillaX\blocks\tile\campfire\RegularCampfireTile;
 use CLADevs\VanillaX\blocks\tile\campfire\SoulCampfireTile;
 use CLADevs\VanillaX\blocks\tile\FlowerPotTile;
 use CLADevs\VanillaX\blocks\utils\CommandBlockType;
+use CLADevs\VanillaX\configuration\features\BlockFeature;
 use CLADevs\VanillaX\items\LegacyItemIds;
 use CLADevs\VanillaX\items\ItemManager;
 use CLADevs\VanillaX\utils\item\NonAutomaticCallItemTrait;
@@ -232,8 +233,7 @@ class BlockManager{
     }
 
     public function registerBlock(Block $block, bool $override = true, bool $creativeItem = false): bool{
-        $vanillaName = array_flip(json_decode(file_get_contents(BEDROCK_DATA_PATH . "/block_id_map.json"), true))[$block->getId()];
-        if(in_array($block->getId(), VanillaX::getInstance()->getConfig()->getNested("disabled.blocks", []))){
+        if(!BlockFeature::getInstance()->isBlockEnabled($block)){
             return false;
         }
         BlockFactory::getInstance()->register($block, $override);

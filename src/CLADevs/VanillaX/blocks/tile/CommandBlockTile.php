@@ -6,6 +6,7 @@ use CLADevs\VanillaX\blocks\block\CommandBlock;
 use CLADevs\VanillaX\blocks\TileIds;
 use CLADevs\VanillaX\blocks\utils\CommandBlockType;
 use CLADevs\VanillaX\commands\sender\CommandBlockSender;
+use Exception;
 use pocketmine\block\BlockFactory;
 use pocketmine\block\BlockLegacyIds;
 use pocketmine\block\tile\Nameable;
@@ -40,13 +41,9 @@ class CommandBlockTile extends Spawnable implements Nameable{
     const TAG_CONDITIONAL_MODE = "conditionalMode";
     const TAG_RAN_COMMAND = "hasRanCommand";
 
-    /** CUSTOM TAGS */
-    const TAG_COMMAND_BLOCK_MODE = "commandBlockMode";
-
     /** @var Tag[] */
     private array $lastOutputParam = [];
-    
-    private CommandBlockType $type;
+
     private int $lastExecution = 0;
     private int $successCount = 0;
     private int $tickDelay = 0;
@@ -54,7 +51,7 @@ class CommandBlockTile extends Spawnable implements Nameable{
 
     private string $command = "";
     private string $lastOutput = "";
-    
+
     private bool $executeOnFirstTick = false;
     private bool $LPCommandMode = false;
     private bool $LPConditionalMode = false;
@@ -69,10 +66,13 @@ class CommandBlockTile extends Spawnable implements Nameable{
         return "";
     }
 
+    /**
+     * @throws Exception
+     */
     public function runCommand(): void{
         if(strlen($this->command) > 0){
             if($this->ranCommand){
-               return;
+                return;
             }
             $sender = new CommandBlockSender(Server::getInstance(), Server::getInstance()->getLanguage());
             if(Server::getInstance()->dispatchCommand($sender, $this->command)){
@@ -80,21 +80,23 @@ class CommandBlockTile extends Spawnable implements Nameable{
             }
             $this->lastOutput = $sender->getMessage();
 
-            if(!$this->type->isRepeating()){
+            if(!$this->getType()->isRepeating()){
                 $this->ranCommand = true;
             }
         }
     }
 
+    /**
+     * @throws Exception
+     */
     public function handleCommandBlockUpdateReceive(CommandBlockUpdatePacket $pk): void{
         $newType = CommandBlockType::fromMode($pk->commandBlockMode);
 
-        if(!$this->type->equals($newType)){
+        if(!$this->getType()->equals($newType)){
             $this->ranCommand = false;
-            $this->type = $newType;
             $originalBlock = $this->getBlock();
             /** @var CommandBlock $block */
-            $block = BlockFactory::getInstance()->get($this->type->getBlockId(), $originalBlock->getMeta());
+            $block = BlockFactory::getInstance()->get($newType->getBlockId(), $originalBlock->getMeta());
 
             if($originalBlock instanceof CommandBlock){
                 $block->setFacing($originalBlock->getFacing());
@@ -126,7 +128,7 @@ class CommandBlockTile extends Spawnable implements Nameable{
             $this->conditionalMode = $pk->isConditional;
             /** @var CommandBlock $originalBlock */
             $originalBlock = $this->getBlock();
-            $block = BlockFactory::getInstance()->get($this->type->getBlockId(), 0);
+            $block = BlockFactory::getInstance()->get($this->getType()->getBlockId(), 0);
 
             if($block instanceof CommandBlock){
                 $block->setFacing($originalBlock->getFacing() + ($pk->isConditional ? 8 : -8));
@@ -143,7 +145,6 @@ class CommandBlockTile extends Spawnable implements Nameable{
 
     protected function writeSaveData(CompoundTag $nbt): void{
         $this->saveName($nbt);
-        $nbt->setInt(self::TAG_COMMAND_BLOCK_MODE, $this->type->getMode());
         $nbt->setString(self::TAG_COMMAND, $this->command);
         $nbt->setInt(self::TAG_EXECUTE_ON_FIRE_TICK, $this->executeOnFirstTick);
         $nbt->setInt(self::TAG_LAST_EXECUTION, $this->lastExecution);
@@ -158,9 +159,6 @@ class CommandBlockTile extends Spawnable implements Nameable{
 
     public function readSaveData(CompoundTag $nbt): void{
         $this->loadName($nbt);
-        if(($tag = $nbt->getTag(self::TAG_COMMAND_BLOCK_MODE)) !== null){
-            $this->type = CommandBlockType::fromMode($tag->getValue());
-        }
         if(($tag = $nbt->getTag(self::TAG_COMMAND)) !== null){
             $this->command = $tag->getValue();
         }
@@ -215,8 +213,16 @@ class CommandBlockTile extends Spawnable implements Nameable{
         $nbt->setByte(self::TAG_CONDITIONAL_MODE, intval($this->conditionalMode));
     }
 
+    /**
+     * @throws Exception
+     */
     public function getType(): CommandBlockType{
-        return $this->type;
+        $block = $this->getBlock();
+
+        if($block instanceof CommandBlock){
+            return $block->getType();
+        }
+        throw new Exception("Invalid command block type");
     }
 
     public function getTickDelay(): int{
