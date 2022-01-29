@@ -85,7 +85,6 @@
 - Music Disc
 - Name Tag
 - Suspicious Stew
-- Trident
 - Turtle Helmet
 - Netherite Armor/Tools
 - ArmorStand
@@ -99,6 +98,7 @@
 - Lingering Potion
 - Map
 - Crossbow
+- Trident
 - 1.17 Items
 
 ### TODO Enchantments

@@ -58,11 +58,13 @@ trait EntityRidableTrait{
     }
 
     public function readSaddle(CompoundTag $nbt): void{
+        /** @var VanillaEntity $that */
+        $that = $this;
         $tag = $nbt->getTag("Saddled");
 
         if($tag instanceof StringTag){
             $this->isSaddled = boolval($tag->getValue());
-            $this->getNetworkProperties()->setGenericFlag(EntityMetadataFlags::SADDLED, $this->isSaddled);
+            $that->getNetworkProperties()->setGenericFlag(EntityMetadataFlags::SADDLED, $this->isSaddled);
         }
     }
 

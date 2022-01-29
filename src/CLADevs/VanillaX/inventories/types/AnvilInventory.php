@@ -3,10 +3,10 @@
 namespace CLADevs\VanillaX\inventories\types;
 
 use CLADevs\VanillaX\inventories\FakeBlockInventory;
-use CLADevs\VanillaX\network\protocol\FilterTextPacketX;
 use pocketmine\block\BlockLegacyIds;
 use pocketmine\item\Item;
 use pocketmine\network\mcpe\protocol\ActorEventPacket;
+use pocketmine\network\mcpe\protocol\FilterTextPacket;
 use pocketmine\network\mcpe\protocol\ServerboundPacket;
 use pocketmine\network\mcpe\protocol\types\ActorEvent;
 use pocketmine\network\mcpe\protocol\types\inventory\WindowTypes;
@@ -25,8 +25,8 @@ class AnvilInventory extends FakeBlockInventory{
             if(!$player->isCreative()){
                 $player->getXpManager()->setXpLevel($player->getXpManager()->getXpLevel() - abs($packet->eventData));
             }
-        }elseif($packet instanceof FilterTextPacketX){
-            $player->getNetworkSession()->sendDataPacket(FilterTextPacketX::create($packet->getText(), true));
+        }elseif($packet instanceof FilterTextPacket){
+            $player->getNetworkSession()->sendDataPacket(FilterTextPacket::create($packet->getText(), true));
         }
         return true;
     }

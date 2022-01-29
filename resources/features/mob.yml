@@ -1,0 +1,79 @@
+---
+#If this is false, it will disable all mobs
+#regardless if its toggled 'true' below
+enabled: true
+#All Mobs that can be enabled or disabled
+#true = enable
+#false = disable
+#everything under is auto generated
+mobs:
+  ender_dragon: true
+  wither: true
+  axolotl: true
+  bat: true
+  cat: true
+  chicken: true
+  cow: true
+  donkey: true
+  cod: true
+  fox: true
+  glow_squid: true
+  horse: true
+  mooshroom: true
+  mule: true
+  ocelot: true
+  parrot: true
+  pig: true
+  rabbit: true
+  sheep: true
+  shulker: true
+  skeleton_horse: true
+  snow_golem: true
+  squid: true
+  strider: true
+  tropicalfish: true
+  turtle: true
+  villager_v2: true
+  wandering_trader: true
+  zombie_horse: true
+  bee: true
+  cave_spider: true
+  dolphin: true
+  enderman: true
+  goat: true
+  iron_golem: true
+  llama: true
+  panda: true
+  piglin: true
+  polar_bear: true
+  pufferfish: true
+  spider: true
+  wolf: true
+  zombie_pigman: true
+  blaze: true
+  creeper: true
+  drowned: true
+  elder_guardian: true
+  endermite: true
+  evocation_illager: true
+  ghast: true
+  guardian: true
+  hoglin: true
+  husk: true
+  magma_cube: true
+  phantom: true
+  piglin_brute: true
+  pillager: true
+  ravager: true
+  silverfish: true
+  skeleton: true
+  slime: true
+  stray: true
+  vex: true
+  vindicator: true
+  witch: true
+  wither_skeleton: true
+  zoglin: true
+  zombie: true
+  zombie_villager: true
+...

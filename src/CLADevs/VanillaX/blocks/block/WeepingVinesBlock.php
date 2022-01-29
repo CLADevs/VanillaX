@@ -2,8 +2,8 @@
 
 namespace CLADevs\VanillaX\blocks\block;
 
-use CLADevs\VanillaX\blocks\utils\BlockVanilla;
-use CLADevs\VanillaX\items\ItemIdentifiers;
+use CLADevs\VanillaX\blocks\BlockIds;
+use CLADevs\VanillaX\items\LegacyItemIds;
 use pocketmine\block\Air;
 use pocketmine\block\Block;
 use pocketmine\block\BlockBreakInfo;
@@ -27,7 +27,7 @@ class WeepingVinesBlock extends Transparent{
     protected int $age = 0;
 
     public function __construct(){
-        parent::__construct(new BlockIdentifier(BlockVanilla::WEEPING_VINES, 0, ItemIdentifiers::WEEPING_VINES), "Weeping Vines", BlockBreakInfo::instant());
+        parent::__construct(new BlockIdentifier(BlockIds::WEEPING_VINES, 0, LegacyItemIds::WEEPING_VINES), "Weeping Vines", BlockBreakInfo::instant());
     }
 
     public function place(BlockTransaction $tx, Item $item, Block $blockReplace, Block $blockClicked, int $face, Vector3 $clickVector, ?Player $player = null): bool{
@@ -68,7 +68,7 @@ class WeepingVinesBlock extends Transparent{
                         }else{
                             $lastAge++;
                         }
-                        $this->position->getWorld()->setBlock($b->position, BlockFactory::getInstance()->get(BlockVanilla::WEEPING_VINES, $lastAge > 15 ? 15 : $lastAge));
+                        $this->position->getWorld()->setBlock($b->position, BlockFactory::getInstance()->get(BlockIds::WEEPING_VINES, $lastAge > 15 ? 15 : $lastAge));
                     }
                 }
             }
@@ -115,7 +115,7 @@ class WeepingVinesBlock extends Transparent{
             if($b->getId() === BlockLegacyIds::AIR){
                 $newAge = $this->age + 1;
 
-                $ev = new BlockGrowEvent($b, BlockFactory::getInstance()->get(BlockVanilla::WEEPING_VINES, $newAge > 15 ? 15 : $newAge));
+                $ev = new BlockGrowEvent($b, BlockFactory::getInstance()->get(BlockIds::WEEPING_VINES, $newAge > 15 ? 15 : $newAge));
                 $ev->call();
                 if($ev->isCancelled()){
                     return;

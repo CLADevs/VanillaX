@@ -30,7 +30,8 @@ class FireworkRocketItem extends Item{
         if(!$this->checkElytra($player)){
             $location = Location::fromObject($blockReplace->getPosition()->add(0.5, 0, 0.5), $blockClicked->getPosition()->getWorld());
             $entity = new FireworkRocketEntity($location, $player);
-            if(($tag = $this->getNamedTag()->getTag("Fireworks")) !== null){
+
+            if(($this->getNamedTag()->getTag("Fireworks")) !== null){
                 $entity->getNetworkProperties()->setCompoundTag(16, new CacheableNbt($this->getNamedTag()));
             }
             $entity->spawnToAll();

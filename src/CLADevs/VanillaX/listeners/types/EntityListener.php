@@ -3,7 +3,7 @@
 namespace CLADevs\VanillaX\listeners\types;
 
 use CLADevs\VanillaX\blocks\block\TwistingVinesBlock;
-use CLADevs\VanillaX\items\ItemIdentifiers;
+use CLADevs\VanillaX\items\LegacyItemIds;
 use CLADevs\VanillaX\items\types\ShieldItem;
 use CLADevs\VanillaX\world\gamerule\GameRule;
 use CLADevs\VanillaX\world\gamerule\GameRuleManager;
@@ -61,7 +61,7 @@ class EntityListener implements Listener{
                 $resist = 1;
 
                 foreach($entity->getArmorInventory()->getContents(true) as $item){
-                    if(in_array($item->getId(), [ItemIdentifiers::NETHERITE_HELMET, ItemIdentifiers::NETHERITE_CHESTPLATE, ItemIdentifiers::NETHERITE_LEGGINGS, ItemIdentifiers::NETHERITE_BOOTS])){
+                    if(in_array($item->getId(), [LegacyItemIds::NETHERITE_HELMET, LegacyItemIds::NETHERITE_CHESTPLATE, LegacyItemIds::NETHERITE_LEGGINGS, LegacyItemIds::NETHERITE_BOOTS])){
                         $resist += 2;
                     }
                 }

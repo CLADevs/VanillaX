@@ -2,7 +2,7 @@
 
 namespace CLADevs\VanillaX\items\types\netherite;
 
-use CLADevs\VanillaX\items\ItemIdentifiers;
+use CLADevs\VanillaX\items\LegacyItemIds;
 use pocketmine\item\Hoe;
 use pocketmine\item\ItemIdentifier;
 use pocketmine\item\ToolTier;
@@ -10,7 +10,7 @@ use pocketmine\item\ToolTier;
 class NetheriteHoe extends Hoe{
 
     public function __construct(){
-        parent::__construct(new ItemIdentifier(ItemIdentifiers::NETHERITE_HOE, 0), "Netherite Hoe", ToolTier::DIAMOND());
+        parent::__construct(new ItemIdentifier(LegacyItemIds::NETHERITE_HOE, 0), "Netherite Hoe", ToolTier::DIAMOND());
     }
 
     public function getMaxDurability(): int{

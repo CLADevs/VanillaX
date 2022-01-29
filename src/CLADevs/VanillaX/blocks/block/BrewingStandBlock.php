@@ -3,6 +3,7 @@
 namespace CLADevs\VanillaX\blocks\block;
 
 use CLADevs\VanillaX\blocks\tile\BrewingStandTile;
+use CLADevs\VanillaX\event\inventory\BrewedItemEvent;
 use CLADevs\VanillaX\inventories\types\BrewingStandInventory;
 use CLADevs\VanillaX\VanillaX;
 use pocketmine\block\BlockBreakInfo;
@@ -10,7 +11,6 @@ use pocketmine\block\BlockIdentifier;
 use pocketmine\block\BlockLegacyIds;
 use pocketmine\block\BlockToolType;
 use pocketmine\block\BrewingStand;
-use pocketmine\block\utils\AnyFacingTrait;
 use pocketmine\item\Item;
 use pocketmine\item\ItemIds;
 use pocketmine\item\ToolTier;
@@ -64,7 +64,9 @@ class BrewingStandBlock extends BrewingStand{
                             $output = $inventoryManager->getBrewingContainerOutput($potion, $ingredient);
                         }
                         if($output !== null){
-                            $inventory->setItem($i, $output);
+                            $ev = new BrewedItemEvent($inventory, $output, $potion, $ingredient);
+                            $ev->call();
+                            $inventory->setItem($i, $ev->getOutput());
                         }
                     }
                 }

@@ -3,7 +3,7 @@
 namespace CLADevs\VanillaX\blocks\block\campfire;
 
 use CLADevs\VanillaX\blocks\tile\campfire\CampfireTile;
-use CLADevs\VanillaX\blocks\utils\facing\FacingPlayerTrait;
+use CLADevs\VanillaX\blocks\utils\FacingPlayerTrait;
 use CLADevs\VanillaX\utils\item\NonAutomaticCallItemTrait;
 use Exception;
 use pocketmine\block\Opaque;

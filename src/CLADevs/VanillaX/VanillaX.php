@@ -4,18 +4,18 @@ namespace CLADevs\VanillaX;
 
 use CLADevs\VanillaX\blocks\BlockManager;
 use CLADevs\VanillaX\commands\CommandManager;
+use CLADevs\VanillaX\configuration\SettingManager;
 use CLADevs\VanillaX\enchantments\EnchantmentManager;
 use CLADevs\VanillaX\entities\EntityManager;
 use CLADevs\VanillaX\inventories\InventoryManager;
 use CLADevs\VanillaX\items\ItemManager;
 use CLADevs\VanillaX\listeners\ListenerManager;
-use CLADevs\VanillaX\network\NetworkManager;
 use CLADevs\VanillaX\session\SessionManager;
 use CLADevs\VanillaX\world\WorldManager;
 use pocketmine\plugin\PluginBase;
 use ReflectionException;
 
-class VanillaX extends PluginBase{
+final class VanillaX extends PluginBase{
 
     private static VanillaX $instance;
 
@@ -25,13 +25,12 @@ class VanillaX extends PluginBase{
     private BlockManager $blockManager;
     private SessionManager $sessionManager;
     private CommandManager $commandManager;
-    private NetworkManager $networkManager;
     private InventoryManager $inventoryManager;
     private ListenerManager $listenerManager;
     private WorldManager $worldManager;
+    private SettingManager $settingManager;
 
     public function onLoad(): void{
-        $this->saveDefaultConfig();
         self::$instance = $this;
         $this->entityManager = new EntityManager();
         $this->itemManager = new ItemManager();
@@ -39,10 +38,10 @@ class VanillaX extends PluginBase{
         $this->blockManager = new BlockManager();
         $this->sessionManager = new SessionManager();
         $this->commandManager = new CommandManager();
-        $this->networkManager = new NetworkManager();
         $this->inventoryManager = new InventoryManager();
         $this->listenerManager = new ListenerManager();
         $this->worldManager = new WorldManager();
+        $this->settingManager = new SettingManager();
     }
 
     /**
@@ -54,7 +53,6 @@ class VanillaX extends PluginBase{
         $this->blockManager->startup();
         $this->itemManager->startup();
         $this->commandManager->startup();
-        $this->networkManager->startup();
         $this->listenerManager->startup();
         $this->worldManager->startup();
     }
@@ -91,15 +89,15 @@ class VanillaX extends PluginBase{
         return $this->blockManager;
     }
 
-    public function getNetworkManager(): NetworkManager{
-        return $this->networkManager;
-    }
-
     public function getInventoryManager(): InventoryManager{
         return $this->inventoryManager;
     }
 
     public function getCommandManager(): CommandManager{
         return $this->commandManager;
+    }
+
+    public function getSettingManager(): SettingManager{
+        return $this->settingManager;
     }
 }

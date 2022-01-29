@@ -2,7 +2,7 @@
 
 namespace CLADevs\VanillaX\items\types;
 
-use CLADevs\VanillaX\items\ItemIdentifiers;
+use CLADevs\VanillaX\items\LegacyItemIds;
 use pocketmine\entity\Consumable;
 use pocketmine\entity\effect\VanillaEffects;
 use pocketmine\entity\Human;
@@ -14,7 +14,7 @@ use pocketmine\item\VanillaItems;
 class HoneyBottleItem extends Item implements Consumable{
 
     public function __construct(){
-        parent::__construct(new ItemIdentifier(ItemIdentifiers::HONEY_BOTTLE, 0), "Honey Bottle");
+        parent::__construct(new ItemIdentifier(LegacyItemIds::HONEY_BOTTLE, 0), "Honey Bottle");
     }
 
     public function onConsume(Living $consumer): void{

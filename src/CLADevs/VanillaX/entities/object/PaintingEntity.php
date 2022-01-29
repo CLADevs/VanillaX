@@ -6,7 +6,6 @@ use CLADevs\VanillaX\utils\entity\CustomRegisterEntityNamesTrait;
 use CLADevs\VanillaX\utils\entity\CustomRegisterEntityTrait;
 use CLADevs\VanillaX\world\gamerule\GameRule;
 use CLADevs\VanillaX\world\gamerule\GameRuleManager;
-use CLADevs\VanillaX\utils\item\NonAutomaticCallItemTrait;
 use Closure;
 use pocketmine\data\bedrock\EntityLegacyIds;
 use pocketmine\entity\EntityDataHelper;
@@ -39,9 +38,9 @@ class PaintingEntity extends Painting implements CustomRegisterEntityTrait , Cus
             }
             $blockIn = new Vector3($nbt->getInt("TileX"), $nbt->getInt("TileY"), $nbt->getInt("TileZ"));
             if(($directionTag = $nbt->getTag("Direction")) instanceof ByteTag){
-                $facing = PaintingEntity::DATA_TO_FACING[$directionTag->getValue()] ?? Facing::NORTH;
+                $facing = Painting::DATA_TO_FACING[$directionTag->getValue()] ?? Facing::NORTH;
             }elseif(($facingTag = $nbt->getTag("Facing")) instanceof ByteTag){
-                $facing = PaintingEntity::DATA_TO_FACING[$facingTag->getValue()] ?? Facing::NORTH;
+                $facing = Painting::DATA_TO_FACING[$facingTag->getValue()] ?? Facing::NORTH;
             }else{
                 throw new UnexpectedValueException("Missing facing info");
             }
@@ -77,5 +76,9 @@ class PaintingEntity extends Painting implements CustomRegisterEntityTrait , Cus
             $this->getWorld()->dropItem($this->getPosition(), ItemFactory::getInstance()->get(ItemIds::PAINTING));
         }
         $this->getWorld()->addParticle($this->getPosition()->add(0.5, 0.5, 0.5), new BlockBreakParticle(BlockFactory::getInstance()->get(BlockLegacyIds::PLANKS)));
+    }
+
+    public static function canRegister(): bool{
+        return true;
     }
 }

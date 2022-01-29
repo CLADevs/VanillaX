@@ -15,6 +15,7 @@ use pocketmine\world\Position;
 
 class BeaconInventory extends FakeBlockInventory{
 
+
     public function __construct(Position $holder){
         parent::__construct($holder, 1, BlockLegacyIds::AIR, WindowTypes::BEACON);
     }
@@ -29,10 +30,11 @@ class BeaconInventory extends FakeBlockInventory{
                 if($id instanceof StringTag && $id->getValue() === "Beacon"){
                     $tile = $player->getWorld()->getTileAt($root->getInt("x"), $root->getInt("y"), $root->getInt("z"));
 
-                    if($tile instanceof BeaconTile){
+                    if($tile instanceof BeaconTile && $tile->isInQueue($player)){
                         $tile->setPrimary($root->getInt(BeaconTile::TAG_PRIMARY));
                         $tile->setSecondary($root->getInt(BeaconTile::TAG_SECONDARY));
                         $tile->getPosition()->getWorld()->scheduleDelayedBlockUpdate($tile->getPosition(), 20);
+                        $tile->removeFromQueue($player);
                     }
                     return false;
                 }

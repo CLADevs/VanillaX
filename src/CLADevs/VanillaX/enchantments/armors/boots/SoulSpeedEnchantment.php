@@ -27,6 +27,10 @@ class SoulSpeedEnchantment extends Enchantment{
         return EnchantmentIds::SOUL_SPEED;
     }
 
+    public function isTreasure(): bool{
+        return true;
+    }
+
     public function isItemCompatible(Item $item): bool{
         return $item instanceof Armor && $item->getArmorSlot() === ArmorInventory::SLOT_FEET;
     }

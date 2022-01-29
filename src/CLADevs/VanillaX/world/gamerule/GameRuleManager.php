@@ -2,7 +2,7 @@
 
 namespace CLADevs\VanillaX\world\gamerule;
 
-use CLADevs\VanillaX\VanillaX;
+use CLADevs\VanillaX\configuration\Setting;
 use CLADevs\VanillaX\world\gamerule\types\DoDayLightCycleRule;
 use CLADevs\VanillaX\world\gamerule\types\DoWeatherCycleRule;
 use pocketmine\nbt\tag\ByteTag;
@@ -56,7 +56,7 @@ class GameRuleManager{
         $this->register(new GameRule(GameRule::TNT_EXPLODES, true));
         $this->register(new GameRule(GameRule::SHOW_TAGS, true)); //TODO
 
-        if(!$this->isEnabled() && VanillaX::getInstance()->getConfig()->get("gamerule-remove-cache", true)){
+        if(!Setting::getInstance()->isGameRuleEnabled()){
             foreach(Server::getInstance()->getWorldManager() as $world){
                 $provider = $world->getProvider();
 
@@ -97,9 +97,8 @@ class GameRuleManager{
         $this->gameRules[strtolower($rule->getName())] = $rule;
     }
 
-
     public function set(World $World, GameRule $rule, bool|int $value, bool $force = false): void{
-        if(!$force && !$this->isEnabled()){
+        if(!$force && !Setting::getInstance()->isGameRuleEnabled()){
             return;
         }
         $provider = $World->getProvider();
@@ -123,7 +122,7 @@ class GameRuleManager{
     }
 
     public function sendChanges(Player $player, World $World = null): void{
-        if(!$this->isEnabled()){
+        if(!Setting::getInstance()->isGameRuleEnabled()){
             return;
         }
         if($World === null){
@@ -157,7 +156,7 @@ class GameRuleManager{
         $rule = $this->gameRules[$name] ?? null;
         $provider = $World->getProvider();
 
-        if($rule !== null && !$this->isEnabled()) return $rule->getDefaultValue();
+        if($rule !== null && !Setting::getInstance()->isGameRuleEnabled()) return $rule->getDefaultValue();
         if($rule !== null && $provider instanceof BaseWorldProvider){
             $data = $provider->getWorldData();
 
@@ -189,9 +188,5 @@ class GameRuleManager{
 
     public function getByName(string $name): ?GameRule{
         return $this->gameRules[strtolower($name)] ?? null;
-    }
-
-    public function isEnabled(): bool{
-        return boolval(VanillaX::getInstance()->getConfig()->getNested("features.gamerule", true));
     }
 }

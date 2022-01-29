@@ -114,6 +114,9 @@ abstract class CampfireTile extends Spawnable implements NonAutomaticCallItemTra
         return $this->items;
     }
 
+    /**
+     * @throws Exception
+     */
     public function readSaveData(CompoundTag $nbt): void{
         $this->loadItems($nbt);
 

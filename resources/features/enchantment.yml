@@ -1,0 +1,47 @@
+---
+#If this is false, it will disable all enchantments
+#regardless if its toggled 'true' below
+enabled: true
+#All Enchantment that can be enabled or disabled
+#true = enable
+#false = disable
+#everything under is auto generated
+enchantments:
+  binding: true
+  blast_protection: true
+  fire_protection: true
+  projectile_protection: true
+  protection: true
+  thorns: true
+  death_strider: true
+  feather_falling: true
+  frost_walker: true
+  soul_speed: true
+  luck_of_the_sea: true
+  lure: true
+  aqua_affinity: true
+  respiration: true
+  flame: true
+  infinity: true
+  power: true
+  punch: true
+  multishot: true
+  piercing: true
+  quick_charge: true
+  mending: true
+  unbreaking: true
+  vanishing: true
+  efficiency: true
+  fortune: true
+  silk_touch: true
+  channeling: true
+  impaling: true
+  loyalty: true
+  riptide: true
+  bane_of_arthropods: true
+  sharpness: true
+  smite: true
+  fire_aspect: true
+  knockback: true
+  looting: true
+...

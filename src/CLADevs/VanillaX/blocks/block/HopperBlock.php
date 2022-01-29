@@ -70,7 +70,7 @@ class HopperBlock extends Transparent{
 
         //Thanks to nukkit for bounding box code
         //Collect dropped items
-        $bb = new AxisAlignedBB($this->position->x, $this->position->y, $this->position->z, $this->position->x + 1, $this->position->y +2, $this->position->z + 1);
+        $bb = new AxisAlignedBB($this->position->x, $this->position->y, $this->position->z, $this->position->x + 1, $this->position->y + 2, $this->position->z + 1);
 
         foreach($this->position->getWorld()->getNearbyEntities($bb) as $entity){
             if(!$entity->isClosed() && !$entity->isFlaggedForDespawn() && $entity instanceof ItemEntity){

@@ -4,7 +4,7 @@ namespace CLADevs\VanillaX\commands\types;
 
 use CLADevs\VanillaX\commands\Command;
 use CLADevs\VanillaX\commands\utils\CommandArgs;
-use CLADevs\VanillaX\VanillaX;
+use CLADevs\VanillaX\configuration\Setting;
 use CLADevs\VanillaX\world\weather\WeatherManager;
 use pocketmine\command\CommandSender;
 use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
@@ -27,7 +27,7 @@ class WeatherCommand extends Command{
     }
 
     public function canRegister(): bool{
-        return boolval(VanillaX::getInstance()->getConfig()->getNested("features.weather", true));
+        return Setting::getInstance()->isWeatherEnabled();
     }
 
     public function execute(CommandSender $sender, string $commandLabel, array $args): void{

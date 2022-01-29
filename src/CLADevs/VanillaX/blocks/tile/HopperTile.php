@@ -2,7 +2,7 @@
 
 namespace CLADevs\VanillaX\blocks\tile;
 
-use CLADevs\VanillaX\blocks\utils\TileVanilla;
+use CLADevs\VanillaX\blocks\TileIds;
 use CLADevs\VanillaX\inventories\types\BrewingStandInventory;
 use CLADevs\VanillaX\inventories\types\HopperInventory;
 use pocketmine\block\Block;
@@ -20,7 +20,7 @@ use pocketmine\world\World;
 class HopperTile extends Spawnable implements Container{
 use ContainerTrait;
 
-    const TILE_ID = TileVanilla::HOPPER;
+    const TILE_ID = TileIds::HOPPER;
     const TILE_BLOCK = BlockLegacyIds::HOPPER_BLOCK;
 
     private int $facing = -1;

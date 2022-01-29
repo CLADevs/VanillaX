@@ -24,6 +24,10 @@ class MendingEnchantment extends Enchantment{
         return EnchantmentIds::MENDING;
     }
 
+    public function isTreasure(): bool{
+        return true;
+    }
+
     public function getIncompatibles(): array{
         return [EnchantmentIds::INFINITY];
     }

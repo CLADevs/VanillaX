@@ -39,12 +39,12 @@ class GameRule{
     CONST SHOW_TAGS = "showTags";
 
     private string $name;
+
     private int $type;
 
-    /** @var bool|int */
-    private $defaultValue;
+    private int|bool $defaultValue;
 
-    public function __construct(string $name, $defaultValue, int $type = self::TYPE_BOOL){
+    public function __construct(string $name, int|bool $defaultValue, int $type = self::TYPE_BOOL){
         $this->name = $name;
         $this->defaultValue = $defaultValue;
         $this->type = $type;
@@ -58,17 +58,10 @@ class GameRule{
         return $this->type;
     }
 
-    /**
-     * @return bool|int
-     */
-    public function getDefaultValue(){
+    public function getDefaultValue(): bool|int{
         return $this->defaultValue;
     }
 
-    /**
-     * @param bool|int $value
-     * @param World $world
-     */
-    public function handleValue($value, World $world): void{
+    public function handleValue(bool|int $value, World $world): void{
     }
 }

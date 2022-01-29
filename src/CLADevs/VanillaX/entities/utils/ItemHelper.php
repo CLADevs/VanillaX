@@ -5,7 +5,7 @@ namespace CLADevs\VanillaX\entities\utils;
 use CLADevs\VanillaX\enchantments\utils\EnchantmentTrait;
 use CLADevs\VanillaX\entities\VanillaEntity;
 use CLADevs\VanillaX\VanillaX;
-use pocketmine\color\Color;
+use pocketmine\block\utils\DyeColor;
 use pocketmine\crafting\FurnaceType;
 use pocketmine\data\bedrock\EnchantmentIdMap;
 use pocketmine\data\bedrock\EnchantmentIds;
@@ -21,23 +21,6 @@ use pocketmine\utils\Random;
 
 class ItemHelper{
 
-    /** All dye colors in array rgb */
-    const DYE_BLACK = [29, 29, 33];
-    const DYE_RED = [176, 40, 38];
-    const DYE_GREEN = [94, 124, 22];
-    const DYE_BROWN = [131, 84, 50];
-    const DYE_BLUE = [60, 68, 170];
-    const DYE_PURPLE = [137, 50, 184];
-    const DYE_CYAN = [22, 156, 156];
-    const DYE_LIGHT_GRAY = [157, 157, 151];
-    const DYE_GRAY = [71, 79, 82];
-    const DYE_PINK = [243, 139, 174];
-    const DYE_LIME = [128, 199, 31];
-    const DYE_YELLOW = [254, 215, 61];
-    const DYE_MAGENTA = [199, 78, 189];
-    const DYE_ORANGE = [249, 128, 29];
-    const DYE_WHITE = [249, 255, 254];
-
     public static function applyEnchantRandomGear(Item $item, int $chance): void{
         $random = new Random();
 
@@ -45,11 +28,8 @@ class ItemHelper{
             $enchantments = VanillaX::getInstance()->getEnchantmentManager()->getEnchantmentForItem($item);
 
             if($enchantments !== null){
-                $enchant = EnchantmentIdMap::getInstance()->fromId($enchantments[array_rand($enchantments)]);
-
-                if($enchant !== null){
-                    $item->addEnchantment(new EnchantmentInstance($enchant, mt_rand(1, $enchant->getMaxLevel())));
-                }
+                $enchant = $enchantments[array_rand($enchantments)];
+                $item->addEnchantment(new EnchantmentInstance($enchant, mt_rand(1, $enchant->getMaxLevel())));
             }
         }
     }
@@ -58,7 +38,7 @@ class ItemHelper{
         if($treasure){
             $enchantments = [];
             /** @var EnchantmentTrait|Enchantment $enchantment */
-            foreach(VanillaX::getInstance()->getEnchantmentManager()->getEnchantments() as $enchantment){
+            foreach(VanillaX::getInstance()->getEnchantmentManager()->getEnchantmentMap() as $enchantment){
                 if($enchantment->isTreasure()){
                     $enchantments[] = $enchantment->getMcpeId();
                 }
@@ -72,7 +52,14 @@ class ItemHelper{
 
     public static function applyEnchantWithLevel(Item $item, bool $treasure, int $min, int $max): void{
         if($treasure){
-            $enchantments = VanillaX::getInstance()->getEnchantmentManager()->getTreasureEnchantsId();
+            $enchantments = [];
+
+            /** @var EnchantmentTrait $enchant */
+            foreach(VanillaX::getInstance()->getEnchantmentManager()->getEnchantmentMap() as $key => $enchant){
+                if($enchant->isTreasure()){
+                    $enchantments[$key] = $enchant;
+                }
+            }
         }else{
             $enchantments = VanillaX::getInstance()->getEnchantmentManager()->getAllEnchantments(false);
         }
@@ -81,7 +68,7 @@ class ItemHelper{
             $level = mt_rand($min, $max);
         }
         $level /= 10;
-        $enchant = EnchantmentIdMap::getInstance()->fromId($enchantments[array_rand($enchantments)]);
+        $enchant = $enchantments[array_rand($enchantments)];
         $item->addEnchantment(new EnchantmentInstance($enchant, min(round($level), $enchant->getMaxLevel())));
     }
 
@@ -146,13 +133,8 @@ class ItemHelper{
 
     public static function applyRandomDye(Item $item): void{
         if($item instanceof Armor){
-            $colors = [
-                self::DYE_BLACK, self::DYE_RED, self::DYE_GREEN, self::DYE_BROWN,
-                self::DYE_BLUE, self::DYE_PURPLE, self::DYE_CYAN, self::DYE_LIGHT_GRAY,
-                self::DYE_GRAY, self::DYE_PINK, self::DYE_LIME, self::DYE_YELLOW,
-                self::DYE_MAGENTA, self::DYE_ORANGE, self::DYE_WHITE
-            ];
-            $item->setCustomColor(new Color(...$colors[array_rand($colors)]));
+            $colors = DyeColor::getAll();
+            $item->setCustomColor($colors[array_rand($colors)]->getRgbValue());
         }
     }
 }

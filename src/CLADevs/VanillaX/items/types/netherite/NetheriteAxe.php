@@ -2,7 +2,7 @@
 
 namespace CLADevs\VanillaX\items\types\netherite;
 
-use CLADevs\VanillaX\items\ItemIdentifiers;
+use CLADevs\VanillaX\items\LegacyItemIds;
 use CLADevs\VanillaX\items\utils\RecipeItemTrait;
 use pocketmine\item\Axe;
 use pocketmine\item\ItemIdentifier;
@@ -13,7 +13,7 @@ class NetheriteAxe extends Axe{
 
     //Netherite Tier isnt a thing
     public function __construct(){
-        parent::__construct(new ItemIdentifier(ItemIdentifiers::NETHERITE_AXE, 0), "Netherite Axe", ToolTier::DIAMOND());
+        parent::__construct(new ItemIdentifier(LegacyItemIds::NETHERITE_AXE, 0), "Netherite Axe", ToolTier::DIAMOND());
     }
 
     public function getAttackPoints(): int{

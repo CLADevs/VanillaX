@@ -17,4 +17,8 @@ class WitherSkullDangerousEntity extends WitherSkullEntity{
         $exp->explodeA();
         $exp->explodeB();
     }
+
+    public static function canRegister(): bool{
+        return true;
+    }
 }

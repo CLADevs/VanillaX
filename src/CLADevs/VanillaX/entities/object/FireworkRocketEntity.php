@@ -11,6 +11,7 @@ use pocketmine\entity\Location;
 use pocketmine\entity\projectile\Projectile;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\network\mcpe\protocol\ActorEventPacket;
+use pocketmine\network\mcpe\protocol\types\ActorEvent;
 use pocketmine\network\mcpe\protocol\types\entity\EntityIds;
 use pocketmine\Server;
 use pocketmine\world\World;
@@ -52,9 +53,9 @@ class FireworkRocketEntity extends Projectile implements CustomRegisterEntityTra
         }else{
             if(!$this->isClosed() && !$this->isFlaggedForDespawn()){
                 $pk = new ActorEventPacket();
-                $pk->entityRuntimeId = $this->id;
-                $pk->event = ActorEventPacket::FIREWORK_PARTICLES;
-                $pk->data = 0;
+                $pk->actorRuntimeId = $this->id;
+                $pk->eventId = ActorEvent::FIREWORK_PARTICLES;
+                $pk->eventData = 0;
                 Server::getInstance()->broadcastPackets($this->getViewers(), [$pk]);
                 $this->flagForDespawn();
             }
@@ -68,5 +69,9 @@ class FireworkRocketEntity extends Projectile implements CustomRegisterEntityTra
 
     public static function getNetworkTypeId(): string{
         return self::NETWORK_ID;
+    }
+
+    public static function canRegister(): bool{
+        return true;
     }
 }

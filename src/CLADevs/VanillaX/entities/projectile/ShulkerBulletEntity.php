@@ -35,7 +35,7 @@ class ShulkerBulletEntity extends Projectile{
 
     protected function onHitBlock(Block $blockHit, RayTraceResult $hitResult): void{
         parent::onHitBlock($blockHit, $hitResult);
-        $this->getWorld()->addParticle($blockHit->getPos(), new ExplodeParticle());
+        $this->getWorld()->addParticle($blockHit->getPosition(), new ExplodeParticle());
         $pk = Session::playSound($this->getPosition(), "bullet.hit");
         $this->getWorld()->broadcastPacketToViewers($this->getPosition(), $pk);
         $this->flagForDespawn();
@@ -47,5 +47,9 @@ class ShulkerBulletEntity extends Projectile{
 
     public static function getNetworkTypeId(): string{
         return self::NETWORK_ID;
+    }
+
+    public static function canRegister(): bool{
+        return true;
     }
 }

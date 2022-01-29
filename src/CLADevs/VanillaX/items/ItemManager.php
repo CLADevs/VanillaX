@@ -2,8 +2,9 @@
 
 namespace CLADevs\VanillaX\items;
 
+use CLADevs\VanillaX\configuration\features\ItemFeature;
 use CLADevs\VanillaX\entities\EntityManager;
-use CLADevs\VanillaX\entities\utils\EntityIdentifierX;
+use CLADevs\VanillaX\entities\utils\EntityIdentifier;
 use CLADevs\VanillaX\items\types\HorseArmorItem;
 use CLADevs\VanillaX\items\types\MusicDiscItem;
 use CLADevs\VanillaX\items\utils\RecipeItemTrait;
@@ -11,7 +12,6 @@ use CLADevs\VanillaX\utils\item\NonAutomaticCallItemTrait;
 use CLADevs\VanillaX\utils\item\NonCreativeItemTrait;
 use CLADevs\VanillaX\utils\item\NonOverwriteItemTrait;
 use CLADevs\VanillaX\utils\Utils;
-use CLADevs\VanillaX\VanillaX;
 use pocketmine\entity\Entity;
 use pocketmine\entity\Location;
 use pocketmine\inventory\CreativeInventory;
@@ -25,7 +25,6 @@ use pocketmine\network\mcpe\protocol\types\LevelSoundEvent;
 use pocketmine\Server;
 use pocketmine\world\World;
 use const pocketmine\BEDROCK_DATA_PATH;
-use const pocketmine\RESOURCE_PATH;
 
 class ItemManager{
 
@@ -37,8 +36,9 @@ class ItemManager{
             }
         });
 
-        self::register(new Item(new ItemIdentifier(ItemIdentifiers::NETHERITE_INGOT, 0), "Netherite Scrap")); //ITEM
-        self::register(new Item(new ItemIdentifier(ItemIdentifiers::HONEYCOMB, 0), "Honeycomb")); //ITEM
+        self::register(new Item(new ItemIdentifier(LegacyItemIds::NETHERITE_INGOT, 0), "Netherite Ingot"), true); //ITEM
+        self::register(new Item(new ItemIdentifier(LegacyItemIds::NETHERITE_SCRAP, 0), "Netherite Scrap"), true); //ITEM
+        self::register(new Item(new ItemIdentifier(LegacyItemIds::HONEYCOMB, 0), "Honeycomb")); //ITEM
         self::register(new Item(new ItemIdentifier(ItemIds::LANTERN, 0), "Lantern")); //ITEM
         self::register(new Item(new ItemIdentifier(ItemIds::CAMPFIRE, 0), "Campfire")); //ITEM
         self::register(new Item(new ItemIdentifier(ItemIds::DRIED_KELP_BLOCK, 0), "Dried Kelp")); //ITEM
@@ -79,7 +79,7 @@ class ItemManager{
 
         /** Spawn Egg */
         foreach(EntityManager::getInstance()->getEntities() as $entity){
-            if(in_array($entity->getType(), [EntityIdentifierX::TYPE_MONSTER, EntityIdentifierX::TYPE_NEUTRAL, EntityIdentifierX::TYPE_PASSIVE])){
+            if(in_array($entity->getType(), [EntityIdentifier::TYPE_MONSTER, EntityIdentifier::TYPE_NEUTRAL, EntityIdentifier::TYPE_PASSIVE])){
                 ItemFactory::getInstance()->register($item = new class(new ItemIdentifier(ItemIds::SPAWN_EGG, $entity->getId()), $entity->getName() . " Spawn Egg", $entity->getNamespace()) extends SpawnEgg{
                     private string $namespace;
 
@@ -118,7 +118,8 @@ class ItemManager{
     }
     
     public static function register(Item $item, bool $creative = false, bool $overwrite = true): bool{
-        if(in_array($item->getId(), VanillaX::getInstance()->getConfig()->getNested("disabled.items", []))){
+        if(!ItemFeature::getInstance()->isItemEnabled($item)){
+            var_dump(ItemFeature::getInstance()->getItemIdMap()[$item->getId()]);
             return false;
         }
         if(isset(class_uses($item)[RecipeItemTrait::class])){

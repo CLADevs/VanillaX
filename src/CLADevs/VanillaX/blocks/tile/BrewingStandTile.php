@@ -2,7 +2,7 @@
 
 namespace CLADevs\VanillaX\blocks\tile;
 
-use CLADevs\VanillaX\blocks\utils\TileVanilla;
+use CLADevs\VanillaX\blocks\TileIds;
 use CLADevs\VanillaX\inventories\types\BrewingStandInventory;
 use pocketmine\block\BlockLegacyIds;
 use pocketmine\block\tile\Container;
@@ -20,7 +20,7 @@ use pocketmine\world\World;
 class BrewingStandTile extends Spawnable implements Container, Nameable{
     use ContainerTrait, NameableTrait;
 
-    const TILE_ID = TileVanilla::BREWING_STAND;
+    const TILE_ID = TileIds::BREWING_STAND;
     const TILE_BLOCK = BlockLegacyIds::BREWING_STAND_BLOCK;
 
     const TAG_BREW_TIME = "BrewTime";
@@ -46,7 +46,7 @@ class BrewingStandTile extends Spawnable implements Container, Nameable{
     }
 
     public function getDefaultName(): string{
-        return TileVanilla::BREWING_STAND;
+        return TileIds::BREWING_STAND;
     }
 
     public function getInventory(): BrewingStandInventory{

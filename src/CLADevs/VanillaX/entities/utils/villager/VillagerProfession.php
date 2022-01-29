@@ -10,6 +10,7 @@ use pocketmine\block\Block;
 use pocketmine\block\BlockLegacyIds;
 use pocketmine\item\Item;
 use pocketmine\item\LegacyStringToItemParser;
+use pocketmine\item\LegacyStringToItemParserException;
 
 abstract class VillagerProfession{
 
@@ -53,22 +54,14 @@ abstract class VillagerProfession{
     /** @var VillagerProfession[] */
     private static array $professions = [];
 
-    /**
-     * @param int $id
-     * @param string $name
-     * @param Block|int $block
-     */
-    public function __construct(int $id, string $name, $block = BlockLegacyIds::AIR){
+    /** @var VillagerOffer[][] */
+    private array $recipes = [];
+    /** @var VillagerOffer[] */
+    private array $offers = [];
+
+    public function __construct(int $id, string $name, int $block = BlockLegacyIds::AIR){
         $this->id = $id;
         $this->name = $name;
-        //TODO uncomment this on 4.0
-//        if(is_int($block)){
-//            try{
-//                $block = BlockFactory::get($block);
-//            }catch (Exception $e){
-//                $block = BlockFactory::get(BlockLegacyIds::AIR);
-//            }
-//        }
         $this->block = $block;
         if($this->hasTrades()){
             $this->data = json_decode(file_get_contents(Utils::getResourceFile("trades" . DIRECTORY_SEPARATOR . strtolower(str_replace(" ", "_", $name)) . "_trades.json")), true);
@@ -219,11 +212,14 @@ abstract class VillagerProfession{
                         $item = LegacyStringToItemParser::getInstance()->parse(is_array($item) ? $item["item"] : $item);
                         $item->setCount(is_array($item) ? ($item["quantity"] ?? 1) : ($give["quantity"] ?? 1));
                         $this->applyFunction($item, $functions);
-                    }catch (InvalidArgumentException $e){
+                    }catch (InvalidArgumentException|LegacyStringToItemParserException){
                         continue;
                     }
                     $result = $item;
                     break;
+                }
+                if($result === null){
+                    continue;
                 }
                 $values[] = new VillagerOffer($input, $input2, $result, $traderExp, $rewardExp, $priceMultiplierA, $priceMultiplierB, $maxUses);
             }

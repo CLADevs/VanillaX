@@ -4,7 +4,7 @@ namespace CLADevs\VanillaX\commands\types;
 
 use CLADevs\VanillaX\commands\Command;
 use CLADevs\VanillaX\commands\utils\CommandArgs;
-use CLADevs\VanillaX\VanillaX;
+use CLADevs\VanillaX\configuration\Setting;
 use CLADevs\VanillaX\world\gamerule\GameRule;
 use CLADevs\VanillaX\world\gamerule\GameRuleManager;
 use pocketmine\command\CommandSender;
@@ -43,7 +43,7 @@ class GameruleCommand extends Command{
     }
 
     public function canRegister(): bool{
-        return boolval(VanillaX::getInstance()->getConfig()->getNested("features.gamerule", true));
+        return Setting::getInstance()->isGameRuleEnabled();
     }
 
     public function execute(CommandSender $sender, string $commandLabel, array $args): void{

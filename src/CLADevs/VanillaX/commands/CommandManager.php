@@ -2,9 +2,9 @@
 
 namespace CLADevs\VanillaX\commands;
 
+use CLADevs\VanillaX\configuration\features\CommandFeature;
 use CLADevs\VanillaX\utils\item\NonAutomaticCallItemTrait;
 use CLADevs\VanillaX\utils\Utils;
-use CLADevs\VanillaX\VanillaX;
 use pocketmine\Server;
 
 class CommandManager{
@@ -21,7 +21,7 @@ class CommandManager{
     }
 
     public function register(Command $command): void{
-        if(in_array(strtolower($command->getName()), VanillaX::getInstance()->getConfig()->getNested("disabled.commands", [])) || !$command->canRegister()){
+        if(!CommandFeature::getInstance()->isCommandEnable(strtolower($command->getName())) || !$command->canRegister()){
             return;
         }
         $map = Server::getInstance()->getCommandMap();

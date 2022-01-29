@@ -4,6 +4,7 @@ namespace CLADevs\VanillaX\listeners\types;
 
 use CLADevs\VanillaX\items\types\ElytraItem;
 use CLADevs\VanillaX\items\types\ShieldItem;
+use CLADevs\VanillaX\network\InGamePacketHandlerX;
 use CLADevs\VanillaX\world\gamerule\GameRule;
 use CLADevs\VanillaX\world\gamerule\GameRuleManager;
 use CLADevs\VanillaX\utils\item\HeldItemChangeTrait;
@@ -23,8 +24,11 @@ use pocketmine\event\player\PlayerItemHeldEvent;
 use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\player\PlayerMoveEvent;
 use pocketmine\event\player\PlayerQuitEvent;
+use pocketmine\event\player\PlayerRespawnEvent;
 use pocketmine\event\player\PlayerToggleSneakEvent;
 use pocketmine\item\Armor;
+use pocketmine\item\GlassBottle;
+use pocketmine\item\VanillaItems;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataFlags;
 use pocketmine\scheduler\ClosureTask;
@@ -40,6 +44,9 @@ class PlayerListener implements Listener{
         GameRuleManager::getInstance()->sendChanges($player);
         if($weather->isRaining($player->getWorld())) $weather->sendWeather($player, $weather->isThundering($player->getWorld()));
         VanillaX::getInstance()->getSessionManager()->add($player);
+        VanillaX::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function ()use($player): void{
+            $player->getNetworkSession()->setHandler(new InGamePacketHandlerX($player, $player->getNetworkSession(), $player->getNetworkSession()->getInvManager()));
+        }), 1);
     }
 
     public function onQuit(PlayerQuitEvent $event): void{
@@ -56,15 +63,35 @@ class PlayerListener implements Listener{
         $manager->remove($player);
     }
 
+    public function onRespawn(PlayerRespawnEvent $event): void{
+        $player = $event->getPlayer();
+
+        VanillaX::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function ()use($player): void{
+            $player->getNetworkSession()->setHandler(new InGamePacketHandlerX($player, $player->getNetworkSession(), $player->getNetworkSession()->getInvManager()));
+        }), 1);
+    }
+
     public function onInteract(PlayerInteractEvent $event): void{
         if(!$event->isCancelled()){
             $player = $event->getPlayer();
             $item = $event->getItem();
+            $block = $event->getBlock();
 
             if($item instanceof Armor && $player->getArmorInventory()->getItem($slot = $item->getArmorSlot())->isNull()){
                 $player->getArmorInventory()->setItem($slot, $item);
                 $item->pop();
                 $player->getInventory()->setItemInHand($item);
+            }
+            if($block instanceof Water && $item instanceof GlassBottle){
+                $waterPotion = VanillaItems::WATER_POTION();
+
+                if($player->getInventory()->canAddItem($waterPotion)){
+                    $player->getInventory()->addItem($waterPotion);
+                    $item->pop();
+                    $player->getInventory()->setItemInHand($item);
+                }elseif($item->getCount() === 1){
+                    $player->getInventory()->setItemInHand($waterPotion);
+                }
             }
         }
     }

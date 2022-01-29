@@ -6,7 +6,6 @@ use CLADevs\VanillaX\inventories\actions\BeaconPaymentAction;
 use CLADevs\VanillaX\inventories\actions\EnchantItemAction;
 use CLADevs\VanillaX\inventories\actions\RepairItemAction;
 use CLADevs\VanillaX\inventories\actions\TradeItemAction;
-use CLADevs\VanillaX\inventories\actions\UpgradedGearAction;
 use CLADevs\VanillaX\inventories\FakeBlockInventory;
 use pocketmine\inventory\transaction\action\InventoryAction;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
@@ -73,10 +72,6 @@ class TypeConverterX extends TypeConverter{
                                     $foundSlot = true;
                                 }
                                 break;
-                            case WindowTypes::SMITHING_TABLE:
-                                $action->inventorySlot -= 51;
-                                $foundSlot = true;
-                                break;
                         }
                         if($foundSlot){
                             return new SlotChangeAction($currentWindow, $action->inventorySlot, $oldItem, $newItem);
@@ -118,20 +113,7 @@ class TypeConverterX extends TypeConverter{
                             case self::SOURCE_TYPE_TRADE_INPUT:
                             case self::SOURCE_TYPE_TRADE_OUTPUT:
                                 $action->inventorySlot = $action->windowId === self::SOURCE_TYPE_TRADE_OUTPUT ? 1 : 0;
-                                $action->windowId = $currentWindowId;
-                                return new TradeItemAction($oldItem, $newItem);
-                        }
-                        break;
-                    case WindowTypes::SMITHING_TABLE:
-                        switch($action->windowId){
-                            case NetworkInventoryAction::SOURCE_TYPE_ANVIL_OUTPUT:
-                            case NetworkInventoryAction::SOURCE_TYPE_ANVIL_RESULT:
-                            case self::SOURCE_TYPE_ANVIL_MATERIAL:
-                            case self::SOURCE_TYPE_ANVIL_INPUT:
-                                if($action->windowId !== NetworkInventoryAction::SOURCE_TYPE_ANVIL_OUTPUT){
-                                    return new UpgradedGearAction($oldItem, $newItem, $action->windowId);
-                                }
-                                return new SlotChangeAction($currentWindow, $action->inventorySlot, $oldItem, $newItem);
+                                return new TradeItemAction($oldItem, $newItem, $action->windowId);
                         }
                         break;
                 }

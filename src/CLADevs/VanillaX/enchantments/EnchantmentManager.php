@@ -2,6 +2,7 @@
 
 namespace CLADevs\VanillaX\enchantments;
 
+use CLADevs\VanillaX\configuration\features\EnchantmentFeature;
 use CLADevs\VanillaX\enchantments\utils\EnchantmentTrait;
 use CLADevs\VanillaX\entities\utils\interfaces\EntityClassification;
 use CLADevs\VanillaX\entities\VanillaEntity;
@@ -26,11 +27,14 @@ use pocketmine\item\Pickaxe;
 use pocketmine\item\Shovel;
 use pocketmine\item\Sword;
 use pocketmine\player\Player;
+use pocketmine\item\enchantment\ItemFlags as PMItemFlags;
 
 class EnchantmentManager{
 
     /** @var Enchantment[] */
-    private array $enchantments = [];
+    private array $enchantmentMap = [];
+    /** @var Enchantment[] */
+    private array $enchantmentTypeMap = [];
 
     public function startup(): void{
         Utils::callDirectory("enchantments", function (string $namespace): void{
@@ -38,185 +42,18 @@ class EnchantmentManager{
                 $this->registerEnchantment(new $namespace());
             }
         });
-        //TODO Crossbow enchantment
     }
 
     public function registerEnchantment(Enchantment $enchantment): void{
-        /** @var EnchantmentTrait $enchantment */
-        $this->enchantments[$enchantment->getId()] = $enchantment;
-        if(!in_array($enchantment->getId(), VanillaX::getInstance()->getConfig()->getNested("disabled.enchantments", []))){
+        if(EnchantmentFeature::getInstance()->isEnchantmentEnabled($enchantment->getId())){
             EnchantmentIdMap::getInstance()->register($enchantment->getMcpeId(), $enchantment);
+            /** @var EnchantmentTrait $enchantment */
+            $this->enchantmentMap[$enchantment->getId()] = $enchantment;
+            $this->enchantmentTypeMap[$enchantment->getPrimaryItemFlags()][] = $enchantment;
+            $this->enchantmentTypeMap[$enchantment->getSecondaryItemFlags()][] = $enchantment;
         }
     }
 
-    /**
-     * @return int[]
-     */
-    public function getTreasureEnchantsId(): array{
-        return [EnchantmentIds::FROST_WALKER, EnchantmentIds::BINDING, EnchantmentIds::SOUL_SPEED, EnchantmentIds::MENDING, EnchantmentIds::VANISHING];
-    }
-
-    /**
-     * @return int[]
-     */
-    public function getGlobalEnchantsId(): array{
-        return [EnchantmentIds::VANISHING, EnchantmentIds::UNBREAKING, EnchantmentIds::MENDING];
-    }
-
-    /**
-     * @return int[]
-     */
-    public function getWeaponEnchantsId(): array{
-        return [EnchantmentIds::BANE_OF_ARTHROPODS, EnchantmentIds::SHARPNESS, EnchantmentIds::SMITE];
-    }
-
-    /**
-     * @return int[]
-     */
-    public function getToolEnchantsId(): array{
-        return [EnchantmentIds::EFFICIENCY, EnchantmentIds::FORTUNE, EnchantmentIds::SILK_TOUCH];
-    }
-
-    /**
-     * @return int[]
-     */
-    public function getArmorEnchantsId(): array{
-        return [EnchantmentIds::PROTECTION, EnchantmentIds::BLAST_PROTECTION, EnchantmentIds::FIRE_PROTECTION, EnchantmentIds::PROJECTILE_PROTECTION];
-    }
-
-    /**
-     * @return int[]
-     */
-    public function getHelmetEnchantsId(): array{
-        return [EnchantmentIds::AQUA_AFFINITY, EnchantmentIds::RESPIRATION];
-    }
-
-    /**
-     * @return int[]
-     */
-    public function getBootEnchantsId(): array{
-        return [EnchantmentIds::DEPTH_STRIDER, EnchantmentIds::FEATHER_FALLING, EnchantmentIds::FROST_WALKER, EnchantmentIds::SOUL_SPEED];
-    }
-
-    /**
-     * @return int[]
-     */
-    public function getSwordEncantsId(): array{
-        return [EnchantmentIds::FIRE_ASPECT, EnchantmentIds::KNOCKBACK, EnchantmentIds::LOOTING];
-    }
-
-    /**
-     * @return int[]
-     */
-    public function getElytraEnchantsId(): array{
-        return [EnchantmentIds::BINDING];
-    }
-
-    /**
-     * @return int[]
-     */
-    public function getBowEnchantsId(): array{
-        return [EnchantmentIds::FLAME, EnchantmentIds::INFINITY, EnchantmentIds::PUNCH];
-    }
-    /**
-     * @return int[]
-     */
-    public function getCrossbowEnchantsId(): array{
-        return [EnchantmentIds::MULTISHOT, EnchantmentIds::PIERCING, EnchantmentIds::QUICK_CHARGE];
-    }
-
-    /**
-     * @return int[]
-     */
-    public function getTridentEnchantsId(): array{
-        return [EnchantmentIds::CHANNELING, EnchantmentIds::IMPALING, EnchantmentIds::LOYALTY, EnchantmentIds::RIPTIDE];
-    }
-
-    /**
-     * @return int[]
-     */
-    public function getFishingRodEnchantsId(): array{
-        return [EnchantmentIds::LUCK_OF_THE_SEA, EnchantmentIds::LURE];
-    }
-
-    /**
-     * @return Enchantment[]
-     */
-    public function getEnchantments(): array{
-        return $this->enchantments;
-    }
-
-    public function getAllEnchantments(bool $treasure = false): array{
-        $treasure = $treasure ? $this->getTreasureEnchantsId() : [];
-        return array_merge($this->getGlobalEnchantsId(), $this->getWeaponEnchantsId(), $this->getToolEnchantsId(), $this->getArmorEnchantsId(), $this->getHelmetEnchantsId(), $this->getBootEnchantsId(), $this->getSwordEncantsId(), $this->getElytraEnchantsId(), $this->getBowEnchantsId(), $this->getCrossbowEnchantsId(), $this->getTridentEnchantsId(), $this->getFishingRodEnchantsId(), $treasure);
-    }
-
-    public function getEnchantmentForItem(Item $item, bool $includeGlobal = true, bool $includeTreasures = true): ?array{
-        $enchantments = [];
-
-        /** Armor */
-        if($item instanceof Armor){
-            $enchantments = $this->getArmorEnchantsId();
-        }
-        /** Sword or Axe */
-        if($item instanceof Sword || $item instanceof Axe){
-            $enchantments = $this->getWeaponEnchantsId();
-
-            if($item instanceof Sword){
-                $enchantments = array_merge($enchantments, $this->getSwordEncantsId());
-            }
-        }
-        /** Pickaxe, Axe or Shove */
-        if($item instanceof Pickaxe || $item instanceof Axe || $item instanceof Shovel){
-            $enchantments = $this->getToolEnchantsId();
-        }
-        /** Helmet, Boots, Elytra, Bow, Crossbow, Trident and FishingRod */
-        switch($item->getId()){
-            case ItemIds::LEATHER_HELMET:
-            case ItemIds::CHAIN_HELMET:
-            case ItemIds::GOLD_HELMET:
-            case ItemIds::IRON_HELMET:
-            case ItemIds::DIAMOND_HELMET:
-                $enchantments = array_merge($enchantments, $this->getHelmetEnchantsId());
-                break;
-            case ItemIds::LEATHER_BOOTS:
-            case ItemIds::CHAIN_BOOTS:
-            case ItemIds::GOLD_BOOTS:
-            case ItemIds::IRON_BOOTS:
-            case ItemIds::DIAMOND_BOOTS:
-                $enchantments = array_merge($enchantments, $this->getBootEnchantsId());
-                break;
-            case ItemIds::ELYTRA:
-                if($includeTreasures){
-                    $enchantments = array_merge($enchantments, $this->getElytraEnchantsId());
-                }
-                break;
-            case ItemIds::BOW:
-                $enchantments = $this->getBowEnchantsId();
-                break;
-            case ItemIds::CROSSBOW:
-                $enchantments = $this->getCrossbowEnchantsId();
-                break;
-            case ItemIds::TRIDENT:
-                $enchantments = $this->getTridentEnchantsId();
-                break;
-            case ItemIds::FISHING_ROD:
-                $enchantments = $this->getFishingRodEnchantsId();
-                if(!$includeTreasures){
-                    unset($enchantments[EnchantmentIds::FROST_WALKER]);
-                    unset($enchantments[EnchantmentIds::SOUL_SPEED]);
-                }
-                break;
-        }
-        if(count($enchantments) < 1) return null;
-        if($includeGlobal){
-            $global = $this->getGlobalEnchantsId();
-            unset($global[EnchantmentIds::MENDING]);
-            unset($global[EnchantmentIds::VANISHING]);
-            return array_merge($global, $enchantments);
-        }
-        return $enchantments;
-    }
 
     public function handleInventoryTransaction(InventoryTransactionEvent $event): void{
         if(!$event->isCancelled()){
@@ -263,5 +100,94 @@ class EnchantmentManager{
                 }
             }
         }
+    }
+
+    /**
+     * @param Item $item
+     * @param bool $includeGlobal
+     * @param bool $includeTreasures
+     * @return Enchantment[]|null
+     */
+    public function getEnchantmentForItem(Item $item, bool $includeGlobal = true, bool $includeTreasures = true): ?array{
+        $enchantments = [];
+
+        /** Armor */
+        if($item instanceof Armor){
+            $enchantments = $this->enchantmentTypeMap[PMItemFlags::ARMOR] ?? [];
+
+            $flag = match($item->getArmorSlot()){
+                ArmorInventory::SLOT_HEAD => PMItemFlags::HEAD,
+                ArmorInventory::SLOT_CHEST => PMItemFlags::TORSO,
+                ArmorInventory::SLOT_LEGS => PMItemFlags::LEGS,
+                ArmorInventory::SLOT_FEET => PMItemFlags::FEET,
+                default => null,
+            };
+            if($flag !== null){
+                $enchantments = array_merge($enchantments, $this->enchantmentTypeMap[$flag] ?? []);
+            }
+        }
+        /** Sword or Axe */
+        if($item instanceof Axe){
+            $enchantments = $this->enchantmentTypeMap[PMItemFlags::AXE] ?? [];
+        }
+        if($item instanceof Sword){
+            $enchantments = $this->enchantmentTypeMap[PMItemFlags::SWORD] ?? [];
+        }
+        /** Pickaxe, Axe or Shove */
+        if($item instanceof Pickaxe || $item instanceof Axe || $item instanceof Shovel){
+            $enchantments = array_merge($enchantments, $this->enchantmentTypeMap[PMItemFlags::DIG] ?? []);
+        }
+        /** Bow, Crossbow, Trident and FishingRod */
+        switch($item->getId()){
+            case ItemIds::BOW:
+                $enchantments = $this->enchantmentTypeMap[PMItemFlags::BOW] ?? [];
+                break;
+            case ItemIds::CROSSBOW:
+                $enchantments = $this->enchantmentTypeMap[ItemFlags::CROSSBOW] ?? [];
+                break;
+            case ItemIds::TRIDENT:
+                $enchantments = $this->enchantmentTypeMap[PMItemFlags::TRIDENT] ?? [];
+                break;
+            case ItemIds::FISHING_ROD:
+                $enchantments = $this->enchantmentTypeMap[PMItemFlags::FISHING_ROD] ?? [];
+                break;
+        }
+        if($includeGlobal){
+            $enchantments = array_merge($this->enchantmentTypeMap[PMItemFlags::ALL] ?? [], $enchantments);
+        }
+        /** @var EnchantmentTrait $enchantment */
+        foreach($enchantments as $key => $enchantment){
+            if(!$includeTreasures && $enchantment->isTreasure()){
+                unset($enchantment[$key]);
+            }
+        }
+        if(count($enchantments) < 1) return null;
+        return $enchantments;
+    }
+
+    public function getAllEnchantments(bool $includeTreasure = true): array{
+        $enchantments = $this->enchantmentMap;
+
+        /** @var EnchantmentTrait $enchant */
+        foreach($enchantments as $key => $enchant){
+            if(!$includeTreasure && $enchant->isTreasure()){
+                unset($enchantments[$key]);
+            }
+        }
+        return $enchantments;
+    }
+
+    /**
+     * @return Enchantment[]
+     */
+    public function getEnchantmentMap(): array{
+        return $this->enchantmentMap;
+    }
+
+    /**
+     * @return Enchantment[]
+     */
+    public function getEnchantmentTypeMap(): array{
+        return $this->enchantmentTypeMap;
     }
 }

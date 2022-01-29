@@ -1,0 +1,69 @@
+---
+#If this is false, it will disable all blocks
+#regardless if its toggled 'true' below
+enabled: true
+#All Blocks that can be enabled or disabled
+#true = enable
+#false = disable
+#everything under is auto generated
+blocks:
+  anvil: true
+  beacon: true
+  bell: true
+  brewing_stand: true
+  chain: true
+  enchanting_table: true
+  fire: true
+  hopper: true
+  jukebox: true
+  mob_spawner: true
+  seaLantern: true
+  skull: true
+  smithing_table: true
+  sponge: true
+  twisting_vines: true
+  warped_wart_block: true
+  weeping_vines: true
+  basalt: true
+  polished_basalt: true
+  melon_block: true
+  nether_wart: true
+  coal_ore: true
+  diamond_ore: true
+  emerald_block: true
+  glowstone: true
+  gold_ore: true
+  iron_ore: true
+  lapis_ore: true
+  quartz_ore: true
+  redstone_ore: true
+  flower_pot: true
+  campfire: true
+  soul_campfire: true
+  crimson_nylium: true
+  warped_nylium: true
+  crimson_roots: true
+  warped_roots: true
+  chiseled_nether_bricks: true
+  chiseled_polished_blackstone: true
+  cracked_nether_bricks: true
+  cracked_polished_blackstone_bricks: true
+  crimson_planks: true
+  warped_planks: true
+  crimson_door: true
+  warped_door: true
+  crimson_fence: true
+  warped_fence: true
+  crimson_fence_gate: true
+  warped_fence_gate: true
+  blackstone_stairs: true
+  crimson_stairs: true
+  polished_blackstone_brick_stairs: true
+  polished_blackstone_stairs: true
+  warped_stairs: true
+  command_block: true
+  repeating_command_block: true
+  chain_command_block: true
+  slime: true
+  ancient_debris: true
+...

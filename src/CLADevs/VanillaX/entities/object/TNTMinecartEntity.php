@@ -18,4 +18,8 @@ class TNTMinecartEntity extends MinecartEntity{
         }
         parent::kill();
     }
+
+    public static function canRegister(): bool{
+        return true;
+    }
 }

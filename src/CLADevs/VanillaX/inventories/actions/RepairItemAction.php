@@ -3,15 +3,14 @@
 namespace CLADevs\VanillaX\inventories\actions;
 
 use CLADevs\VanillaX\inventories\types\AnvilInventory;
-use pocketmine\block\BlockLegacyIds;
+use CLADevs\VanillaX\inventories\utils\TypeConverterX;
 use pocketmine\inventory\transaction\action\InventoryAction;
 use pocketmine\inventory\transaction\TransactionValidationException;
 use pocketmine\item\Item;
+use pocketmine\network\mcpe\protocol\types\inventory\NetworkInventoryAction;
 use pocketmine\player\Player;
 
 class RepairItemAction extends InventoryAction{
-
-    /** Nukkit Repair Item Action */
 
     private int $sourceType;
 
@@ -21,10 +20,13 @@ class RepairItemAction extends InventoryAction{
     }
 
     public function execute(Player $source): void{
-        $inv = $source->getCurrentWindow();
+        $inventory = $source->getCurrentWindow();
 
-        if($inv instanceof AnvilInventory && $this->targetItem->getId() === BlockLegacyIds::AIR){
-            $inv->onSuccess($source, $this->sourceItem);
+        if(!$inventory instanceof AnvilInventory){
+            throw new TransactionValidationException("Anvil Inventory is not opened");
+        }
+        if($this->isResult()){
+            $inventory->onSuccess($source, $this->getSourceItem());
         }
     }
 
@@ -32,6 +34,18 @@ class RepairItemAction extends InventoryAction{
         if(!$source->getCurrentWindow() instanceof AnvilInventory){
             throw new TransactionValidationException("Anvil Inventory is not opened");
         }
+    }
+
+    public function isInput(): bool{
+        return $this->sourceType === TypeConverterX::SOURCE_TYPE_ANVIL_INPUT;
+    }
+
+    public function isMaterial(): bool{
+        return $this->sourceType === TypeConverterX::SOURCE_TYPE_ANVIL_MATERIAL;
+    }
+
+    public function isResult(): bool{
+        return $this->sourceType === NetworkInventoryAction::SOURCE_TYPE_ANVIL_RESULT;
     }
 
     public function getType(): int{

@@ -6,6 +6,7 @@ use CLADevs\VanillaX\entities\utils\traits\EntityContainer;
 use CLADevs\VanillaX\inventories\FakeBlockInventory;
 use CLADevs\VanillaX\world\gamerule\GameRule;
 use CLADevs\VanillaX\world\gamerule\GameRuleManager;
+use Exception;
 use pocketmine\block\BlockLegacyIds;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
@@ -23,6 +24,9 @@ use EntityContainer;
 
     private FakeBlockInventory $inventory;
 
+    /**
+     * @throws Exception
+     */
     protected function initEntity(CompoundTag $nbt): void{
         parent::initEntity($nbt);
         $pos = $this->getPosition();
@@ -61,5 +65,9 @@ use EntityContainer;
 
     public function getContents(bool $includeEmpty = false): array{
         return $this->inventory->getContents($includeEmpty);
+    }
+
+    public static function canRegister(): bool{
+        return true;
     }
 }

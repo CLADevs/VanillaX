@@ -2,8 +2,8 @@
 
 namespace CLADevs\VanillaX\blocks\block;
 
-use CLADevs\VanillaX\blocks\utils\BlockVanilla;
-use CLADevs\VanillaX\items\ItemIdentifiers;
+use CLADevs\VanillaX\blocks\BlockIds;
+use CLADevs\VanillaX\items\LegacyItemIds;
 use pocketmine\block\Air;
 use pocketmine\block\BlockBreakInfo;
 use pocketmine\block\BlockFactory;
@@ -25,7 +25,7 @@ class TwistingVinesBlock extends Transparent{
     protected int $age = 0;
 
     public function __construct(){
-        parent::__construct(new BlockIdentifier(BlockVanilla::TWISTING_VINES, 0, ItemIdentifiers::TWISTING_VINES), "Twisting Vines", BlockBreakInfo::instant());
+        parent::__construct(new BlockIdentifier(BlockIds::TWISTING_VINES, 0, LegacyItemIds::TWISTING_VINES), "Twisting Vines", BlockBreakInfo::instant());
     }
 
     public function onInteract(Item $item, int $face, Vector3 $clickVector, ?Player $player = null): bool{
@@ -56,7 +56,7 @@ class TwistingVinesBlock extends Transparent{
                        }else{
                            $lastAge++;
                        }
-                       $this->position->getWorld()->setBlock($b->position, BlockFactory::getInstance()->get(BlockVanilla::TWISTING_VINES, $lastAge > 15 ? 15 : $lastAge));
+                       $this->position->getWorld()->setBlock($b->position, BlockFactory::getInstance()->get(BlockIds::TWISTING_VINES, $lastAge > 15 ? 15 : $lastAge));
                    }else{
                        break;
                    }
@@ -100,7 +100,7 @@ class TwistingVinesBlock extends Transparent{
             if($b->getId() === BlockLegacyIds::AIR){
                 $newAge = $this->age + 1;
 
-                $ev = new BlockGrowEvent($b, BlockFactory::getInstance()->get(BlockVanilla::TWISTING_VINES, $newAge > 15 ? 15 : $newAge));
+                $ev = new BlockGrowEvent($b, BlockFactory::getInstance()->get(BlockIds::TWISTING_VINES, $newAge > 15 ? 15 : $newAge));
                 $ev->call();
                 if($ev->isCancelled()){
                     return;

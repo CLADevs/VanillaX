@@ -2,7 +2,7 @@
 
 namespace CLADevs\VanillaX\blocks\tile;
 
-use CLADevs\VanillaX\blocks\utils\TileVanilla;
+use CLADevs\VanillaX\blocks\TileIds;
 use CLADevs\VanillaX\items\types\MusicDiscItem;
 use pocketmine\block\BlockLegacyIds;
 use pocketmine\block\tile\Tile;
@@ -16,7 +16,7 @@ use pocketmine\world\Position;
 
 class JukeboxTile extends Tile{
 
-    const TILE_ID = TileVanilla::JUKEBOX;
+    const TILE_ID = TileIds::JUKEBOX;
     const TILE_BLOCK = BlockLegacyIds::JUKEBOX;
 
     const TAG_RECORD_ITEM = "RecordItem";

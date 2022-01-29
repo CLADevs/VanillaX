@@ -2,6 +2,7 @@
 
 namespace CLADevs\VanillaX\entities\object;
 
+use CLADevs\VanillaX\configuration\features\ItemFeature;
 use CLADevs\VanillaX\world\gamerule\GameRule;
 use CLADevs\VanillaX\world\gamerule\GameRuleManager;
 use CLADevs\VanillaX\session\Session;
@@ -197,8 +198,6 @@ class ArmorStandEntity extends Living implements InteractButtonItemTrait{
                 $slotItem = $slot === self::EQUIPMENT_MAINHAND ? $this->getMainHand() : $this->getArmorInventory()->getItem($slot - 1);
 
                 if($slotItem->isNull()){
-                    $takeSlot = null;
-
                     /**
                      * @var int $key
                      * @var Item $value */
@@ -286,7 +285,7 @@ class ArmorStandEntity extends Living implements InteractButtonItemTrait{
             $item = $this->mainHand;
         }
         $pk = new MobEquipmentPacket();
-        $pk->entityRuntimeId = $this->id;
+        $pk->actorRuntimeId = $this->id;
         $pk->item = ItemStackWrapper::legacy(TypeConverter::getInstance()->coreItemStackToNet($item));
         $pk->inventorySlot = 0;
         $pk->hotbarSlot = $pk->inventorySlot;
@@ -304,5 +303,9 @@ class ArmorStandEntity extends Living implements InteractButtonItemTrait{
             return self::EQUIPMENT_FEETS;
         }
         return self::EQUIPMENT_MAINHAND;
+    }
+
+    public static function canRegister(): bool{
+        return ItemFeature::getInstance()->isItemEnabled(ItemIds::ARMOR_STAND);
     }
 }

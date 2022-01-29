@@ -53,4 +53,8 @@ class WitherSkullEntity extends Projectile{
     public static function getNetworkTypeId(): string{
         return self::NETWORK_ID;
     }
+
+    public static function canRegister(): bool{
+        return true;
+    }
 }

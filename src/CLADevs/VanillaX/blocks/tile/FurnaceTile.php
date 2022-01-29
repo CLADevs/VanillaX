@@ -2,7 +2,7 @@
 
 namespace CLADevs\VanillaX\blocks\tile;
 
-use CLADevs\VanillaX\blocks\utils\TileVanilla;
+use CLADevs\VanillaX\blocks\TileIds;
 use pocketmine\block\BlockLegacyIds;
 use pocketmine\block\tile\Furnace;
 use pocketmine\crafting\FurnaceType;
@@ -15,20 +15,22 @@ use pocketmine\world\Position;
 
 class FurnaceTile extends Furnace{
 
-    const TILE_ID = TileVanilla::FURNACE;
+    const TAG_XP_HOLDER = "xpHolder";
+
+    const TILE_ID = TileIds::FURNACE;
     const TILE_BLOCK = BlockLegacyIds::FURNACE;
 
     private float $xpHolder = 0.0;
 
     protected function writeSaveData(CompoundTag $nbt): void{
         parent::writeSaveData($nbt);
-        $nbt->setFloat("xpHolder", $this->xpHolder);
+        $nbt->setFloat(self::TAG_XP_HOLDER, $this->xpHolder);
     }
 
     public function readSaveData(CompoundTag $nbt): void{
         parent::readSaveData($nbt);
 
-        if(($tag = $nbt->getTag("xpHolder")) !== null){
+        if(($tag = $nbt->getTag(self::TAG_XP_HOLDER)) !== null){
             $this->xpHolder = $tag->getValue();
         }
         $this->inventory->getListeners()->add(new CallbackInventoryListener(

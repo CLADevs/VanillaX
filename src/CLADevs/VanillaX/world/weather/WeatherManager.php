@@ -2,6 +2,7 @@
 
 namespace CLADevs\VanillaX\world\weather;
 
+use CLADevs\VanillaX\configuration\Setting;
 use CLADevs\VanillaX\entities\object\LightningBoltEntity;
 use CLADevs\VanillaX\world\gamerule\GameRule;
 use CLADevs\VanillaX\world\gamerule\GameRuleManager;
@@ -26,7 +27,7 @@ class WeatherManager{
     }
 
     public function startup(): void{
-        if(!VanillaX::getInstance()->getConfig()->getNested("features.weather", true)){
+        if(!Setting::getInstance()->isWeatherEnabled()){
             return;
         }
         foreach(Server::getInstance()->getWorldManager()->getWorlds() as $world){
@@ -93,7 +94,7 @@ class WeatherManager{
         $weather = $this->weathers[strtolower($world->getFolderName())] ?? null;
 
         if($weather !== null){
-            return $weather->isRaining() ? true : ($checkThunder ? $weather->isThundering() : false);
+            return $weather->isRaining() || (($checkThunder && $weather->isThundering()));
         }
         return false;
     }

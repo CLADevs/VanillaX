@@ -1,0 +1,16 @@
+---
+#If this is false, it will disable all commands
+#regardless if its toggled 'true' below
+enabled: true
+#All Command that can be enabled or disabled
+#true = enable
+#false = disable
+#everything under is auto generated
+commands:
+  gamerule: true
+  give: true
+  playsound: true
+  stopsound: true
+  toggledownfall: true
+  weather: true
+...

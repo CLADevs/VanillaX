@@ -2,36 +2,36 @@
 
 namespace CLADevs\VanillaX\blocks\tile;
 
-use CLADevs\VanillaX\blocks\utils\TileVanilla;
+use CLADevs\VanillaX\blocks\TileIds;
+use CLADevs\VanillaX\inventories\actions\BeaconPaymentAction;
+use CLADevs\VanillaX\inventories\types\BeaconInventory;
 use pocketmine\block\BlockLegacyIds;
 use pocketmine\block\tile\Spawnable;
+use pocketmine\math\Vector3;
 use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\player\Player;
+use pocketmine\world\Position;
+use pocketmine\world\World;
 
 class BeaconTile extends Spawnable{
 
     const TAG_PRIMARY = "primary";
     const TAG_SECONDARY = "secondary";
 
-    const TILE_ID = TileVanilla::BEACON;
+    const TILE_ID = TileIds::BEACON;
     const TILE_BLOCK = BlockLegacyIds::BEACON;
 
     private int $primary = 0;
     private int $secondary = 0;
 
-    public function setPrimary(int $primary): void{
-        $this->primary = $primary;
-    }
+    private BeaconInventory $inventory;
 
-    public function getPrimary(): int{
-        return $this->primary;
-    }
+    /** @var BeaconPaymentAction[] */
+    private array $queues = [];
 
-    public function setSecondary(int $secondary): void{
-        $this->secondary = $secondary;
-    }
-
-    public function getSecondary(): int{
-        return $this->secondary;
+    public function __construct(World $world, Vector3 $pos){
+        parent::__construct($world, $pos);
+        $this->inventory = new BeaconInventory(Position::fromObject($pos, $world));
     }
 
     public function readSaveData(CompoundTag $nbt): void{
@@ -50,5 +50,39 @@ class BeaconTile extends Spawnable{
 
     protected function addAdditionalSpawnData(CompoundTag $nbt): void{
         $this->writeSaveData($nbt);
+    }
+
+    public function isInQueue(Player $player): bool{
+        return isset($this->queues[$player->getName()]);
+    }
+
+    public function addToQueue(Player $player, BeaconPaymentAction $action): void{
+        $this->queues[$player->getName()] = $action;
+    }
+
+    public function removeFromQueue(Player $player): void{
+        if($this->isInQueue($player)){
+            unset($this->queues[$player->getName()]);
+        }
+    }
+
+    public function getInventory(): BeaconInventory{
+        return $this->inventory;
+    }
+
+    public function setPrimary(int $primary): void{
+        $this->primary = $primary;
+    }
+
+    public function getPrimary(): int{
+        return $this->primary;
+    }
+
+    public function setSecondary(int $secondary): void{
+        $this->secondary = $secondary;
+    }
+
+    public function getSecondary(): int{
+        return $this->secondary;
     }
 }

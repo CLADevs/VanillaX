@@ -32,16 +32,7 @@ class FakeBlockInventory extends SimpleInventory implements BlockInventory{
     /** @var null|callable */
     private $packetCallable;
 
-    /**
-     * FakeBlockInventory constructor.
-     * @param Position $holder
-     * @param int $size
-     * @param Block|int $block
-     * @param int $windowType
-     * @param callable|null $packetCallable
-     * @param Player|null $owner
-     */
-    public function __construct(Position $holder, int $size = 27, $block = BlockLegacyIds::CHEST, int $windowType = WindowTypes::CONTAINER, callable $packetCallable = null, ?Player $owner = null){
+    public function __construct(Position $holder, int $size = 27, int|Block $block = BlockLegacyIds::CHEST, int $windowType = WindowTypes::CONTAINER, callable $packetCallable = null, ?Player $owner = null){
         parent::__construct($size);
         $holder->x = intval($holder->x);
         $holder->y = intval($holder->y);

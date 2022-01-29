@@ -2,6 +2,7 @@
 
 namespace CLADevs\VanillaX\entities;
 
+use CLADevs\VanillaX\configuration\features\MobFeature;
 use CLADevs\VanillaX\entities\utils\interfaces\EntityClassification;
 use CLADevs\VanillaX\world\gamerule\GameRule;
 use CLADevs\VanillaX\world\gamerule\GameRuleManager;
@@ -116,5 +117,9 @@ abstract class VanillaEntity extends Living{
         }, $this->attributeMap->getAll());
         $pk->metadata = $this->getAllNetworkData();
         $player->getNetworkSession()->sendDataPacket($pk);
+    }
+
+    public static function canRegister(): bool{
+        return MobFeature::getInstance()->isMobEnabled(str_replace("minecraft:", "", self::getNetworkTypeId()));
     }
 }

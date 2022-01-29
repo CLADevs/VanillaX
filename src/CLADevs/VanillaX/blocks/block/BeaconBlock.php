@@ -3,8 +3,7 @@
 namespace CLADevs\VanillaX\blocks\block;
 
 use CLADevs\VanillaX\blocks\tile\BeaconTile;
-use CLADevs\VanillaX\blocks\utils\BlockVanilla;
-use CLADevs\VanillaX\inventories\types\BeaconInventory;
+use CLADevs\VanillaX\blocks\BlockIds;
 use Exception;
 use pocketmine\block\BlockBreakInfo;
 use pocketmine\block\BlockIdentifier;
@@ -23,16 +22,12 @@ class BeaconBlock extends Transparent{
         parent::__construct(new BlockIdentifier(BlockLegacyIds::BEACON, 0, null, BeaconTile::class),"Beacon", new BlockBreakInfo(3));
     }
 
-    /**
-     * @param Item $item
-     * @param int $face
-     * @param Vector3 $clickVector
-     * @param Player|null $player
-     * @return bool
-     * @throws Exception
-     */
     public function onInteract(Item $item, int $face, Vector3 $clickVector, ?Player $player = null): bool{
-        $player?->setCurrentWindow(new BeaconInventory($this->getPosition()));
+        $tile = $this->position->getWorld()->getTile($this->position);
+
+        if($tile instanceof BeaconTile){
+            $player?->setCurrentWindow($tile->getInventory());
+        }
         return true;
     }
 
@@ -91,7 +86,7 @@ class BeaconBlock extends Transparent{
             for($z = -$level; $z <= $level; $z++){
                 $block = $this->position->getWorld()->getBlock($this->position->add($x, 0, $z)->subtract(0, $level, 0));
 
-                if(!in_array($block->getId(), [BlockLegacyIds::IRON_BLOCK, BlockLegacyIds::GOLD_BLOCK, BlockLegacyIds::DIAMOND_BLOCK, BlockLegacyIds::EMERALD_BLOCK, BlockVanilla::NETHERITE_BLOCK])){
+                if(!in_array($block->getId(), [BlockLegacyIds::IRON_BLOCK, BlockLegacyIds::GOLD_BLOCK, BlockLegacyIds::DIAMOND_BLOCK, BlockLegacyIds::EMERALD_BLOCK, BlockIds::NETHERITE_BLOCK])){
                     return false;
                 }
                 $i++;

@@ -9,7 +9,7 @@ use CLADevs\VanillaX\entities\passive\AxolotlEntity;
 use CLADevs\VanillaX\entities\passive\GlowSquidEntity;
 use CLADevs\VanillaX\entities\passive\StriderEntity;
 use CLADevs\VanillaX\entities\passive\VillagerEntity;
-use CLADevs\VanillaX\entities\utils\EntityIdentifierX;
+use CLADevs\VanillaX\entities\utils\EntityIdentifier;
 use CLADevs\VanillaX\entities\utils\villager\VillagerProfession;
 use CLADevs\VanillaX\utils\entity\CustomRegisterEntityNamesTrait;
 use CLADevs\VanillaX\utils\entity\CustomRegisterEntityTrait;
@@ -30,7 +30,7 @@ use ReflectionClass;
 class EntityManager{
     use SingletonTrait;
 
-    /** @var EntityIdentifierX[] */
+    /** @var EntityIdentifier[] */
     private array $entities = [];
 
     public function __construct(){
@@ -40,34 +40,27 @@ class EntityManager{
     public function startup(): void{
         VillagerProfession::init();
 
-        if(VanillaX::getInstance()->getConfig()->get("entities", true)){
-            $pathList = ["object", "projectile"];
+        foreach( ["object", "projectile", "boss", "passive", "neutral", "monster"] as $path){
+            Utils::callDirectory("entities" . DIRECTORY_SEPARATOR . $path, function (string $namespace)use($path): void{
+                $implements = class_implements($namespace);
 
-            if(VanillaX::getInstance()->getConfig()->get("mobs", true)){
-                $pathList = array_merge($pathList, ["boss", "passive", "neutral", "monster"]);
-            }
-            foreach($pathList as $path){
-                Utils::callDirectory("entities" . DIRECTORY_SEPARATOR . $path, function (string $namespace)use($path): void{
-                    $implements = class_implements($namespace);
+                if(!isset($implements[NonAutomaticCallItemTrait::class])){
+                    $closure = null;
+                    $saveNames = [$namespace::NETWORK_ID];
+                    $saveId = null;
 
-                    if(!isset($implements[NonAutomaticCallItemTrait::class])){
-                        $closure = null;
-                        $saveNames = [$namespace::NETWORK_ID];
-                        $saveId = null;
-
-                        if(isset($implements[CustomRegisterEntityTrait::class])){
-                            /** @var CustomRegisterEntityTrait $namespace */
-                            $closure = $namespace::getRegisterClosure();
-                        }
-                        if(isset($implements[CustomRegisterEntityNamesTrait::class])){
-                            /** @var CustomRegisterEntityNamesTrait $namespace */
-                            $saveNames = $namespace::getRegisterSaveNames();
-                            $saveId = $namespace::getSaveId();
-                        }
-                        $this->registerEntity($namespace, $path, $saveNames, $saveId, $closure);
+                    if(isset($implements[CustomRegisterEntityTrait::class])){
+                        /** @var CustomRegisterEntityTrait $namespace */
+                        $closure = $namespace::getRegisterClosure();
                     }
-                });
-            }
+                    if(isset($implements[CustomRegisterEntityNamesTrait::class])){
+                        /** @var CustomRegisterEntityNamesTrait $namespace */
+                        $saveNames = $namespace::getRegisterSaveNames();
+                        $saveId = $namespace::getSaveId();
+                    }
+                    $this->registerEntity($namespace, $path, $saveNames, $saveId, $closure);
+                }
+            });
         }
     }
 
@@ -113,35 +106,33 @@ class EntityManager{
                 $entityName[] = ucfirst(strtolower($value));
             }
             $entityName = implode(" ", $entityName);
-            $this->entities[$networkId] = new EntityIdentifierX($networkId, $entityName, $namespace, $path, $id);
+            $this->entities[$networkId] = new EntityIdentifier($networkId, $entityName, $namespace, $path, $id);
             $this->entities[$id] = $this->entities[$networkId];
         }
     }
 
     public function registerEntity(string $namespace, string $path = "none", array $saveNames = [], ?int $saveId = null, ?Closure $closure = null): void{
-        $disabledMobs = VanillaX::getInstance()->getConfig()->getNested("disabled.mobs", []);
-
-        if(in_array($namespace::NETWORK_ID, $disabledMobs)){
-           return;
+        if(!$namespace::canRegister()){
+            return;
         }
         $this->initializeEntityIds($namespace, $path);
 
-        EntityFactory::getInstance()->register($namespace, $closure ? $closure : function(World $world, CompoundTag $nbt)use($namespace): Entity{
+        EntityFactory::getInstance()->register($namespace, $closure ?: function(World $world, CompoundTag $nbt)use($namespace): Entity{
             return new $namespace(EntityDataHelper::parseLocation($nbt, $world), $nbt);
         }, $saveNames, $saveId);
     }
 
     /**
      * @param string|int $entity
-     * @return EntityIdentifierX|null
+     * @return EntityIdentifier|null
      * returns namespace of the entity or null if not found
      */
-    public function getEntity(string|int $entity): ?EntityIdentifierX{
+    public function getEntity(string|int $entity): ?EntityIdentifier{
         return $this->entities[$entity] ?? null;
     }
 
     /**
-     * @return EntityIdentifierX[]
+     * @return EntityIdentifier[]
      */
     public function getEntities(): array{
         return $this->entities;

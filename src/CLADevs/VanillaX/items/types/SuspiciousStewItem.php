@@ -2,7 +2,7 @@
 
 namespace CLADevs\VanillaX\items\types;
 
-use CLADevs\VanillaX\items\ItemIdentifiers;
+use CLADevs\VanillaX\items\LegacyItemIds;
 use pocketmine\entity\effect\EffectInstance;
 use pocketmine\entity\effect\VanillaEffects;
 use pocketmine\item\Food;
@@ -11,7 +11,7 @@ use pocketmine\item\ItemIdentifier;
 class SuspiciousStewItem extends Food{
 
     public function __construct(){
-        parent::__construct(new ItemIdentifier(ItemIdentifiers::SUSPICIOUS_STEW, 0), "Suspicious Stew");
+        parent::__construct(new ItemIdentifier(LegacyItemIds::SUSPICIOUS_STEW, 0), "Suspicious Stew");
     }
 
     public function getMaxStackSize(): int{

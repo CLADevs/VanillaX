@@ -1,0 +1,72 @@
+---
+#If this is false, it will disable all items
+#regardless if its toggled 'true' below
+enabled: true
+#All items that can be enabled or disabled
+#true = enable
+#false = disable
+#everything under is auto generated
+items:
+  anvil: true
+  campfire: true
+  soul_campfire: true
+  item.campfire: true
+  crimson_door: true
+  warped_door: true
+  crimson_fence_gate: true
+  warped_fence_gate: true
+  blackstone_stairs: true
+  crimson_stairs: true
+  polished_blackstone_brick_stairs: true
+  polished_blackstone_stairs: true
+  warped_stairs: true
+  armor_stand: true
+  elytra: true
+  enchanted_book: true
+  end_crystal: true
+  fireball: true
+  fireworks: true
+  honey_bottle: true
+  name_tag: true
+  saddle: true
+  shield: true
+  suspicious_stew: true
+  turtle_helmet: true
+  netherite_axe: true
+  netherite_boots: true
+  netherite_chestplate: true
+  netherite_helmet: true
+  netherite_hoe: true
+  netherite_leggings: true
+  netherite_pickaxe: true
+  netherite_shovel: true
+  netherite_sword: true
+  netherite_ingot: true
+  netherite_scrap: true
+  honeycomb: true
+  lantern: true
+  dried_kelp_block: true
+  kelp: true
+  dried_kelp: true
+  turtle_shell_piece: true
+  phantom_membrane: true
+  fireworkscharge: true
+  carrotonastick: true
+  horsearmorleather: true
+  horsearmoriron: true
+  horsearmorgold: true
+  horsearmordiamond: true
+  record_13: true
+  record_cat: true
+  record_blocks: true
+  record_chirp: true
+  record_far: true
+  record_mall: true
+  record_mellohi: true
+  record_stal: true
+  record_strad: true
+  record_ward: true
+  record_11: true
+  record_wait: true
+  record_pigstep: true
+...

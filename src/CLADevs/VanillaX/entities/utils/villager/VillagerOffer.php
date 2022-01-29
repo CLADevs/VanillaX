@@ -30,20 +30,8 @@ class VillagerOffer{
     private int $traderExp;
     private float $priceMultiplierA;
     private float $priceMultiplierB;
-
-    /**
-     * VillagerOffer constructor.
-     * @param Item|int|null $input
-     * @param Item|int|null $input2
-     * @param Item|int|null $result
-     * @param int $traderExp
-     * @param bool $rewardExp
-     * @param float $priceMultiplierA
-     * @param float $priceMultiplierB
-     * @param int $maxUses
-     * @param int $uses
-     */
-    public function __construct($input = null, $input2 = null, $result = null, int $traderExp = 0, bool $rewardExp = false, float $priceMultiplierA = 0, float $priceMultiplierB = 0, int $maxUses = 100, int $uses = 0){
+    
+    public function __construct(int|Item $input = null, int|Item $input2 = null, int|Item $result = null, int $traderExp = 0, bool $rewardExp = false, float $priceMultiplierA = 0, float $priceMultiplierB = 0, int $maxUses = 100, int $uses = 0){
         $this->traderExp = $traderExp;
         $this->rewardExp = $rewardExp;
         $this->priceMultiplierA = $priceMultiplierA;

@@ -3,7 +3,7 @@
 namespace CLADevs\VanillaX\inventories\actions;
 
 use CLADevs\VanillaX\inventories\types\EnchantInventory;
-use pocketmine\block\BlockLegacyIds;
+use CLADevs\VanillaX\inventories\utils\TypeConverterX;
 use pocketmine\inventory\transaction\action\InventoryAction;
 use pocketmine\inventory\transaction\TransactionValidationException;
 use pocketmine\item\Item;
@@ -20,10 +20,13 @@ class EnchantItemAction extends InventoryAction{
     }
 
     public function execute(Player $source): void{
-        $inv = $source->getCurrentWindow();
+        $inventory = $source->getCurrentWindow();
 
-        if($inv instanceof EnchantInventory && $this->targetItem->getId() === BlockLegacyIds::AIR && $this->sourceType === NetworkInventoryAction::SOURCE_TYPE_ENCHANT_OUTPUT){
-            $inv->onSuccess($source, $this->sourceItem);
+        if(!$inventory instanceof EnchantInventory){
+            throw new TransactionValidationException("Enchantment Inventory is not opened");
+        }
+        if($this->isResult()){
+            $inventory->onSuccess($source, $this->getSourceItem());
         }
     }
 
@@ -31,6 +34,18 @@ class EnchantItemAction extends InventoryAction{
         if(!$source->getCurrentWindow() instanceof EnchantInventory){
             throw new TransactionValidationException("Enchantment Inventory is not opened");
         }
+    }
+
+    public function isInput(): bool{
+        return $this->sourceType === TypeConverterX::SOURCE_TYPE_ENCHANT_INPUT;
+    }
+
+    public function isMaterial(): bool{
+        return $this->sourceType === TypeConverterX::SOURCE_TYPE_ENCHANT_MATERIAL;
+    }
+
+    public function isResult(): bool{
+        return $this->sourceType === NetworkInventoryAction::SOURCE_TYPE_ENCHANT_OUTPUT;
     }
 
     public function getType(): int{

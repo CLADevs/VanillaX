@@ -2,9 +2,9 @@
 
 namespace CLADevs\VanillaX\blocks\tile;
 
-use CLADevs\VanillaX\blocks\utils\TileVanilla;
+use CLADevs\VanillaX\blocks\TileIds;
 use CLADevs\VanillaX\entities\EntityManager;
-use CLADevs\VanillaX\entities\utils\EntityIdentifierX;
+use CLADevs\VanillaX\entities\utils\EntityIdentifier;
 use pocketmine\block\BlockLegacyIds;
 use pocketmine\block\tile\Spawnable;
 use pocketmine\nbt\tag\CompoundTag;
@@ -13,7 +13,7 @@ use pocketmine\Server;
 
 class MobSpawnerTile extends Spawnable{
 
-    const TILE_ID = TileVanilla::MOB_SPAWNER;
+    const TILE_ID = TileIds::MOB_SPAWNER;
     const TILE_BLOCK = BlockLegacyIds::MOB_SPAWNER;
 
     const TAG_ENTITY_ID = "EntityId";
@@ -34,7 +34,7 @@ class MobSpawnerTile extends Spawnable{
     private int $maxSpawnDelay = 800;
     private int $tick = 20;
 
-    private ?EntityIdentifierX $entity = null;
+    private ?EntityIdentifier $entity = null;
 
     public function getEntityId(): int{
         return $this->entityId;
@@ -56,7 +56,7 @@ class MobSpawnerTile extends Spawnable{
         }
     }
 
-    public function getEntity(): ?EntityIdentifierX{
+    public function getEntity(): ?EntityIdentifier{
         return $this->entity;
     }
 

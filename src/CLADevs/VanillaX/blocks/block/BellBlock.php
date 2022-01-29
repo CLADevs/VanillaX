@@ -2,7 +2,7 @@
 
 namespace CLADevs\VanillaX\blocks\block;
 
-use CLADevs\VanillaX\blocks\utils\facing\FacingPlayerHorizontallyTrait;
+use CLADevs\VanillaX\blocks\utils\FacingPlayerHorizontallyTrait;
 use pocketmine\block\BlockBreakInfo;
 use pocketmine\block\BlockIdentifier;
 use pocketmine\block\BlockLegacyIds;
