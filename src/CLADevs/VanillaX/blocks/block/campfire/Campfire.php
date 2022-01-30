@@ -43,18 +43,19 @@ class Campfire extends Opaque implements NonAutomaticCallItemTrait{
     public function onScheduledUpdate(): void{
         $tile = $this->position->getWorld()->getTile($this->position);
 
-        if($tile instanceof CampfireTile && !$tile->closed){
-            foreach($tile->getContents() as $slot => $item){
-                $tile->increaseSlotTime($slot);
+        if(!$tile instanceof CampfireTile || $tile->isClosed()){
+            return;
+        }
+        foreach($tile->getContents() as $slot => $item){
+            $tile->increaseSlotTime($slot);
 
-                if($tile->getItemTime($slot) >= CampfireTile::MAX_COOK_TIME){
-                    $tile->setItem(ItemFactory::air(), $slot);
-                    $tile->setSlotTime($slot, 0);
-                    $this->position->world->setBlock($this->position, $this);
+            if($tile->getItemTime($slot) >= CampfireTile::MAX_COOK_TIME){
+                $tile->setItem(ItemFactory::air(), $slot);
+                $tile->setSlotTime($slot, 0);
+                $this->position->world->setBlock($this->position, $this);
 
-                    $result = ItemFactory::getInstance()->get($tile->getRecipes()[$item->getId()] ?? $item->getId());
-                    $this->position->getWorld()->dropItem($this->position->add(0, 1, 0), $result);
-                }
+                $result = ItemFactory::getInstance()->get($tile->getRecipes()[$item->getId()] ?? $item->getId());
+                $this->position->getWorld()->dropItem($this->position->add(0, 1, 0), $result);
             }
         }
         $this->position->getWorld()->scheduleDelayedBlockUpdate($this->position, 20);

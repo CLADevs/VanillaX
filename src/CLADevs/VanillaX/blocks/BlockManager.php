@@ -6,6 +6,7 @@ use CLADevs\VanillaX\blocks\block\campfire\Campfire;
 use CLADevs\VanillaX\blocks\block\CommandBlock;
 use CLADevs\VanillaX\blocks\block\FlowerPotBlock;
 use CLADevs\VanillaX\blocks\block\HopperBlock;
+use CLADevs\VanillaX\blocks\block\nylium\Nylium;
 use CLADevs\VanillaX\blocks\tile\campfire\RegularCampfireTile;
 use CLADevs\VanillaX\blocks\tile\campfire\SoulCampfireTile;
 use CLADevs\VanillaX\blocks\tile\FlowerPotTile;
@@ -74,9 +75,8 @@ class BlockManager{
         $method = new ReflectionMethod(RuntimeBlockMapping::class, "registerMapping");
         $method->setAccessible(true);
 
-        $blockIdMap = json_decode(file_get_contents(BEDROCK_DATA_PATH . 'block_id_map.json'), true);
+        $blockIdMap = json_decode(file_get_contents(BEDROCK_DATA_PATH . "block_id_map.json"), true);
         $metaMap = [];
-
         foreach($instance->getBedrockKnownStates() as $runtimeId => $nbt){
             $mcpeName = $nbt->getString("name");
             $meta = isset($metaMap[$mcpeName]) ? ($metaMap[$mcpeName] + 1) : 0;
@@ -142,11 +142,7 @@ class BlockManager{
                         return;
                     }
                 }
-                if(self::registerBlock(($class = new $namespace()), true, !$rc->implementsInterface(NonAutomaticCallItemTrait::class)) && $class instanceof Block && $class->ticksRandomly()){
-                    foreach(Server::getInstance()->getWorldManager()->getWorlds() as $world){
-                        $world->addRandomTickedBlock($class);
-                    }
-                }
+                self::registerBlock(new $namespace(), true, !$rc->implementsInterface(NonAutomaticCallItemTrait::class));
             }
         });
         $this->registerFlowerPot();
@@ -166,7 +162,7 @@ class BlockManager{
             self::registerBlock(new HopperBlock($meta));
         });
 
-        self::registerBlock(new Block(new BlockIdentifier(BlockLegacyIds::SLIME_BLOCK, 0), "Slime", new BlockBreakInfo(0)));
+        self::registerBlock(new Block(new BlockIdentifier(BlockLegacyIds::SLIME_BLOCK, 0), "Slime", BlockBreakInfo::instant()));
         self::registerBlock(new Block(new BlockIdentifier(BlockIds::ANCIENT_DEBRIS, 0, LegacyItemIds::ANCIENT_DEBRIS), "Ancient Debris", new BlockBreakInfo(5.0, BlockToolType::PICKAXE, ToolTier::WOOD()->getHarvestLevel(), 6000.0)));
     }
 
@@ -184,8 +180,8 @@ class BlockManager{
     }
 
     private function registerNylium(): void{
-        self::registerBlock(new Block(new BlockIdentifier(BlockIds::CRIMSON_NYLIUM, 0, LegacyItemIds::CRIMSON_NYLIUM), "Crimson Nylium", new BlockBreakInfo(0.4, BlockToolType::PICKAXE, 0, 1)));
-        self::registerBlock(new Block(new BlockIdentifier(BlockIds::WARPED_NYLIUM, 0, LegacyItemIds::WARPED_NYLIUM), "Warped Nylium", new BlockBreakInfo(0.4, BlockToolType::PICKAXE, 0, 1)));
+        self::registerBlock(new Nylium(new BlockIdentifier(BlockIds::CRIMSON_NYLIUM, 0, LegacyItemIds::CRIMSON_NYLIUM), "Crimson Nylium", new BlockBreakInfo(0.4, BlockToolType::PICKAXE, 0, 1)));
+        self::registerBlock(new Nylium(new BlockIdentifier(BlockIds::WARPED_NYLIUM, 0, LegacyItemIds::WARPED_NYLIUM), "Warped Nylium", new BlockBreakInfo(0.4, BlockToolType::PICKAXE, 0, 1)));
     }
 
     private function registerRoots(): void{
@@ -259,6 +255,9 @@ class BlockManager{
             }, $creativeItem, true);
         }elseif(!CreativeInventory::getInstance()->contains($item)){
             CreativeInventory::getInstance()->add($item);
+        }
+        foreach(Server::getInstance()->getWorldManager()->getWorlds() as $world){
+            $world->addRandomTickedBlock($block);
         }
         return true;
     }

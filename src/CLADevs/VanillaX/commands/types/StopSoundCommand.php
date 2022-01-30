@@ -4,9 +4,9 @@ namespace CLADevs\VanillaX\commands\types;
 
 use CLADevs\VanillaX\commands\Command;
 use CLADevs\VanillaX\commands\utils\CommandArgs;
+use CLADevs\VanillaX\commands\utils\CommandOverload;
 use CLADevs\VanillaX\commands\utils\CommandTargetSelector;
 use pocketmine\command\CommandSender;
-use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
 use pocketmine\network\mcpe\protocol\StopSoundPacket;
 use pocketmine\network\mcpe\protocol\types\PlayerPermissions;
 use pocketmine\player\Player;
@@ -16,10 +16,12 @@ class StopSoundCommand extends Command{
     public function __construct(){
         parent::__construct("stopsound", "Stops a sound.");
         $this->setPermission("stopsound.command");
-        $this->commandArg = new CommandArgs(CommandArgs::FLAG_NORMAL, PlayerPermissions::MEMBER);
-        $this->commandArg->addParameter(0, "player", AvailableCommandsPacket::ARG_TYPE_TARGET);
-        $this->commandArg->addParameter(0, "sound", AvailableCommandsPacket::ARG_TYPE_STRING, false);
+        $this->commandArg = new CommandArgs(PlayerPermissions::MEMBER);
 
+        $overload = new CommandOverload();
+        $overload->addTarget("player");
+        $overload->addString("sound", false);
+        $this->commandArg->addOverload($overload);
     }
 
     public function execute(CommandSender $sender, string $commandLabel, array $args): void{
@@ -34,10 +36,7 @@ class StopSoundCommand extends Command{
 
         foreach($players as $player){
             if($player instanceof Player){
-                $pk = new StopSoundPacket();
-                $pk->soundName = $sound;
-                $pk->stopAll = false;
-                $player->getNetworkSession()->sendDataPacket($pk);
+                $player->getNetworkSession()->sendDataPacket(StopSoundPacket::create($sound, false));
                 $sender->sendMessage("Stopped sound '$sound' for " . $player->getName());
             }
         }

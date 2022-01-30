@@ -4,7 +4,6 @@ namespace CLADevs\VanillaX\blocks\utils;
 
 use CLADevs\VanillaX\blocks\block\CommandBlock;
 use InvalidArgumentException;
-use pocketmine\block\Block;
 use pocketmine\block\BlockLegacyIds;
 use pocketmine\utils\EnumTrait;
 
@@ -73,7 +72,7 @@ final class CommandBlockType{
         $this->mode = $mode;
     }
 
-    public function isNormal(): bool{
+    public function isImpulse(): bool{
         return $this->blockId === BlockLegacyIds::COMMAND_BLOCK;
     }
 

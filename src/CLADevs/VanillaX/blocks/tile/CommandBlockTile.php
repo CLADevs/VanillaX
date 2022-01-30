@@ -5,7 +5,6 @@ namespace CLADevs\VanillaX\blocks\tile;
 use CLADevs\VanillaX\blocks\block\CommandBlock;
 use CLADevs\VanillaX\blocks\TileIds;
 use CLADevs\VanillaX\blocks\utils\CommandBlockType;
-use CLADevs\VanillaX\commands\sender\CommandBlockSender;
 use Exception;
 use pocketmine\block\BlockFactory;
 use pocketmine\block\BlockLegacyIds;
@@ -13,20 +12,15 @@ use pocketmine\block\tile\Nameable;
 use pocketmine\block\tile\NameableTrait;
 use pocketmine\block\tile\Spawnable;
 use pocketmine\nbt\tag\CompoundTag;
-use pocketmine\nbt\tag\ListTag;
-use pocketmine\nbt\tag\Tag;
 use pocketmine\network\mcpe\protocol\CommandBlockUpdatePacket;
-use pocketmine\Server;
+use pocketmine\permission\DefaultPermissions;
+use pocketmine\player\Player;
 
 class CommandBlockTile extends Spawnable implements Nameable{
     use NameableTrait;
 
-    const TILE_ID = TileIds::COMMAND_BLOCK;
-    const TILE_BLOCK = [BlockLegacyIds::COMMAND_BLOCK, BlockLegacyIds::CHAIN_COMMAND_BLOCK, BlockLegacyIds::REPEATING_COMMAND_BLOCK];
-
-    /** VANILLA TAGS */
     const TAG_COMMAND = "Command";
-    const TAG_EXECUTE_ON_FIRE_TICK = "ExecuteOnFirstTick";
+    const TAG_EXECUTE_ON_FIRST_TICK = "ExecuteOnFirstTick";
     const TAG_LOOP_COMMAND_MODE = "LPCommandMode";
     const TAG_LOOP_CONDITIONAL_MODE = "LPCondionalMode";
     const TAG_LOOP_REDSTONE_MODE = "LPRedstoneMode";
@@ -41,26 +35,143 @@ class CommandBlockTile extends Spawnable implements Nameable{
     const TAG_CONDITIONAL_MODE = "conditionalMode";
     const TAG_RAN_COMMAND = "hasRanCommand";
 
-    /** @var Tag[] */
-    private array $lastOutputParam = [];
-
-    private int $lastExecution = 0;
-    private int $successCount = 0;
-    private int $tickDelay = 0;
-    private int $countDelayTick = 0;
+    const TILE_ID = TileIds::COMMAND_BLOCK;
+    const TILE_BLOCK = [BlockLegacyIds::COMMAND_BLOCK, BlockLegacyIds::CHAIN_COMMAND_BLOCK, BlockLegacyIds::REPEATING_COMMAND_BLOCK];
 
     private string $command = "";
     private string $lastOutput = "";
 
+    private int $tickDelay = 0;
+
+    private bool $isRedstoneMode = true;
+    private bool $isConditional = false;
     private bool $executeOnFirstTick = false;
-    private bool $LPCommandMode = false;
-    private bool $LPConditionalMode = false;
-    private bool $LPRedstoneMode = false;
     private bool $shouldTrackOutput = true;
-    private bool $auto = false;
-    private bool $conditionMet = false;
-    private bool $conditionalMode = false;
     private bool $ranCommand = false;
+
+    /**
+     * @throws Exception
+     */
+    public function handleCommandBlockUpdate(Player $player, CommandBlockUpdatePacket $packet): void{
+        if($packet->isBlock && $player->hasPermission(DefaultPermissions::ROOT_OPERATOR)){
+            $this->customName = $packet->name;
+            $this->lastOutput = $packet->lastOutput;
+            $this->tickDelay = $packet->tickDelay;
+            $this->isConditional = $packet->isConditional;
+            $this->executeOnFirstTick = $packet->executeOnFirstTick;
+            $this->shouldTrackOutput = $packet->shouldTrackOutput;
+
+            if(($value = $packet->command) !== $this->command){
+                $this->command = $value;
+            }
+            if(($value = $packet->isRedstoneMode) !== $this->isRedstoneMode){
+                $this->isRedstoneMode = $value;
+                if($value) $this->clearOldRanCommands();
+            }
+            $newType = CommandBlockType::fromMode($packet->commandBlockMode);
+            if(!$newType->equals($this->getType())){
+                $this->getPosition()->getWorld()->setBlock($this->getPosition(), BlockFactory::getInstance()->get($newType->getBlockId(), $this->getBlock()->getMeta()));
+                $this->clearOldRanCommands();
+            }
+            $this->position->getWorld()->scheduleDelayedBlockUpdate($this->position, 1);
+            $this->setDirty();
+            $this->position->getWorld()->setBlock($this->position, $this->getBlock());
+        }
+    }
+
+    public function readSaveData(CompoundTag $nbt): void{
+        $this->loadName($nbt);
+
+        foreach($nbt->getValue() as $name => $tag){
+            $value = $tag->getValue();
+
+            switch($name){
+                case self::TAG_COMMAND:
+                    $this->command = $value;
+                    break;
+                case self::TAG_LAST_OUTPUT:
+                    $this->lastOutput = $value;
+                    break;
+                case self::TAG_TICK_DELAY:
+                    $this->tickDelay = $value;
+                    break;
+                case self::TAG_AUTO:
+                    $this->isRedstoneMode = (bool)$value;
+                    break;
+                case self::TAG_CONDITIONAL_MODE:
+                    $this->isConditional = (bool)$value;
+                    break;
+                case self::TAG_EXECUTE_ON_FIRST_TICK:
+                    $this->executeOnFirstTick = (bool)$value;
+                    break;
+                case self::TAG_TRACK_OUTPUT:
+                    $this->shouldTrackOutput = (bool)$value;
+                    break;
+                case self::TAG_RAN_COMMAND:
+                    $this->ranCommand = (bool)$value;
+                    break;
+            }
+        }
+    }
+
+    protected function writeSaveData(CompoundTag $nbt): void{
+        $this->addAdditionalSpawnData($nbt);
+        $nbt->setByte(self::TAG_RAN_COMMAND, $this->ranCommand);
+    }
+
+    protected function addAdditionalSpawnData(CompoundTag $nbt): void{
+        $this->saveName($nbt);
+        $nbt->setString(self::TAG_COMMAND, $this->command);
+        $nbt->setString(self::TAG_LAST_OUTPUT, $this->lastOutput);
+        $nbt->setInt(self::TAG_TICK_DELAY, $this->tickDelay);
+        $nbt->setByte(self::TAG_AUTO, !$this->isRedstoneMode);
+        $nbt->setByte(self::TAG_CONDITIONAL_MODE, $this->isConditional);
+        $nbt->setByte(self::TAG_EXECUTE_ON_FIRST_TICK, $this->executeOnFirstTick);
+        $nbt->setByte(self::TAG_TRACK_OUTPUT, $this->shouldTrackOutput);
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function clearOldRanCommands(): void{
+        $this->setRanCommand(false);
+        $this->getCommandBlock()->clearTickDelay();
+    }
+
+    public function setRanCommand(bool $ranCommand): void{
+        $this->ranCommand = $ranCommand;
+    }
+
+    public function setLastOutput(string $lastOutput): void{
+        $this->lastOutput = $lastOutput;
+    }
+
+    public function getTickDelay(): int{
+        return $this->tickDelay;
+    }
+
+    public function getCommand(): string{
+        return $this->command;
+    }
+
+    /**
+     * @return bool
+     * @throws Exception
+     */
+    public function canRun(): bool{
+        //TODO chain
+        switch($this->getType()->name()){
+            case CommandBlockType::IMPULSE()->name():
+                if($this->isRedstoneMode){
+                    //TODO redstone
+                    return false;
+                }
+                return !$this->ranCommand;
+            case CommandBlockType::REPEAT()->name():
+                return !$this->isRedstoneMode;
+        }
+        return false;
+    }
 
     public function getDefaultName(): string{
         return "";
@@ -69,183 +180,19 @@ class CommandBlockTile extends Spawnable implements Nameable{
     /**
      * @throws Exception
      */
-    public function runCommand(): void{
-        if(strlen($this->command) > 0){
-            if($this->ranCommand){
-                return;
-            }
-            $sender = new CommandBlockSender(Server::getInstance(), Server::getInstance()->getLanguage());
-            if(Server::getInstance()->dispatchCommand($sender, $this->command)){
-                $this->successCount++;
-            }
-            $this->lastOutput = $sender->getMessage();
-
-            if(!$this->getType()->isRepeating()){
-                $this->ranCommand = true;
-            }
-        }
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function handleCommandBlockUpdateReceive(CommandBlockUpdatePacket $pk): void{
-        $newType = CommandBlockType::fromMode($pk->commandBlockMode);
-
-        if(!$this->getType()->equals($newType)){
-            $this->ranCommand = false;
-            $originalBlock = $this->getBlock();
-            /** @var CommandBlock $block */
-            $block = BlockFactory::getInstance()->get($newType->getBlockId(), $originalBlock->getMeta());
-
-            if($originalBlock instanceof CommandBlock){
-                $block->setFacing($originalBlock->getFacing());
-            }
-            $this->getPosition()->getWorld()->setBlock($this->getPosition(), $block);
-        }
-        if($pk->name !== $this->getName()){
-            $this->setName($pk->name);
-        }
-        if($pk->command !== $this->command){
-            $this->command = $pk->command;
-        }
-        if($pk->executeOnFirstTick !== $this->executeOnFirstTick){
-            $this->executeOnFirstTick = $pk->executeOnFirstTick;
-        }
-        if($pk->lastOutput !== $this->lastOutput){
-            $this->lastOutput = $pk->lastOutput;
-        }
-        if($pk->tickDelay !== $this->tickDelay){
-            $this->tickDelay = $pk->tickDelay;
-        }
-        if($pk->shouldTrackOutput !== $this->shouldTrackOutput){
-            $this->shouldTrackOutput = $pk->shouldTrackOutput;
-        }
-        if($pk->isRedstoneMode !== $this->auto){
-            $this->auto = $pk->isRedstoneMode;
-        }
-        if($pk->isConditional !== $this->conditionalMode){
-            $this->conditionalMode = $pk->isConditional;
-            /** @var CommandBlock $originalBlock */
-            $originalBlock = $this->getBlock();
-            $block = BlockFactory::getInstance()->get($this->getType()->getBlockId(), 0);
-
-            if($block instanceof CommandBlock){
-                $block->setFacing($originalBlock->getFacing() + ($pk->isConditional ? 8 : -8));
-            }
-            $this->getPosition()->getWorld()->setBlock($this->getPosition(), $block);
-        }
-        if($this->tickDelay == 0 && strlen($this->command) >= 1){
-            $this->runCommand();
-        }
-        $this->position->getWorld()->scheduleDelayedBlockUpdate($this->position, 1);
-        $this->setDirty();
-        $this->position->getWorld()->setBlock($this->position, $this->getBlock());
-    }
-
-    protected function writeSaveData(CompoundTag $nbt): void{
-        $this->saveName($nbt);
-        $nbt->setString(self::TAG_COMMAND, $this->command);
-        $nbt->setInt(self::TAG_EXECUTE_ON_FIRE_TICK, $this->executeOnFirstTick);
-        $nbt->setInt(self::TAG_LAST_EXECUTION, $this->lastExecution);
-        $nbt->setInt(self::TAG_SUCCESS_COUNT, $this->successCount);
-        $nbt->setInt(self::TAG_TICK_DELAY, $this->tickDelay);
-        $nbt->setInt(self::TAG_TRACK_OUTPUT, $this->shouldTrackOutput);
-        $nbt->setInt(self::TAG_AUTO, $this->auto);
-        $nbt->setInt(self::TAG_CONDITION_MET, $this->conditionMet);
-        $nbt->setInt(self::TAG_CONDITIONAL_MODE, $this->conditionalMode);
-        $nbt->setInt(self::TAG_RAN_COMMAND, $this->ranCommand);
-    }
-
-    public function readSaveData(CompoundTag $nbt): void{
-        $this->loadName($nbt);
-        if(($tag = $nbt->getTag(self::TAG_COMMAND)) !== null){
-            $this->command = $tag->getValue();
-        }
-        if(($tag = $nbt->getTag(self::TAG_EXECUTE_ON_FIRE_TICK)) !== null){
-            $this->executeOnFirstTick = boolval($tag->getValue());
-        }
-        if(($tag = $nbt->getTag(self::TAG_LAST_EXECUTION)) !== null){
-            $this->lastExecution = $tag->getValue();
-        }
-        if(($tag = $nbt->getTag(self::TAG_SUCCESS_COUNT)) !== null){
-            $this->successCount = $tag->getValue();
-        }
-        if(($tag = $nbt->getTag(self::TAG_TICK_DELAY)) !== null){
-            $this->tickDelay = $tag->getValue();
-        }
-        if(($tag = $nbt->getTag(self::TAG_TRACK_OUTPUT)) !== null){
-            $this->shouldTrackOutput = boolval($tag->getValue());
-        }
-        if(($tag = $nbt->getTag(self::TAG_AUTO)) !== null){
-            $this->auto = boolval($tag->getValue());
-        }
-        if(($tag = $nbt->getTag(self::TAG_CONDITION_MET)) !== null){
-            $this->conditionMet = boolval($tag->getValue());
-        }
-        if(($tag = $nbt->getTag(self::TAG_CONDITIONAL_MODE)) !== null){
-            $this->conditionalMode = boolval($tag->getValue());
-        }
-        if(($tag = $nbt->getTag(self::TAG_RAN_COMMAND)) !== null){
-            $this->ranCommand = boolval($tag->getValue());
-        }
-        $this->setDirty();
-        $this->position->getWorld()->setBlock($this->position, $this->getBlock());
-    }
-
-    protected function addAdditionalSpawnData(CompoundTag $nbt): void{
-        $nbt->setString(Nameable::TAG_CUSTOM_NAME, $this->getName());
-        $nbt->setString(self::TAG_COMMAND, $this->command);
-        $nbt->setByte(self::TAG_EXECUTE_ON_FIRE_TICK, intval($this->executeOnFirstTick));
-        $nbt->setByte(self::TAG_LOOP_COMMAND_MODE, intval($this->LPCommandMode));
-        $nbt->setByte(self::TAG_LOOP_CONDITIONAL_MODE, intval($this->LPConditionalMode));
-        $nbt->setByte(self::TAG_LOOP_REDSTONE_MODE, intval($this->LPRedstoneMode));
-        $nbt->setInt(self::TAG_LAST_EXECUTION, $this->lastExecution);
-        $nbt->setString(self::TAG_LAST_OUTPUT, $this->lastOutput);
-        if(count($this->lastOutputParam) >= 1){
-            $nbt->setTag(self::TAG_LAST_OUTPUT_PARAMS, new ListTag($this->lastOutputParam));
-        }
-        $nbt->setInt(self::TAG_SUCCESS_COUNT, $this->successCount);
-        $nbt->setInt(self::TAG_TICK_DELAY, $this->tickDelay);
-        $nbt->setByte(self::TAG_TRACK_OUTPUT, intval($this->shouldTrackOutput));
-        $nbt->setByte(self::TAG_AUTO, intval($this->auto));
-        $nbt->setByte(self::TAG_CONDITION_MET, intval($this->conditionMet));
-        $nbt->setByte(self::TAG_CONDITIONAL_MODE, intval($this->conditionalMode));
-    }
-
-    /**
-     * @throws Exception
-     */
     public function getType(): CommandBlockType{
+        return $this->getCommandBlock()->getType();
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function getCommandBlock(): CommandBlock{
         $block = $this->getBlock();
 
         if($block instanceof CommandBlock){
-            return $block->getType();
+            return $block;
         }
-        throw new Exception("Invalid command block type");
-    }
-
-    public function getTickDelay(): int{
-        return $this->tickDelay;
-    }
-
-    public function getCountDelayTick(): int{
-        return $this->countDelayTick;
-    }
-
-    public function setCountDelayTick(int $countDelayTick): void{
-        $this->countDelayTick = $countDelayTick;
-    }
-
-    public function decreaseCountDelayTick(): void{
-        $this->countDelayTick--;
-    }
-
-    public function hasRanCommand(): bool{
-        return $this->ranCommand;
-    }
-
-    public function setRanCommand(bool $ranCommand): void{
-        $this->ranCommand = $ranCommand;
+        throw new Exception("Command Block cannot be found");
     }
 }

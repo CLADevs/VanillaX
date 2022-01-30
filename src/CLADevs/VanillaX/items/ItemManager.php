@@ -119,7 +119,6 @@ class ItemManager{
     
     public static function register(Item $item, bool $creative = false, bool $overwrite = true): bool{
         if(!ItemFeature::getInstance()->isItemEnabled($item)){
-            var_dump(ItemFeature::getInstance()->getItemIdMap()[$item->getId()]);
             return false;
         }
         if(isset(class_uses($item)[RecipeItemTrait::class])){

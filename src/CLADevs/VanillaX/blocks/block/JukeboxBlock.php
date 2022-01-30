@@ -46,7 +46,7 @@ class JukeboxBlock extends Opaque{
     public function onScheduledUpdate(): void{
         $tile = $this->position->getWorld()->getTile($this->position);
 
-        if($tile->isClosed() || !$tile instanceof JukeboxTile){
+        if(!$tile instanceof JukeboxTile || $tile->isClosed()){
             return;
         }
         if($tile->getRecordItem() !== null && !$tile->isFinishedPlaying()){

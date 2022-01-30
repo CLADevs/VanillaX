@@ -23,6 +23,7 @@ use CLADevs\VanillaX\session\SessionManager;
 use CLADevs\VanillaX\utils\instances\InteractButtonResult;
 use CLADevs\VanillaX\utils\item\InteractButtonItemTrait;
 use CLADevs\VanillaX\VanillaX;
+use Exception;
 use pocketmine\block\VanillaBlocks;
 use pocketmine\data\java\GameModeIdMap;
 use pocketmine\inventory\transaction\action\InventoryAction;
@@ -155,17 +156,17 @@ class InGamePacketHandlerX extends InGamePacketHandler{
         return parent::handlePlayerAction($packet);
     }
 
+    /**
+     * @throws Exception
+     */
     public function handleCommandBlockUpdate(CommandBlockUpdatePacket $packet): bool{
         $player = $this->session->getPlayer();
+        $position = new Position($packet->blockPosition->getX(), $packet->blockPosition->getY(), $packet->blockPosition->getZ(), $player->getWorld());
+        $tile = $position->getWorld()->getTile($position);
 
-        if($player->hasPermission(DefaultPermissions::ROOT_OPERATOR)){
-            $position = new Position($packet->blockPosition->getX(), $packet->blockPosition->getY(), $packet->blockPosition->getZ(), $player->getWorld());
-            $tile = $position->getWorld()->getTile($position);
-
-            if($tile instanceof CommandBlockTile){
-                $tile->handleCommandBlockUpdateReceive($packet);
-                return true;
-            }
+        if($tile instanceof CommandBlockTile){
+            $tile->handleCommandBlockUpdate($player, $packet);
+            return true;
         }
         return true;
     }

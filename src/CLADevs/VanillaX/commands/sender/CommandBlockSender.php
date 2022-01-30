@@ -7,7 +7,7 @@ use pocketmine\lang\Translatable;
 
 class CommandBlockSender extends ConsoleCommandSender{
 
-    private string $messages = "";
+    private string $output = "";
 
     public function sendMessage(Translatable|string $message): void{
         if($message instanceof Translatable){
@@ -15,14 +15,14 @@ class CommandBlockSender extends ConsoleCommandSender{
         }else{
             $message = $this->getLanguage()->translateString($message);
         }
-        $this->messages .= trim($message, "\r\n") . "\n";
-    }
-
-    public function getMessage(): string{
-        return $this->messages;
+        $this->output .= trim($message, "\r\n") . "\n";
     }
 
     public function getName(): string{
         return "Command Block";
+    }
+
+    public function getOutput(): string{
+        return $this->output;
     }
 }

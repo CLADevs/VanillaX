@@ -4,13 +4,14 @@ namespace CLADevs\VanillaX\commands\types;
 
 use CLADevs\VanillaX\commands\Command;
 use CLADevs\VanillaX\commands\utils\CommandArgs;
+use CLADevs\VanillaX\commands\utils\CommandOverload;
 use CLADevs\VanillaX\configuration\Setting;
 use CLADevs\VanillaX\world\gamerule\GameRule;
 use CLADevs\VanillaX\world\gamerule\GameRuleManager;
 use pocketmine\command\CommandSender;
-use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
 use pocketmine\network\mcpe\protocol\GameRulesChangedPacket;
 use pocketmine\network\mcpe\protocol\types\BoolGameRule;
+use pocketmine\network\mcpe\protocol\types\command\CommandEnum;
 use pocketmine\network\mcpe\protocol\types\IntGameRule;
 use pocketmine\network\mcpe\protocol\types\PlayerPermissions;
 use pocketmine\player\Player;
@@ -30,16 +31,17 @@ class GameruleCommand extends Command{
                 $boolGameRules[] = strtolower($rule->getName());
             }
         }
-        $this->commandArg = new CommandArgs(CommandArgs::FLAG_NORMAL, PlayerPermissions::MEMBER);
-        /** First Column */
-        $key = $this->commandArg->addParameter(0, "rule", AvailableCommandsPacket::ARG_FLAG_ENUM | AvailableCommandsPacket::ARG_TYPE_STRING, false);
-        $this->commandArg->setEnum(0, $key, "BoolGameRule", $boolGameRules);
+        $this->commandArg = new CommandArgs(PlayerPermissions::MEMBER);
 
-        $this->commandArg->addParameter(0, "value", AvailableCommandsPacket::ARG_FLAG_ENUM | AvailableCommandsPacket::ARG_TYPE_WILDCARD_INT, true, "Boolean", ["true", "false"]);
+        $overload = new CommandOverload();
+        $overload->addEnum("rule", new CommandEnum("BoolGameRule", $boolGameRules), false);
+        $overload->addEnum("value", new CommandEnum("Boolean", ["true", "false"]));
+        $this->commandArg->addOverload($overload);
 
-        /** Second Column */
-        $this->commandArg->addParameter(1, "rule", AvailableCommandsPacket::ARG_FLAG_ENUM | 0x21, false, "IntGameRule", $intGameRules);
-        $this->commandArg->addParameter(1, "value", AvailableCommandsPacket::ARG_TYPE_INT);
+        $overload = new CommandOverload();
+        $overload->addEnum("rule", new CommandEnum("IntGameRule", $intGameRules), false);
+        $overload->addInt("value");
+        $this->commandArg->addOverload($overload);
     }
 
     public function canRegister(): bool{

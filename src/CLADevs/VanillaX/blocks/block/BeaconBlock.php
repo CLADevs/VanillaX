@@ -37,7 +37,7 @@ class BeaconBlock extends Transparent{
     public function onScheduledUpdate(): void{
         $tile = $this->position->getWorld()->getTile($this->position);
 
-        if(!$tile instanceof BeaconTile){
+        if(!$tile instanceof BeaconTile || $tile->isClosed()){
             return;
         }
         $primary = $tile->getPrimary();

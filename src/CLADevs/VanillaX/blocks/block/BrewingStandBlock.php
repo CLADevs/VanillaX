@@ -39,7 +39,7 @@ class BrewingStandBlock extends BrewingStand{
     public function onScheduledUpdate(): void{
         $tile = $this->position->getWorld()->getTile($this->position);
 
-        if($tile->isClosed() || !$tile instanceof BrewingStandTile){
+        if(!$tile instanceof BrewingStandTile || $tile->isClosed()){
             return;
         }
         $inventory = $tile->getInventory();

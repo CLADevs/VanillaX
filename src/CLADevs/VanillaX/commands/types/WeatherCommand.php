@@ -4,10 +4,11 @@ namespace CLADevs\VanillaX\commands\types;
 
 use CLADevs\VanillaX\commands\Command;
 use CLADevs\VanillaX\commands\utils\CommandArgs;
+use CLADevs\VanillaX\commands\utils\CommandOverload;
 use CLADevs\VanillaX\configuration\Setting;
 use CLADevs\VanillaX\world\weather\WeatherManager;
 use pocketmine\command\CommandSender;
-use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
+use pocketmine\network\mcpe\protocol\types\command\CommandEnum;
 use pocketmine\network\mcpe\protocol\types\PlayerPermissions;
 use pocketmine\player\Player;
 use pocketmine\Server;
@@ -18,12 +19,16 @@ class WeatherCommand extends Command{
     public function __construct(){
         parent::__construct("weather", "Sets the weather.");
         $this->setPermission("weather.command");
-        $this->commandArg = new CommandArgs(CommandArgs::FLAG_NORMAL, PlayerPermissions::MEMBER);
-        /** First Column */
-        $this->commandArg->addParameter(0, "clear", AvailableCommandsPacket::ARG_FLAG_ENUM | 0x69 | 0x4, false, "rain: thunder", ["clear", "rain", "thunder"]);
-        $this->commandArg->addParameter(0, "duration", AvailableCommandsPacket::ARG_TYPE_INT);
-        /** Second Column */
-        $this->commandArg->addParameter(1, "query", AvailableCommandsPacket::ARG_FLAG_ENUM | 0x68 | 0x6, false, "WeatherQuery", ["query"]);
+        $this->commandArg = new CommandArgs(PlayerPermissions::MEMBER);
+
+        $overload = new CommandOverload();
+        $overload->addEnum("clear", new CommandEnum("rain: thunder", ["clear", "rain", "thunder"]), false);
+        $overload->addInt("duration");
+        $this->commandArg->addOverload($overload);
+
+        $overload = new CommandOverload();
+        $overload->addEnum("query", new CommandEnum("WeatherQuery", ["query"]), false);
+        $this->commandArg->addOverload($overload);
     }
 
     public function canRegister(): bool{
