@@ -5,6 +5,7 @@ namespace CLADevs\VanillaX\blocks;
 use CLADevs\VanillaX\blocks\block\campfire\Campfire;
 use CLADevs\VanillaX\blocks\block\CommandBlock;
 use CLADevs\VanillaX\blocks\block\FlowerPotBlock;
+use CLADevs\VanillaX\blocks\block\HopperBlock;
 use CLADevs\VanillaX\blocks\tile\campfire\RegularCampfireTile;
 use CLADevs\VanillaX\blocks\tile\campfire\SoulCampfireTile;
 use CLADevs\VanillaX\blocks\tile\FlowerPotTile;
@@ -158,7 +159,12 @@ class BlockManager{
         $this->registerDoors();
         $this->registerFence();
         $this->registerStairs();
-        $this->registerCommandBlock();
+        $this->registerMultipleMetaBlock(6, function (int $meta): void{
+            self::registerBlock(new CommandBlock(CommandBlockType::IMPULSE(), $meta));
+            self::registerBlock(new CommandBlock(CommandBlockType::REPEAT(), $meta));
+            self::registerBlock(new CommandBlock(CommandBlockType::CHAIN(), $meta));
+            self::registerBlock(new HopperBlock($meta));
+        });
 
         self::registerBlock(new Block(new BlockIdentifier(BlockLegacyIds::SLIME_BLOCK, 0), "Slime", new BlockBreakInfo(0)));
         self::registerBlock(new Block(new BlockIdentifier(BlockIds::ANCIENT_DEBRIS, 0, LegacyItemIds::ANCIENT_DEBRIS), "Ancient Debris", new BlockBreakInfo(5.0, BlockToolType::PICKAXE, ToolTier::WOOD()->getHarvestLevel(), 6000.0)));
@@ -224,11 +230,9 @@ class BlockManager{
         self::registerBlock(new Stair(new BlockIdentifier(BlockIds::WARPED_STAIRS, 0, LegacyItemIds::WARPED_STAIRS), "Warped Stairs", new BlockBreakInfo(3, BlockToolType::AXE, 0, 6)));
     }
 
-    private function registerCommandBlock(): void{
-        for($i = 0; $i < 6; $i++){
-            self::registerBlock(new CommandBlock(CommandBlockType::IMPULSE(), $i));
-            self::registerBlock(new CommandBlock(CommandBlockType::REPEAT(), $i));
-            self::registerBlock(new CommandBlock(CommandBlockType::CHAIN(), $i));
+    private function registerMultipleMetaBlock(int $max, callable $callable): void{
+        for($i = 0; $i < $max; $i++){
+            $callable($i);
         }
     }
 
@@ -270,7 +274,7 @@ class BlockManager{
             $blockId = [$blockId];
         }
         foreach($blockId as $id){
-            if($id !== BlockLegacyIds::AIR && in_array($id, VanillaX::getInstance()->getConfig()->getNested("disabled.blocks", []))){
+            if($id !== BlockLegacyIds::AIR && !BlockFeature::getInstance()->isBlockEnabled($id)){
                 return false;
             }
         }

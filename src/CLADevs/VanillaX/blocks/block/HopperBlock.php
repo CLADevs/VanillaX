@@ -3,6 +3,7 @@
 namespace CLADevs\VanillaX\blocks\block;
 
 use CLADevs\VanillaX\blocks\tile\HopperTile;
+use CLADevs\VanillaX\utils\item\NonAutomaticCallItemTrait;
 use pocketmine\block\Block;
 use pocketmine\block\BlockBreakInfo;
 use pocketmine\block\BlockIdentifier;
@@ -19,11 +20,13 @@ use pocketmine\math\Vector3;
 use pocketmine\player\Player;
 use pocketmine\world\BlockTransaction;
 
-class HopperBlock extends Transparent{
+class HopperBlock extends Transparent implements NonAutomaticCallItemTrait{
     use AnyFacingTrait;
 
-    public function __construct(){
-        parent::__construct(new BlockIdentifier(BlockLegacyIds::HOPPER_BLOCK, 0, ItemIds::HOPPER, HopperTile::class), "Hopper", new BlockBreakInfo(3, BlockToolType::PICKAXE, 0, 4.8));
+    private int $transferCooldown = 0;
+
+    public function __construct(int $meta = 0){
+        parent::__construct(new BlockIdentifier(BlockLegacyIds::HOPPER_BLOCK, $meta, ItemIds::HOPPER, HopperTile::class), "Hopper", new BlockBreakInfo(3, BlockToolType::PICKAXE, 0, 4.8));
     }
 
     public function place(BlockTransaction $tx, Item $item, Block $blockReplace, Block $blockClicked, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
@@ -33,6 +36,7 @@ class HopperBlock extends Transparent{
             Facing::SOUTH => Facing::NORTH,
             Facing::WEST => Facing::EAST,
             Facing::EAST => Facing::WEST,
+            default => $face
         };
         return parent::place($tx, $item, $blockReplace, $blockClicked, $face, $clickVector, $player);
     }
@@ -55,15 +59,16 @@ class HopperBlock extends Transparent{
     public function onScheduledUpdate(): void{
         $tile = $this->position->getWorld()->getTile($this->position);
 
-        if($tile->isClosed() || !$tile instanceof HopperTile){
+        if(!$tile instanceof HopperTile || $tile->isClosed()){
             return;
         }
         $inventory = $tile->getInventory();
         //Transfer items
         if(count($inventory->getContents()) >= 1){
-            $tile->decreaseTransferCooldown();
-            if($tile->getTransferCooldown() < 1){
-                $tile->setTransferCooldown(8);
+            $this->transferCooldown--;
+
+            if($this->transferCooldown < 1){
+                $this->transferCooldown = 8;
                 $tile->transferItems();
             }
         }

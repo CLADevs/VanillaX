@@ -24,6 +24,7 @@ class ArmorStandItem extends Item{
         $location->z += 0.5;
         $entity = new ArmorStandEntity($location);
         $entity->lookAt($player->getPosition());
+        $entity->spawnToAll();
         Session::playSound($player, "mob.armor_stand.place");
         if($player->isSurvival() || $player->isAdventure()) $this->pop();
         return ItemUseResult::SUCCESS();

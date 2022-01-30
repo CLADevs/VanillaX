@@ -72,22 +72,18 @@ class ArmorStandEntity extends Living implements InteractButtonItemTrait{
     protected function initEntity(CompoundTag $nbt): void{
         parent::initEntity($nbt);
         /** Main Hand */
-        if(($tag = $nbt->getTag(self::TAG_MAINHAND)) !== null){
-            $this->setMainHand(Item::nbtDeserialize($tag->getValue()));
+        if(($tag = $nbt->getTag(self::TAG_MAINHAND)) !== null && $tag instanceof CompoundTag){
+            $this->setMainHand(Item::nbtDeserialize($tag));
         }else{
             $this->mainHand = ItemFactory::air();
         }
 
         /** Armor */
         if(($tag = $nbt->getTag(self::TAG_ARMOR)) !== null){
-            $armorListener = $this->armorInventory->getListeners()->toArray();
-            $this->armorInventory->getListeners()->clear();
-
             /** @var CompoundTag $item */
-            foreach($tag as $i => $item){
+            foreach($tag as $item){
                 $this->armorInventory->setItem($item->getByte("Slot"), Item::nbtDeserialize($item));
             }
-            $this->armorInventory->getListeners()->add($armorListener);
         }
     }
     

@@ -23,9 +23,6 @@ use ContainerTrait;
     const TILE_ID = TileIds::HOPPER;
     const TILE_BLOCK = BlockLegacyIds::HOPPER_BLOCK;
 
-    private int $facing = -1;
-    private int $transferCooldown = 0;
-
     private HopperInventory $inventory;
 
     public function __construct(World $world, Vector3 $pos){
@@ -42,7 +39,7 @@ use ContainerTrait;
     }
 
     public function getFacingBlock(): Block{
-        return $this->getPosition()->getWorld()->getBlock($this->getPosition())->getSide($this->facing);
+        return $this->getBlock()->getSide($this->getBlock()->getMeta());
     }
 
     public function transferItems(): void{
@@ -78,20 +75,7 @@ use ContainerTrait;
         }
     }
 
-    public function getTransferCooldown(): int{
-        return $this->transferCooldown;
-    }
-
-    public function setTransferCooldown(int $transferCooldown): void{
-        $this->transferCooldown = $transferCooldown;
-    }
-
-    public function decreaseTransferCooldown(): void{
-        $this->transferCooldown--;
-    }
-
     public function readSaveData(CompoundTag $nbt): void{
-        $this->facing = $this->getPosition()->getWorld()->getBlock($this->position)->getMeta();
         $this->loadItems($nbt);
     }
 

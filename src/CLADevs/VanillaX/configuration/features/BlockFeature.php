@@ -22,8 +22,8 @@ class BlockFeature extends Feature{
         $this->blocks = $this->config->get("blocks", []);
     }
 
-    public function isBlockEnabled(Block $block): bool{
-        $vanillaName = $this->blockIdMap[$block->getId()] ?? null;
+    public function isBlockEnabled(Block|int $block): bool{
+        $vanillaName = $this->blockIdMap[$block instanceof Block ? $block->getId() : $block] ?? null;
 
         if($vanillaName === null){
             return false;
