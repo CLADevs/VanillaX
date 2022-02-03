@@ -28,46 +28,42 @@
 - Fence Gate (Warped & Crimson)
 - Slabs (Warped & Crimson)
 - Buttons (Warped & Crimson)
+- Pressure Plates (Warped & Crimson)
 - Doors (Warped & Crimson)
+- Trap Doors (Warped & Crimson)
 - Roots (Warped & Crimson)
 - Fungus (Warped & Crimson)
 - Planks (Warped & Crimson)
+- Stem (Warped & Crimson, stripped version too)
+- Hyphae (Warped & Crimson, stripped version too)
 - Trap Doors (Warped & Crimson)
 - Nylium (Warped & Crimson)
 - Chiseled (Polished Blackstone & Nether Bricks)
 - Cracked (Polished Blackstone & Nether Bricks)
 
 #### TODO Blocks Functionality:
+- Deepslate (Chiseled, Cracked)
+- Blackstone (Slab, Stairs, Wall, Polished, Cracked)
+- Soul (Fire, Soil, Torch, Lantern)
 - Cauldron
 - Dispenser
 - Dropper
 - Dragon Egg
-- Magma Block(pmmp collision box)
-- Chiseled Blocks (every)
-- Cracked Blocks (every)
-- Warped Blocks (every)
-- Slabs (every)
-- Trap Doors(every)
-- Stems (every)
-- Crimson (every)
-- Kelp (every)
-- Blackstone (every)
+- Warped Sign
+- Crimson Sign
 - Conduit
 - Smithing Table
 - Crying Obsidian
 - Cartography
 - Fletching
 - Honey Blocks
-- Lantern (Soul Too)
 - Lectern
 - Smithing
 - Smoker
 - Nether Gold Ore
 - Nether Sprouts
-- Soul (Fire, Soil, Torch)
 - Stonecutter Block
-- Stripped Blocks (every)
-- Sweet Berry (every)
+- Sweet Berry
 - Structure Block
 - Structure Void
 - Turtle Egg

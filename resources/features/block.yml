@@ -66,4 +66,21 @@ blocks:
   chain_command_block: true
   slime: true
   ancient_debris: true
+  composter: true
+  crimson_slab: true
+  warped_slab: true
+  crimson_button: true
+  warped_button: true
+  crimson_stem: true
+  stripped_crimson_stem: true
+  crimson_hyphae: true
+  stripped_crimson_hyphae: true
+  warped_stem: true
+  stripped_warped_stem: true
+  warped_hyphae: true
+  stripped_warped_hyphae: true
+  crimson_trapdoor: true
+  warped_trapdoor: true
+  crimson_pressure_plate: true
+  warped_pressure_plate: true
 ...

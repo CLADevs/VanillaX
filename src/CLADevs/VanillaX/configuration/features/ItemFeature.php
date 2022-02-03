@@ -36,6 +36,6 @@ class ItemFeature extends Feature{
         if($vanillaName === null){
             return false;
         }
-        return $this->items[$vanillaName] ?? false;
+        return $this->items[$vanillaName] ?? true;
     }
 }

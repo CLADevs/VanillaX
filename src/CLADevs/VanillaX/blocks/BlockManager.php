@@ -8,6 +8,7 @@ use CLADevs\VanillaX\blocks\block\CommandBlock;
 use CLADevs\VanillaX\blocks\block\ComposerBlock;
 use CLADevs\VanillaX\blocks\block\FlowerPotBlock;
 use CLADevs\VanillaX\blocks\block\HopperBlock;
+use CLADevs\VanillaX\blocks\block\log\NewLog;
 use CLADevs\VanillaX\blocks\block\nylium\Nylium;
 use CLADevs\VanillaX\blocks\block\slab\NewSlab;
 use CLADevs\VanillaX\blocks\tile\campfire\RegularCampfireTile;
@@ -35,6 +36,9 @@ use pocketmine\block\Planks;
 use pocketmine\block\Stair;
 use pocketmine\block\tile\TileFactory;
 use pocketmine\block\Transparent;
+use pocketmine\block\utils\TreeType;
+use pocketmine\block\WoodenPressurePlate;
+use pocketmine\block\WoodenTrapdoor;
 use pocketmine\inventory\CreativeInventory;
 use pocketmine\item\Item;
 use pocketmine\item\ItemIdentifier;
@@ -157,11 +161,15 @@ class BlockManager{
         $this->registerChiseled();
         $this->registerCracked();
         $this->registerPlanks();
+        $this->registerLogs();
         $this->registerDoors();
+        $this->registerTrapDoors();
         $this->registerFence();
         $this->registerStairs();
         $this->registerSlabs();
         $this->registerButtons();
+        $this->registerPressurePlates();
+
         $this->registerMultipleMetaBlock(6, function (int $meta): void{
             self::registerBlock(new CommandBlock(CommandBlockType::IMPULSE(), $meta));
             self::registerBlock(new CommandBlock(CommandBlockType::REPEAT(), $meta));
@@ -212,9 +220,29 @@ class BlockManager{
         self::registerBlock(new Planks(new BlockIdentifier(BlockIds::WARPED_PLANKS, 0, LegacyItemIds::WARPED_PLANKS), "Warped Planks", new BlockBreakInfo(2, BlockToolType::AXE, 0, 3)));
     }
 
+    private function registerLogs(): void{
+        //TODO treeType for Crimson & Warped
+        $breakInfo = new BlockBreakInfo(2.0, BlockToolType::AXE);
+        $this->registerAllMeta(new NewLog(new BlockIdentifier(BlockIds::CRIMSON_STEM, 0), "Crimson Stem", $breakInfo, TreeType::OAK(), false));
+        $this->registerAllMeta(new NewLog(new BlockIdentifier(BlockIds::STRIPPED_CRIMSON_STEM, 0), "Stripped Crimson Stem", $breakInfo, TreeType::OAK(), true));
+        $this->registerAllMeta(new NewLog(new BlockIdentifier(BlockIds::CRIMSON_HYPHAE, 0), "Crimson Hyphae", $breakInfo, TreeType::OAK(), false));
+        $this->registerAllMeta(new NewLog(new BlockIdentifier(BlockIds::STRIPPED_CRIMSON_HYPHAE, 0), "Stripped Crimson Hyphae", $breakInfo, TreeType::OAK(), true));
+
+        $this->registerAllMeta(new NewLog(new BlockIdentifier(BlockIds::WARPED_STEM, 0), "Warped Stem", $breakInfo, TreeType::OAK(), false));
+        $this->registerAllMeta(new NewLog(new BlockIdentifier(BlockIds::STRIPPED_WARPED_STEM, 0), "Stripped Warped Stem", $breakInfo, TreeType::OAK(), true));
+        $this->registerAllMeta(new NewLog(new BlockIdentifier(BlockIds::WARPED_HYPHAE, 0), "Warped Hyphae", $breakInfo, TreeType::OAK(), false));
+        $this->registerAllMeta(new NewLog(new BlockIdentifier(BlockIds::STRIPPED_WARPED_HYPHAE, 0), "Warped Crimson Hyphae", $breakInfo, TreeType::OAK(), true));
+    }
+
     private function registerDoors(): void{
         self::registerBlock(new Door(new BlockIdentifier(BlockIds::CRIMSON_DOOR, 0, LegacyItemIds::CRIMSON_DOOR), "Crimson Door", new BlockBreakInfo(3, BlockToolType::AXE)));
         self::registerBlock(new Door(new BlockIdentifier(BlockIds::WARPED_DOOR, 0, LegacyItemIds::WARPED_DOOR), "Warped Door", new BlockBreakInfo(3, BlockToolType::AXE)));
+    }
+
+    private function registerTrapDoors(): void{
+        $breakInfo = new BlockBreakInfo(3.0, BlockToolType::AXE, 0, 15.0);
+        $this->registerBlock(new WoodenTrapdoor(new BlockIdentifier(BlockIds::CRIMSON_TRAPDOOR, 0), "Crimson Trapdoor", $breakInfo));
+        $this->registerBlock(new WoodenTrapdoor(new BlockIdentifier(BlockIds::WARPED_TRAPDOOR, 0), "Warped Trapdoor", $breakInfo));
     }
 
     private function registerFence(): void{
@@ -244,6 +272,12 @@ class BlockManager{
         $breakInfo = new BlockBreakInfo(0.5, BlockToolType::AXE);
         $this->registerBlock(new NewWoodenButton(new BlockIdentifier(BlockIds::CRIMSON_BUTTON, 0), "Crimson Button", $breakInfo));
         $this->registerBlock(new NewWoodenButton(new BlockIdentifier(BlockIds::WARPED_BUTTON, 0), "Warped Button", $breakInfo));
+    }
+
+    private function registerPressurePlates(): void{
+        $breakInfo = new BlockBreakInfo(0.5, BlockToolType::AXE);
+        $this->registerBlock(new WoodenPressurePlate(new BlockIdentifier(BlockIds::CRIMSON_PRESSURE_PLATE, 0), "Crimson Pressure Plate", $breakInfo));
+        $this->registerBlock(new WoodenPressurePlate(new BlockIdentifier(BlockIds::WARPED_PRESSURE_PLATE, 0), "Warped Pressure Plate", $breakInfo));
     }
 
     private function registerAllMeta(Block $default, Block ...$additional) : void{
