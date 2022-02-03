@@ -29,6 +29,7 @@ interface LegacyItemIds{
     const CAMPFIRE = 720;
     const CAMERA = 242;
     const STRUCTURE_VOID = 217;
+    const NETHER_WART_BLOCK = 214;
     const BORDER_BLOCK = 212;
     const DENY = 211;
     const ALLOW = 210;

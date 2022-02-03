@@ -10,7 +10,7 @@
 - Anvil
 - Brewing Stand
 - Hopper
-- Command Block (80% done)
+- Command Block (WIP chain)
 - Beacon
 - Ancient Debris
 - Basalt
@@ -21,10 +21,13 @@
 - Warped Wart Block
 - Twisting Vines
 - Weeping Vines
+- Composter
 - Campfire (Soul & Regular)
 - Stairs (Warped, Blackstone & Crimson)
 - Fence (Warped & Crimson)
 - Fence Gate (Warped & Crimson)
+- Slabs (Warped & Crimson)
+- Buttons (Warped & Crimson)
 - Doors (Warped & Crimson)
 - Roots (Warped & Crimson)
 - Fungus (Warped & Crimson)

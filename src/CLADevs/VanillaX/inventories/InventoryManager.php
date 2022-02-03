@@ -3,6 +3,7 @@
 namespace CLADevs\VanillaX\inventories;
 
 use CLADevs\VanillaX\inventories\utils\TypeConverterX;
+use CLADevs\VanillaX\items\LegacyItemIds;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
@@ -85,14 +86,7 @@ class InventoryManager{
         return new PotionContainerChangeRecipe($inputId, $ingredientId, $outputId);
     }
 
-    /**
-     * @param PotionTypeRecipe|int $ingredientId
-     * @param int $ingredientMeta
-     * @param int $inputId
-     * @param int $inputMeta
-     * @return string
-     */
-    public function hashPotionType($ingredientId, int $ingredientMeta = 0, int $inputId = 0, int $inputMeta = 0): string{
+    public function hashPotionType(PotionTypeRecipe|int $ingredientId, int $ingredientMeta = 0, int $inputId = 0, int $inputMeta = 0): string{
         $recipe = $ingredientId;
 
         if($recipe instanceof PotionTypeRecipe){
@@ -104,12 +98,7 @@ class InventoryManager{
         return $ingredientId + $ingredientMeta + $inputId + $inputMeta;
     }
 
-    /**
-     * @param PotionContainerChangeRecipe|int $ingredientId
-     * @param int $inputId
-     * @return string
-     */
-    public function hashPotionContainer($ingredientId, int $inputId = 0): string{
+    public function hashPotionContainer(PotionContainerChangeRecipe|int $ingredientId, int $inputId = 0): string{
         $recipe = $ingredientId;
 
         if($recipe instanceof PotionContainerChangeRecipe){
@@ -119,11 +108,11 @@ class InventoryManager{
         return $ingredientId + $inputId;
     }
 
-    public static function getExpForFurnace(Item $ingredient): float{
+    public function getExpForFurnace(Item $ingredient): float{
         switch($ingredient->getId()){
             case ItemIds::DIAMOND_ORE:
             case ItemIds::GOLD_ORE:
-                case ItemIds::EMERALD_ORE;
+            case ItemIds::EMERALD_ORE;
                 return 1;
             case ItemIds::IRON_ORE:
                 return 0.7;
@@ -147,7 +136,7 @@ class InventoryManager{
             case ItemIds::LOG:
             case ItemIds::LOG2:
             case ItemIds::SPONGE:
-                if($ingredient === ItemIds::SPONGE && $ingredient->getMeta() !== 1){
+                if($ingredient->getId() === ItemIds::SPONGE && $ingredient->getMeta() !== 1){
                     break;
                 }
                 return 0.15;
@@ -168,4 +157,64 @@ class InventoryManager{
         }
         return 0;
     }
+
+    public function getComposterChance(Item $ingredient): int{
+        switch($ingredient->getId()){
+            case ItemIds::BEETROOT_SEEDS:
+            case ItemIds::DRIED_KELP:
+            case ItemIds::KELP;
+            case ItemIds::GRASS;
+            case ItemIds::LEAVES;
+            case ItemIds::MELON_SEEDS;
+            case ItemIds::PUMPKIN_SEEDS;
+            case ItemIds::SAPLING;
+            case ItemIds::SEAGRASS;
+            case ItemIds::SWEET_BERRIES;
+            case ItemIds::WHEAT_SEEDS;
+                return 30;
+            case ItemIds::CACTUS:
+            case ItemIds::DRIED_KELP_BLOCK:
+            case ItemIds::MELON_SLICE:
+            case ItemIds::SUGARCANE:
+            case ItemIds::TALL_GRASS:
+            case ItemIds::VINES:
+            case LegacyItemIds::WEEPING_VINES:
+            case LegacyItemIds::TWISTING_VINES:
+                return 50;
+            case ItemIds::APPLE:
+            case ItemIds::BEETROOT:
+            case ItemIds::CARROT:
+            case ItemIds::COCOA:
+            case ItemIds::RED_FLOWER:
+            case ItemIds::YELLOW_FLOWER:
+            case ItemIds::LILY_PAD:
+            case ItemIds::MELON:
+            case ItemIds::RED_MUSHROOM:
+            case ItemIds::BROWN_MUSHROOM:
+            case ItemIds::MUSHROOM_STEW:
+            case ItemIds::NETHER_WART:
+            case ItemIds::POTATO:
+            case ItemIds::PUMPKIN:
+            case ItemIds::SEA_PICKLE:
+            case ItemIds::WHEAT:
+            case LegacyItemIds::CRIMSON_FUNGUS:
+            case LegacyItemIds::WARPED_FUNGUS:
+            case LegacyItemIds::CRIMSON_ROOTS:
+            case LegacyItemIds::WARPED_ROOTS:
+                return 65;
+            case ItemIds::BAKED_POTATO:
+            case ItemIds::BREAD:
+            case ItemIds::COOKIE:
+            case ItemIds::HAY_BALE:
+            case ItemIds::BROWN_MUSHROOM_BLOCK:
+            case LegacyItemIds::NETHER_WART_BLOCK:
+            case LegacyItemIds::WARPED_WART_BLOCK:
+                return 85;
+            case ItemIds::CAKE:
+            case ItemIds::PUMPKIN_PIE:
+                return 100;
+        }
+        return 0;
+    }
+
 }

@@ -5,6 +5,7 @@ namespace CLADevs\VanillaX\blocks;
 use CLADevs\VanillaX\blocks\block\button\NewWoodenButton;
 use CLADevs\VanillaX\blocks\block\campfire\Campfire;
 use CLADevs\VanillaX\blocks\block\CommandBlock;
+use CLADevs\VanillaX\blocks\block\ComposerBlock;
 use CLADevs\VanillaX\blocks\block\FlowerPotBlock;
 use CLADevs\VanillaX\blocks\block\HopperBlock;
 use CLADevs\VanillaX\blocks\block\nylium\Nylium;
@@ -168,6 +169,7 @@ class BlockManager{
             self::registerBlock(new HopperBlock($meta));
         });
 
+        self::registerAllMeta(new ComposerBlock());
         self::registerBlock(new Block(new BlockIdentifier(BlockLegacyIds::SLIME_BLOCK, 0), "Slime", BlockBreakInfo::instant()));
         self::registerBlock(new Block(new BlockIdentifier(BlockIds::ANCIENT_DEBRIS, 0, LegacyItemIds::ANCIENT_DEBRIS), "Ancient Debris", new BlockBreakInfo(5.0, BlockToolType::PICKAXE, ToolTier::WOOD()->getHarvestLevel(), 6000.0)));
     }
@@ -242,6 +244,28 @@ class BlockManager{
         $breakInfo = new BlockBreakInfo(0.5, BlockToolType::AXE);
         $this->registerBlock(new NewWoodenButton(new BlockIdentifier(BlockIds::CRIMSON_BUTTON, 0), "Crimson Button", $breakInfo));
         $this->registerBlock(new NewWoodenButton(new BlockIdentifier(BlockIds::WARPED_BUTTON, 0), "Warped Button", $breakInfo));
+    }
+
+    private function registerAllMeta(Block $default, Block ...$additional) : void{
+        $ids = [];
+        BlockFactory::getInstance()->register($default);
+        foreach($default->getIdInfo()->getAllBlockIds() as $id){
+            $ids[$id] = $id;
+        }
+        foreach($additional as $block){
+            BlockFactory::getInstance()->register($block);
+            foreach($block->getIdInfo()->getAllBlockIds() as $id){
+                $ids[$id] = $id;
+            }
+        }
+
+        foreach($ids as $id){
+            for($meta = 0; $meta < 1 << Block::INTERNAL_METADATA_BITS; ++$meta){
+                if(!BlockFactory::getInstance()->isRegistered($id, $meta)){
+                    BlockFactory::getInstance()->remap($id, $meta, $default);
+                }
+            }
+        }
     }
 
     private function registerMultipleMetaBlock(int $max, callable $callable): void{

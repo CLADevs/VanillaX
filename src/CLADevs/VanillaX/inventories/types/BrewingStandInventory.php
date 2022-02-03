@@ -7,6 +7,7 @@ use CLADevs\VanillaX\blocks\block\BrewingStandBlock;
 use CLADevs\VanillaX\inventories\FakeBlockInventory;
 use CLADevs\VanillaX\VanillaX;
 use pocketmine\block\BlockLegacyIds;
+use pocketmine\block\utils\BrewingStandSlot;
 use pocketmine\item\Item;
 use pocketmine\item\ItemIds;
 use pocketmine\network\mcpe\convert\TypeConverter;
@@ -97,27 +98,17 @@ class BrewingStandInventory extends FakeBlockInventory{
                         case self::FIRST_POTION_SLOT:
                         case self::SECOND_POTION_SLOT:
                         case self::THIRD_POTION_SLOT:
-                            /** @var BrewingStandBlock $block */
                             $block = $player->getWorld()->getBlock($this->getHolder());
 
                             if($block instanceof BrewingStandBlock){
-                                /** Nukkit Reference */
-                                $damage = 0;
-
-                                for($i = self::FIRST_POTION_SLOT; $i <= self::THIRD_POTION_SLOT; $i++){
-                                    if($action->inventorySlot === $i){
-                                        $potion = $newItem;
-                                    }else{
-                                        $potion = $this->getItem($i);
-                                    }
-
-                                    if(!$potion->isNull() && $this->isPotion($potion)){
-                                        $damage |= 1 << ($i - 1);
-                                    }
-                                }
-                                $block->setFacing($damage);
+                                $slot = match($action->inventorySlot){
+                                    self::FIRST_POTION_SLOT => BrewingStandSlot::NORTHWEST(),
+                                    self::SECOND_POTION_SLOT => BrewingStandSlot::EAST(),
+                                    self::THIRD_POTION_SLOT => BrewingStandSlot::SOUTHWEST(),
+                                };
+                                $block->setSlot($slot, $action->newItem->getItemStack()->getId() !== 0);
+                                $player->getWorld()->setBlock($block->getPosition(), $block);
                             }
-                            $player->getWorld()->setBlock($block->getPosition(), $block);
                             break;
                         case self::FUEL_SLOT:
                             if(!$this->tile->isFueled() && $newItem->getId() === ItemIds::BLAZE_POWDER){
@@ -151,36 +142,24 @@ class BrewingStandInventory extends FakeBlockInventory{
         return true;
     }
 
-    private function sendContainerSetDataPacket(?Player $player, int $start, int $end, int $amount, ?callable $callable = null): void{
-        for($i = $start; $i <= $end; $i++){
-            $pk = new ContainerSetDataPacket();
-            $pk->property = $i;
-            if($callable === null){
-                $pk->value = $amount;
-            }else{
-                $callable($pk, $amount, $i);
-            }
-
-            foreach(($player === null ? $this->getViewers() : [$player]) as $p){
-                $pk->windowId = $p->getNetworkSession()->getInvManager()->getCurrentWindowId();
-                $p->getNetworkSession()->sendDataPacket($pk);
-            }
-        }
-    }
-
-    public function sendFuelData(?Player $player, int $amount, bool $total = true): void{
-        $this->sendContainerSetDataPacket($player, 1, $total ? 2 : 1, $amount);
-    }
-
     public function sendFuelAmount(?Player $player, int $amount): void{
-        $this->sendContainerSetDataPacket($player, 1, 1, $amount);
+        $this->sendData($player, ContainerSetDataPacket::PROPERTY_BREWING_STAND_FUEL_AMOUNT, $amount);
     }
 
-    public function sendFuelTotal(?Player $player, int $amount): void{
-        $this->sendContainerSetDataPacket($player, 2, 2, $amount);
+    public function sendFuelTotal(?Player $player, int $total): void{
+        $this->sendData($player, ContainerSetDataPacket::PROPERTY_BREWING_STAND_FUEL_TOTAL, $total);
     }
 
-    public function sendBrewTimeData(?Player $player, int $amount): void{
-        $this->sendContainerSetDataPacket($player, 0, 0, $amount);
+    public function sendBrewTimeData(?Player $player, int $time): void{
+        $this->sendData($player, ContainerSetDataPacket::PROPERTY_BREWING_STAND_BREW_TIME, $time);
+    }
+
+    public function sendData(?Player $player, int $property, int $value): void{
+        $pk = ContainerSetDataPacket::create(-1, $property, $value);
+
+        foreach(($player === null ? $this->getViewers() : [$player]) as $p){
+            $pk->windowId = $p->getNetworkSession()->getInvManager()->getCurrentWindowId();
+            $p->getNetworkSession()->sendDataPacket($pk);
+        }
     }
 }

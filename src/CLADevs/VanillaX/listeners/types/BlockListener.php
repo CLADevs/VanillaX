@@ -44,7 +44,7 @@ class BlockListener implements Listener{
         if(!$event->isCancelled()){
             $tile = $event->getFurnace();
             if($tile instanceof FurnaceTile){
-                $xp = InventoryManager::getExpForFurnace($event->getSource());
+                $xp = InventoryManager::getInstance()->getExpForFurnace($event->getSource());
                 if($xp >= 0.1){
                     $tile->setXpHolder($tile->getXpHolder() + $xp);
                 }

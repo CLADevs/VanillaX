@@ -15,6 +15,7 @@ use pocketmine\item\Item;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\IntTag;
+use pocketmine\network\mcpe\protocol\ContainerSetDataPacket;
 use pocketmine\world\World;
 
 class BrewingStandTile extends Spawnable implements Container, Nameable{
@@ -99,15 +100,12 @@ class BrewingStandTile extends Spawnable implements Container, Nameable{
         return $this->fuelTotal >= 1 || $this->fuelAmount >= 1;
     }
 
-    /**
-     * @param bool $removeFuel, idk if there is a better method
-     * If a player puts a fuel in fuel slot u cant decrease the count
-     * so queueing it and removing it from task itself
-     */
     public function resetFuel(bool $removeFuel = false): void{
-        $this->inventory->sendFuelData(null, 20);
-        $this->setFuelAmount(20);
-        $this->setFuelTotal(20);
+        $value = 20;
+        $this->inventory->sendFuelAmount(null, $value);
+        $this->inventory->sendFuelTotal(null, $value);
+        $this->setFuelAmount($value);
+        $this->setFuelTotal($value);
         if($removeFuel){
             $this->removeFuel = true;
         }
