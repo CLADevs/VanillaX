@@ -28,6 +28,6 @@ class BlockFeature extends Feature{
         if($vanillaName === null){
             return false;
         }
-        return $this->blocks[$vanillaName] ?? false;
+        return $this->blocks[$vanillaName] ?? true;
     }
 }

@@ -2,11 +2,13 @@
 
 namespace CLADevs\VanillaX\blocks;
 
+use CLADevs\VanillaX\blocks\block\button\NewWoodenButton;
 use CLADevs\VanillaX\blocks\block\campfire\Campfire;
 use CLADevs\VanillaX\blocks\block\CommandBlock;
 use CLADevs\VanillaX\blocks\block\FlowerPotBlock;
 use CLADevs\VanillaX\blocks\block\HopperBlock;
 use CLADevs\VanillaX\blocks\block\nylium\Nylium;
+use CLADevs\VanillaX\blocks\block\slab\NewSlab;
 use CLADevs\VanillaX\blocks\tile\campfire\RegularCampfireTile;
 use CLADevs\VanillaX\blocks\tile\campfire\SoulCampfireTile;
 use CLADevs\VanillaX\blocks\tile\FlowerPotTile;
@@ -21,6 +23,7 @@ use pocketmine\block\Block;
 use pocketmine\block\BlockBreakInfo;
 use pocketmine\block\BlockFactory;
 use pocketmine\block\BlockIdentifier;
+use pocketmine\block\BlockIdentifierFlattened;
 use pocketmine\block\BlockLegacyIds;
 use pocketmine\block\BlockToolType;
 use pocketmine\block\Door;
@@ -77,6 +80,7 @@ class BlockManager{
 
         $blockIdMap = json_decode(file_get_contents(BEDROCK_DATA_PATH . "block_id_map.json"), true);
         $metaMap = [];
+
         foreach($instance->getBedrockKnownStates() as $runtimeId => $nbt){
             $mcpeName = $nbt->getString("name");
             $meta = isset($metaMap[$mcpeName]) ? ($metaMap[$mcpeName] + 1) : 0;
@@ -155,6 +159,8 @@ class BlockManager{
         $this->registerDoors();
         $this->registerFence();
         $this->registerStairs();
+        $this->registerSlabs();
+        $this->registerButtons();
         $this->registerMultipleMetaBlock(6, function (int $meta): void{
             self::registerBlock(new CommandBlock(CommandBlockType::IMPULSE(), $meta));
             self::registerBlock(new CommandBlock(CommandBlockType::REPEAT(), $meta));
@@ -224,6 +230,18 @@ class BlockManager{
         self::registerBlock(new Stair(new BlockIdentifier(BlockIds::POLISHED_BLACKSTONE_BRICK_STAIRS, 0, LegacyItemIds::POLISHED_BLACKSTONE_BRICK_STAIRS), "Polished Blackstone Brick Stairs", new BlockBreakInfo(3, BlockToolType::AXE, 0, 6)));
         self::registerBlock(new Stair(new BlockIdentifier(BlockIds::POLISHED_BLACKSTONE_STAIRS, 0, LegacyItemIds::POLISHED_BLACKSTONE_STAIRS), "Polished Blackstone Stairs", new BlockBreakInfo(3, BlockToolType::AXE, 0, 6)));
         self::registerBlock(new Stair(new BlockIdentifier(BlockIds::WARPED_STAIRS, 0, LegacyItemIds::WARPED_STAIRS), "Warped Stairs", new BlockBreakInfo(3, BlockToolType::AXE, 0, 6)));
+    }
+
+    private function registerSlabs(): void{
+        $breakInfo = new BlockBreakInfo(2.0, BlockToolType::PICKAXE, ToolTier::WOOD()->getHarvestLevel(), 30.0);
+        self::registerBlock(new NewSlab(new BlockIdentifierFlattened(BlockIds::CRIMSON_SLAB, [BlockIds::CRIMSON_DOUBLE_SLAB], 0), "Crimson Slab", $breakInfo));
+        self::registerBlock(new NewSlab(new BlockIdentifierFlattened(BlockIds::WARPED_SLAB, [BlockIds::WARPED_DOUBLE_SLAB], 0), "Warped Slab", $breakInfo));
+    }
+
+    private function registerButtons(): void{
+        $breakInfo = new BlockBreakInfo(0.5, BlockToolType::AXE);
+        $this->registerBlock(new NewWoodenButton(new BlockIdentifier(BlockIds::CRIMSON_BUTTON, 0), "Crimson Button", $breakInfo));
+        $this->registerBlock(new NewWoodenButton(new BlockIdentifier(BlockIds::WARPED_BUTTON, 0), "Warped Button", $breakInfo));
     }
 
     private function registerMultipleMetaBlock(int $max, callable $callable): void{
