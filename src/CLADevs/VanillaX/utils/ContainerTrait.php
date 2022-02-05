@@ -1,6 +1,6 @@
 <?php
 
-namespace CLADevs\VanillaX\entities\utils\traits;
+namespace CLADevs\VanillaX\utils;
 
 use Exception;
 use pocketmine\block\tile\Container;
@@ -9,7 +9,7 @@ use pocketmine\nbt\NBT;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\ListTag;
 
-trait EntityContainer{
+trait ContainerTrait{
 
     public function getContainerSaveName(): string{
         return Container::TAG_ITEMS;

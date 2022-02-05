@@ -2,7 +2,7 @@
 
 namespace CLADevs\VanillaX\blocks\tile\campfire;
 
-use CLADevs\VanillaX\entities\utils\traits\EntityContainer;
+use CLADevs\VanillaX\utils\ContainerTrait;
 use CLADevs\VanillaX\utils\item\NonAutomaticCallItemTrait;
 use Exception;
 use pocketmine\block\tile\Spawnable;
@@ -13,7 +13,7 @@ use pocketmine\nbt\tag\IntTag;
 use pocketmine\nbt\tag\ListTag;
 
 abstract class CampfireTile extends Spawnable implements NonAutomaticCallItemTrait{
-    use EntityContainer;
+    use ContainerTrait;
 
     const TAG_ITEM_TIME = "ItemTimes";
 

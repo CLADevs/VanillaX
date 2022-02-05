@@ -2,13 +2,13 @@
 
 namespace CLADevs\VanillaX\entities\passive;
 
-use CLADevs\VanillaX\entities\utils\interfaces\EntityClassification;
+use CLADevs\VanillaX\entities\utils\EntityClassification;
 use CLADevs\VanillaX\entities\VanillaEntity;
 use pocketmine\nbt\tag\CompoundTag;
 
 class AxolotlEntity extends VanillaEntity{
 
-    const NETWORK_ID = self::LEGACY_ID_MAP_BC[self::AXOLOTL];
+    const NETWORK_ID = "minecraft:axolotl";
 
     public float $width = 1.3;
     public float $height = 0.6;

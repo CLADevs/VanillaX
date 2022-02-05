@@ -45,7 +45,7 @@ class VillagerTradeNBTStream{
      * @param int $tier
      * @param VillagerOffer|VillagerOffer[] $offer
      */
-    public function addOffer(int $tier, $offer): void{
+    public function addOffer(int $tier, array|VillagerOffer $offer): void{
         if(!is_array($offer)){
             $offer = [$offer];
         }

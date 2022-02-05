@@ -2,7 +2,7 @@
 
 namespace CLADevs\VanillaX\entities\object;
 
-use CLADevs\VanillaX\utils\entity\CustomRegisterEntityTrait;
+use CLADevs\VanillaX\entities\utils\EntityCustomRegisterClosure;
 use Closure;
 use pocketmine\entity\Entity;
 use pocketmine\entity\EntityDataHelper;
@@ -16,7 +16,7 @@ use pocketmine\network\mcpe\protocol\types\entity\EntityIds;
 use pocketmine\Server;
 use pocketmine\world\World;
 
-class FireworkRocketEntity extends Projectile implements CustomRegisterEntityTrait{
+class FireworkRocketEntity extends Projectile implements EntityCustomRegisterClosure{
 
     const NETWORK_ID = EntityIds::FIREWORKS_ROCKET;
 

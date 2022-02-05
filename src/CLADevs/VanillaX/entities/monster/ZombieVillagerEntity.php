@@ -2,7 +2,7 @@
 
 namespace CLADevs\VanillaX\entities\monster;
 
-use CLADevs\VanillaX\entities\utils\interfaces\EntityClassification;
+use CLADevs\VanillaX\entities\utils\EntityClassification;
 use CLADevs\VanillaX\entities\VanillaEntity;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\network\mcpe\protocol\types\entity\EntityIds;

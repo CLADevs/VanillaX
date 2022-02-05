@@ -1,10 +1,10 @@
 <?php
 
-namespace CLADevs\VanillaX\utils\entity;
+namespace CLADevs\VanillaX\entities\utils;
 
 use Closure;
 
-interface CustomRegisterEntityTrait{
+interface EntityCustomRegisterClosure{
 
     public static function getRegisterClosure(): Closure;
 }

@@ -2,13 +2,14 @@
 
 namespace CLADevs\VanillaX\entities\neutral;
 
-use CLADevs\VanillaX\entities\utils\interfaces\EntityClassification;
+use CLADevs\VanillaX\entities\utils\EntityClassification;
 use CLADevs\VanillaX\entities\VanillaEntity;
 use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\network\mcpe\protocol\types\entity\EntityIds;
 
 class BeeEntity extends VanillaEntity{
 
-    const NETWORK_ID = self::LEGACY_ID_MAP_BC[self::BEE];
+    const NETWORK_ID = EntityIds::BEE;
 
     public float $width = 0.55;
     public float $height = 0.5;

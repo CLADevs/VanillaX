@@ -39,6 +39,7 @@ use pocketmine\block\Transparent;
 use pocketmine\block\utils\TreeType;
 use pocketmine\block\WoodenPressurePlate;
 use pocketmine\block\WoodenTrapdoor;
+use pocketmine\data\bedrock\LegacyBlockIdToStringIdMap;
 use pocketmine\inventory\CreativeInventory;
 use pocketmine\item\Item;
 use pocketmine\item\ItemIdentifier;
@@ -51,7 +52,6 @@ use pocketmine\utils\SingletonTrait;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
-use const pocketmine\BEDROCK_DATA_PATH;
 
 class BlockManager{
     use SingletonTrait;
@@ -64,6 +64,14 @@ class BlockManager{
      * @throws ReflectionException
      */
     public function startup(): void{
+        $oldMap = LegacyBlockIdToStringIdMap::getInstance()->getStringToLegacyMap();
+
+        foreach(Utils::getBlockIdsMap() as $name => $id){
+            if(!isset($oldMap[$name])){
+                BlockFeature::addLegacy(LegacyBlockIdToStringIdMap::getInstance(), $name, $id);
+            }
+        }
+
         $this->initializeRuntimeIds();
         $this->initializeBlocks();
         $this->initializeTiles();
@@ -83,7 +91,7 @@ class BlockManager{
         $method = new ReflectionMethod(RuntimeBlockMapping::class, "registerMapping");
         $method->setAccessible(true);
 
-        $blockIdMap = json_decode(file_get_contents(BEDROCK_DATA_PATH . "block_id_map.json"), true);
+        $blockIdMap = Utils::getBlockIdsMap();
         $metaMap = [];
 
         foreach($instance->getBedrockKnownStates() as $runtimeId => $nbt){
@@ -107,7 +115,7 @@ class BlockManager{
             $tileConst[$value] = $id;
         }
 
-        Utils::callDirectory("blocks" . DIRECTORY_SEPARATOR . "tile", function (string $namespace)use($tileConst): void{
+        Utils::callDirectory("blocks/tile", function (string $namespace)use($tileConst): void{
             $rc = new ReflectionClass($namespace);
 
             if(!$rc->isAbstract()){
@@ -140,7 +148,7 @@ class BlockManager{
      * @throws ReflectionException
      */
     private function initializeBlocks(): void{
-        Utils::callDirectory("blocks" . DIRECTORY_SEPARATOR . "block", function (string $namespace): void{
+        Utils::callDirectory("blocks/block", function (string $namespace): void{
             $rc = new ReflectionClass($namespace);
 
             if(!$rc->isAbstract()){
@@ -179,7 +187,11 @@ class BlockManager{
 
         self::registerAllMeta(new ComposerBlock());
         self::registerBlock(new Block(new BlockIdentifier(BlockLegacyIds::SLIME_BLOCK, 0), "Slime", BlockBreakInfo::instant()));
-        self::registerBlock(new Block(new BlockIdentifier(BlockIds::ANCIENT_DEBRIS, 0, LegacyItemIds::ANCIENT_DEBRIS), "Ancient Debris", new BlockBreakInfo(5.0, BlockToolType::PICKAXE, ToolTier::WOOD()->getHarvestLevel(), 6000.0)));
+        self::registerBlock(new Block(new BlockIdentifier(BlockIds::ANCIENT_DEBRIS, 0, LegacyItemIds::ANCIENT_DEBRIS), "Ancient Debris", new BlockBreakInfo(30, BlockToolType::PICKAXE, ToolTier::WOOD()->getHarvestLevel(), 1200)));
+        self::registerBlock(new Block(new BlockIdentifier(BlockIds::NETHER_GOLD_ORE, 0, LegacyItemIds::NETHER_GOLD_ORE), "Nether Gold Ore", new BlockBreakInfo(3, BlockToolType::PICKAXE, ToolTier::WOOD()->getHarvestLevel(), 3)));
+        self::registerBlock(new Block(new BlockIdentifier(BlockIds::COPPER_ORE, 0, LegacyItemIds::COPPER_ORE), "Copper Ore", new BlockBreakInfo(3, BlockToolType::PICKAXE, ToolTier::STONE()->getHarvestLevel(), 3)));
+        self::registerBlock(new Block(new BlockIdentifier(BlockIds::DEEPSLATE_COPPER_ORE, 0, LegacyItemIds::DEEPSLATE_COPPER_ORE), "Deepslate Copper Ore", new BlockBreakInfo(3.5, BlockToolType::PICKAXE, ToolTier::STONE()->getHarvestLevel(), 3)));
+        self::registerBlock(new Block(new BlockIdentifier(BlockIds::RAW_COPPER_BLOCK, 0, LegacyItemIds::RAW_COPPER_BLOCK), "Raw Copper Block", new BlockBreakInfo(5, BlockToolType::PICKAXE, ToolTier::STONE()->getHarvestLevel(), 6)));
     }
 
     private function registerFlowerPot(): void{
@@ -320,6 +332,7 @@ class BlockManager{
             ItemManager::register(new class(new ItemIdentifier($item->getId(), $item->getMeta()), $block->getName(), $block) extends Item{
 
                 private Block $block;
+
                 public function __construct(ItemIdentifier $identifier, string $name, Block $block){
                     parent::__construct($identifier, $name);
                     $this->block = $block;

@@ -11,7 +11,7 @@ use pocketmine\nbt\tag\CompoundTag;
 
 class GlowSquidEntity extends VanillaEntity{
 
-    const NETWORK_ID = self::LEGACY_ID_MAP_BC[self::GLOW_SQUID];
+    const NETWORK_ID = "minecraft:glow_squid";
 
     public float $width = 0.95;
     public float $height = 0.95;

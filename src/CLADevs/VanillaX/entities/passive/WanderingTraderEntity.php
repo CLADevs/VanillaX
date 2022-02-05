@@ -4,10 +4,11 @@ namespace CLADevs\VanillaX\entities\passive;
 
 use CLADevs\VanillaX\entities\VanillaEntity;
 use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\network\mcpe\protocol\types\entity\EntityIds;
 
 class WanderingTraderEntity extends VanillaEntity{
 
-    const NETWORK_ID = self::LEGACY_ID_MAP_BC[self::WANDERING_TRADER];
+    const NETWORK_ID = EntityIds::WANDERING_TRADER;
 
     public float $width = 0.6;
     public float $height = 1.9;

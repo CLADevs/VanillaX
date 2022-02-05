@@ -4,7 +4,7 @@ namespace CLADevs\VanillaX\session;
 
 use CLADevs\VanillaX\entities\passive\VillagerEntity;
 use CLADevs\VanillaX\entities\projectile\TridentEntity;
-use CLADevs\VanillaX\entities\utils\interfaces\EntityRidable;
+use CLADevs\VanillaX\entities\utils\EntityRidable;
 use CLADevs\VanillaX\entities\VanillaEntity;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\DataPacket;

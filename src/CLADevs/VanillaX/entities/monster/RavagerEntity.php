@@ -2,16 +2,17 @@
 
 namespace CLADevs\VanillaX\entities\monster;
 
-use CLADevs\VanillaX\entities\utils\interfaces\EntityClassification;
+use CLADevs\VanillaX\entities\utils\EntityClassification;
 use CLADevs\VanillaX\entities\VanillaEntity;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
 use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\network\mcpe\protocol\types\entity\EntityIds;
 
 class RavagerEntity extends VanillaEntity{
 
-    const NETWORK_ID = self::LEGACY_ID_MAP_BC[self::RAVAGER];
+    const NETWORK_ID = EntityIds::RAVAGER;
 
     public $width = 1.9;
     public $height = 1.2;

@@ -13,6 +13,7 @@ use pocketmine\nbt\tag\IntTag;
 use pocketmine\nbt\tag\StringTag;
 use pocketmine\network\mcpe\protocol\serializer\NetworkNbtSerializer;
 use pocketmine\network\mcpe\protocol\types\CacheableNbt;
+use pocketmine\network\mcpe\protocol\types\entity\EntityIds;
 use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataProperties;
 use pocketmine\player\Player;
 
@@ -23,7 +24,7 @@ class VillagerEntity extends VanillaEntity{
     const TAG_TIER = "Tier";
     const TAG_EXPERIENCE = "Experience";
 
-    const NETWORK_ID = self::LEGACY_ID_MAP_BC[self::VILLAGER_V2];
+    const NETWORK_ID = EntityIds::VILLAGER_V2;
 
     public float $width = 0.6;
     public float $height = 1.9;

@@ -97,4 +97,7 @@ interface BlockIds{
     public const CHISELED_NETHER_BRICKS = 557;
     public const CRACKED_NETHER_BRICKS = 558;
     public const QUARTZ_BRICKS = 559;
+    public const COPPER_ORE = 566;
+    public const DEEPSLATE_COPPER_ORE = 663;
+    public const RAW_COPPER_BLOCK = 707;
 }

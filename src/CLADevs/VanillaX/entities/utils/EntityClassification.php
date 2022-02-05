@@ -1,6 +1,6 @@
 <?php
 
-namespace CLADevs\VanillaX\entities\utils\interfaces;
+namespace CLADevs\VanillaX\entities\utils;
 
 interface EntityClassification{
 

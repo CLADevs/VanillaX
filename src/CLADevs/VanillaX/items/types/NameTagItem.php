@@ -3,7 +3,7 @@
 namespace CLADevs\VanillaX\items\types;
 
 use CLADevs\VanillaX\entities\utils\EntityInteractResult;
-use CLADevs\VanillaX\entities\utils\interfaces\EntityInteractable;
+use CLADevs\VanillaX\entities\utils\EntityInteractable;
 use pocketmine\item\Item;
 use pocketmine\item\ItemIdentifier;
 use pocketmine\item\ItemIds;

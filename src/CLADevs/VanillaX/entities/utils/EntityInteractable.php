@@ -1,8 +1,6 @@
 <?php
 
-namespace CLADevs\VanillaX\entities\utils\interfaces;
-
-use CLADevs\VanillaX\entities\utils\EntityInteractResult;
+namespace CLADevs\VanillaX\entities\utils;
 
 interface EntityInteractable{
 

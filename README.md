@@ -22,6 +22,9 @@
 - Twisting Vines
 - Weeping Vines
 - Composter
+- Copper Ore (Deepslate too)
+- Raw Copper Block
+- Nether Gold Ore
 - Campfire (Soul & Regular)
 - Stairs (Warped, Blackstone & Crimson)
 - Fence (Warped & Crimson)

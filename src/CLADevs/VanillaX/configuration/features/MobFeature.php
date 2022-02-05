@@ -18,6 +18,6 @@ class MobFeature extends Feature{
     }
 
     public function isMobEnabled(string $name): bool{
-        return $this->mobs[$name] ?? false;
+        return $this->mobs[$name] ?? true;
     }
 }

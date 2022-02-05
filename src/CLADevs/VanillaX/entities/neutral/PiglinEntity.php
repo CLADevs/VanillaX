@@ -4,10 +4,11 @@ namespace CLADevs\VanillaX\entities\neutral;
 
 use CLADevs\VanillaX\entities\VanillaEntity;
 use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\network\mcpe\protocol\types\entity\EntityIds;
 
 class PiglinEntity extends VanillaEntity{
 
-    const NETWORK_ID = self::LEGACY_ID_MAP_BC[self::PIGLIN];
+    const NETWORK_ID = EntityIds::PIGLIN;
 
     public $width = 0.6;
     public $height = 1.9;

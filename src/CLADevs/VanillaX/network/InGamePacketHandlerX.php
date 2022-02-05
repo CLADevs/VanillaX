@@ -8,7 +8,7 @@ use CLADevs\VanillaX\configuration\Setting;
 use CLADevs\VanillaX\entities\EntityManager;
 use CLADevs\VanillaX\entities\passive\VillagerEntity;
 use CLADevs\VanillaX\entities\utils\EntityInteractResult;
-use CLADevs\VanillaX\entities\utils\interfaces\EntityInteractable;
+use CLADevs\VanillaX\entities\utils\EntityInteractable;
 use CLADevs\VanillaX\entities\VanillaEntity;
 use CLADevs\VanillaX\event\player\PlayerEntityPickEvent;
 use CLADevs\VanillaX\inventories\transaction\EnchantTransaction;

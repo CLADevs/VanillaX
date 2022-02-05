@@ -3,8 +3,9 @@
 namespace CLADevs\VanillaX\configuration;
 
 use CLADevs\VanillaX\VanillaX;
+use pocketmine\data\bedrock\LegacyToStringBidirectionalIdMap;
 use pocketmine\utils\Config;
-use pocketmine\utils\SingletonTrait;
+use ReflectionProperty;
 
 class Feature{
 
@@ -24,5 +25,19 @@ class Feature{
 
     public function getConfig(): Config{
         return $this->config;
+    }
+
+    public static function addLegacy(LegacyToStringBidirectionalIdMap $instance, string $name, int $id): void{
+        $property = new ReflectionProperty(LegacyToStringBidirectionalIdMap::class, "legacyToString");
+        $property->setAccessible(true);
+        $value = $property->getValue($instance);
+        $value[$id] = $name;
+        $property->setValue($instance, $value);
+
+        $property = new ReflectionProperty(LegacyToStringBidirectionalIdMap::class, "stringToLegacy");
+        $property->setAccessible(true);
+        $value = $property->getValue($instance);
+        $value[$name] = $id;
+        $property->setValue($instance, $value);
     }
 }

@@ -7,7 +7,7 @@ use pocketmine\nbt\tag\CompoundTag;
 
 class GoatEntity extends VanillaEntity{
 
-    const NETWORK_ID = self::LEGACY_ID_MAP_BC[self::GOAT];
+    const NETWORK_ID = "minecraft:goat";
 
     public float $width = 0.9;
     public float $height = 1.3;

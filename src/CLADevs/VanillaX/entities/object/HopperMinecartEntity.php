@@ -2,7 +2,7 @@
 
 namespace CLADevs\VanillaX\entities\object;
 
-use CLADevs\VanillaX\entities\utils\traits\EntityContainer;
+use CLADevs\VanillaX\utils\ContainerTrait;
 use CLADevs\VanillaX\inventories\FakeBlockInventory;
 use CLADevs\VanillaX\world\gamerule\GameRule;
 use CLADevs\VanillaX\world\gamerule\GameRuleManager;
@@ -18,7 +18,7 @@ use pocketmine\network\mcpe\protocol\types\inventory\WindowTypes;
 use pocketmine\player\Player;
 
 class HopperMinecartEntity extends MinecartEntity{
-use EntityContainer;
+use ContainerTrait;
 
     const NETWORK_ID = EntityIds::HOPPER_MINECART;
 

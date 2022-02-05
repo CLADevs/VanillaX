@@ -7,7 +7,7 @@ use pocketmine\nbt\tag\CompoundTag;
 
 class PiglinBruteEntity extends VanillaEntity{
 
-    const NETWORK_ID = self::LEGACY_ID_MAP_BC[self::PIGLIN_BRUTE];
+    const NETWORK_ID = "minecraft:piglin_brute";
 
     public float $width = 0.6;
     public float $height = 1.9;

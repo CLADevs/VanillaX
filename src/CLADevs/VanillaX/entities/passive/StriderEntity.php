@@ -8,10 +8,11 @@ use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
 use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\network\mcpe\protocol\types\entity\EntityIds;
 
 class StriderEntity extends VanillaEntity{
 
-    const NETWORK_ID = self::LEGACY_ID_MAP_BC[self::STRIDER];
+    const NETWORK_ID = EntityIds::STRIDER;
 
     public float $width = 0.9;
     public float $height = 1.7;

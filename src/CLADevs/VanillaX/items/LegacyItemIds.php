@@ -120,4 +120,7 @@ interface LegacyItemIds{
     const CHISELED_NETHER_BRICKS = -302;
     const CRACKED_NETHER_BRICKS = -303;
     const QUARTZ_BRICKS = -304;
+    const COPPER_ORE = -311;
+    const DEEPSLATE_COPPER_ORE = -408;
+    const RAW_COPPER_BLOCK = -452;
 }
