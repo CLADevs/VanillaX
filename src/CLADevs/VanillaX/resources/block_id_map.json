@@ -1,5 +1,21 @@
 {
-  "minecraft:copper_ore": 566,
-  "minecraft:raw_copper_block": 707,
-  "minecraft:deepslate_copper_ore": 663
+    "minecraft:raw_gold_block": 708,
+    "minecraft:raw_copper_block": 707,
+    "minecraft:raw_iron_block": 706,
+    "minecraft:deepslate_copper_ore": 663,
+    "minecraft:deepslate_emerald_ore": 662,
+    "minecraft:deepslate_coal_ore": 661,
+    "minecraft:deepslate_diamond_ore": 660,
+    "minecraft:lit_deepslate_redstone_ore": 659,
+    "minecraft:deepslate_redstone_ore": 658,
+    "minecraft:deepslate_gold_ore": 657,
+    "minecraft:deepslate_iron_ore": 656,
+    "minecraft:deepslate_lapis_ore": 655,
+    "minecraft:smooth_basalt": 632,
+    "minecraft:waxed_copper": 599,
+    "minecraft:copper_block": 595,
+    "minecraft:hanging_roots": 574,
+    "minecraft:dirt_with_roots": 573,
+    "minecraft:copper_ore": 566,
+    "minecraft:netherite_block": 525
 }

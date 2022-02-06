@@ -25,6 +25,12 @@
 - Copper Ore (Deepslate too)
 - Raw Copper Block
 - Nether Gold Ore
+- Copper Block
+- Waxed Copper
+- Netherite Block
+- Smooth Basalt
+- Rooted Dirt
+- Hanging Roots
 - Campfire (Soul & Regular)
 - Stairs (Warped, Blackstone & Crimson)
 - Fence (Warped & Crimson)
@@ -43,6 +49,7 @@
 - Nylium (Warped & Crimson)
 - Chiseled (Polished Blackstone & Nether Bricks)
 - Cracked (Polished Blackstone & Nether Bricks)
+- Depslated Ores (Iron, Gold, Diamond, Lapis, Coal, Emerald, Copper, Redstone)
 
 #### TODO Blocks Functionality:
 - Deepslate (Chiseled, Cracked)
@@ -63,7 +70,6 @@
 - Lectern
 - Smithing
 - Smoker
-- Nether Gold Ore
 - Nether Sprouts
 - Stonecutter Block
 - Sweet Berry

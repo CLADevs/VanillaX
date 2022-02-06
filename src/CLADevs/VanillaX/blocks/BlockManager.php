@@ -2,11 +2,14 @@
 
 namespace CLADevs\VanillaX\blocks;
 
+use CLADevs\VanillaX\blocks\block\bee\BeehiveBlock;
+use CLADevs\VanillaX\blocks\block\bee\BeeNestBlock;
 use CLADevs\VanillaX\blocks\block\button\NewWoodenButton;
 use CLADevs\VanillaX\blocks\block\campfire\Campfire;
 use CLADevs\VanillaX\blocks\block\CommandBlock;
 use CLADevs\VanillaX\blocks\block\ComposerBlock;
 use CLADevs\VanillaX\blocks\block\FlowerPotBlock;
+use CLADevs\VanillaX\blocks\block\fungus\Fungus;
 use CLADevs\VanillaX\blocks\block\HopperBlock;
 use CLADevs\VanillaX\blocks\block\log\NewLog;
 use CLADevs\VanillaX\blocks\block\nylium\Nylium;
@@ -19,6 +22,7 @@ use CLADevs\VanillaX\configuration\features\BlockFeature;
 use CLADevs\VanillaX\items\LegacyItemIds;
 use CLADevs\VanillaX\items\ItemManager;
 use CLADevs\VanillaX\utils\item\NonAutomaticCallItemTrait;
+use CLADevs\VanillaX\utils\item\NonCreativeItemTrait;
 use CLADevs\VanillaX\utils\Utils;
 use CLADevs\VanillaX\VanillaX;
 use pocketmine\block\Block;
@@ -33,6 +37,7 @@ use pocketmine\block\Fence;
 use pocketmine\block\FenceGate;
 use pocketmine\block\Opaque;
 use pocketmine\block\Planks;
+use pocketmine\block\RedstoneOre;
 use pocketmine\block\Stair;
 use pocketmine\block\tile\TileFactory;
 use pocketmine\block\Transparent;
@@ -159,11 +164,10 @@ class BlockManager{
                         return;
                     }
                 }
-                self::registerBlock(new $namespace(), true, !$rc->implementsInterface(NonAutomaticCallItemTrait::class));
+                self::registerBlock(new $namespace(), true, !$rc->implementsInterface(NonCreativeItemTrait::class));
             }
         });
         $this->registerFlowerPot();
-        $this->registerCampfire();
         $this->registerNylium();
         $this->registerRoots();
         $this->registerChiseled();
@@ -183,15 +187,35 @@ class BlockManager{
             self::registerBlock(new CommandBlock(CommandBlockType::REPEAT(), $meta));
             self::registerBlock(new CommandBlock(CommandBlockType::CHAIN(), $meta));
             self::registerBlock(new HopperBlock($meta));
+            self::registerBlock(new BeehiveBlock($meta));
+            self::registerBlock(new BeeNestBlock($meta));
         });
 
         self::registerAllMeta(new ComposerBlock());
         self::registerBlock(new Block(new BlockIdentifier(BlockLegacyIds::SLIME_BLOCK, 0), "Slime", BlockBreakInfo::instant()));
-        self::registerBlock(new Block(new BlockIdentifier(BlockIds::ANCIENT_DEBRIS, 0, LegacyItemIds::ANCIENT_DEBRIS), "Ancient Debris", new BlockBreakInfo(30, BlockToolType::PICKAXE, ToolTier::WOOD()->getHarvestLevel(), 1200)));
-        self::registerBlock(new Block(new BlockIdentifier(BlockIds::NETHER_GOLD_ORE, 0, LegacyItemIds::NETHER_GOLD_ORE), "Nether Gold Ore", new BlockBreakInfo(3, BlockToolType::PICKAXE, ToolTier::WOOD()->getHarvestLevel(), 3)));
-        self::registerBlock(new Block(new BlockIdentifier(BlockIds::COPPER_ORE, 0, LegacyItemIds::COPPER_ORE), "Copper Ore", new BlockBreakInfo(3, BlockToolType::PICKAXE, ToolTier::STONE()->getHarvestLevel(), 3)));
-        self::registerBlock(new Block(new BlockIdentifier(BlockIds::DEEPSLATE_COPPER_ORE, 0, LegacyItemIds::DEEPSLATE_COPPER_ORE), "Deepslate Copper Ore", new BlockBreakInfo(3.5, BlockToolType::PICKAXE, ToolTier::STONE()->getHarvestLevel(), 3)));
-        self::registerBlock(new Block(new BlockIdentifier(BlockIds::RAW_COPPER_BLOCK, 0, LegacyItemIds::RAW_COPPER_BLOCK), "Raw Copper Block", new BlockBreakInfo(5, BlockToolType::PICKAXE, ToolTier::STONE()->getHarvestLevel(), 6)));
+        self::registerBlock(new Opaque(new BlockIdentifier(BlockIds::ANCIENT_DEBRIS, 0, LegacyItemIds::ANCIENT_DEBRIS), "Ancient Debris", new BlockBreakInfo(30, BlockToolType::PICKAXE, ToolTier::WOOD()->getHarvestLevel(), 1200)));
+        self::registerBlock(new Opaque(new BlockIdentifier(BlockIds::NETHER_GOLD_ORE, 0, LegacyItemIds::NETHER_GOLD_ORE), "Nether Gold Ore", new BlockBreakInfo(3, BlockToolType::PICKAXE, ToolTier::WOOD()->getHarvestLevel(), 3)));
+        self::registerBlock(new Fungus(new BlockIdentifier(BlockIds::CRIMSON_FUNGUS, 0, LegacyItemIds::CRIMSON_FUNGUS), "Crimson Fungus"));
+        self::registerBlock(new Fungus(new BlockIdentifier(BlockIds::WARPED_FUNGUS, 0, LegacyItemIds::WARPED_FUNGUS), "Warped Fungus"));
+        self::registerBlock(new Campfire(new BlockIdentifier(BlockLegacyIds::CAMPFIRE, 0, LegacyItemIds::CAMPFIRE, RegularCampfireTile::class), "Campfire"));
+        self::registerBlock(new Campfire(new BlockIdentifier(BlockIds::SOUL_CAMPFIRE, 0, LegacyItemIds::SOUL_CAMPFIRE, SoulCampfireTile::class), "Soul Campfire"));
+        self::registerCreativeBlock(new Opaque(new BlockIdentifier(BlockIds::RAW_IRON_BLOCK, 0, LegacyItemIds::RAW_IRON_BLOCK), "Raw Iron Block", new BlockBreakInfo(5, BlockToolType::PICKAXE, ToolTier::STONE()->getHarvestLevel(), 6)));
+        self::registerCreativeBlock(new Opaque(new BlockIdentifier(BlockIds::DEEPSLATE_IRON_ORE, 0, LegacyItemIds::DEEPSLATE_IRON_ORE), "Deepslate Iron Ore", new BlockBreakInfo(4.5, BlockToolType::PICKAXE, ToolTier::STONE()->getHarvestLevel(), 3)));
+        self::registerCreativeBlock(new Opaque(new BlockIdentifier(BlockIds::RAW_GOLD_BLOCK, 0, LegacyItemIds::RAW_GOLD_BLOCK), "Raw Gold Block", new BlockBreakInfo(5, BlockToolType::PICKAXE, ToolTier::IRON()->getHarvestLevel(), 6)));
+        self::registerCreativeBlock(new Opaque(new BlockIdentifier(BlockIds::DEEPSLATE_GOLD_ORE, 0, LegacyItemIds::DEEPSLATE_GOLD_ORE), "Deepslate Gold Ore", new BlockBreakInfo(4.5, BlockToolType::PICKAXE, ToolTier::IRON()->getHarvestLevel(), 3)));
+        self::registerCreativeBlock(new Opaque(new BlockIdentifier(BlockIds::DEEPSLATE_DIAMOND_ORE, 0, LegacyItemIds::DEEPSLATE_DIAMOND_ORE), "Deepslate Diamond Ore", new BlockBreakInfo(4.5, BlockToolType::PICKAXE, ToolTier::IRON()->getHarvestLevel(), 3)));
+        self::registerCreativeBlock(new Opaque(new BlockIdentifier(BlockIds::DEEPSLATE_LAPIS_ORE, 0, LegacyItemIds::DEEPSLATE_LAPIS_ORE), "Deepslate Lapis Lazuli Ore", new BlockBreakInfo(4.5, BlockToolType::PICKAXE, ToolTier::IRON()->getHarvestLevel(), 3)));
+        self::registerCreativeBlock(new Opaque(new BlockIdentifier(BlockIds::DEEPSLATE_COAL_ORE, 0, LegacyItemIds::DEEPSLATE_COAL_ORE), "Deepslate Coal Ore", new BlockBreakInfo(4.5, BlockToolType::PICKAXE, ToolTier::STONE()->getHarvestLevel(), 3)));
+        self::registerCreativeBlock(new Opaque(new BlockIdentifier(BlockIds::DEEPSLATE_EMERALD_ORE, 0, LegacyItemIds::DEEPSLATE_EMERALD_ORE), "Deepslate Emerald Ore", new BlockBreakInfo(4.5, BlockToolType::PICKAXE, ToolTier::IRON()->getHarvestLevel(), 3)));
+        self::registerCreativeBlock(new RedstoneOre(new BlockIdentifierFlattened(BlockIds::DEEPSLATE_REDSTONE_ORE, [BlockIds::LIT_DEEPSLATE_REDSTONE_ORE], 0), "Desplate Redstone Ore", new BlockBreakInfo(3.0, BlockToolType::PICKAXE, ToolTier::IRON()->getHarvestLevel())));
+        self::registerCreativeBlock(new Opaque(new BlockIdentifier(BlockIds::RAW_COPPER_BLOCK, 0, LegacyItemIds::RAW_COPPER_BLOCK), "Raw Copper Block", new BlockBreakInfo(5, BlockToolType::PICKAXE, ToolTier::STONE()->getHarvestLevel(), 6)));
+        self::registerCreativeBlock(new Opaque(new BlockIdentifier(BlockIds::COPPER_ORE, 0, LegacyItemIds::COPPER_ORE), "Copper Ore", new BlockBreakInfo(3, BlockToolType::PICKAXE, ToolTier::STONE()->getHarvestLevel(), 3)));
+        self::registerCreativeBlock(new Opaque(new BlockIdentifier(BlockIds::DEEPSLATE_COPPER_ORE, 0, LegacyItemIds::DEEPSLATE_COPPER_ORE), "Deepslate Copper Ore", new BlockBreakInfo(4.5, BlockToolType::PICKAXE, ToolTier::STONE()->getHarvestLevel(), 3)));
+        self::registerCreativeBlock(new Opaque(new BlockIdentifier(BlockIds::COPPER_BLOCK, 0, LegacyItemIds::COPPER_BLOCK), "Block of Copper", new BlockBreakInfo(3, BlockToolType::PICKAXE, ToolTier::STONE()->getHarvestLevel(), 6)));
+        self::registerCreativeBlock(new Opaque(new BlockIdentifier(BlockIds::WAXED_COPPER, 0, LegacyItemIds::WAXED_COPPER), "Waxed Block of Copper", new BlockBreakInfo(3, BlockToolType::PICKAXE, ToolTier::STONE()->getHarvestLevel(), 6)));
+        self::registerCreativeBlock(new Opaque(new BlockIdentifier(BlockIds::NETHERITE_BLOCK, 0, LegacyItemIds::NETHERITE_BLOCK), "Block of Netherite", new BlockBreakInfo(50, BlockToolType::PICKAXE, ToolTier::DIAMOND()->getHarvestLevel(), 1200)));
+        self::registerCreativeBlock(new Opaque(new BlockIdentifier(BlockIds::SMOOTH_BASALT, 0, LegacyItemIds::SMOOTH_BASALT), "Smooth Basalt", new BlockBreakInfo(1.25, BlockToolType::PICKAXE, 0, 4.2)));
+        self::registerCreativeBlock(new Opaque(new BlockIdentifier(BlockIds::DIRT_WITH_ROOTS, 0, LegacyItemIds::DIRT_WITH_ROOTS), "Rooted Dirt", new BlockBreakInfo(0.1, BlockToolType::NONE, 0, 0.5)));
     }
 
     private function registerFlowerPot(): void{
@@ -200,11 +224,6 @@ class BlockManager{
         for($meta = 1; $meta < 16; ++$meta){
             BlockFactory::getInstance()->remap(BlockLegacyIds::FLOWER_POT_BLOCK, $meta, $flowerPot);
         }
-    }
-
-    private function registerCampfire(): void{
-        self::registerBlock(new Campfire(new BlockIdentifier(BlockLegacyIds::CAMPFIRE, 0, LegacyItemIds::CAMPFIRE, RegularCampfireTile::class), "Campfire", new BlockBreakInfo(2, BlockToolType::AXE, 0, 2)));
-        self::registerBlock(new Campfire(new BlockIdentifier(BlockIds::SOUL_CAMPFIRE, 0, LegacyItemIds::SOUL_CAMPFIRE, SoulCampfireTile::class), "Soul Campfire", new BlockBreakInfo(2, BlockToolType::AXE, 0, 2)));
     }
 
     private function registerNylium(): void{
@@ -320,6 +339,10 @@ class BlockManager{
         }
     }
 
+    public function registerCreativeBlock(Block $block, bool $override = true): bool{
+        return $this->registerBlock($block, $override, true);
+    }
+
     public function registerBlock(Block $block, bool $override = true, bool $creativeItem = false): bool{
         if(!BlockFeature::getInstance()->isBlockEnabled($block)){
             return false;
@@ -342,7 +365,7 @@ class BlockManager{
                     return $this->block;
                 }
             }, $creativeItem, true);
-        }elseif(!CreativeInventory::getInstance()->contains($item)){
+        }elseif($creativeItem && !CreativeInventory::getInstance()->contains($item)){
             CreativeInventory::getInstance()->add($item);
         }
         foreach(Server::getInstance()->getWorldManager()->getWorlds() as $world){

@@ -38,7 +38,7 @@ class Utils{
      */
     public static function getBlockIdsMap(): array{
         $file = "block_id_map.json";
-        return array_merge_recursive(json_decode(file_get_contents(BEDROCK_DATA_PATH . "/$file"), true), json_decode(file_get_contents(self::getResourceFile($file)), true));
+        return array_merge(json_decode(file_get_contents(BEDROCK_DATA_PATH . "/$file"), true), json_decode(file_get_contents(self::getResourceFile($file)), true));
     }
 
     /**
@@ -46,6 +46,6 @@ class Utils{
      */
     public static function getItemIdsMap(): array{
         $file = "item_id_map.json";
-        return array_merge_recursive(json_decode(file_get_contents(BEDROCK_DATA_PATH . "/$file"), true), json_decode(file_get_contents(self::getResourceFile($file)), true));
+        return array_merge(json_decode(file_get_contents(BEDROCK_DATA_PATH . "/$file"), true), json_decode(file_get_contents(self::getResourceFile($file)), true));
     }
 }

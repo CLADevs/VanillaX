@@ -6,6 +6,9 @@ use CLADevs\VanillaX\blocks\tile\campfire\CampfireTile;
 use CLADevs\VanillaX\blocks\utils\FacingPlayerTrait;
 use CLADevs\VanillaX\utils\item\NonAutomaticCallItemTrait;
 use Exception;
+use pocketmine\block\BlockBreakInfo;
+use pocketmine\block\BlockIdentifier;
+use pocketmine\block\BlockToolType;
 use pocketmine\block\Opaque;
 use pocketmine\entity\Entity;
 use pocketmine\item\Item;
@@ -15,6 +18,10 @@ use pocketmine\player\Player;
 
 class Campfire extends Opaque implements NonAutomaticCallItemTrait{
     use FacingPlayerTrait;
+
+    public function __construct(BlockIdentifier $idInfo, string $name){
+        parent::__construct($idInfo, $name, new BlockBreakInfo(2, BlockToolType::AXE, 0, 2));
+    }
 
     /**
      * @param Item $item
