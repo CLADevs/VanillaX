@@ -54,7 +54,7 @@ class MobSpawnerBlock extends MonsterSpawner{
     public function onScheduledUpdate(): void{
         $tile = $this->position->getWorld()->getTile($this->position);
 
-        if($tile->isClosed() || !$tile instanceof MobSpawnerTile || $tile->getEntity() === null){
+        if($tile->isClosed() || !$tile instanceof MobSpawnerTile || $tile->getEntityInfo() === null){
             return;
         }
         if($tile->getTick() > 0) $tile->decreaseTick();
@@ -64,7 +64,7 @@ class MobSpawnerBlock extends MonsterSpawner{
                 $tile->decreaseSpawnDelay();
             }else{
                 $tile->setSpawnDelay($tile->getMinSpawnDelay() + mt_rand(0, min(0, $tile->getMaxSpawnDelay() - $tile->getMinSpawnDelay())));
-                $namespace = $tile->getEntity()->getNamespace();
+                $namespace = $tile->getEntityInfo()->getClass();
 
                 for($i = 0; $i < $tile->getSpawnCount(); $i++){
                     $x = ((mt_rand(-10, 10) / 10) * $tile->getSpawnRange()) + 0.5;

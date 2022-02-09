@@ -4,7 +4,7 @@ namespace CLADevs\VanillaX\blocks\tile;
 
 use CLADevs\VanillaX\blocks\TileIds;
 use CLADevs\VanillaX\entities\EntityManager;
-use CLADevs\VanillaX\entities\utils\EntityIdentifier;
+use CLADevs\VanillaX\entities\utils\EntityInfo;
 use pocketmine\block\BlockLegacyIds;
 use pocketmine\block\tile\Spawnable;
 use pocketmine\nbt\tag\CompoundTag;
@@ -34,30 +34,26 @@ class MobSpawnerTile extends Spawnable{
     private int $maxSpawnDelay = 800;
     private int $tick = 20;
 
-    private ?EntityIdentifier $entity = null;
+    private ?EntityInfo $entityInfo = null;
 
     public function getEntityId(): int{
         return $this->entityId;
     }
 
     public function setEntityId(int $entityId): void{
-        $previousEntity = $this->entity;
-        foreach(EntityManager::getInstance()->getEntities() as $entity){
-            if($entity->getId() === $entityId){
-                $this->entity = $entity;
-                break;
-            }
-        }
+        $previousInfo = $this->entityInfo;
+        $this->entityInfo = EntityManager::getInstance()->getEntityInfo($entityId);
         $this->entityId = $entityId;
         $this->validEntity = true;
         $this->setDirty();
-        if($previousEntity === null && $this->entity !== null){
+
+        if($previousInfo === null && $this->entityInfo !== null){
             $this->position->getWorld()->scheduleDelayedBlockUpdate($this->position, 1);
         }
     }
 
-    public function getEntity(): ?EntityIdentifier{
-        return $this->entity;
+    public function getEntityInfo(): ?EntityInfo{
+        return $this->entityInfo;
     }
 
     public function getSpawnCount(): int{
@@ -161,8 +157,8 @@ class MobSpawnerTile extends Spawnable{
     }
 
     protected function addAdditionalSpawnData(CompoundTag $nbt): void{
-        if($this->entity !== null){
-            $nbt->setString(self::TAG_ENTITY_IDENTIFIER, $this->entity->getMcpeId());
+        if($this->entityInfo !== null){
+            $nbt->setString(self::TAG_ENTITY_IDENTIFIER, $this->getEntityInfo()->getName());
             $nbt->setFloat(self::TAG_DISPLAY_ENTITY_SCALE, 1.0);
         }
     }
