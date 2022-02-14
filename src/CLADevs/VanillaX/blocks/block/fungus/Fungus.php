@@ -20,7 +20,7 @@ class Fungus extends Transparent implements NonAutomaticCallItemTrait{
     public function canBePlacedAt(Block $blockReplace, Vector3 $clickVector, int $face, bool $isClickedBlock): bool{
         $block = $this->position->getWorld()->getBlock(clone $this->position->subtract(0, 1, 0));
 
-        if(!in_array($block->getId(), [BlockLegacyIds::GRASS, BlockLegacyIds::DIRT, BlockLegacyIds::PODZOL, BlockLegacyIds::FARMLAND, BlockIds::ROOTED_DIRT, BlockIds::CRIMSON_NYLIUM, BlockIds::WARPED_NYLIUM])){
+        if(!in_array($block->getId(), [BlockLegacyIds::GRASS, BlockLegacyIds::DIRT, BlockLegacyIds::PODZOL, BlockLegacyIds::FARMLAND, BlockIds::DIRT_WITH_ROOTS, BlockIds::CRIMSON_NYLIUM, BlockIds::WARPED_NYLIUM])){
             return false;
         }
         return parent::canBePlacedAt($blockReplace, $clickVector, $face, $isClickedBlock);
