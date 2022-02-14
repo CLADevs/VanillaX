@@ -207,7 +207,7 @@ class InventoryManager{
             case ItemIds::COOKIE:
             case ItemIds::HAY_BALE:
             case ItemIds::BROWN_MUSHROOM_BLOCK:
-            case LegacyItemIds::NETHER_WART_BLOCK:
+            case ItemIds::NETHER_WART_BLOCK:
             case LegacyItemIds::WARPED_WART_BLOCK:
                 return 85;
             case ItemIds::CAKE:
