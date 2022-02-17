@@ -4,9 +4,6 @@ namespace CLADevs\VanillaX\commands;
 
 use CLADevs\VanillaX\commands\utils\CommandArgs;
 use pocketmine\command\CommandSender;
-use pocketmine\permission\DefaultPermissions;
-use pocketmine\permission\Permission;
-use pocketmine\permission\PermissionManager;
 use pocketmine\utils\TextFormat;
 
 abstract class Command extends \pocketmine\command\Command{
@@ -15,21 +12,6 @@ abstract class Command extends \pocketmine\command\Command{
 
     public function canRegister(): bool{
         return true;
-    }
-
-    public function setPermission(?string $permission): void{
-        if($permission !== null){
-            $permManager = PermissionManager::getInstance();
-            $opRoot = $permManager->getPermission(DefaultPermissions::ROOT_OPERATOR);
-
-            foreach(explode(";", $permission) as $perm){
-                if(PermissionManager::getInstance()->getPermission($perm) === null){
-                    $permManager->addPermission($perm = new Permission($perm));
-                    $opRoot->addChild($perm->getName(), true);
-                }
-            }
-        }
-        parent::setPermission($permission);
     }
 
     public function getCommandArg(): ?CommandArgs{

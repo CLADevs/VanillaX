@@ -3,3 +3,22 @@ version: 3.0.0
 api: 4.0.0
 main: CLADevs\VanillaX\VanillaX
 author: CLADevs
+permissions:
+  gamerule.command:
+    description: "Allows you to access /gamerule"
+    default: op
+  give.command:
+    description: "Allows you to access /give"
+    default: op
+  playsound.command:
+    description: "Allows you to access /playsound"
+    default: op
+  stopsound.command:
+    description: "Allows you to access /stopsound"
+    default: op
+  toggledownfall.command:
+    description: "Allows you to access /toggledownfall"
+    default: op
+  weather.command:
+    description: "Allows you to access /weather"
+    default: op
