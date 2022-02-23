@@ -262,6 +262,7 @@ class InGamePacketHandlerX extends InGamePacketHandler{
      * @return bool
      */
     private function handleEnchantTransaction(Player $player, array $actions, NormalTransactionData $trData): bool{
+        //try and see if enchant transaction can happen
         try{
             if($this->enchantTransaction === null){
                 $this->enchantTransaction = new EnchantTransaction($player, $actions);
@@ -270,16 +271,19 @@ class InGamePacketHandlerX extends InGamePacketHandler{
                     $this->enchantTransaction->addAction($action);
                 }
             }
+            // check if enchant can execute
             if($this->enchantTransaction->canExecute()){
                 $this->enchantTransaction->execute();
                 $this->enchantTransaction = null;
             }
             return true;
         }catch(TransactionException $e){
+            // catch any errors?
             foreach($this->enchantTransaction->getInventories() as $inventory){
                 $player->getNetworkSession()->getInvManager()->syncContents($inventory);
             }
             $this->enchantTransaction = null;
+            // debug
             $logger = $player->getNetworkSession()->getLogger();
             $logger->debug("Failed to execute enchant inventory transaction: " . $e->getMessage());
             $logger->debug("Actions: " . json_encode($trData->getActions()));
