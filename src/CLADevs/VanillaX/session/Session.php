@@ -4,12 +4,11 @@ namespace CLADevs\VanillaX\session;
 
 use CLADevs\VanillaX\entities\passive\VillagerEntity;
 use CLADevs\VanillaX\entities\projectile\TridentEntity;
-use CLADevs\VanillaX\entities\utils\EntityRidable;
+use CLADevs\VanillaX\entities\utils\interfaces\EntityRidable;
 use CLADevs\VanillaX\entities\VanillaEntity;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\DataPacket;
 use pocketmine\network\mcpe\protocol\PlaySoundPacket;
-use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataFlags;
 use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataProperties;
 use pocketmine\player\Player;
 
@@ -21,9 +20,6 @@ class Session{
     private string $interactiveText = "";
 
     private int $entityId;
-
-    private bool $gliding = false;
-    private bool $swimming = false;
 
     private Player $player;
 
@@ -72,24 +68,6 @@ class Session{
             $this->tradingEntity->setCustomer(null);
         }
         $this->tradingEntity = $tradingEntity;
-    }
-
-    public function isGliding(): bool{
-        return $this->gliding;
-    }
-
-    public function setGliding(bool $gliding): void{
-        $this->player->getNetworkProperties()->setGenericFlag(EntityMetadataFlags::GLIDING, $gliding);
-        $this->gliding = $gliding;
-    }
-
-    public function isSwimming(): bool{
-        return $this->swimming;
-    }
-
-    public function setSwimming(bool $value): void{
-        $this->player->getNetworkProperties()->setGenericFlag(EntityMetadataFlags::SWIMMING, $value);
-        $this->swimming = $value;
     }
 
     /**

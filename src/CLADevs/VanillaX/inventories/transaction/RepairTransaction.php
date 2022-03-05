@@ -61,7 +61,7 @@ class RepairTransaction extends InventoryTransaction{
         if(!$this->inputAction->getSourceItem()->equalsExact($this->input)){
             throw new TransactionValidationException("Input item does not match");
         }
-        if($this->material !== null && !$this->materialAction->getSourceItem()->equalsExact($this->material)){
+        if($this->material !== null && !$this->materialAction->getSourceItem()->equals($this->material)){
             throw new TransactionValidationException("Material item does not match");
         }
         $ev = new RepairedItemEvent($this->source, $this->input, $this->material, $this->result);

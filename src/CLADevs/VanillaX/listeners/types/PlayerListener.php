@@ -187,7 +187,7 @@ class PlayerListener implements Listener{
                 }
             }
             //Elytra
-            if($chestplate instanceof ElytraItem && $session->isGliding() && ItemFeature::getInstance()->isItemEnabled(ItemIds::ELYTRA)){
+            if($chestplate instanceof ElytraItem && $player->isGliding() && ItemFeature::getInstance()->isItemEnabled(ItemIds::ELYTRA)){
                 if(Server::getInstance()->getTick() % 20 == 0){
                     $chestplate->applyDamage(1);
                     $player->getArmorInventory()->setChestplate($chestplate);

@@ -4,7 +4,6 @@ namespace CLADevs\VanillaX\items\types;
 
 use CLADevs\VanillaX\entities\object\FireworkRocketEntity;
 use CLADevs\VanillaX\session\Session;
-use CLADevs\VanillaX\VanillaX;
 use pocketmine\block\Block;
 use pocketmine\entity\Location;
 use pocketmine\item\Item;
@@ -42,9 +41,7 @@ class FireworkRocketItem extends Item{
     }
 
     public function checkElytra(Player $player): bool{
-        $session = VanillaX::getInstance()->getSessionManager()->get($player);
-
-        if($player->getArmorInventory()->getChestplate() instanceof ElytraItem && $session->isGliding()){
+        if($player->getArmorInventory()->getChestplate() instanceof ElytraItem && $player->isGliding()){
             $player->setMotion($player->getDirectionVector()->multiply(1.6));
             $this->pop();
             return true;

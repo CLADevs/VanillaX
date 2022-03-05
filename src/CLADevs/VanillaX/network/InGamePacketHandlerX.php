@@ -41,7 +41,6 @@ use pocketmine\network\mcpe\protocol\CommandBlockUpdatePacket;
 use pocketmine\network\mcpe\protocol\ContainerClosePacket;
 use pocketmine\network\mcpe\protocol\FilterTextPacket;
 use pocketmine\network\mcpe\protocol\InventoryTransactionPacket;
-use pocketmine\network\mcpe\protocol\PlayerActionPacket;
 use pocketmine\network\mcpe\protocol\SetDefaultGameTypePacket;
 use pocketmine\network\mcpe\protocol\SetDifficultyPacket;
 use pocketmine\network\mcpe\protocol\SetPlayerGameTypePacket;
@@ -50,7 +49,6 @@ use pocketmine\network\mcpe\protocol\types\inventory\NetworkInventoryAction;
 use pocketmine\network\mcpe\protocol\types\inventory\NormalTransactionData;
 use pocketmine\network\mcpe\protocol\types\inventory\UseItemOnEntityTransactionData;
 use pocketmine\network\mcpe\protocol\types\inventory\UseItemTransactionData;
-use pocketmine\network\mcpe\protocol\types\PlayerAction;
 use pocketmine\permission\DefaultPermissions;
 use pocketmine\player\Player;
 use pocketmine\Server;
@@ -129,7 +127,7 @@ class InGamePacketHandlerX extends InGamePacketHandler{
         $entity = $player->getWorld()->getEntity($packet->actorUniqueId);
 
         if($entity instanceof VanillaEntity && $player->hasPermission(DefaultPermissions::ROOT_OPERATOR)){
-            $result = ItemFactory::getInstance()->get(ItemIds::SPAWN_EGG, EntityManager::getInstance()->getEntity($entity->getNetworkTypeId())->getId());
+            $result = ItemFactory::getInstance()->get(ItemIds::SPAWN_EGG, EntityManager::getInstance()->getEntityInfo($entity::getNetworkTypeId())->getLegacyId());
             $ev = new PlayerEntityPickEvent($player, $entity, $result);
             $ev->call();
 
@@ -138,22 +136,6 @@ class InGamePacketHandlerX extends InGamePacketHandler{
             }
         }
         return true;
-    }
-
-    public function handlePlayerAction(PlayerActionPacket $packet): bool{
-        switch($packet->action){
-            case PlayerAction::SET_ENCHANTMENT_SEED:
-                return true;
-            case PlayerAction::START_GLIDE:
-            case PlayerAction::STOP_GLIDE:
-                $this->session->setGliding($packet->action === PlayerAction::START_GLIDE);
-                break;
-            case PlayerAction::START_SWIMMING:
-            case PlayerAction::STOP_SWIMMING:
-                $this->session->setSwimming($packet->action === PlayerAction::START_SWIMMING);
-                break;
-        }
-        return parent::handlePlayerAction($packet);
     }
 
     /**

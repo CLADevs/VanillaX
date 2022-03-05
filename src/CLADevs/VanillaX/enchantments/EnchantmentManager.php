@@ -45,7 +45,9 @@ class EnchantmentManager{
 
     public function registerEnchantment(Enchantment $enchantment): void{
         if(EnchantmentFeature::getInstance()->isEnchantmentEnabled($enchantment->getId())){
-            EnchantmentIdMap::getInstance()->register($enchantment->getMcpeId(), $enchantment);
+            if(EnchantmentIdMap::getInstance()->fromId($mcpeId = $enchantment->getMcpeId()) === null){
+                EnchantmentIdMap::getInstance()->register($mcpeId, $enchantment);
+            }
             /** @var EnchantmentTrait $enchantment */
             $this->enchantmentMap[$enchantment->getId()] = $enchantment;
             $this->enchantmentTypeMap[$enchantment->getPrimaryItemFlags()][] = $enchantment;
