@@ -23,6 +23,6 @@ class CommandBlockSender extends ConsoleCommandSender{
     }
 
     public function getOutput(): string{
-        return $this->output;
+        return $this->output; 
     }
 }
