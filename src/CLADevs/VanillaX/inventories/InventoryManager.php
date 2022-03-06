@@ -5,107 +5,16 @@ namespace CLADevs\VanillaX\inventories;
 use CLADevs\VanillaX\inventories\utils\TypeConverterX;
 use CLADevs\VanillaX\items\LegacyItemIds;
 use pocketmine\item\Item;
-use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
-use pocketmine\network\mcpe\convert\ItemTranslator;
 use pocketmine\network\mcpe\convert\TypeConverter;
-use pocketmine\network\mcpe\protocol\types\recipe\PotionContainerChangeRecipe;
-use pocketmine\network\mcpe\protocol\types\recipe\PotionTypeRecipe;
 use pocketmine\utils\SingletonTrait;
 
 class InventoryManager{
     use SingletonTrait;
 
-    /** @var PotionTypeRecipe[] */
-    private array $potionTypeRecipes = [];
-    /** @var PotionContainerChangeRecipe[] */
-    private array $potionContainerRecipes = [];
-
     public function __construct(){
         self::setInstance($this);
         TypeConverter::setInstance(new TypeConverterX());
-    }
-
-    /**
-     * @return PotionTypeRecipe[]
-     */
-    public function getPotionTypeRecipes(): array{
-        return $this->potionTypeRecipes;
-    }
-
-    /**
-     * @param PotionTypeRecipe[] $potionTypeRecipes
-     */
-    public function setPotionTypeRecipes(array $potionTypeRecipes): void{
-        $this->potionTypeRecipes = $potionTypeRecipes;
-    }
-
-    /**
-     * @return PotionContainerChangeRecipe[]
-     */
-    public function getPotionContainerRecipes(): array{
-        return $this->potionContainerRecipes;
-    }
-
-    /**
-     * @param PotionContainerChangeRecipe[] $potionContainerRecipes
-     */
-    public function setPotionContainerRecipes(array $potionContainerRecipes): void{
-        $this->potionContainerRecipes = $potionContainerRecipes;
-    }
-
-    public function getBrewingOutput(Item $input, Item $ingredient): ?Item{
-        $potion = $this->potionTypeRecipes[self::hashPotionType($ingredient->getId(), $ingredient->getMeta(), $input->getId(), $input->getMeta())] ?? null;
-
-        if($potion instanceof PotionTypeRecipe){
-            return ItemFactory::getInstance()->get($potion->getOutputItemId(), $potion->getOutputItemMeta(), $input->getCount());
-        }
-        return null;
-    }
-
-    public function getBrewingContainerOutput(Item $input, Item $ingredient): ?Item{
-        $potion = $this->potionContainerRecipes[self::hashPotionContainer($ingredient->getId(), $input->getId())] ?? null;
-
-        if($potion instanceof PotionContainerChangeRecipe){
-            return ItemFactory::getInstance()->get($potion->getOutputItemId(), $input->getMeta(), $input->getCount());
-        }
-        return null;
-    }
-
-    public function internalPotionTypeRecipe(PotionTypeRecipe $recipe): PotionTypeRecipe{
-        [$inputId, $inputMeta] = ItemTranslator::getInstance()->fromNetworkId($recipe->getInputItemId(), $recipe->getInputItemMeta());
-        [$ingredientId, $ingredientMeta] = ItemTranslator::getInstance()->fromNetworkId($recipe->getIngredientItemId(), $recipe->getIngredientItemMeta());
-        [$outputId, $outputMeta] = ItemTranslator::getInstance()->fromNetworkId($recipe->getOutputItemId(), $recipe->getOutputItemMeta());
-        return new PotionTypeRecipe($inputId, $inputMeta, $ingredientId, $ingredientMeta, $outputId, $outputMeta);
-    }
-
-    public function internalPotionContainerRecipe(PotionContainerChangeRecipe $recipe): PotionContainerChangeRecipe{
-        $inputId = ItemTranslator::getInstance()->fromNetworkId($recipe->getInputItemId(), 0)[0];
-        $ingredientId = ItemTranslator::getInstance()->fromNetworkId($recipe->getIngredientItemId(), 0)[0];
-        $outputId = ItemTranslator::getInstance()->fromNetworkId($recipe->getOutputItemId(), 0)[0];
-        return new PotionContainerChangeRecipe($inputId, $ingredientId, $outputId);
-    }
-
-    public function hashPotionType(PotionTypeRecipe|int $ingredientId, int $ingredientMeta = 0, int $inputId = 0, int $inputMeta = 0): string{
-        $recipe = $ingredientId;
-
-        if($recipe instanceof PotionTypeRecipe){
-            $ingredientId = $recipe->getIngredientItemId();
-            $ingredientMeta = $recipe->getIngredientItemMeta();
-            $inputId = $recipe->getInputItemId();
-            $inputMeta = $recipe->getInputItemMeta();
-        }
-        return $ingredientId + $ingredientMeta + $inputId + $inputMeta;
-    }
-
-    public function hashPotionContainer(PotionContainerChangeRecipe|int $ingredientId, int $inputId = 0): string{
-        $recipe = $ingredientId;
-
-        if($recipe instanceof PotionContainerChangeRecipe){
-            $ingredientId = $recipe->getIngredientItemId();
-            $inputId = $recipe->getInputItemId();
-        }
-        return $ingredientId + $inputId;
     }
 
     public function getExpForFurnace(Item $ingredient): float{

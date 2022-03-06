@@ -3,19 +3,13 @@
 namespace CLADevs\VanillaX\listeners\types;
 
 use CLADevs\VanillaX\inventories\FakeBlockInventory;
-use CLADevs\VanillaX\inventories\InventoryManager;
 use CLADevs\VanillaX\VanillaX;
 use pocketmine\event\inventory\InventoryTransactionEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\server\DataPacketReceiveEvent;
 use pocketmine\event\server\DataPacketSendEvent;
-use pocketmine\network\mcpe\convert\ItemTranslator;
 use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
-use pocketmine\network\mcpe\protocol\CraftingDataPacket;
 use pocketmine\network\mcpe\protocol\ProtocolInfo;
-use pocketmine\network\mcpe\protocol\types\recipe\PotionContainerChangeRecipe;
-use pocketmine\network\mcpe\protocol\types\recipe\PotionTypeRecipe;
-use const pocketmine\BEDROCK_DATA_PATH;
 
 class PacketListener implements Listener{
 
@@ -29,9 +23,6 @@ class PacketListener implements Listener{
                 switch($packet::NETWORK_ID){
                     case ProtocolInfo::AVAILABLE_COMMANDS_PACKET:
                         if($packet instanceof AvailableCommandsPacket) $this->handleCommandEnum($packet);
-                        break;
-                    case ProtocolInfo::CRAFTING_DATA_PACKET:
-                        if($packet instanceof CraftingDataPacket) $this->handleCraftingData($packet);
                         break;
                 }
             }
@@ -62,40 +53,5 @@ class PacketListener implements Listener{
                 $command->overloads = $arg->getOverload();
             }
         }
-    }
-
-    /**
-     * @param CraftingDataPacket $packet
-     * called whenever player joins to send recipes for brewing, crafting, etc
-     */
-    private function handleCraftingData(CraftingDataPacket $packet): void{
-        $manager = InventoryManager::getInstance();
-        $translator = ItemTranslator::getInstance();
-        $recipes = json_decode(file_get_contents(BEDROCK_DATA_PATH . "recipes.json"), true);
-
-        $potionTypeRecipes = [];
-        foreach($recipes["potion_type"] as $recipe){
-            [$inputNetId, $inputNetDamage] = $translator->toNetworkId($recipe["input"]["id"], $recipe["input"]["damage"] ?? 0);
-            [$ingredientNetId, $ingredientNetDamage] = $translator->toNetworkId($recipe["ingredient"]["id"], $recipe["ingredient"]["damage"] ?? 0);
-            [$outputNetId, $outputNetDamage] = $translator->toNetworkId($recipe["output"]["id"], $recipe["output"]["damage"] ?? 0);
-            $potion = new PotionTypeRecipe($inputNetId, $inputNetDamage, $ingredientNetId, $ingredientNetDamage, $outputNetId, $outputNetDamage);
-            $packet->potionTypeRecipes[] = $potion;
-            $potion = $manager->internalPotionTypeRecipe(clone $potion);
-            $potionTypeRecipes[$manager->hashPotionType($potion)] = $potion;
-        }
-
-        $potionContainerRecipes = [];
-        foreach($recipes["potion_container_change"] as $recipe){
-            $inputNetId = $translator->toNetworkId($recipe["input_item_id"], 0)[0];
-            $ingredientNetId = $translator->toNetworkId($recipe["ingredient"]["id"], 0)[0];
-            $outputNetId = $translator->toNetworkId($recipe["output_item_id"], 0)[0];
-            $potion = new PotionContainerChangeRecipe($inputNetId, $ingredientNetId, $outputNetId);
-            $packet->potionContainerRecipes[] = $potion;
-            $potion = $manager->internalPotionContainerRecipe(clone $potion);
-            $potionContainerRecipes[$manager->hashPotionContainer($potion)] = $potion;
-        }
-
-        InventoryManager::getInstance()->setPotionTypeRecipes($potionTypeRecipes);
-        InventoryManager::getInstance()->setPotionContainerRecipes($potionContainerRecipes);
     }
 }

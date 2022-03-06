@@ -33,7 +33,6 @@ class TypeConverterX extends TypeConverter{
     public function createInventoryAction(NetworkInventoryAction $action, Player $player, InventoryManager $inventoryManager): ?InventoryAction{
         $oldItem = TypeConverter::getInstance()->netItemStackToCore($action->oldItem->getItemStack());
         $newItem = TypeConverter::getInstance()->netItemStackToCore($action->newItem->getItemStack());
-        $currentWindowId = $inventoryManager->getCurrentWindowId();
         $currentWindow = $player->getCurrentWindow();
 
         if($currentWindow instanceof FakeBlockInventory){

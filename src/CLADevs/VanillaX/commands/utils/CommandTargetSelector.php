@@ -46,6 +46,24 @@ class CommandTargetSelector{
                     return null;
                 }
                 return $entities;
+            case "@p":
+                if(!$player instanceof Player){
+                    return null;
+                }
+                $chosen = null;
+                $lastDistance = 0;
+
+                foreach($player->getWorld()->getPlayers() as $p){
+                    $distance = $p->getPosition()->distance($player->getPosition());
+
+                    if($p->getName() !== $player->getName() && ($chosen === null || $distance <= $lastDistance)){
+                        $chosen = $p;
+                    }
+                }
+                if($chosen === null){
+                    $chosen = $player;
+                }
+                return $returnArray ? [$chosen] : $chosen;
             case "@r":
                 $p = self::getRandomPlayer();
                 $chosen = $p === null ? null : ($returnArray ? [$p] : $p);

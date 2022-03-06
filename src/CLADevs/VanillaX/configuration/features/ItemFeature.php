@@ -23,11 +23,15 @@ class ItemFeature extends Feature{
     }
 
     public function isItemEnabled(Item|int $item): bool{
-        $vanillaName = $this->itemIdMap[$item instanceof Item ? $item->getId() : $item] ?? null;
+        $vanillaName = $this->getVanillaName($item);
 
         if($vanillaName === null){
             return false;
         }
         return $this->items[$vanillaName] ?? true;
+    }
+
+    public function getVanillaName(Item|int $item): ?string{
+        return $this->itemIdMap[$item instanceof Item ? $item->getId() : $item] ?? null;
     }
 }

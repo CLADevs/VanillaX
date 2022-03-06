@@ -19,6 +19,8 @@ use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIdentifier;
 use pocketmine\item\ItemIds;
 use pocketmine\item\SpawnEgg;
+use pocketmine\item\StringToItemParser;
+use pocketmine\item\VanillaItems;
 use pocketmine\math\Vector3;
 use pocketmine\Server;
 use pocketmine\world\World;
@@ -98,8 +100,14 @@ class ItemManager{
             if(($shaped = $item->getShapedRecipe()) !== null) $craftingManager->registerShapedRecipe($shaped);
         }
         ItemFactory::getInstance()->register($item, $overwrite);
-        if($creative && !CreativeInventory::getInstance()->contains($item)){
-            CreativeInventory::getInstance()->add($item);
+
+        if($creative){
+            $name = ItemFeature::getInstance()->getVanillaName($item);
+
+            if($name !== null && StringToItemParser::getInstance()->parse($name) === null){
+                StringToItemParser::getInstance()->register($name, fn() => $item);
+            }
+            if(!CreativeInventory::getInstance()->contains($item)) CreativeInventory::getInstance()->add($item);
         }
         return true;
     }

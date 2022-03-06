@@ -11,6 +11,8 @@ use Exception;
 use pocketmine\command\CommandSender;
 use pocketmine\item\Durable;
 use pocketmine\item\LegacyStringToItemParser;
+use pocketmine\item\LegacyStringToItemParserException;
+use pocketmine\item\StringToItemParser;
 use pocketmine\nbt\JsonNbtParser;
 use pocketmine\network\mcpe\protocol\types\command\CommandEnum;
 use pocketmine\network\mcpe\protocol\types\PlayerPermissions;
@@ -25,7 +27,7 @@ class GiveCommand extends Command{
 
         $overload = new CommandOverload();
         $overload->addTarget("player");
-        $overload->addEnum("itemName", new CommandEnum("Item", []));
+        $overload->addEnum("itemName", new CommandEnum("Items", array_map("strtolower", StringToItemParser::getInstance()->getKnownAliases())));
         $overload->addInt("amount");
         $overload->addInt("data");
         $overload->addJson("components");
@@ -45,8 +47,8 @@ class GiveCommand extends Command{
             if(!$player = CommandTargetSelector::getFromString($sender, $args[0], true, true, true)) return;
             if(isset($args[1])){
                 try{
-                    $itemName = LegacyStringToItemParser::getInstance()->parse($args[1]);
-                }catch (Exception){
+                    $itemName = StringToItemParser::getInstance()->parse($args[1]) ?? LegacyStringToItemParser::getInstance()->parse($args[1]);
+                }catch (LegacyStringToItemParserException){
                     $this->sendSyntaxError($sender, $args[1], "/$commandLabel", $args[1]);
                     return;
                 }
@@ -81,6 +83,9 @@ class GiveCommand extends Command{
             }
         }
         foreach($player as $p){
+            if($itemName === null){
+                return;
+            }
             if(!$p instanceof Player){
                 continue;
             }
