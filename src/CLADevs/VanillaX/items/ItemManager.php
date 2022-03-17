@@ -20,7 +20,6 @@ use pocketmine\item\ItemIdentifier;
 use pocketmine\item\ItemIds;
 use pocketmine\item\SpawnEgg;
 use pocketmine\item\StringToItemParser;
-use pocketmine\item\VanillaItems;
 use pocketmine\math\Vector3;
 use pocketmine\Server;
 use pocketmine\world\World;
@@ -101,14 +100,10 @@ class ItemManager{
         }
         ItemFactory::getInstance()->register($item, $overwrite);
 
-        if($creative){
-            $name = ItemFeature::getInstance()->getVanillaName($item);
+        $name = ItemFeature::getInstance()->getVanillaName($item);
 
-            if($name !== null && StringToItemParser::getInstance()->parse($name) === null){
-                StringToItemParser::getInstance()->register($name, fn() => $item);
-            }
-            if(!CreativeInventory::getInstance()->contains($item)) CreativeInventory::getInstance()->add($item);
-        }
+        if($name !== null && StringToItemParser::getInstance()->parse($name) === null) StringToItemParser::getInstance()->register($name, fn() => $item);
+        if($creative && !CreativeInventory::getInstance()->contains($item)) CreativeInventory::getInstance()->add($item);
         return true;
     }
 }
