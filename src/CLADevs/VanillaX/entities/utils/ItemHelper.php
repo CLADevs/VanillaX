@@ -29,7 +29,10 @@ class ItemHelper{
 
             if($enchantments !== null){
                 $enchant = $enchantments[array_rand($enchantments)];
-                $item->addEnchantment(new EnchantmentInstance($enchant, mt_rand(1, $enchant->getMaxLevel())));
+
+                if($enchant instanceof Enchantment){
+                    $item->addEnchantment(new EnchantmentInstance($enchant, mt_rand(1, $enchant->getMaxLevel())));
+                }
             }
         }
     }
@@ -69,7 +72,10 @@ class ItemHelper{
         }
         $level /= 10;
         $enchant = $enchantments[array_rand($enchantments)];
-        $item->addEnchantment(new EnchantmentInstance($enchant, min(round($level), $enchant->getMaxLevel())));
+
+        if($enchant instanceof Enchantment){
+            $item->addEnchantment(new EnchantmentInstance($enchant, min(round($level), $enchant->getMaxLevel())));
+        }
     }
 
     public static function applyFurnaceSmelt(Item &$item): void{
@@ -85,8 +91,9 @@ class ItemHelper{
 
         if($lastDamage instanceof EntityDamageByEntityEvent){
             $player = $lastDamage->getDamager();
+            $looting = EnchantmentIdMap::getInstance()->fromId(EnchantmentIds::LOOTING);
 
-            if($player instanceof Player && ($level = $player->getInventory()->getItemInHand()->getEnchantmentLevel(EnchantmentIdMap::getInstance()->fromId(EnchantmentIds::LOOTING))) > 0){
+            if($player instanceof Player && $looting instanceof Enchantment && ($level = $player->getInventory()->getItemInHand()->getEnchantmentLevel($looting)) > 0){
                 $item->setCount($item->getCount() + mt_rand(0, $level));
             }
         }
@@ -124,7 +131,7 @@ class ItemHelper{
         foreach($enchants as $i){
             $enchant = EnchantmentIdMap::getInstance()->fromId($i["id"]);
 
-            if($enchant !== null){
+            if($enchant instanceof Enchantment){
                 $level = mt_rand($i["level"][0], $i["level"][1]);
                 $item->addEnchantment(new EnchantmentInstance($enchant, $level));
             }

@@ -17,6 +17,7 @@ use CLADevs\VanillaX\blocks\block\slab\NewSlab;
 use CLADevs\VanillaX\blocks\tile\campfire\RegularCampfireTile;
 use CLADevs\VanillaX\blocks\tile\campfire\SoulCampfireTile;
 use CLADevs\VanillaX\blocks\tile\FlowerPotTile;
+use CLADevs\VanillaX\blocks\tile\FurnaceTile;
 use CLADevs\VanillaX\blocks\utils\CommandBlockType;
 use CLADevs\VanillaX\configuration\features\BlockFeature;
 use CLADevs\VanillaX\items\LegacyItemIds;
@@ -35,6 +36,7 @@ use pocketmine\block\BlockToolType;
 use pocketmine\block\Door;
 use pocketmine\block\Fence;
 use pocketmine\block\FenceGate;
+use pocketmine\block\Furnace;
 use pocketmine\block\Opaque;
 use pocketmine\block\Planks;
 use pocketmine\block\RedstoneOre;
@@ -191,6 +193,7 @@ class BlockManager{
             self::registerBlock(new BeeNestBlock($meta));
         });
 
+        $this->registerAllMeta(new Furnace(new BlockIdentifierFlattened(BlockLegacyIds::FURNACE, [BlockLegacyIds::LIT_FURNACE], 0, null, FurnaceTile::class), "Furnace", new BlockBreakInfo(3.5, BlockToolType::PICKAXE, ToolTier::WOOD()->getHarvestLevel())));
         self::registerAllMeta(new ComposerBlock());
         self::registerBlock(new Block(new BlockIdentifier(BlockLegacyIds::SLIME_BLOCK, 0), "Slime", BlockBreakInfo::instant()));
         self::registerBlock(new Opaque(new BlockIdentifier(BlockIds::ANCIENT_DEBRIS, 0, LegacyItemIds::ANCIENT_DEBRIS), "Ancient Debris", new BlockBreakInfo(30, BlockToolType::PICKAXE, ToolTier::WOOD()->getHarvestLevel(), 1200)));
@@ -313,12 +316,12 @@ class BlockManager{
 
     private function registerAllMeta(Block $default, Block ...$additional) : void{
         $ids = [];
-        BlockFactory::getInstance()->register($default);
+        BlockFactory::getInstance()->register($default, true);
         foreach($default->getIdInfo()->getAllBlockIds() as $id){
             $ids[$id] = $id;
         }
         foreach($additional as $block){
-            BlockFactory::getInstance()->register($block);
+            BlockFactory::getInstance()->register($block, true);
             foreach($block->getIdInfo()->getAllBlockIds() as $id){
                 $ids[$id] = $id;
             }

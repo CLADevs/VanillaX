@@ -43,8 +43,10 @@ class BlockListener implements Listener{
     public function onFurnaceSmelt(FurnaceSmeltEvent $event): void{
         if(!$event->isCancelled()){
             $tile = $event->getFurnace();
+
             if($tile instanceof FurnaceTile){
                 $xp = InventoryManager::getInstance()->getExpForFurnace($event->getSource());
+
                 if($xp >= 0.1){
                     $tile->setXpHolder($tile->getXpHolder() + $xp);
                 }
