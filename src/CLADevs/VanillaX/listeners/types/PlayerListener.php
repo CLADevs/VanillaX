@@ -28,7 +28,6 @@ use pocketmine\event\player\PlayerMoveEvent;
 use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\event\player\PlayerRespawnEvent;
 use pocketmine\event\player\PlayerToggleSneakEvent;
-use pocketmine\item\Armor;
 use pocketmine\item\GlassBottle;
 use pocketmine\item\ItemIds;
 use pocketmine\item\VanillaItems;
@@ -80,11 +79,6 @@ class PlayerListener implements Listener{
             $item = $event->getItem();
             $block = $event->getBlock();
 
-            if($item instanceof Armor && $player->getArmorInventory()->getItem($slot = $item->getArmorSlot())->isNull()){
-                $player->getArmorInventory()->setItem($slot, $item);
-                $item->pop();
-                $player->getInventory()->setItemInHand($item);
-            }
             if($block instanceof Water && $item instanceof GlassBottle){
                 $waterPotion = VanillaItems::WATER_POTION();
 

@@ -134,18 +134,19 @@ class GameRuleManager{
             $data = $provider->getWorldData();
 
             if($data instanceof BedrockWorldData){
-                /** @var CompoundTag $nbt */
                 $nbt = $data->getCompoundTag()->getTag("GameRules");
 
-                foreach($nbt->getValue() as $key => $tag){
-                    if($tag instanceof ByteTag){
-                        $value = new BoolGameRule(boolval($tag->getValue()), false);
-                    }else{
-                        $value = new IntGameRule(intval($tag->getValue()), false);
+                if($nbt instanceof CompoundTag){
+                    foreach($nbt->getValue() as $key => $tag){
+                        if($tag instanceof ByteTag){
+                            $value = new BoolGameRule(boolval($tag->getValue()), false);
+                        }else{
+                            $value = new IntGameRule(intval($tag->getValue()), false);
+                        }
+                        $pk = new GameRulesChangedPacket();
+                        $pk->gameRules = [$key => $value];
+                        $player->getNetworkSession()->sendDataPacket($pk);
                     }
-                    $pk = new GameRulesChangedPacket();
-                    $pk->gameRules = [$key => $value];
-                    $player->getNetworkSession()->sendDataPacket($pk);
                 }
             }
         }

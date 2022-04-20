@@ -43,7 +43,7 @@ class WeatherManager{
 
                     if($weather->duration < 1){
                         $weather->stopStorm();
-                    }elseif($weather->isThundering() && mt_rand(1, 100000) === 0){
+                    }elseif($weather->isThundering() && mt_rand(0, 6) === 0){
                         $players = Server::getInstance()->getOnlinePlayers();
 
                         if(count($players) >= 1){

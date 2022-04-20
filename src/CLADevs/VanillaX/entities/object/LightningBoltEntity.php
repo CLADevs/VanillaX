@@ -2,6 +2,7 @@
 
 namespace CLADevs\VanillaX\entities\object;
 
+use CLADevs\VanillaX\session\Session;
 use pocketmine\block\BlockFactory;
 use pocketmine\block\BlockLegacyIds;
 use pocketmine\entity\Entity;
@@ -10,7 +11,7 @@ use pocketmine\network\mcpe\protocol\LevelSoundEventPacket;
 use pocketmine\network\mcpe\protocol\types\entity\EntityIds;
 use pocketmine\network\mcpe\protocol\types\LevelSoundEvent;
 use pocketmine\Server;
-use pocketmine\world\sound\ExplodeSound;
+use pocketmine\world\Position;
 use pocketmine\world\World;
 
 class LightningBoltEntity extends Entity{
@@ -39,7 +40,8 @@ class LightningBoltEntity extends Entity{
                     }
                 }
             }
-            $this->getWorld()->addSound($this->getPosition(), new ExplodeSound());
+            $this->sendImpactSound($this->getPosition());
+            $this->sendRoarSound($this->getPosition());
         }else{
             $this->getWorld()->broadcastPacketToViewers($this->getPosition(), LevelSoundEventPacket::nonActorSound(LevelSoundEvent::THUNDER, $this->getPosition(), false));
         }
@@ -60,5 +62,13 @@ class LightningBoltEntity extends Entity{
 
     public static function canRegister(): bool{
         return true;
+    }
+
+    public function sendImpactSound(Position $position, float $pitch = 1, float $volume = 1): void{
+        $this->getWorld()->broadcastPacketToViewers($position, Session::playSound($position, "ambient.weather.lightning.impact", $pitch, $volume, true));
+    }
+
+    public function sendRoarSound(Position $position, float $pitch = 1, float $volume = 1): void{
+        $this->getWorld()->broadcastPacketToViewers($position, Session::playSound($position, "ambient.weather.thunder", $pitch, $volume, true));
     }
 }
