@@ -8,6 +8,8 @@ use CLADevs\VanillaX\world\gamerule\GameRule;
 use CLADevs\VanillaX\world\gamerule\GameRuleManager;
 use CLADevs\VanillaX\session\Session;
 use pocketmine\block\BlockLegacyIds;
+use pocketmine\data\bedrock\EnchantmentIdMap;
+use pocketmine\data\bedrock\EnchantmentIds;
 use pocketmine\entity\object\FallingBlock;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\entity\EntityBlockChangeEvent;
@@ -24,8 +26,37 @@ class BlockListener implements Listener{
                 return;
             }
             $tile = $block->getPosition()->getWorld()->getTile($block->getPosition());
+
             if($tile instanceof FurnaceTile){
                 $tile->dropXpHolder($block->getPosition());
+            }
+            $drops = $event->getDrops();
+            $fortuneLevel = $event->getItem()->getEnchantmentLevel(EnchantmentIdMap::getInstance()->fromId(EnchantmentIds::FORTUNE));
+
+            if($fortuneLevel >= 1 && count($drops) === 1){
+                $drop = $drops[$key = array_key_first($drops)];
+                $fortune = $drop->getCount();
+
+                switch($block->getId()){
+                    case BlockLegacyIds::DIAMOND_ORE:
+                    case BlockLegacyIds::EMERALD_ORE:
+                    case BlockLegacyIds::REDSTONE_ORE:
+                    case BlockLegacyIds::NETHER_QUARTZ_ORE:
+                    case BlockLegacyIds::IRON_ORE:
+                    case BlockLegacyIds::GOLD_ORE:
+                    case BlockLegacyIds::GLOWSTONE:
+                    case BlockLegacyIds::COAL_ORE:
+                        $fortune += mt_rand(0, $fortuneLevel);
+                        break;
+                    case BlockLegacyIds::LAPIS_ORE:
+                        $fortune = mt_rand(4, 9 * ($fortuneLevel * 1));
+                        break;
+                }
+                if($fortune !== $drop->getCount()){
+                    $drop->setCount($fortune);
+                    $drops[$key] = $drop;
+                    $event->setDrops($drops);
+                }
             }
         }
     }

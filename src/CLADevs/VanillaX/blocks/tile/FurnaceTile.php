@@ -10,8 +10,10 @@ use pocketmine\inventory\CallbackInventoryListener;
 use pocketmine\inventory\Inventory;
 use pocketmine\item\Item;
 use pocketmine\item\ItemIds;
+use pocketmine\math\Vector3;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\world\Position;
+use pocketmine\world\World;
 
 class FurnaceTile extends Furnace{
 
@@ -21,6 +23,20 @@ class FurnaceTile extends Furnace{
     const TILE_BLOCK = BlockLegacyIds::FURNACE;
 
     private float $xpHolder = 0.0;
+
+    public function __construct(World $world, Vector3 $pos){
+        parent::__construct($world, $pos);
+        $this->inventory->getListeners()->add(new CallbackInventoryListener(
+            function(Inventory $unused, int $slot, Item $oldItem): void{
+                $newItem = $this->inventory->getItem($slot);
+
+                if($slot === 2 && $oldItem->getId() !== ItemIds::AIR && $newItem->getId() === ItemIds::AIR){
+                    $this->dropXpHolder($this->getPosition());
+                }
+            },
+            null
+        ));
+    }
 
     protected function writeSaveData(CompoundTag $nbt): void{
         parent::writeSaveData($nbt);
@@ -33,16 +49,6 @@ class FurnaceTile extends Furnace{
         if(($tag = $nbt->getTag(self::TAG_XP_HOLDER)) !== null){
             $this->xpHolder = $tag->getValue();
         }
-        $this->inventory->getListeners()->add(new CallbackInventoryListener(
-            function(Inventory $unused, int $slot, Item $oldItem): void{
-                $newItem = $this->inventory->getItem($slot);
-
-                if($slot === 2 && $oldItem->getId() !== ItemIds::AIR && $newItem->getId() === ItemIds::AIR){
-                    $this->dropXpHolder($this->getPosition());
-                }
-            },
-            null
-        ));
     }
 
     public function getXpHolder(): float{

@@ -43,7 +43,7 @@ class WeatherManager{
 
                     if($weather->duration < 1){
                         $weather->stopStorm();
-                    }elseif($weather->isThundering() && mt_rand(0, 100000) === 0){
+                    }elseif($weather->isThundering() && mt_rand(0, 5000) === 0){ //100,000(chance of lightning striking)/20(1s tick) = 5,000 (per sec chance)
                         $players = Server::getInstance()->getOnlinePlayers();
 
                         if(count($players) >= 1){

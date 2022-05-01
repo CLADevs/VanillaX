@@ -78,7 +78,7 @@ class Weather{
     }
 
     public function saveData(): void{
-        if($this->world->isLoaded()){
+        if(!$this->world->isLoaded()){
             return;
         }
         $provider = $this->world->getProvider();
