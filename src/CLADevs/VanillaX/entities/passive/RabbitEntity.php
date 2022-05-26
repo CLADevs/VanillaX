@@ -40,7 +40,7 @@ class RabbitEntity extends VanillaEntity{
          
         $rabbit = ItemFactory::getInstance()->get(ItemIds::RAW_RABBIT, 0, 1);
         ItemHelper::applySetCount($rabbit, 0, 1);
-        ItemHelper::applyFurnaceSmelt($rabbit);
+         if($this->isOnFire())ItemHelper::applyFurnaceSmelt($rabbit);
         return [$rabbit_hide, $rabbit, ItemFactory::getInstance()->get(ItemIds::RABBIT_FOOT, 0, 1)];
     }
 }
