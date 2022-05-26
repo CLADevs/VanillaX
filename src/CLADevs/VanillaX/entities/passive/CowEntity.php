@@ -40,7 +40,7 @@ class CowEntity extends VanillaEntity{
          
         $beef = ItemFactory::getInstance()->get(ItemIds::RAW_BEEF, 0, 1);
         ItemHelper::applySetCount($beef, 1, 3);
-        ItemHelper::applyFurnaceSmelt($beef);
+         if($this->isOnFire())ItemHelper::applyFurnaceSmelt($beef);
         ItemHelper::applyLootingEnchant($this, $beef);
         return [$leather, $beef];
     }
