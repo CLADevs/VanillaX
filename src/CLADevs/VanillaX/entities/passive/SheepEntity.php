@@ -38,7 +38,7 @@ class SheepEntity extends VanillaEntity{
          
         $muttonraw = ItemFactory::getInstance()->get(ItemIds::RAW_MUTTON, 0, 1);
         ItemHelper::applySetCount($muttonraw, 1, 2);
-        ItemHelper::applyFurnaceSmelt($muttonraw);
+         if($this->isOnFire())ItemHelper::applyFurnaceSmelt($muttonraw);
         ItemHelper::applyLootingEnchant($this, $muttonraw);
         return [$wool, $muttonraw];
     }

@@ -39,7 +39,7 @@ class ChickenEntity extends VanillaEntity{
         ItemHelper::applyLootingEnchant($this, $feather);
          
         $chicken = ItemFactory::getInstance()->get(ItemIds::RAW_CHICKEN, 0, 1);
-        ItemHelper::applyFurnaceSmelt($chicken);
+         if($this->isOnFire())ItemHelper::applyFurnaceSmelt($chicken);
         ItemHelper::applyLootingEnchant($this, $chicken);
         return [$feather, $chicken];
     }
