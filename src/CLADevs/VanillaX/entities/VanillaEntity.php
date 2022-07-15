@@ -11,7 +11,9 @@ use pocketmine\entity\Attribute;
 use pocketmine\entity\EntitySizeInfo;
 use pocketmine\entity\Living;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
+use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\entity\EntityDeathEvent;
+use pocketmine\item\enchantment\VanillaEnchantments;
 use pocketmine\network\mcpe\protocol\AddActorPacket;
 use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataCollection;
 use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataFlags;
@@ -27,6 +29,19 @@ abstract class VanillaEntity extends Living{
     protected function syncNetworkData(EntityMetadataCollection $properties): void{
         parent::syncNetworkData($properties);
         $properties->setGenericFlag(EntityMetadataFlags::BABY, $this->baby);
+    }
+
+    public function isOnFire(): bool{
+        $parent = parent::isOnFire();
+
+        if(!$parent){
+            if(($killer = $this->getLastHitPlayer()) !== null){
+                return $killer->getInventory()->getItemInHand()->hasEnchantment(VanillaEnchantments::FIRE_ASPECT());
+            }else{
+                return ($cause = $this->getLastDamageCause()) instanceof EntityDamageEvent && $cause->getCause() === EntityDamageEvent::CAUSE_FIRE_TICK;
+            }
+        }
+        return true;
     }
 
     protected function onDeath(): void{
@@ -71,8 +86,20 @@ abstract class VanillaEntity extends Living{
     }
 
     public function getLastHitByPlayer(): bool{
+        return $this->getLastHitPlayer() !== null;
+    }
+
+    public function getLastHitPlayer(): ?Player{
         $cause = $this->getLastDamageCause();
-        return $cause instanceof EntityDamageByEntityEvent && $cause->getDamager() instanceof Player;
+
+        if($cause instanceof EntityDamageByEntityEvent){
+            $killer = $cause->getDamager();
+
+            if($killer instanceof Player){
+                return $killer;
+            }
+        }
+        return null;
     }
 
     public function getEntityInfo(): ?EntityInfo{
