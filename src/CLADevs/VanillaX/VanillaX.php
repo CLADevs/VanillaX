@@ -53,6 +53,7 @@ final class VanillaX extends PluginBase{
         $this->blockManager->startup();
         $this->itemManager->startup();
         $this->commandManager->startup();
+        $this->inventoryManager->startup();
         $this->listenerManager->startup();
         $this->worldManager->startup();
     }

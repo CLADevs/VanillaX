@@ -1,0 +1,51 @@
+{
+  "type": "smithing_table",
+  "id": "shapeless",
+  "recipes": [
+    {
+      "input": "diamond_helmet",
+      "material": "netherite_ingot",
+      "output": "netherite_helmet"
+    },
+    {
+      "input": "diamond_chestplate",
+      "material": "netherite_ingot",
+      "output": "netherite_chestplate"
+    },
+    {
+      "input": "diamond_leggings",
+      "material": "netherite_ingot",
+      "output": "netherite_leggings"
+    },
+    {
+      "input": "diamond_boots",
+      "material": "netherite_ingot",
+      "output": "netherite_boots"
+    },
+    {
+      "input": "diamond_axe",
+      "material": "netherite_ingot",
+      "output": "netherite_axe"
+    },
+    {
+      "input": "diamond_pickaxe",
+      "material": "netherite_ingot",
+      "output": "netherite_pickaxe"
+    },
+    {
+      "input": "diamond_hoe",
+      "material": "netherite_ingot",
+      "output": "netherite_hoe"
+    },
+    {
+      "input": "diamond_shovel",
+      "material": "netherite_ingot",
+      "output": "netherite_shovel"
+    },
+    {
+      "input": "diamond_sword",
+      "material": "netherite_ingot",
+      "output": "netherite_sword"
+    }
+  ]
+}

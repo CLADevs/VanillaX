@@ -2,19 +2,74 @@
 
 namespace CLADevs\VanillaX\inventories;
 
+use CLADevs\VanillaX\inventories\recipe\RecipesMap;
 use CLADevs\VanillaX\inventories\utils\TypeConverterX;
 use CLADevs\VanillaX\items\LegacyItemIds;
+use CLADevs\VanillaX\utils\Utils;
 use pocketmine\item\Item;
 use pocketmine\item\ItemIds;
+use pocketmine\network\mcpe\cache\CraftingDataCache;
 use pocketmine\network\mcpe\convert\TypeConverter;
+use pocketmine\network\mcpe\protocol\CraftingDataPacket;
+use pocketmine\network\mcpe\protocol\types\inventory\ItemStack;
+use pocketmine\network\mcpe\protocol\types\recipe\RecipeIngredient;
+use pocketmine\network\mcpe\protocol\types\recipe\ShapelessRecipe;
+use pocketmine\Server;
+use pocketmine\utils\Binary;
 use pocketmine\utils\SingletonTrait;
+use Ramsey\Uuid\Uuid;
 
 class InventoryManager{
     use SingletonTrait;
 
+    /** @var RecipesMap[] */
+    private array $recipes = [];
+
     public function __construct(){
         self::setInstance($this);
         TypeConverter::setInstance(new TypeConverterX());
+    }
+
+    public function startup(): void{
+        $this->registerRecipes("smithing_table");
+    }
+
+    private function registerRecipes(string $type): bool{
+        $content = @file_get_contents(Utils::getResourceFile("recipes/$type.json"));
+
+        if($content){
+           $map = RecipesMap::from(json_decode($content, true));
+           $cache = CraftingDataCache::getInstance()->getCache(Server::getInstance()->getCraftingManager());
+
+           if($map->isShapeless()){
+               $this->registerShapeless($cache, $map);
+           }
+           $this->recipes[$map->getType()] = $map;
+        }
+        return false;
+    }
+
+    private function registerShapeless(CraftingDataPacket $cache, RecipesMap $map): void{
+        $counter = count($cache->recipesWithTypeIds);
+        $converter = TypeConverterX::getInstance();
+        $nullUUID = Uuid::fromString(Uuid::NIL);
+
+        foreach($map->getRecipes() as $recipe){
+            $cache->recipesWithTypeIds[] = new ShapelessRecipe(
+                CraftingDataPacket::ENTRY_SHAPELESS,
+                Binary::writeInt(++$counter),
+                array_map(function(Item $item) use ($converter) : RecipeIngredient{
+                    return $converter->coreItemStackToRecipeIngredient($item);
+                }, [$recipe->getInput(), $recipe->getMaterial()]),
+                array_map(function(Item $item) use ($converter) : ItemStack{
+                    return $converter->coreItemStackToNet($item);
+                }, [$recipe->getOutput()]),
+                $nullUUID,
+                $map->getType(),
+                50,
+                $counter
+            );
+        }
     }
 
     public function getExpForFurnace(Item $ingredient): float{
@@ -126,4 +181,10 @@ class InventoryManager{
         return 0;
     }
 
+    /**
+     * @return RecipesMap[]
+     */
+    public function getRecipes(): array{
+        return $this->recipes;
+    }
 }
