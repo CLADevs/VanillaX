@@ -45,6 +45,7 @@ use pocketmine\network\mcpe\protocol\CommandBlockUpdatePacket;
 use pocketmine\network\mcpe\protocol\ContainerClosePacket;
 use pocketmine\network\mcpe\protocol\FilterTextPacket;
 use pocketmine\network\mcpe\protocol\InventoryTransactionPacket;
+use pocketmine\network\mcpe\protocol\ItemStackRequestPacket;
 use pocketmine\network\mcpe\protocol\SetDefaultGameTypePacket;
 use pocketmine\network\mcpe\protocol\SetDifficultyPacket;
 use pocketmine\network\mcpe\protocol\SetPlayerGameTypePacket;
@@ -61,6 +62,7 @@ use pocketmine\world\Position;
 class InGamePacketHandlerX extends InGamePacketHandler{
 
     private Session $session;
+    private ItemStackRequestHandler $itemStackRequestHandler;
     private ?RepairTransaction $repairTransaction = null;
     private ?EnchantTransaction $enchantTransaction = null;
     private ?TradeTransaction $tradeTransaction = null;
@@ -69,6 +71,7 @@ class InGamePacketHandlerX extends InGamePacketHandler{
     public function __construct(Player $player, NetworkSession $session, InventoryManager $inventoryManager){
         parent::__construct($player, $session, $inventoryManager);
         $this->session = SessionManager::getInstance()->get($player);
+        $this->itemStackRequestHandler = new ItemStackRequestHandler($session);
     }
 
     public function handleAnvilDamage(AnvilDamagePacket $packet): bool{
@@ -394,4 +397,7 @@ class InGamePacketHandlerX extends InGamePacketHandler{
         }
     }
 
+    public function handleItemStackRequest(ItemStackRequestPacket $packet): bool{
+        return $this->itemStackRequestHandler->handleItemStackRequest($packet);
+    }
 }

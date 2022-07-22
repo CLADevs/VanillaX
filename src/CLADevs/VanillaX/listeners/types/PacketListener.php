@@ -10,6 +10,7 @@ use pocketmine\event\server\DataPacketReceiveEvent;
 use pocketmine\event\server\DataPacketSendEvent;
 use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
 use pocketmine\network\mcpe\protocol\ProtocolInfo;
+use pocketmine\network\mcpe\protocol\StartGamePacket;
 
 class PacketListener implements Listener{
 
@@ -22,7 +23,10 @@ class PacketListener implements Listener{
             foreach($event->getPackets() as $packet){
                 switch($packet::NETWORK_ID){
                     case ProtocolInfo::AVAILABLE_COMMANDS_PACKET:
-                        if($packet instanceof AvailableCommandsPacket) $this->handleCommandEnum($packet);
+                        if($packet instanceof AvailableCommandsPacket) $this->handleAvailableCommands($packet);
+                        break;
+                    case ProtocolInfo::START_GAME_PACKET:
+                        if($packet instanceof StartGamePacket) $this->handleStartGame($packet);
                         break;
                 }
             }
@@ -45,7 +49,7 @@ class PacketListener implements Listener{
      * Modifies enums for commands, arguments you see once you type /weather
      * are modified through this packet. '<clear: rain: thunder> [duration: int]'
      */
-    private function handleCommandEnum(AvailableCommandsPacket $packet): void{
+    private function handleAvailableCommands(AvailableCommandsPacket $packet): void{
         foreach(VanillaX::getInstance()->getCommandManager()->getCommands() as $key => $command){
             if(($arg = $command->getCommandArg()) !== null && ($command = $packet->commandData[strtolower($key)] ?? null) !== null){
                 $command->flags = $arg->getFlags();
@@ -53,5 +57,15 @@ class PacketListener implements Listener{
                 $command->overloads = $arg->getOverload();
             }
         }
+    }
+
+    /**
+     * @param StartGamePacket $packet
+     * This packet is sent by server to tell client where they are.
+     * There are more to this but its alot, so we are using it for
+     * to enable new inventory system made in 1.16.
+     */
+    private function handleStartGame(StartGamePacket $packet): void{
+        $packet->enableNewInventorySystem = true;
     }
 }
