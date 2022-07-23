@@ -49,10 +49,6 @@ class PlayerListener implements Listener{
         VanillaX::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function ()use($player): void{
             $player->getNetworkSession()->setHandler(new InGamePacketHandlerX($player, $player->getNetworkSession(), $player->getNetworkSession()->getInvManager()));
         }), 1);
-        //TODO remove testing
-//        $player->getInventory()->clearAll();
-//        $player->getInventory()->setItem(0, VanillaBlocks::OAK_PLANKS()->asItem()->setCount(32));
-//        $player->getInventory()->setItem(1, VanillaBlocks::OAK_PLANKS()->asItem()->setCount(32));
     }
 
     public function onQuit(PlayerQuitEvent $event): void{

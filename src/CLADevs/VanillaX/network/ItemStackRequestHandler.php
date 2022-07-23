@@ -53,7 +53,6 @@ class ItemStackRequestHandler{
         foreach($packet->getRequests() as $request){
             try {
                 foreach($request->getActions() as $action){
-//                    var_dump(get_class($action));
                     if($action instanceof TakeStackRequestAction){
                         $this->handleTake($action);
                     }else if($action instanceof PlaceStackRequestAction){
@@ -114,42 +113,21 @@ class ItemStackRequestHandler{
     }
 
     public function move(ItemStackRequestSlotInfo $source, ItemStackRequestSlotInfo $destination, int $count): void{
-        //TODO Mainly this is broken rest works fine, this causes glitch alot such as dupe
-        $destItem = $this->getItemFromStack($destination);
+        $dest = $this->getItemFromStack($destination);
 
         if($source->getContainerId() === ContainerIds::CREATIVE_OUTPUT){
             if($this->creativeItem === null){
-                throw new Exception("Expected CreativeCreateStackRequestAction, before moving item from creative inventory.");
+                return;
             }
-            $sourceItem = $this->creativeItem;
-            $sourceItem->setCount($count);
+            $item = $this->creativeItem;
         }else{
-            $sourceItem = $this->getItemFromStack($source);
+            $item = $this->getItemFromStack($source);
+            $this->setItemInStack($source, $item->setCount($item->getCount() - $count));
         }
-        if($sourceItem->isNull() && !$destItem->isNull()){
-            $sourceItem = $destItem;
-            $destItem = $sourceItem;
+        if($dest->isNull()){
+            $dest = (clone $item)->setCount(0);
         }
-        if($sourceItem->canStackWith($destItem)){
-            if($sourceItem->getCount() < ($maxStack = $sourceItem->getMaxStackSize())){
-                $resultCount = $sourceItem->getCount() + $destItem->getCount();
-                $leftOverCount = 0;
-
-                if($resultCount > $maxStack){
-                    $leftOverCount = $resultCount - $maxStack;
-                    $resultCount = $maxStack;
-                }
-                $sourceItem->setCount($resultCount);
-                $destItem->setCount($leftOverCount);
-            }
-        }elseif($sourceItem->getCount() !== $count && $count === 1){
-            $destItem = (clone $sourceItem)->setCount($sourceItem->getCount() - 1);
-            $sourceItem = $sourceItem->setCount($count);
-        }
-        $this->setItemInStack($destination, $sourceItem);
-        if($source->getContainerId() !== ContainerIds::CREATIVE_OUTPUT){
-            $this->setItemInStack($source, $destItem);
-        }
+        $this->setItemInStack($destination, $dest->setCount($dest->getCount() + $count));
     }
 
     private function handleSwap(SwapStackRequestAction $action): void{
@@ -230,7 +208,6 @@ class ItemStackRequestHandler{
     }
 
     private function handleDeprecatedCraftingResults(DeprecatedCraftingResultsStackRequestAction $action): void{
-
     }
 
     private function acceptRequest(int $requestId): void{
@@ -258,11 +235,8 @@ class ItemStackRequestHandler{
         return $inventory;
     }
 
-    private function getItemFromStack(ItemStackRequestSlotInfo $slotInfo, ?Inventory $inventory = null): Item{
-        if($inventory === null){
-            $inventory = $this->getInventory($slotInfo->getContainerId());
-        }
-        return $inventory->getItem($slotInfo->getSlotId());
+    private function getItemFromStack(ItemStackRequestSlotInfo $slotInfo): Item{
+        return $this->getInventory($slotInfo->getContainerId())->getItem($slotInfo->getSlotId());
     }
 
     private function setItemInStack(ItemStackRequestSlotInfo $slotInfo, Item $item): void{
@@ -280,6 +254,6 @@ class ItemStackRequestHandler{
             )
         ]);
         $inventory->setItem($index, $item);
-//        var_dump("Index: $index Count: " . $item->getCount() . " Name: " . $item->getName() . " Class: " . get_class($inventory));
     }
+
 }
