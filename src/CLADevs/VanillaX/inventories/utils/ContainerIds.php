@@ -3,6 +3,9 @@
 namespace CLADevs\VanillaX\inventories\utils;
 
 //ids from dragonfly and nukkit
+use CLADevs\VanillaX\inventories\types\AnvilInventory;
+use CLADevs\VanillaX\inventories\types\EnchantInventory;
+use pocketmine\block\inventory\CraftingTableInventory;
 use pocketmine\inventory\Inventory;
 use pocketmine\player\Player;
 
@@ -58,13 +61,40 @@ class ContainerIds{
     const CREATIVE_OUTPUT = 59;
 
     public static function getInventory(int $containerId, Player $player): ?Inventory{
-        return match ($containerId){
-            self::OFFHAND => $player->getOffHandInventory(),
-            self::CURSOR => $player->getCursorInventory(),
-            self::ARMOR => $player->getArmorInventory(),
-            self::HOTBAR, self::INVENTORY, self::FULL_INVENTORY => $player->getInventory(),
-            self::CRAFTING_INPUT, self::CRAFTING_OUTPUT, self::CREATIVE_OUTPUT => $player->getCraftingGrid(),
-            default => null,
-        };
+        $currentInventory = $player->getCurrentWindow();
+
+        switch($containerId){
+            case self::OFFHAND:
+                return $player->getOffHandInventory();
+            case self::CURSOR:
+                return $player->getCursorInventory();
+            case self::ARMOR:
+                return $player->getArmorInventory();
+            case self::HOTBAR:
+            case self::INVENTORY:
+            case self::FULL_INVENTORY:
+                return $player->getInventory();
+            case self::CRAFTING_INPUT:
+            case self::CRAFTING_OUTPUT:
+            case self::CREATIVE_OUTPUT:
+                if($currentInventory instanceof CraftingTableInventory){
+                    return $currentInventory;
+                }
+                return $player->getCraftingGrid();
+            case self::ANVIL_INPUT:
+            case self::ANVIL_MATERIAL:
+            case self::ANVIL_RESULT:
+                if($currentInventory instanceof AnvilInventory){
+                    return $currentInventory;
+                }
+                break;
+            case self::ENCHANTING_INPUT:
+            case self::ENCHANTING_MATERIAL:
+                if($currentInventory instanceof EnchantInventory){
+                    return $currentInventory;
+                }
+                break;
+        }
+        return null;
     }
 }

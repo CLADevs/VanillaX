@@ -6,13 +6,18 @@ use CLADevs\VanillaX\inventories\recipe\RecipesMap;
 use CLADevs\VanillaX\inventories\utils\TypeConverterX;
 use CLADevs\VanillaX\items\LegacyItemIds;
 use CLADevs\VanillaX\utils\Utils;
+use pocketmine\block\Planks;
+use pocketmine\item\Armor;
 use pocketmine\item\Item;
 use pocketmine\item\ItemIds;
+use pocketmine\item\ToolTier;
 use pocketmine\network\mcpe\cache\CraftingDataCache;
 use pocketmine\network\mcpe\convert\TypeConverter;
 use pocketmine\network\mcpe\protocol\CraftingDataPacket;
 use pocketmine\network\mcpe\protocol\types\inventory\ItemStack;
 use pocketmine\network\mcpe\protocol\types\recipe\RecipeIngredient;
+use pocketmine\network\mcpe\protocol\types\recipe\RecipeWithTypeId;
+use pocketmine\network\mcpe\protocol\types\recipe\ShapedRecipe;
 use pocketmine\network\mcpe\protocol\types\recipe\ShapelessRecipe;
 use pocketmine\Server;
 use pocketmine\utils\Binary;
@@ -24,6 +29,8 @@ class InventoryManager{
 
     /** @var RecipesMap[] */
     private array $recipes = [];
+    /** @var RecipeWithTypeId[] */
+    private array $recipeNetIds = [];
 
     public function __construct(){
         self::setInstance($this);
@@ -32,6 +39,13 @@ class InventoryManager{
 
     public function startup(): void{
         $this->registerRecipes("smithing_table");
+
+        $cache = CraftingDataCache::getInstance()->getCache(Server::getInstance()->getCraftingManager());
+        foreach($cache->recipesWithTypeIds as $recipe){
+            if($recipe instanceof ShapelessRecipe || $recipe instanceof ShapedRecipe){
+                $this->recipeNetIds[$recipe->getRecipeNetId()] = $recipe;
+            }
+        }
     }
 
     private function registerRecipes(string $type): bool{
@@ -179,6 +193,66 @@ class InventoryManager{
                 return 100;
         }
         return 0;
+    }
+
+    public function isRepairable(Item $input, Item $material): bool{
+        if($input instanceof ToolTier){
+            switch($input->name()){
+                case "wood":
+                    return $material instanceof Planks;
+                case "stone":
+                    return $material->getId() === ItemIds::COBBLESTONE;
+                case "iron":
+                    return $material->getId() === ItemIds::IRON_INGOT;
+                case "gold":
+                    return $material->getId() === ItemIds::GOLD_INGOT;
+                case "diamond":
+                    return $material->getId() === ItemIds::DIAMOND;
+            }
+        }
+        switch($input->getId()){
+            case ItemIds::SHIELD:
+                return $material instanceof Planks;
+            case ItemIds::LEATHER_CAP:
+            case ItemIds::LEATHER_CHESTPLATE:
+            case ItemIds::LEATHER_LEGGINGS:
+            case ItemIds::LEATHER_BOOTS:
+                return $material->getId() === ItemIds::LEATHER;
+            case ItemIds::IRON_HELMET:
+            case ItemIds::IRON_CHESTPLATE:
+            case ItemIds::IRON_LEGGINGS:
+            case ItemIds::IRON_BOOTS:
+                return $material->getId() === ItemIds::IRON_INGOT;
+            case ItemIds::GOLD_HELMET:
+            case ItemIds::GOLD_CHESTPLATE:
+            case ItemIds::GOLD_LEGGINGS:
+            case ItemIds::GOLD_BOOTS:
+                return $material->getId() === ItemIds::GOLD_INGOT;
+            case ItemIds::DIAMOND_HELMET:
+            case ItemIds::DIAMOND_CHESTPLATE:
+            case ItemIds::DIAMOND_LEGGINGS:
+            case ItemIds::DIAMOND_BOOTS:
+                return $material->getId() === ItemIds::DIAMOND;
+            case LegacyItemIds::NETHERITE_HELMET:
+            case LegacyItemIds::NETHERITE_CHESTPLATE:
+            case LegacyItemIds::NETHERITE_LEGGINGS:
+            case LegacyItemIds::NETHERITE_BOOTS:
+            case LegacyItemIds::NETHERITE_AXE:
+            case LegacyItemIds::NETHERITE_PICKAXE:
+            case LegacyItemIds::NETHERITE_HOE:
+            case LegacyItemIds::NETHERITE_SHOVEL:
+            case LegacyItemIds::NETHERITE_SWORD:
+                return $material->getId() === LegacyItemIds::NETHERITE_INGOT;
+            case ItemIds::TURTLE_SHELL_PIECE:
+                return $material->getId() === LegacyItemIds::SCUTE;
+            case ItemIds::ELYTRA:
+                return $material->getId() === ItemIds::PHANTOM_MEMBRANE;
+        }
+        return $input->equals($material, false);
+    }
+
+    public function getRecipeByNetId(int $netId): ?RecipeWithTypeId{
+        return $this->recipeNetIds[$netId] ?? null;
     }
 
     /**

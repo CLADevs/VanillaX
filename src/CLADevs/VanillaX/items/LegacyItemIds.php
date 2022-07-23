@@ -29,7 +29,7 @@ interface LegacyItemIds{
 	const HONEYCOMB = 736;
 	const SUSPICIOUS_STEW = 734;
 	const CAMPFIRE = 720;
-	const CAMERA = 498;
+	const SCUTE = 572;
 	const MAP = 358;
 	const STRUCTURE_VOID = 217;
 	const BORDER_BLOCK = 212;
