@@ -34,9 +34,15 @@ class WorldListener implements Listener{
 
             if($entity instanceof Player){
                 GameRuleManager::getInstance()->sendChanges($entity, $to->getWorld());
-                if($previousWeather !== null && $targetWeather !== null && $previousWeather->isRaining() && !$targetWeather->isRaining()){
-                    $weather->sendClear($entity);
+
+                if($previousWeather !== null && $targetWeather !== null) {
+                    if ($previousWeather->isRaining() && !$targetWeather->isRaining()) {
+                        $weather->sendClear($entity);
+                    } elseif (!$previousWeather->isRaining() && $targetWeather->isRaining()) {
+                        $weather->sendWeather($entity, $targetWeather->isThundering());
+                    }
                 }
+
             }
         }
     }
