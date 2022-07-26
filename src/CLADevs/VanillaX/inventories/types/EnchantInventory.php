@@ -9,7 +9,6 @@ use CLADevs\VanillaX\event\inventory\EnchantItemEvent;
 use CLADevs\VanillaX\inventories\FakeBlockInventory;
 use CLADevs\VanillaX\items\LegacyItemIds;
 use CLADevs\VanillaX\utils\Utils;
-use CLADevs\VanillaX\player\VanillaPlayer;
 use Exception;
 use pocketmine\block\Air;
 use pocketmine\block\BlockLegacyIds;
@@ -35,29 +34,11 @@ class EnchantInventory extends FakeBlockInventory implements TemporaryInventory{
     const SLOT_INPUT = 0;
     const SLOT_MATERIAL = 1;
 
-    private Random $random;
-
     /** @var EnchantOption[] */
     private array $options = [];
 
     public function __construct(Position $holder){
         parent::__construct($holder, 2, BlockLegacyIds::AIR, WindowTypes::ENCHANTMENT);
-    }
-
-
-    /**
-     * @param Player $player, returns player who successfully enchanted their item
-     * @param Item $item, returns a new item after its enchanted
-     */
-    public function onSuccess(Player $player, Item $item): void{
-    }
-
-    /**
-     * @param VanillaPlayer $who
-     */
-    public function onOpen(Player $who): void{
-        parent::onOpen($who);
-        $this->random = new Random($who->getXpSeed());
     }
 
     protected function onSlotChange(int $index, Item $before): void{
@@ -70,48 +51,49 @@ class EnchantInventory extends FakeBlockInventory implements TemporaryInventory{
     }
 
     public function sendEnchantmentOptions(Item $input, Player $player): void{
+        $random = new Random($player->getXpSeed());
         $options = [];
 
         if(!$input->isNull() && !$input->hasEnchantments()){
             $bookshelfCount = $this->countBookshelves();
-            $baseCost = ($this->random->nextBoundedInt(8) + 1) + floor($bookshelfCount >> 1) + $this->random->nextBoundedInt($bookshelfCount + 1);
+            $baseCost = ($random->nextBoundedInt(8) + 1) + floor($bookshelfCount >> 1) + $random->nextBoundedInt($bookshelfCount + 1);
             $topCost = floor(max($baseCost / 3, 1));
             $middleCost = floor($baseCost * 2 / 3 + 1);
             $bottomCost = floor(max($baseCost, $bookshelfCount * 2));
 
             $options = [
-                $this->createOption($input, $topCost),
-                $this->createOption($input, $middleCost),
-                $this->createOption($input, $bottomCost),
+                $this->createOption($random, $input, $topCost),
+                $this->createOption($random, $input, $middleCost),
+                $this->createOption($random, $input, $bottomCost),
             ];
         }
         $player->getNetworkSession()->sendDataPacket(PlayerEnchantOptionsPacket::create($options));
     }
 
-    public function createOption(Item $input, int $optionCost): EnchantOption{
+    public function createOption(Random $random, Item $input, int $optionCost): EnchantOption{
         $cost = $optionCost;
         $ability = $this->getEnchantability($input);
-        $enchantAbility = $cost + 1 + $this->random->nextBoundedInt($ability / 4 + 1) + $this->random->nextBoundedInt($ability / 4 + 1);
+        $enchantAbility = $cost + 1 + $random->nextBoundedInt($ability / 4 + 1) + $random->nextBoundedInt($ability / 4 + 1);
         $enchantAbility = Utils::clamp(round($cost + $cost * $enchantAbility), 1, PHP_INT_MAX);
         $enchantments = $this->getAvailableEnchantments($cost, $input);
         /** @var EnchantmentInstance[] $list */
         $list = [];
 
         if(count($enchantments) >= 1){
-            $weightedEnchantment = $this->getRandomWeightedEnchantment($this->random, $enchantments);
+            $weightedEnchantment = $this->getRandomWeightedEnchantment($random, $enchantments);
 
             if($weightedEnchantment !== null){
                 $list[] = $weightedEnchantment;
             }
 
-            while($this->random->nextBoundedInt(50) <= $enchantAbility){
+            while($random->nextBoundedInt(50) <= $enchantAbility){
                 if(count($list) >= 1){
                     $enchantments = $this->filterEnchantments($enchantments, $list[array_key_last($list)]);
                 }
                 if(count($enchantments) < 1){
                     break;
                 }
-                $weightedEnchantment = $this->getRandomWeightedEnchantment($this->random, $enchantments);
+                $weightedEnchantment = $this->getRandomWeightedEnchantment($random, $enchantments);
 
                 if($weightedEnchantment !== null){
                     $list[] = $weightedEnchantment;

@@ -8,6 +8,7 @@ use CLADevs\VanillaX\inventories\FakeBlockInventory;
 use CLADevs\VanillaX\items\LegacyItemIds;
 use CLADevs\VanillaX\session\Session;
 use Exception;
+use pocketmine\block\Air;
 use pocketmine\block\Anvil;
 use pocketmine\block\BlockLegacyIds;
 use pocketmine\block\Planks;
@@ -23,7 +24,6 @@ use pocketmine\item\TieredTool;
 use pocketmine\nbt\tag\IntTag;
 use pocketmine\network\mcpe\protocol\types\inventory\WindowTypes;
 use pocketmine\player\Player;
-use pocketmine\utils\Random;
 use pocketmine\world\Position;
 
 class AnvilInventory extends FakeBlockInventory implements TemporaryInventory{
@@ -99,7 +99,7 @@ class AnvilInventory extends FakeBlockInventory implements TemporaryInventory{
             }
             $xpManager->subtractXpLevels($cost);
         }
-        if((new Random())->nextFloat() < 0.12){
+        if($player->getRandom()->nextFloat() < 0.12){
             $block = $this->holder->getWorld()->getBlock($this->holder);
 
             if($block instanceof Anvil){
@@ -111,7 +111,10 @@ class AnvilInventory extends FakeBlockInventory implements TemporaryInventory{
                     $block = VanillaBlocks::AIR();
                     Session::playSound($player, "random.anvil_break");
                 }
-                $this->holder->getWorld()->setBlock($block->getPosition(), $block);
+                $this->holder->getWorld()->setBlock($this->holder, $block);
+                if(!$block instanceof Air){
+                    Session::playSound($player, "random.anvil_use");
+                }
             }
         }else{
             Session::playSound($player, "random.anvil_use");
@@ -194,7 +197,6 @@ class AnvilInventory extends FakeBlockInventory implements TemporaryInventory{
                 $input->addEnchantment(new EnchantmentInstance($type, $costLevel));
 
                 $rarityCost = $type->getRarityCost();
-
                 if($isBook){
                     $rarityCost = max(1, $rarityCost / 2);
                 }
