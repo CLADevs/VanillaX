@@ -143,7 +143,6 @@ class BlockManager{
                     if($constID !== null){
                         $saveNames[] = "minecraft:" . strtolower($constID);
                     }
-                    var_dump($namespace);
                     self::registerTile($namespace, $saveNames, $tileBlock === false ? BlockLegacyIds::AIR : $tileBlock);
                 }else{
                     VanillaX::getInstance()->getLogger()->error("Tile ID could not be found for '$namespace'");
