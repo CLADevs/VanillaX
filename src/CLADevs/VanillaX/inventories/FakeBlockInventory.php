@@ -21,13 +21,13 @@ use pocketmine\world\Position;
 class FakeBlockInventory extends SimpleInventory implements BlockInventory{
     use BlockInventoryTrait;
 
-    private string $title;
+    protected string $title;
 
-    private int $defaultSize;
-    private int $windowType;
+    protected int $defaultSize;
+    protected int $windowType;
 
-    private ?Player $owner;
-    private Block $block;
+    protected ?Player $owner;
+    protected Block $block;
 
     /** @var null|callable */
     private $packetCallable;

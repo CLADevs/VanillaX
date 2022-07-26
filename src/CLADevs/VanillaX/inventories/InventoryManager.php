@@ -3,6 +3,7 @@
 namespace CLADevs\VanillaX\inventories;
 
 use CLADevs\VanillaX\inventories\recipe\RecipesMap;
+use CLADevs\VanillaX\inventories\types\SmithingInventory;
 use CLADevs\VanillaX\inventories\utils\TypeConverterX;
 use CLADevs\VanillaX\items\LegacyItemIds;
 use CLADevs\VanillaX\utils\Utils;
@@ -13,6 +14,8 @@ use pocketmine\network\mcpe\convert\TypeConverter;
 use pocketmine\network\mcpe\protocol\CraftingDataPacket;
 use pocketmine\network\mcpe\protocol\types\inventory\ItemStack;
 use pocketmine\network\mcpe\protocol\types\recipe\RecipeIngredient;
+use pocketmine\network\mcpe\protocol\types\recipe\RecipeWithTypeId;
+use pocketmine\network\mcpe\protocol\types\recipe\ShapedRecipe;
 use pocketmine\network\mcpe\protocol\types\recipe\ShapelessRecipe;
 use pocketmine\Server;
 use pocketmine\utils\Binary;
@@ -24,6 +27,8 @@ class InventoryManager{
 
     /** @var RecipesMap[] */
     private array $recipes = [];
+    /** @var RecipeWithTypeId[] */
+    private array $recipeNetIds = [];
 
     public function __construct(){
         self::setInstance($this);
@@ -31,7 +36,14 @@ class InventoryManager{
     }
 
     public function startup(): void{
-        $this->registerRecipes("smithing_table");
+        $this->registerRecipes(SmithingInventory::BLOCK_NAME);
+
+        $cache = CraftingDataCache::getInstance()->getCache(Server::getInstance()->getCraftingManager());
+        foreach($cache->recipesWithTypeIds as $recipe){
+            if($recipe instanceof ShapelessRecipe || $recipe instanceof ShapedRecipe){
+                $this->recipeNetIds[$recipe->getRecipeNetId()] = $recipe;
+            }
+        }
     }
 
     private function registerRecipes(string $type): bool{
@@ -123,62 +135,18 @@ class InventoryManager{
     }
 
     public function getComposterChance(Item $ingredient): int{
-        switch($ingredient->getId()){
-            case ItemIds::BEETROOT_SEEDS:
-            case ItemIds::DRIED_KELP:
-            case ItemIds::KELP;
-            case ItemIds::GRASS;
-            case ItemIds::LEAVES;
-            case ItemIds::MELON_SEEDS;
-            case ItemIds::PUMPKIN_SEEDS;
-            case ItemIds::SAPLING;
-            case ItemIds::SEAGRASS;
-            case ItemIds::SWEET_BERRIES;
-            case ItemIds::WHEAT_SEEDS;
-                return 30;
-            case ItemIds::CACTUS:
-            case ItemIds::DRIED_KELP_BLOCK:
-            case ItemIds::MELON_SLICE:
-            case ItemIds::SUGARCANE:
-            case ItemIds::TALL_GRASS:
-            case ItemIds::VINES:
-            case LegacyItemIds::WEEPING_VINES:
-            case LegacyItemIds::TWISTING_VINES:
-                return 50;
-            case ItemIds::APPLE:
-            case ItemIds::BEETROOT:
-            case ItemIds::CARROT:
-            case ItemIds::COCOA:
-            case ItemIds::RED_FLOWER:
-            case ItemIds::YELLOW_FLOWER:
-            case ItemIds::LILY_PAD:
-            case ItemIds::MELON:
-            case ItemIds::RED_MUSHROOM:
-            case ItemIds::BROWN_MUSHROOM:
-            case ItemIds::MUSHROOM_STEW:
-            case ItemIds::NETHER_WART:
-            case ItemIds::POTATO:
-            case ItemIds::PUMPKIN:
-            case ItemIds::SEA_PICKLE:
-            case ItemIds::WHEAT:
-            case LegacyItemIds::CRIMSON_FUNGUS:
-            case LegacyItemIds::WARPED_FUNGUS:
-            case LegacyItemIds::CRIMSON_ROOTS:
-            case LegacyItemIds::WARPED_ROOTS:
-                return 65;
-            case ItemIds::BAKED_POTATO:
-            case ItemIds::BREAD:
-            case ItemIds::COOKIE:
-            case ItemIds::HAY_BALE:
-            case ItemIds::BROWN_MUSHROOM_BLOCK:
-            case ItemIds::NETHER_WART_BLOCK:
-            case LegacyItemIds::WARPED_WART_BLOCK:
-                return 85;
-            case ItemIds::CAKE:
-            case ItemIds::PUMPKIN_PIE:
-                return 100;
-        }
-        return 0;
+        return match ($ingredient->getId()){
+            ItemIds::BEETROOT_SEEDS, ItemIds::DRIED_KELP, ItemIds::KELP, ItemIds::GRASS, ItemIds::LEAVES, ItemIds::MELON_SEEDS, ItemIds::PUMPKIN_SEEDS, ItemIds::SAPLING, ItemIds::SEAGRASS, ItemIds::SWEET_BERRIES, ItemIds::WHEAT_SEEDS => 30,
+            ItemIds::CACTUS, ItemIds::DRIED_KELP_BLOCK, ItemIds::MELON_SLICE, ItemIds::SUGARCANE, ItemIds::TALL_GRASS, ItemIds::VINES, LegacyItemIds::WEEPING_VINES, LegacyItemIds::TWISTING_VINES => 50,
+            ItemIds::APPLE, ItemIds::BEETROOT, ItemIds::CARROT, ItemIds::COCOA, ItemIds::RED_FLOWER, ItemIds::YELLOW_FLOWER, ItemIds::LILY_PAD, ItemIds::MELON, ItemIds::RED_MUSHROOM, ItemIds::BROWN_MUSHROOM, ItemIds::MUSHROOM_STEW, ItemIds::NETHER_WART, ItemIds::POTATO, ItemIds::PUMPKIN, ItemIds::SEA_PICKLE, ItemIds::WHEAT, LegacyItemIds::CRIMSON_FUNGUS, LegacyItemIds::WARPED_FUNGUS, LegacyItemIds::CRIMSON_ROOTS, LegacyItemIds::WARPED_ROOTS => 65,
+            ItemIds::BAKED_POTATO, ItemIds::BREAD, ItemIds::COOKIE, ItemIds::HAY_BALE, ItemIds::BROWN_MUSHROOM_BLOCK, ItemIds::NETHER_WART_BLOCK, LegacyItemIds::WARPED_WART_BLOCK => 85,
+            ItemIds::CAKE, ItemIds::PUMPKIN_PIE => 100,
+            default => 0,
+        };
+    }
+
+    public function getRecipeByNetId(int $netId): ?RecipeWithTypeId{
+        return $this->recipeNetIds[$netId] ?? null;
     }
 
     /**

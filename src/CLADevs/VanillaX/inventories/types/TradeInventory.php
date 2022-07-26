@@ -6,13 +6,14 @@ use CLADevs\VanillaX\entities\passive\VillagerEntity;
 use CLADevs\VanillaX\inventories\FakeBlockInventory;
 use CLADevs\VanillaX\VanillaX;
 use pocketmine\block\BlockLegacyIds;
+use pocketmine\inventory\TemporaryInventory;
 use pocketmine\network\mcpe\protocol\ContainerClosePacket;
 use pocketmine\network\mcpe\protocol\types\CacheableNbt;
 use pocketmine\network\mcpe\protocol\types\inventory\WindowTypes;
 use pocketmine\network\mcpe\protocol\UpdateTradePacket;
 use pocketmine\player\Player;
 
-class TradeInventory extends FakeBlockInventory{
+class TradeInventory extends FakeBlockInventory implements TemporaryInventory{
 
     private VillagerEntity $villager;
 
@@ -34,10 +35,6 @@ class TradeInventory extends FakeBlockInventory{
     }
 
     public function onClose(Player $who): void{
-        foreach($this->getContents() as $item){
-            $who->dropItem($item);
-        }
-        $this->clearAll();
         VanillaX::getInstance()->getSessionManager()->get($who)->setTradingEntity(null);
         $this->villager->setCustomer(null);
 
@@ -51,7 +48,7 @@ class TradeInventory extends FakeBlockInventory{
     public function onOpen(Player $who): void{
         parent::onOpen($who);
         $pk = new UpdateTradePacket();
-        $pk->windowId = $who->getNetworkSession()->getInvManager()->getWindowId($this);
+        $pk->windowId = $who->getNetworkSession()->getInvManager()->getCurrentWindowId();
         $pk->windowType = WindowTypes::TRADING;
         $pk->windowSlotCount = 0;
         $pk->tradeTier = 0;

@@ -2,7 +2,7 @@
 
 namespace CLADevs\VanillaX\entities\utils;
 
-use CLADevs\VanillaX\enchantments\utils\EnchantmentTrait;
+use CLADevs\VanillaX\enchantments\EnchantmentTrait;
 use CLADevs\VanillaX\entities\VanillaEntity;
 use CLADevs\VanillaX\VanillaX;
 use pocketmine\block\utils\DyeColor;
@@ -40,8 +40,7 @@ class ItemHelper{
     public static function applyEnchantRandomly(Item $item, bool $treasure): void{
         if($treasure){
             $enchantments = [];
-            /** @var EnchantmentTrait|Enchantment $enchantment */
-            foreach(VanillaX::getInstance()->getEnchantmentManager()->getEnchantmentMap() as $enchantment){
+            foreach(VanillaX::getInstance()->getEnchantmentManager()->getEnchantments() as $enchantment){
                 if($enchantment->isTreasure()){
                     $enchantments[] = $enchantment->getMcpeId();
                 }
@@ -57,8 +56,7 @@ class ItemHelper{
         if($treasure){
             $enchantments = [];
 
-            /** @var EnchantmentTrait $enchant */
-            foreach(VanillaX::getInstance()->getEnchantmentManager()->getEnchantmentMap() as $key => $enchant){
+            foreach(VanillaX::getInstance()->getEnchantmentManager()->getEnchantments() as $key => $enchant){
                 if($enchant->isTreasure()){
                     $enchantments[$key] = $enchant;
                 }

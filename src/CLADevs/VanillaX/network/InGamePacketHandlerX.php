@@ -3,35 +3,19 @@
 namespace CLADevs\VanillaX\network;
 
 use CLADevs\VanillaX\blocks\tile\CommandBlockTile;
-use CLADevs\VanillaX\configuration\features\BlockFeature;
-use CLADevs\VanillaX\configuration\Setting;
 use CLADevs\VanillaX\entities\EntityManager;
-use CLADevs\VanillaX\entities\passive\VillagerEntity;
 use CLADevs\VanillaX\entities\utils\EntityInteractResult;
 use CLADevs\VanillaX\entities\utils\EntityInteractable;
 use CLADevs\VanillaX\entities\VanillaEntity;
 use CLADevs\VanillaX\event\player\PlayerEntityPickEvent;
-use CLADevs\VanillaX\inventories\transaction\EnchantTransaction;
-use CLADevs\VanillaX\inventories\transaction\RepairTransaction;
-use CLADevs\VanillaX\inventories\transaction\TradeTransaction;
-use CLADevs\VanillaX\inventories\transaction\UpgradeTransaction;
-use CLADevs\VanillaX\inventories\types\AnvilInventory;
-use CLADevs\VanillaX\inventories\types\EnchantInventory;
-use CLADevs\VanillaX\inventories\types\SmithingInventory;
 use CLADevs\VanillaX\inventories\types\TradeInventory;
-use CLADevs\VanillaX\inventories\utils\TypeConverterX;
 use CLADevs\VanillaX\session\Session;
 use CLADevs\VanillaX\session\SessionManager;
 use CLADevs\VanillaX\utils\instances\InteractButtonResult;
 use CLADevs\VanillaX\utils\item\InteractButtonItemTrait;
 use CLADevs\VanillaX\VanillaX;
 use Exception;
-use pocketmine\block\BlockFactory;
-use pocketmine\block\BlockLegacyIds;
-use pocketmine\block\VanillaBlocks;
 use pocketmine\data\java\GameModeIdMap;
-use pocketmine\inventory\transaction\action\InventoryAction;
-use pocketmine\inventory\transaction\TransactionException;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
 use pocketmine\network\mcpe\convert\TypeConverter;
@@ -45,11 +29,11 @@ use pocketmine\network\mcpe\protocol\CommandBlockUpdatePacket;
 use pocketmine\network\mcpe\protocol\ContainerClosePacket;
 use pocketmine\network\mcpe\protocol\FilterTextPacket;
 use pocketmine\network\mcpe\protocol\InventoryTransactionPacket;
+use pocketmine\network\mcpe\protocol\ItemStackRequestPacket;
 use pocketmine\network\mcpe\protocol\SetDefaultGameTypePacket;
 use pocketmine\network\mcpe\protocol\SetDifficultyPacket;
 use pocketmine\network\mcpe\protocol\SetPlayerGameTypePacket;
 use pocketmine\network\mcpe\protocol\types\ActorEvent;
-use pocketmine\network\mcpe\protocol\types\inventory\NetworkInventoryAction;
 use pocketmine\network\mcpe\protocol\types\inventory\NormalTransactionData;
 use pocketmine\network\mcpe\protocol\types\inventory\UseItemOnEntityTransactionData;
 use pocketmine\network\mcpe\protocol\types\inventory\UseItemTransactionData;
@@ -61,14 +45,12 @@ use pocketmine\world\Position;
 class InGamePacketHandlerX extends InGamePacketHandler{
 
     private Session $session;
-    private ?RepairTransaction $repairTransaction = null;
-    private ?EnchantTransaction $enchantTransaction = null;
-    private ?TradeTransaction $tradeTransaction = null;
-    private ?UpgradeTransaction $upgradeTransaction = null;
+    private ItemStackRequestHandler $itemStackRequestHandler;
 
     public function __construct(Player $player, NetworkSession $session, InventoryManager $inventoryManager){
         parent::__construct($player, $session, $inventoryManager);
         $this->session = SessionManager::getInstance()->get($player);
+        $this->itemStackRequestHandler = new ItemStackRequestHandler($session);
     }
 
     public function handleAnvilDamage(AnvilDamagePacket $packet): bool{
@@ -161,188 +143,10 @@ class InGamePacketHandlerX extends InGamePacketHandler{
     public function handleInventoryTransaction(InventoryTransactionPacket $packet): bool{
         $trData = $packet->trData;
 
-        if($trData instanceof NormalTransactionData){
-            $session = $this->session;
-            $player = $session->getPlayer();
-            $inventory = $player->getCurrentWindow();
-
-            if($inventory instanceof AnvilInventory || $inventory instanceof EnchantInventory || $inventory instanceof TradeInventory || $inventory instanceof SmithingInventory){
-                $convertor = TypeConverterX::getInstance();
-                $isRepairPart = false;
-                $isEnchantPart = false;
-                $isTradePart = false;
-                $isUpgradePart = false;
-                $actions = [];
-
-                foreach($trData->getActions() as $networkInventoryAction){
-                    $networkInventoryAction = clone $networkInventoryAction;
-
-                    if(in_array($networkInventoryAction->sourceType, [NetworkInventoryAction::SOURCE_TODO, TypeConverterX::SOURCE_CRAFT_SLOT])){
-                        switch($networkInventoryAction->windowId){
-                            case NetworkInventoryAction::SOURCE_TYPE_ANVIL_RESULT:
-                            case TypeConverterX::SOURCE_TYPE_ANVIL_INPUT:
-                            case TypeConverterX::SOURCE_TYPE_ANVIL_MATERIAL:
-                                if($inventory instanceof SmithingInventory){
-                                    $isUpgradePart = true;
-                                }else{
-                                    $isRepairPart = true;
-                                }
-                                break;
-                            case NetworkInventoryAction::SOURCE_TYPE_ENCHANT_OUTPUT:
-                            case TypeConverterX::SOURCE_TYPE_ENCHANT_INPUT:
-                            case TypeConverterX::SOURCE_TYPE_ENCHANT_MATERIAL:
-                                $isEnchantPart = true;
-                                break;
-                            case TypeConverterX::SOURCE_TYPE_TRADE_OUTPUT:
-                            case TypeConverterX::SOURCE_TYPE_TRADE_INPUT:
-                                $isTradePart = true;
-                                break;
-                        }
-                    }
-                    $actions[] = $convertor->createInventoryAction($networkInventoryAction, $player, $player->getNetworkSession()->getInvManager());
-                }
-                if($isRepairPart && BlockFeature::getInstance()->isBlockEnabled(VanillaBlocks::ANVIL())){
-                    return $this->handleRepairTransaction($player, $actions, $trData);
-                }elseif($isEnchantPart && BlockFeature::getInstance()->isBlockEnabled(VanillaBlocks::ENCHANTING_TABLE())){
-                    return $this->handleEnchantTransaction($player, $actions, $trData);
-                }elseif($isTradePart && Setting::getInstance()->isTradeEnabled()){
-                    return $this->handleTradeTransaction($player, $actions, $trData, $inventory->getVillager());
-                }elseif($isUpgradePart && BlockFeature::getInstance()->isBlockEnabled(BlockFactory::getInstance()->get(BlockLegacyIds::SMITHING_TABLE, 0))){
-                    return $this->handleUpgradeTransaction($player, $actions, $trData);
-                }
-            }
-        }else{
+        if(!$trData instanceof NormalTransactionData){
             $this->handleInteractableButton($packet);
         }
         return parent::handleInventoryTransaction($packet);
-    }
-
-    /**
-     * @param Player $player
-     * @param InventoryAction[] $actions
-     * @param NormalTransactionData $trData
-     * @return bool
-     */
-    private function handleRepairTransaction(Player $player, array $actions, NormalTransactionData $trData): bool{
-        try{
-            if($this->repairTransaction === null){
-                $this->repairTransaction = new RepairTransaction($player, $actions);
-            }else{
-                foreach($actions as $action){
-                    $this->repairTransaction->addAction($action);
-                }
-            }
-            if($this->repairTransaction->canExecute()){
-                $this->repairTransaction->execute();
-                $this->repairTransaction = null;
-            }
-            return true;
-        }catch(TransactionException $e){
-            foreach($this->repairTransaction->getInventories() as $inventory){
-                $player->getNetworkSession()->getInvManager()->syncContents($inventory);
-            }
-            $this->repairTransaction = null;
-            $logger = $player->getNetworkSession()->getLogger();
-            $logger->debug("Failed to execute anvil inventory transaction: " . $e->getMessage());
-            $logger->debug("Actions: " . json_encode($trData->getActions()));
-            return false;
-        }
-    }
-
-    /**
-     * @param Player $player
-     * @param InventoryAction[] $actions
-     * @param NormalTransactionData $trData
-     * @return bool
-     */
-    private function handleEnchantTransaction(Player $player, array $actions, NormalTransactionData $trData): bool{
-        try{
-            if($this->enchantTransaction === null){
-                $this->enchantTransaction = new EnchantTransaction($player, $actions);
-            }else{
-                foreach($actions as $action){
-                    $this->enchantTransaction->addAction($action);
-                }
-            }
-            if($this->enchantTransaction->canExecute()){
-                $this->enchantTransaction->execute();
-                $this->enchantTransaction = null;
-            }
-            return true;
-        }catch(TransactionException $e){
-            foreach($this->enchantTransaction->getInventories() as $inventory){
-                $player->getNetworkSession()->getInvManager()->syncContents($inventory);
-            }
-            $this->enchantTransaction = null;
-            $logger = $player->getNetworkSession()->getLogger();
-            $logger->debug("Failed to execute enchant inventory transaction: " . $e->getMessage());
-            $logger->debug("Actions: " . json_encode($trData->getActions()));
-            return false;
-        }
-    }
-
-    /**
-     * @param Player $player
-     * @param InventoryAction[] $actions
-     * @param NormalTransactionData $trData
-     * @return bool
-     */
-    private function handleTradeTransaction(Player $player, array $actions, NormalTransactionData $trData, VillagerEntity $villager): bool{
-        try{
-            if($this->tradeTransaction === null){
-                $this->tradeTransaction = new TradeTransaction($player, $actions, $villager);
-            }else{
-                foreach($actions as $action){
-                    $this->tradeTransaction->addAction($action);
-                }
-            }
-            if($this->tradeTransaction->canExecute()){
-                $this->tradeTransaction->execute();
-                $this->tradeTransaction = null;
-            }
-            return true;
-        }catch(TransactionException $e){
-            foreach($this->tradeTransaction->getInventories() as $inventory){
-                $player->getNetworkSession()->getInvManager()->syncContents($inventory);
-            }
-            $this->tradeTransaction = null;
-            $logger = $player->getNetworkSession()->getLogger();
-            $logger->debug("Failed to execute trade inventory transaction: " . $e->getMessage());
-            $logger->debug("Actions: " . json_encode($trData->getActions()));
-            return false;
-        }
-    }
-
-    /**
-     * @param Player $player
-     * @param InventoryAction[] $actions
-     * @param NormalTransactionData $trData
-     * @return bool
-     */
-    private function handleUpgradeTransaction(Player $player, array $actions, NormalTransactionData $trData): bool{
-        try{
-            if($this->upgradeTransaction === null){
-                $this->upgradeTransaction = new UpgradeTransaction($player, $actions);
-            }else{
-                foreach($actions as $action){
-                    $this->upgradeTransaction->addAction($action);
-                }
-            }
-            if($this->upgradeTransaction->canExecute()){
-                $this->upgradeTransaction->execute();
-                $this->upgradeTransaction = null;
-            }
-            return true;
-        }catch(TransactionException $e){
-            foreach($this->upgradeTransaction->getInventories() as $inventory){
-                $player->getNetworkSession()->getInvManager()->syncContents($inventory);
-            }
-            $this->upgradeTransaction = null;
-            $logger = $player->getNetworkSession()->getLogger();
-            $logger->debug("Failed to execute smithing inventory transaction: " . $e->getMessage());
-            $logger->debug("Actions: " . json_encode($trData->getActions()));
-            return false;
-        }
     }
 
     private function handleInteractableButton(InventoryTransactionPacket $packet): void{
@@ -394,4 +198,7 @@ class InGamePacketHandlerX extends InGamePacketHandler{
         }
     }
 
+    public function handleItemStackRequest(ItemStackRequestPacket $packet): bool{
+        return $this->itemStackRequestHandler->handleItemStackRequest($packet);
+    }
 }

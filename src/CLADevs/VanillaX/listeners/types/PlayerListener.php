@@ -7,6 +7,7 @@ use CLADevs\VanillaX\configuration\features\ItemFeature;
 use CLADevs\VanillaX\items\types\ElytraItem;
 use CLADevs\VanillaX\items\types\ShieldItem;
 use CLADevs\VanillaX\network\InGamePacketHandlerX;
+use CLADevs\VanillaX\player\VanillaPlayer;
 use CLADevs\VanillaX\world\gamerule\GameRule;
 use CLADevs\VanillaX\world\gamerule\GameRuleManager;
 use CLADevs\VanillaX\utils\item\HeldItemChangeTrait;
@@ -17,9 +18,11 @@ use pocketmine\block\BlockLegacyIds;
 use pocketmine\block\Water;
 use pocketmine\data\bedrock\EnchantmentIdMap;
 use pocketmine\data\bedrock\EnchantmentIds;
+use pocketmine\event\entity\EntityTeleportEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerBedLeaveEvent;
 use pocketmine\event\player\PlayerBlockPickEvent;
+use pocketmine\event\player\PlayerCreationEvent;
 use pocketmine\event\player\PlayerDeathEvent;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\event\player\PlayerItemHeldEvent;
@@ -33,6 +36,7 @@ use pocketmine\item\ItemIds;
 use pocketmine\item\VanillaItems;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataFlags;
+use pocketmine\player\Player;
 use pocketmine\scheduler\ClosureTask;
 use pocketmine\Server;
 use pocketmine\world\World;
@@ -71,6 +75,23 @@ class PlayerListener implements Listener{
         VanillaX::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function ()use($player): void{
             $player->getNetworkSession()->setHandler(new InGamePacketHandlerX($player, $player->getNetworkSession(), $player->getNetworkSession()->getInvManager()));
         }), 1);
+    }
+
+    public function onTeleport(EntityTeleportEvent $event): void{
+        $player = $event->getEntity();
+
+        if($player instanceof Player){
+            $instance = WeatherManager::getInstance();
+            $weather = $instance->getWeather($event->getTo()->getWorld());
+
+            if($weather !== null){
+                if($weather->isRaining()){
+                    $instance->sendWeather($player, $weather->isThundering());
+                }else{
+                    $instance->sendClear($player);
+                }
+            }
+        }
     }
 
     public function onInteract(PlayerInteractEvent $event): void{
@@ -208,5 +229,10 @@ class PlayerListener implements Listener{
                 $newItem->onSlotChange($player, $oldItem, $newItem);
             }
         }
+    }
+
+    public function onCreation(PlayerCreationEvent $event): void{
+        $event->setBaseClass($event->getPlayerClass());
+        $event->setPlayerClass(VanillaPlayer::class);
     }
 }

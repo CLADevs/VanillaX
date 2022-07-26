@@ -48,4 +48,10 @@ class Utils{
         $file = "item_id_map.json";
         return array_merge(json_decode(file_get_contents(BEDROCK_DATA_PATH . "/$file"), true), json_decode(file_get_contents(self::getResourceFile($file)), true));
     }
+
+    public static function clamp(int|float $value, int|float $min, int|float $max): int|float{
+        if($value < $min) return $min;
+        if($value > $max) return $max;
+        return $value;
+    }
 }
