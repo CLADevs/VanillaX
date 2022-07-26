@@ -3,43 +3,35 @@
 namespace CLADevs\VanillaX\inventories\types;
 
 use CLADevs\VanillaX\blocks\tile\BeaconTile;
+use CLADevs\VanillaX\event\inventory\BeaconPaymentEvent;
 use CLADevs\VanillaX\inventories\FakeBlockInventory;
 use pocketmine\block\BlockLegacyIds;
-use pocketmine\nbt\tag\CompoundTag;
-use pocketmine\nbt\tag\StringTag;
-use pocketmine\network\mcpe\protocol\BlockActorDataPacket;
-use pocketmine\network\mcpe\protocol\ServerboundPacket;
+use pocketmine\inventory\TemporaryInventory;
 use pocketmine\network\mcpe\protocol\types\inventory\WindowTypes;
 use pocketmine\player\Player;
 use pocketmine\world\Position;
 
-class BeaconInventory extends FakeBlockInventory{
+class BeaconInventory extends FakeBlockInventory implements TemporaryInventory{
 
+    const SLOT_PAYMENT = 0;
 
     public function __construct(Position $holder){
         parent::__construct($holder, 1, BlockLegacyIds::AIR, WindowTypes::BEACON);
     }
 
-    public function handlePacket(Player $player, ServerboundPacket $packet): bool{
-        if($packet instanceof BlockActorDataPacket){
-            $root = $packet->nbt->getRoot();
+    public function onBeaconPayment(Player $player, int $primary, int $secondary): void{
+        $ev = new BeaconPaymentEvent($player, $this, $this->getItem(self::SLOT_PAYMENT), $primary, $secondary);
+        $ev->call();
 
-            if($root instanceof CompoundTag){
-                $id = $root->getTag("id");
-
-                if($id instanceof StringTag && $id->getValue() === "Beacon"){
-                    $tile = $player->getWorld()->getTileAt($root->getInt("x"), $root->getInt("y"), $root->getInt("z"));
-
-                    if($tile instanceof BeaconTile && $tile->isInQueue($player)){
-                        $tile->setPrimary($root->getInt(BeaconTile::TAG_PRIMARY));
-                        $tile->setSecondary($root->getInt(BeaconTile::TAG_SECONDARY));
-                        $tile->getPosition()->getWorld()->scheduleDelayedBlockUpdate($tile->getPosition(), 20);
-                        $tile->removeFromQueue($player);
-                    }
-                    return false;
-                }
-            }
+        if($ev->isCancelled()){
+            return;
         }
-        return true;
+        $tile = $player->getWorld()->getTile($this->holder);
+
+        if($tile instanceof BeaconTile){
+            $tile->setPrimary($ev->getPrimary());
+            $tile->setSecondary($ev->getSecondary());
+            $tile->getPosition()->getWorld()->scheduleDelayedBlockUpdate($tile->getPosition(), 20);
+        }
     }
 }

@@ -4,8 +4,10 @@ namespace CLADevs\VanillaX\inventories\utils;
 
 //ids from dragonfly and nukkit
 use CLADevs\VanillaX\inventories\types\AnvilInventory;
+use CLADevs\VanillaX\inventories\types\BeaconInventory;
 use CLADevs\VanillaX\inventories\types\EnchantInventory;
 use pocketmine\block\inventory\CraftingTableInventory;
+use pocketmine\block\inventory\ShulkerBoxInventory;
 use pocketmine\inventory\Inventory;
 use pocketmine\player\Player;
 
@@ -81,20 +83,7 @@ class ContainerIds{
                     return $currentInventory;
                 }
                 return $player->getCraftingGrid();
-            case self::ANVIL_INPUT:
-            case self::ANVIL_MATERIAL:
-            case self::ANVIL_RESULT:
-                if($currentInventory instanceof AnvilInventory){
-                    return $currentInventory;
-                }
-                break;
-            case self::ENCHANTING_INPUT:
-            case self::ENCHANTING_MATERIAL:
-                if($currentInventory instanceof EnchantInventory){
-                    return $currentInventory;
-                }
-                break;
         }
-        return null;
+        return $currentInventory;
     }
 }

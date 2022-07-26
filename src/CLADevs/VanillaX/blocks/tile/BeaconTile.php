@@ -26,9 +26,6 @@ class BeaconTile extends Spawnable{
 
     private BeaconInventory $inventory;
 
-    /** @var BeaconPaymentAction[] */
-    private array $queues = [];
-
     public function __construct(World $world, Vector3 $pos){
         parent::__construct($world, $pos);
         $this->inventory = new BeaconInventory(Position::fromObject($pos, $world));
@@ -50,20 +47,6 @@ class BeaconTile extends Spawnable{
 
     protected function addAdditionalSpawnData(CompoundTag $nbt): void{
         $this->writeSaveData($nbt);
-    }
-
-    public function isInQueue(Player $player): bool{
-        return isset($this->queues[$player->getName()]);
-    }
-
-    public function addToQueue(Player $player, BeaconPaymentAction $action): void{
-        $this->queues[$player->getName()] = $action;
-    }
-
-    public function removeFromQueue(Player $player): void{
-        if($this->isInQueue($player)){
-            unset($this->queues[$player->getName()]);
-        }
     }
 
     public function getInventory(): BeaconInventory{

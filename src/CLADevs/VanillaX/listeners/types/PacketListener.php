@@ -4,7 +4,6 @@ namespace CLADevs\VanillaX\listeners\types;
 
 use CLADevs\VanillaX\inventories\FakeBlockInventory;
 use CLADevs\VanillaX\VanillaX;
-use pocketmine\event\inventory\InventoryTransactionEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\server\DataPacketReceiveEvent;
 use pocketmine\event\server\DataPacketSendEvent;
@@ -13,10 +12,6 @@ use pocketmine\network\mcpe\protocol\ProtocolInfo;
 use pocketmine\network\mcpe\protocol\StartGamePacket;
 
 class PacketListener implements Listener{
-
-    public function onInventoryTransaction(InventoryTransactionEvent $event): void{
-        VanillaX::getInstance()->getEnchantmentManager()->handleInventoryTransaction($event);
-    }
 
     public function onDataPacketSend(DataPacketSendEvent $event): void{
         if(!$event->isCancelled()){

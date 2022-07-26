@@ -10,14 +10,16 @@ use CLADevs\VanillaX\event\inventory\itemstack\MoveItemStackEvent;
 use CLADevs\VanillaX\event\inventory\itemstack\SwapItemStackEvent;
 use CLADevs\VanillaX\inventories\InventoryManager;
 use CLADevs\VanillaX\inventories\types\AnvilInventory;
+use CLADevs\VanillaX\inventories\types\BeaconInventory;
 use CLADevs\VanillaX\inventories\types\EnchantInventory;
+use CLADevs\VanillaX\inventories\types\SmithingInventory;
 use CLADevs\VanillaX\inventories\utils\ContainerIds;
-use CLADevs\VanillaX\items\types\EnchantedBookItem;
 use CLADevs\VanillaX\VanillaX;
 use Exception;
 use pocketmine\block\inventory\CraftingTableInventory;
 use pocketmine\crafting\ShapelessRecipe;
-use pocketmine\event\inventory\CraftItemEvent;
+use pocketmine\data\bedrock\EnchantmentIdMap;
+use pocketmine\data\bedrock\EnchantmentIds;
 use pocketmine\inventory\CreativeInventory;
 use pocketmine\inventory\Inventory;
 use pocketmine\inventory\PlayerCraftingInventory;
@@ -120,7 +122,7 @@ class ItemStackRequestHandler{
                 }
                 $this->acceptRequest($request->getRequestId());
             }catch (Exception $e){
-//                Server::getInstance()->getLogger()->logException($e);
+                Server::getInstance()->getLogger()->logException($e);
                 $this->rejectRequest($request->getRequestId());
                 VanillaX::getInstance()->getLogger()->debug("Failed to handle ItemStackRequest for player '" . $this->session->getPlayer()->getName() . "': " . $e->getMessage());
             }
@@ -147,6 +149,9 @@ class ItemStackRequestHandler{
     }
 
     public function move(int $type, ItemStackRequestSlotInfo $source, ItemStackRequestSlotInfo $destination, int $count): void{
+        if($this->session->getPlayer()->isCreative() && $source->getContainerId() === ContainerIds::ARMOR && $this->getItemFromStack($source)->hasEnchantment(EnchantmentIdMap::getInstance()->fromId(EnchantmentIds::BINDING))){
+            return;
+        }
         $ev = new MoveItemStackEvent($this->session->getPlayer(), $type, $count, $source, $destination);
         $ev->call();
 
@@ -220,12 +225,21 @@ class ItemStackRequestHandler{
      * Deleting items in creative mode by throwing it into creative inventory
      */
     private function handleDestroy(DestroyStackRequestAction $action): void{
+        $source = $action->getSource();
         $player = $this->session->getPlayer();
 
         if(!$player->isCreative()){
-            throw new Exception("received DestroyStackRequestAction while not being in creative");
+            $handled = false;
+            $inventory = $this->getInventory($source->getContainerId());
+
+            if($inventory instanceof BeaconInventory){
+                $handled = true;
+            }
+            if(!$handled){
+                throw new Exception("received DestroyStackRequestAction while not being in creative");
+            }
         }
-        $ev = new DestroyItemStackEvent($player, $action->getSource());
+        $ev = new DestroyItemStackEvent($player, $source);
         $ev->call();
 
         if($ev->isCancelled()){
@@ -270,6 +284,12 @@ class ItemStackRequestHandler{
     }
 
     private function handleBeaconPayment(BeaconPaymentStackRequestAction $action): void{
+        $player = $this->session->getPlayer();
+        $currentInventory = $player->getCurrentWindow();
+
+        if($currentInventory instanceof BeaconInventory){
+            $currentInventory->onBeaconPayment($player, $action->getPrimaryEffectId(), $action->getSecondaryEffectId());
+        }
     }
 
     private function handleMineBlock(MineBlockStackRequestAction $action): void{
@@ -281,7 +301,18 @@ class ItemStackRequestHandler{
      * Crafting normally without using auto
      */
     private function handleCraftRecipe(CraftRecipeStackRequestAction $action): void{
-        $this->craft($action->getRecipeId());
+        $netId = $action->getRecipeId();
+        $player = $this->session->getPlayer();
+        $currentInventory = $player->getCurrentWindow();
+
+        if($currentInventory instanceof EnchantInventory){
+            $this->creativeOutput = $currentInventory->getResultItem($player, $netId);
+            return;
+        }elseif($currentInventory instanceof SmithingInventory){
+            $this->creativeOutput = $currentInventory->getResultItem($player, $netId);
+            return;
+        }
+        $this->craft($netId);
     }
 
     /**
@@ -342,37 +373,12 @@ class ItemStackRequestHandler{
     }
 
     private function handleCraftRecipeOptional(CraftRecipeOptionalStackRequestAction $action, array $filterStrings): void{
-        $currentInventory = $this->session->getPlayer()->getCurrentWindow();
-        if(!$currentInventory instanceof AnvilInventory){
-            throw new Exception("No anvil inventory opened");
+        $player = $this->session->getPlayer();
+        $currentInventory = $player->getCurrentWindow();
+
+        if($currentInventory instanceof AnvilInventory){
+            $this->creativeOutput = $currentInventory->getResultItem($player, $action->getFilterStringIndex(), $filterStrings);
         }
-
-        //TODO Repair Cost
-        $item = $currentInventory->getItem(0);
-        $material = $currentInventory->getItem(1);
-        $newName = $filterStrings[$action->getFilterStringIndex()];
-        $newItem = (clone $item)->setCustomName($newName);
-
-        if(!$material->isNull()){
-            foreach($material->getEnchantments() as $enchantment){
-                $newItem->addEnchantment($enchantment);
-            }
-            if($newItem instanceof Durable && InventoryManager::getInstance()->isRepairable($newItem, $material)){
-                $maxRepairDamage = $newItem->getMaxDurability() / 4;
-                $repairDamage = min($newItem->getDamage(), $maxRepairDamage);
-
-                if($repairDamage > 0){
-                    $damage = $newItem->getDamage();
-
-                    for($i = 0; $repairDamage > 0 && $i < $material->getCount(); $i++){
-                        $damage -= $repairDamage;
-                        $repairDamage = min($damage, $maxRepairDamage);
-                    }
-                    $newItem->setDamage($damage);
-                }
-            }
-        }
-        $this->creativeOutput = $newItem;
     }
 
     private function handleGrindstone(GrindstoneStackRequestAction $action): void{
@@ -447,6 +453,8 @@ class ItemStackRequestHandler{
         $slotMap = match(true){
             $inventory instanceof AnvilInventory => UIInventorySlotOffset::ANVIL,
             $inventory instanceof EnchantInventory => UIInventorySlotOffset::ENCHANTING_TABLE,
+            $inventory instanceof BeaconInventory => [UIInventorySlotOffset::BEACON_PAYMENT => 0],
+            $inventory instanceof SmithingInventory => [51 => 0, 52 => 2],
             default => null
         };
         if($slotMap !== null){

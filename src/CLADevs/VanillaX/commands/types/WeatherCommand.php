@@ -42,11 +42,16 @@ class WeatherCommand extends Command{
             return;
         }
         $duration = 6000;
+
         $weathers = [];
-        foreach(Server::getInstance()->getWorldManager()->getWorlds() as $world){
-            if(($weather = WeatherManager::getInstance()->getWeather($world)) !== null){
-                $weathers[] = $weather;
+        if(!$sender instanceof Player){
+            foreach(Server::getInstance()->getWorldManager()->getWorlds() as $world){
+                if(($weather = WeatherManager::getInstance()->getWeather($world)) !== null){
+                    $weathers[] = $weather;
+                }
             }
+        }else{
+            $weathers[] = WeatherManager::getInstance()->getWeather($sender->getWorld());
         }
 
         if(isset($args[1]) && is_numeric($args[1])){
