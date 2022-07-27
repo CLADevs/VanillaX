@@ -232,7 +232,6 @@ class PlayerListener implements Listener{
     }
 
     public function onCreation(PlayerCreationEvent $event): void{
-        $event->setBaseClass($event->getPlayerClass());
         $event->setPlayerClass(VanillaPlayer::class);
     }
 }
