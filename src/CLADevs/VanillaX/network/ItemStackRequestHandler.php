@@ -214,8 +214,12 @@ class ItemStackRequestHandler{
             return;
         }
         $source = $ev->getSource();
-        $item = $this->getItemFromStack($source);
-        $this->setItemInStack($source, VanillaItems::AIR());
+        if($source->getContainerId() !== ContainerIds::CREATIVE_OUTPUT){
+            $item = $this->getItemFromStack($source);
+            $this->setItemInStack($source, VanillaItems::AIR());
+        }else{
+            $item = $this->creativeOutput;
+        }
         $this->session->getPlayer()->dropItem($item);
     }
 
