@@ -66,8 +66,8 @@ abstract class VanillaEntity extends Living{
         $pk->yaw = $this->location->yaw;
         $pk->headYaw = $this->location->yaw;
         $pk->pitch = $this->location->pitch;
-        $pk->attributes = array_map(function(Attribute $attr): NetworkAttribute{
-            return new NetworkAttribute($attr->getId(), $attr->getMinValue(), $attr->getMaxValue(), $attr->getValue(), $attr->getDefaultValue());
+        $pk->attributes = array_map(function(Attribute $attr) : NetworkAttribute{
+            return new NetworkAttribute($attr->getId(), $attr->getMinValue(), $attr->getMaxValue(), $attr->getValue(), $attr->getDefaultValue(), []);
         }, $this->attributeMap->getAll());
         $pk->metadata = $this->getAllNetworkData();
         $player->getNetworkSession()->sendDataPacket($pk);
