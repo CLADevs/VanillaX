@@ -22,7 +22,7 @@ class NameTagItem extends Item implements EntityInteractable{
             return;
         }
         $entity->setNameTag($this->getName());
-        if($player->isSurvival() || $player->isAdventure()){
+        if($player->hasFiniteResources()){
             $this->pop();
             $player->getInventory()->setItemInHand($this);
         }

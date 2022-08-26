@@ -1,6 +1,6 @@
 <?php
 
-namespace CLADevs\VanillaX\network;
+namespace CLADevs\VanillaX\inventories;
 
 use CLADevs\VanillaX\event\inventory\itemstack\CraftItemStackEvent;
 use CLADevs\VanillaX\event\inventory\itemstack\CreativeCreateItemStackEvent;
@@ -8,12 +8,10 @@ use CLADevs\VanillaX\event\inventory\itemstack\DestroyItemStackEvent;
 use CLADevs\VanillaX\event\inventory\itemstack\DropItemStackEvent;
 use CLADevs\VanillaX\event\inventory\itemstack\MoveItemStackEvent;
 use CLADevs\VanillaX\event\inventory\itemstack\SwapItemStackEvent;
-use CLADevs\VanillaX\inventories\InventoryManager;
 use CLADevs\VanillaX\inventories\types\AnvilInventory;
 use CLADevs\VanillaX\inventories\types\BeaconInventory;
 use CLADevs\VanillaX\inventories\types\EnchantInventory;
 use CLADevs\VanillaX\inventories\types\SmithingInventory;
-use CLADevs\VanillaX\inventories\utils\ContainerIds;
 use CLADevs\VanillaX\VanillaX;
 use Exception;
 use pocketmine\block\inventory\CraftingTableInventory;
@@ -23,6 +21,7 @@ use pocketmine\data\bedrock\EnchantmentIds;
 use pocketmine\inventory\CreativeInventory;
 use pocketmine\inventory\Inventory;
 use pocketmine\inventory\PlayerCraftingInventory;
+use pocketmine\inventory\PlayerOffHandInventory;
 use pocketmine\item\Durable;
 use pocketmine\item\Item;
 use pocketmine\item\VanillaItems;
@@ -30,6 +29,7 @@ use pocketmine\network\mcpe\convert\TypeConverter;
 use pocketmine\network\mcpe\NetworkSession;
 use pocketmine\network\mcpe\protocol\ItemStackRequestPacket;
 use pocketmine\network\mcpe\protocol\ItemStackResponsePacket;
+use pocketmine\network\mcpe\protocol\types\inventory\ContainerUIIds;
 use pocketmine\network\mcpe\protocol\types\inventory\stackrequest\BeaconPaymentStackRequestAction;
 use pocketmine\network\mcpe\protocol\types\inventory\stackrequest\CraftingConsumeInputStackRequestAction;
 use pocketmine\network\mcpe\protocol\types\inventory\stackrequest\CraftingMarkSecondaryResultStackRequestAction;
@@ -60,12 +60,8 @@ use pocketmine\network\mcpe\protocol\types\recipe\ShapedRecipe;
 use pocketmine\Server;
 
 class ItemStackRequestHandler{
-
-    //From nukkit
-    const CRAFTING_GRID_SMALL_OFFSET = 28;
-    const CRAFTING_GRID_LARGE_OFFSET = 32;
-
-    private ?Item $creativeOutput = null;
+    
+    private ?Item $createdOutput = null;
 
     /** @var ItemStackResponseContainerInfo[] */
     private array $containerInfo = [];
@@ -149,7 +145,7 @@ class ItemStackRequestHandler{
     }
 
     public function move(int $type, ItemStackRequestSlotInfo $source, ItemStackRequestSlotInfo $destination, int $count): void{
-        if($this->session->getPlayer()->isCreative() && $source->getContainerId() === ContainerIds::ARMOR && $this->getItemFromStack($source)->hasEnchantment(EnchantmentIdMap::getInstance()->fromId(EnchantmentIds::BINDING))){
+        if($this->session->getPlayer()->isCreative() && $source->getContainerId() === ContainerUIIds::ARMOR && $this->getItemFromStack($source)->hasEnchantment(EnchantmentIdMap::getInstance()->fromId(EnchantmentIds::BINDING))){
             return;
         }
         $ev = new MoveItemStackEvent($this->session->getPlayer(), $type, $count, $source, $destination);
@@ -164,11 +160,11 @@ class ItemStackRequestHandler{
         $count = $ev->getCount();
         $dest = $this->getItemFromStack($destination);
 
-        if($source->getContainerId() === ContainerIds::CREATIVE_OUTPUT){
-            if($this->creativeOutput === null){
-                throw new Exception("Expected creative output to be created.");
+        if($source->getContainerId() === ContainerUIIds::CREATED_OUTPUT){
+            if($this->createdOutput === null){
+                throw new Exception("Expected created_output_request to be set.");
             }
-            $item = $this->creativeOutput;
+            $item = $this->createdOutput;
         }else{
             $item = $this->getItemFromStack($source);
             $this->setItemInStack($source, $item->setCount($item->getCount() - $count));
@@ -214,11 +210,11 @@ class ItemStackRequestHandler{
             return;
         }
         $source = $ev->getSource();
-        if($source->getContainerId() !== ContainerIds::CREATIVE_OUTPUT){
+        if($source->getContainerId() !== ContainerUIIds::CREATED_OUTPUT){
             $item = $this->getItemFromStack($source);
             $this->setItemInStack($source, VanillaItems::AIR());
         }else{
-            $item = $this->creativeOutput;
+            $item = $this->createdOutput;
         }
         $this->session->getPlayer()->dropItem($item);
     }
@@ -259,7 +255,7 @@ class ItemStackRequestHandler{
      * Crafting input being reduced
      */
     private function handleCraftingConsumeInput(CraftingConsumeInputStackRequestAction $action): void{
-        if($this->creativeOutput === null || $this->creativeOutput->isNull()){
+        if($this->createdOutput === null || $this->createdOutput->isNull()){
             return;
         }
         $source = $action->getSource();
@@ -310,10 +306,10 @@ class ItemStackRequestHandler{
         $currentInventory = $player->getCurrentWindow();
 
         if($currentInventory instanceof EnchantInventory){
-            $this->creativeOutput = $currentInventory->getResultItem($player, $netId);
+            $this->createdOutput = $currentInventory->getResultItem($player, $netId);
             return;
         }elseif($currentInventory instanceof SmithingInventory){
-            $this->creativeOutput = $currentInventory->getResultItem($player, $netId);
+            $this->createdOutput = $currentInventory->getResultItem($player, $netId);
             return;
         }
         $this->craft($netId);
@@ -346,7 +342,7 @@ class ItemStackRequestHandler{
             VanillaX::getInstance()->getLogger()->debug("Failed to execute CraftItemStack: Event Cancelled");
         }
 
-        $this->creativeOutput = $ev->getResult();
+        $this->createdOutput = $ev->getResult();
     }
 
     /**
@@ -373,7 +369,7 @@ class ItemStackRequestHandler{
             VanillaX::getInstance()->getLogger()->debug("Failed to execute CreativeCreateItemStack: Event Cancelled");
             return;
         }
-        $this->creativeOutput = $ev->getItem();
+        $this->createdOutput = $ev->getItem();
     }
 
     private function handleCraftRecipeOptional(CraftRecipeOptionalStackRequestAction $action, array $filterStrings): void{
@@ -381,7 +377,7 @@ class ItemStackRequestHandler{
         $currentInventory = $player->getCurrentWindow();
 
         if($currentInventory instanceof AnvilInventory){
-            $this->creativeOutput = $currentInventory->getResultItem($player, $action->getFilterStringIndex(), $filterStrings);
+            $this->createdOutput = $currentInventory->getResultItem($player, $action->getFilterStringIndex(), $filterStrings);
         }
     }
 
@@ -403,7 +399,7 @@ class ItemStackRequestHandler{
             new ItemStackResponse(ItemStackResponse::RESULT_OK, $requestId, $this->containerInfo)
         ]));
         $this->containerInfo = [];
-        $this->creativeOutput = null;
+        $this->createdOutput = null;
     }
 
     private function rejectRequest(int $requestId): void{
@@ -411,11 +407,11 @@ class ItemStackRequestHandler{
             new ItemStackResponse(ItemStackResponse::RESULT_ERROR, $requestId, $this->containerInfo)
         ]));
         $this->containerInfo = [];
-        $this->creativeOutput = null;
+        $this->createdOutput = null;
     }
 
     private function getInventory(int $id): Inventory{
-        $inventory = ContainerIds::getInventory($id, $this->session->getPlayer());
+        $inventory = $this->translateContainerId($id);
 
         if(!$inventory){
             throw new Exception("Failed to find container with id of $id");
@@ -447,23 +443,45 @@ class ItemStackRequestHandler{
     }
 
     private function getIndexForInventory(int $index, Inventory $inventory): int{
-        if($index >= $inventory->getSize()){
-            if($inventory instanceof CraftingTableInventory){
-                $index -= self::CRAFTING_GRID_LARGE_OFFSET;
-            }else if($inventory instanceof PlayerCraftingInventory){
-                $index -= self::CRAFTING_GRID_SMALL_OFFSET;
-            }
-        }
         $slotMap = match(true){
+            $inventory instanceof PlayerCraftingInventory => UIInventorySlotOffset::CRAFTING2X2_INPUT,
+            $inventory instanceof CraftingTableInventory => UIInventorySlotOffset::CRAFTING3X3_INPUT,
             $inventory instanceof AnvilInventory => UIInventorySlotOffset::ANVIL,
             $inventory instanceof EnchantInventory => UIInventorySlotOffset::ENCHANTING_TABLE,
             $inventory instanceof BeaconInventory => [UIInventorySlotOffset::BEACON_PAYMENT => 0],
             $inventory instanceof SmithingInventory => [51 => 0, 52 => 2],
+            $inventory instanceof PlayerOffHandInventory => [1 => 0],
             default => null
         };
         if($slotMap !== null){
             $index = $slotMap[$index] ?? $index;
         }
         return $index;
+    }
+
+    private function translateContainerId(int $containerId): ?Inventory{
+        $player = $this->session->getPlayer();
+        $currentInventory = $player->getCurrentWindow();
+
+        switch($containerId){
+            case ContainerUIIds::OFFHAND:
+                return $player->getOffHandInventory();
+            case ContainerUIIds::CURSOR:
+                return $player->getCursorInventory();
+            case ContainerUIIds::ARMOR:
+                return $player->getArmorInventory();
+            case ContainerUIIds::HOTBAR:
+            case ContainerUIIds::INVENTORY:
+            case ContainerUIIds::COMBINED_HOTBAR_AND_INVENTORY:
+                return $player->getInventory();
+            case ContainerUIIds::CRAFTING_INPUT:
+            case ContainerUIIds::CRAFTING_OUTPUT_PREVIEW:
+            case ContainerUIIds::CREATED_OUTPUT:
+                if($currentInventory instanceof CraftingTableInventory){
+                    return $currentInventory;
+                }
+                return $player->getCraftingGrid();
+        }
+        return $currentInventory;
     }
 }

@@ -21,11 +21,17 @@ class FireworkRocketItem extends Item{
     }
 
     public function onClickAir(Player $player, Vector3 $directionVector): ItemUseResult{
-        $this->checkElytra($player);
-        return parent::onClickAir($player, $directionVector);
+        if($this->checkElytra($player) && $this->count > 0){
+            if($player->hasFiniteResources()) $this->pop();
+            return ItemUseResult::SUCCESS();
+        }
+        return ItemUseResult::FAIL();
     }
 
     public function onInteractBlock(Player $player, Block $blockReplace, Block $blockClicked, int $face, Vector3 $clickVector): ItemUseResult{
+        if($this->count < 1){
+            return ItemUseResult::FAIL();
+        }
         if(!$this->checkElytra($player)){
             $location = Location::fromObject($blockReplace->getPosition()->add(0.5, 0, 0.5), $blockClicked->getPosition()->getWorld());
             $entity = new FireworkRocketEntity($location, $player);
@@ -36,14 +42,13 @@ class FireworkRocketItem extends Item{
             $entity->spawnToAll();
         }
         Session::playSound($player, "firework.launch");
-        if($player->isSurvival() || $player->isAdventure()) $this->pop();
-        return parent::onInteractBlock($player, $blockReplace, $blockClicked, $face, $clickVector);
+        if($player->hasFiniteResources()) $this->pop();
+        return ItemUseResult::SUCCESS();
     }
 
     public function checkElytra(Player $player): bool{
         if($player->getArmorInventory()->getChestplate() instanceof ElytraItem && $player->isGliding()){
             $player->setMotion($player->getDirectionVector()->multiply(1.6));
-            $this->pop();
             return true;
         }
         return false;

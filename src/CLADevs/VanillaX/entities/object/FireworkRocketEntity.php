@@ -49,7 +49,6 @@ class FireworkRocketEntity extends Projectile implements EntityCustomRegisterClo
             if($this->straight){
                 $this->motion->y += 0.05;
             }
-            //TODO Horizontal Firework
         }else{
             if(!$this->isClosed() && !$this->isFlaggedForDespawn()){
                 $pk = new ActorEventPacket();

@@ -27,26 +27,17 @@ class SuspiciousStewItem extends Food{
     }
 
     public function getAdditionalEffects(): array{
-        switch($this->getMeta()){
-            case 0:
-                return [new EffectInstance(VanillaEffects::NIGHT_VISION())];
-            case 1:
-                return [new EffectInstance(VanillaEffects::JUMP_BOOST())];
-            case 2:
-                return [new EffectInstance(VanillaEffects::WEAKNESS())];
-            case 3:
-                return [new EffectInstance(VanillaEffects::BLINDNESS())];
-            case 4:
-                return [new EffectInstance(VanillaEffects::POISON())];
-            case 6:
-                return [new EffectInstance(VanillaEffects::SATURATION())];
-            case 7:
-                return [new EffectInstance(VanillaEffects::FIRE_RESISTANCE())];
-            case 8:
-                return [VanillaEffects::REGENERATION()];
-            case 9:
-                return [VanillaEffects::WITHER()];
-        }
-        return [];
+        return match ($this->getMeta()){
+            0 => [new EffectInstance(VanillaEffects::NIGHT_VISION())],
+            1 => [new EffectInstance(VanillaEffects::JUMP_BOOST())],
+            2 => [new EffectInstance(VanillaEffects::WEAKNESS())],
+            3 => [new EffectInstance(VanillaEffects::BLINDNESS())],
+            4 => [new EffectInstance(VanillaEffects::POISON())],
+            6 => [new EffectInstance(VanillaEffects::SATURATION())],
+            7 => [new EffectInstance(VanillaEffects::FIRE_RESISTANCE())],
+            8 => [VanillaEffects::REGENERATION()],
+            9 => [VanillaEffects::WITHER()],
+            default => [],
+        };
     }
 }

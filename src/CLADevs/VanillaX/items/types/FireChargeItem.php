@@ -22,7 +22,7 @@ class FireChargeItem extends Item{
     public function onInteractBlock(Player $player, Block $blockReplace, Block $blockClicked, int $face, Vector3 $clickVector): ItemUseResult{
         if($blockReplace instanceof Air){
             $blockReplace->getPosition()->getWorld()->setBlock($blockReplace->getPosition(), VanillaBlocks::FIRE(), true);
-            if($player->isSurvival() || $player->isAdventure()) $this->pop();
+            if($player->hasFiniteResources()) $this->pop();
             Session::playSound($player, "mob.blaze.shoot");
             return ItemUseResult::SUCCESS();
         }

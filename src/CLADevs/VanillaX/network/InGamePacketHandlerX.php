@@ -8,7 +8,9 @@ use CLADevs\VanillaX\entities\utils\EntityInteractResult;
 use CLADevs\VanillaX\entities\utils\EntityInteractable;
 use CLADevs\VanillaX\entities\VanillaEntity;
 use CLADevs\VanillaX\event\player\PlayerEntityPickEvent;
+use CLADevs\VanillaX\inventories\ItemStackRequestHandler;
 use CLADevs\VanillaX\inventories\types\TradeInventory;
+use CLADevs\VanillaX\items\types\CrossbowItem;
 use CLADevs\VanillaX\session\Session;
 use CLADevs\VanillaX\session\SessionManager;
 use CLADevs\VanillaX\utils\instances\InteractButtonResult;
@@ -141,10 +143,23 @@ class InGamePacketHandlerX extends InGamePacketHandler{
     }
 
     public function handleInventoryTransaction(InventoryTransactionPacket $packet): bool{
+        $player = $this->session->getPlayer();
         $trData = $packet->trData;
 
-        if(!$trData instanceof NormalTransactionData){
-            $this->handleInteractableButton($packet);
+        switch($trData->getTypeId()){
+            case UseItemTransactionData::ID:
+            case UseItemOnEntityTransactionData::ID:
+                $this->handleInteractableButton($packet);
+
+                if($trData instanceof UseItemTransactionData && $trData->getActionType() === UseItemTransactionData::ACTION_CLICK_AIR && $player->isUsingItem()){
+                    $item = $player->getInventory()->getItemInHand();
+
+                    if($item instanceof CrossbowItem){
+                        $player->useHeldItem();
+                        return true;
+                    }
+                }
+                break;
         }
         return parent::handleInventoryTransaction($packet);
     }

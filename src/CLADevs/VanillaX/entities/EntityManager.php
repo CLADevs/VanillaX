@@ -2,6 +2,7 @@
 
 namespace CLADevs\VanillaX\entities;
 
+use CLADevs\VanillaX\entities\utils\EntityCustomSaveNames;
 use CLADevs\VanillaX\entities\utils\EntityInfo;
 use CLADevs\VanillaX\entities\utils\villager\VillagerProfession;
 use CLADevs\VanillaX\entities\utils\EntityCustomRegisterClosure;
@@ -38,14 +39,19 @@ class EntityManager{
                 $implements = class_implements($namespace);
 
                 if(!isset($implements[NonAutomaticCallItemTrait::class])){
+                    $names = [$namespace::getNetworkTypeId()];
                     $closure = null;
 
                     if(isset($implements[EntityCustomRegisterClosure::class])){
                         /** @var EntityCustomRegisterClosure $namespace */
                         $closure = $namespace::getRegisterClosure();
                     }
+                    if(isset($implements[EntityCustomSaveNames::class])){
+                        /** @var EntityCustomSaveNames $namespace */
+                        $names = array_merge($namespace::getSaveNames(), $names);
+                    }
                     /** @var VanillaEntity $namespace */
-                    $this->registerEntity($namespace, $type, [$namespace::getNetworkTypeId()], null, $closure);
+                    $this->registerEntity($namespace, $type, $names, null, $closure);
                 }
             });
         }

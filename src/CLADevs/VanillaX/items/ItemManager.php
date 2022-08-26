@@ -13,7 +13,10 @@ use CLADevs\VanillaX\utils\Utils;
 use pocketmine\data\bedrock\LegacyItemIdToStringIdMap;
 use pocketmine\entity\Entity;
 use pocketmine\entity\Location;
+use pocketmine\inventory\ArmorInventory;
 use pocketmine\inventory\CreativeInventory;
+use pocketmine\item\Armor;
+use pocketmine\item\ArmorTypeInfo;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIdentifier;
@@ -49,6 +52,7 @@ class ItemManager{
         self::register(new Item(new ItemIdentifier(ItemIds::PHANTOM_MEMBRANE, 0), "Phantom Membrane")); //ITEM
         self::register(new Item(new ItemIdentifier(ItemIds::FIREWORKS_CHARGE, 0), "Fireworks Charge")); //ITEM
         self::register(new Item(new ItemIdentifier(ItemIds::CARROT_ON_A_STICK, 0), "Carrot on a Stick")); //ITEM
+        self::register(new Armor(new ItemIdentifier(ItemIds::TURTLE_HELMET, 0), "Turtle Helmet", new ArmorTypeInfo(1, 276, ArmorInventory::SLOT_HEAD))); //ITEM
         for($i = 416; $i <= 419; $i++){
             self::register(new HorseArmorItem($i));
         }
