@@ -395,4 +395,5 @@ class BlockManager{
         TileFactory::getInstance()->register($namespace, $names);
         return true;
     }
+
 }

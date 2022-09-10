@@ -23,21 +23,18 @@ class VillagerOffer{
     private ?Item $input2;
     private ?Item $result;
     private CompoundTag $namedtag;
-
-    private int $uses;
-    private int $maxUses;
-    private bool $rewardExp;
-    private int $traderExp;
-    private float $priceMultiplierA;
-    private float $priceMultiplierB;
     
-    public function __construct(int|Item $input = null, int|Item $input2 = null, int|Item $result = null, int $traderExp = 0, bool $rewardExp = false, float $priceMultiplierA = 0, float $priceMultiplierB = 0, int $maxUses = 100, int $uses = 0){
-        $this->traderExp = $traderExp;
-        $this->rewardExp = $rewardExp;
-        $this->priceMultiplierA = $priceMultiplierA;
-        $this->priceMultiplierB = $priceMultiplierB;
-        $this->maxUses = $maxUses;
-        $this->uses = $uses;
+    public function __construct(
+        int|Item $input = null,
+        int|Item $input2 = null,
+        int|Item $result = null,
+        private int $traderExp = 0,
+        private bool $rewardExp = false,
+        private float $priceMultiplierA = 0,
+        private float $priceMultiplierB = 0,
+        private int $maxUses = 100,
+        private int $uses = 0
+    ){
         $this->setInput($input, $input2);
         $this->setResult($result);
         $this->initializeNBT();
@@ -53,7 +50,7 @@ class VillagerOffer{
         $this->namedtag->setByte(self::TAG_REWARD_EXP, $this->rewardExp);
     }
 
-    public function asItem(): ?CompoundTag{
+    public function serialize(): ?CompoundTag{
         $input = $this->input;
         $input2 = $this->input2;
         $result = $this->result;
@@ -70,6 +67,25 @@ class VillagerOffer{
         return null;
     }
 
+    public static function deserialize(CompoundTag $nbt): VillagerOffer{
+        $input = Item::nbtDeserialize($nbt->getCompoundTag(self::TAG_BUY_A));
+        $input2 = $nbt->getTag(self::TAG_BUY_B);
+
+        if($input2 instanceof CompoundTag){
+            $input2 = Item::nbtDeserialize($input2);
+        }else{
+            $input2 = null;
+        }
+        $result = Item::nbtDeserialize($nbt->getCompoundTag(self::TAG_SELL));
+        $traderExp = $nbt->getInt(self::TAG_TRADER_EXP);
+        $rewardExp = $nbt->getByte(self::TAG_REWARD_EXP);
+        $priceMultiplierA = $nbt->getFloat(self::TAG_PRICE_MULTIPLIER_A);
+        $priceMultiplierB = $nbt->getFloat(self::TAG_PRICE_MULTIPLIER_B);
+        $maxUses = $nbt->getInt(self::TAG_MAX_USES);
+        $uses = $nbt->getInt(self::TAG_USES);
+        return new VillagerOffer($input, $input2, $result, $traderExp, $rewardExp, $priceMultiplierA, $priceMultiplierB, $maxUses, $uses);
+    }
+
     public function getUses(): int{
         return $this->uses;
     }
@@ -83,11 +99,6 @@ class VillagerOffer{
         return $this->maxUses;
     }
 
-    public function setMaxUses(int $maxUses): void{
-        $this->maxUses = $maxUses;
-        $this->initializeNBT();
-    }
-
     public function getInput(): ?Item{
         return $this->input;
     }
@@ -96,12 +107,8 @@ class VillagerOffer{
         return $this->input2;
     }
 
-    public function isRewardExp(): bool{
-        return $this->rewardExp;
-    }
-
-    public function setRewardExp(bool $rewardExp): void{
-        $this->rewardExp = $rewardExp;
+    public function getTraderExp(): int{
+        return $this->traderExp;
     }
 
     public function setInput(int|Item $input, int|Item $input2 = null): void{

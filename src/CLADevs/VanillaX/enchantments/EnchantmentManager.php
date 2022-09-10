@@ -132,15 +132,56 @@ class EnchantmentManager{
         return count($enchantments) < 1 ? null : $enchantments;
     }
 
-    public function getAllEnchantments(bool $treasure = true): array{
+    /**
+     * @param bool $treasure
+     * @param bool $normal
+     * @return VanillaEnchantment[]|Enchantment[]
+     */
+    public function getAllEnchantments(bool $treasure = true, bool $normal = false): array{
+        $data = [];
         $enchantments = $this->enchantments;
 
         foreach($enchantments as $key => $enchant){
             if(!$treasure && $enchant->isTreasure()){
-                unset($enchantments[$key]);
+                continue;
+            }
+            if($normal){
+                $vanilla = EnchantmentIdMap::getInstance()->fromId($enchant->getMcpeId());
+
+                if($vanilla !== null){
+                    $data[$key] = $vanilla;
+                }
+            }else{
+                $data[$key] = $enchant;
             }
         }
-        return $enchantments;
+        return $data;
+    }
+
+    /**
+     * @param bool $treasure
+     * @param bool $normal
+     * @return VanillaEnchantment[]|Enchantment[]
+     */
+    public function getTreasureEnchantments(bool $normal = false): array{
+        $data = [];
+        $enchantments = $this->enchantments;
+
+        foreach($enchantments as $key => $enchant){
+            if(!$enchant->isTreasure()){
+                continue;
+            }
+            if($normal){
+                $vanilla = EnchantmentIdMap::getInstance()->fromId($enchant->getMcpeId());
+
+                if($vanilla !== null){
+                    $data[$key] = $vanilla;
+                }
+            }else{
+                $data[$key] = $enchant;
+            }
+        }
+        return $data;
     }
 
     /**

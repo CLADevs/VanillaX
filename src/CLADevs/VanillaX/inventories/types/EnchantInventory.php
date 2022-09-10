@@ -29,7 +29,7 @@ use pocketmine\player\Player;
 use pocketmine\utils\Random;
 use pocketmine\world\Position;
 
-class EnchantInventory extends FakeBlockInventory implements TemporaryInventory{
+class EnchantInventory extends FakeBlockInventory implements TemporaryInventory, RecipeInventory{
 
     const SLOT_INPUT = 0;
     const SLOT_MATERIAL = 1;
@@ -115,7 +115,7 @@ class EnchantInventory extends FakeBlockInventory implements TemporaryInventory{
         return $this->options[$slot];
     }
 
-    public function getResultItem(Player $player, int $netId): Item{
+    public function getResultItem(Player $player, int $netId): ?Item{
         $option = $this->options[$netId] ?? null;
 
         if($option === null){

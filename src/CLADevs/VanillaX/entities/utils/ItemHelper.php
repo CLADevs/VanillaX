@@ -39,30 +39,19 @@ class ItemHelper{
 
     public static function applyEnchantRandomly(Item $item, bool $treasure): void{
         if($treasure){
-            $enchantments = [];
-            foreach(VanillaX::getInstance()->getEnchantmentManager()->getEnchantments() as $enchantment){
-                if($enchantment->isTreasure()){
-                    $enchantments[] = $enchantment->getMcpeId();
-                }
-            }
+            $enchantments = VanillaX::getInstance()->getEnchantmentManager()->getTreasureEnchantments(true);
         }else{
-            $enchantments = VanillaX::getInstance()->getEnchantmentManager()->getAllEnchantments(false);
+            $enchantments = VanillaX::getInstance()->getEnchantmentManager()->getAllEnchantments(false, true);
         }
-        $enchant = EnchantmentIdMap::getInstance()->fromId($enchantments[array_rand($enchantments)]);
+        $enchant = $enchantments[array_rand($enchantments)];
         $item->addEnchantment(new EnchantmentInstance($enchant, mt_rand(1, $enchant->getMaxLevel())));
     }
 
     public static function applyEnchantWithLevel(Item $item, bool $treasure, int $min, int $max): void{
         if($treasure){
-            $enchantments = [];
-
-            foreach(VanillaX::getInstance()->getEnchantmentManager()->getEnchantments() as $key => $enchant){
-                if($enchant->isTreasure()){
-                    $enchantments[$key] = $enchant;
-                }
-            }
+            $enchantments = VanillaX::getInstance()->getEnchantmentManager()->getTreasureEnchantments(true);
         }else{
-            $enchantments = VanillaX::getInstance()->getEnchantmentManager()->getAllEnchantments(false);
+            $enchantments = VanillaX::getInstance()->getEnchantmentManager()->getAllEnchantments(false, true);
         }
         $level = $min;
         if($max !== 0){

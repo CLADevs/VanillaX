@@ -36,7 +36,6 @@ use pocketmine\network\mcpe\protocol\SetDefaultGameTypePacket;
 use pocketmine\network\mcpe\protocol\SetDifficultyPacket;
 use pocketmine\network\mcpe\protocol\SetPlayerGameTypePacket;
 use pocketmine\network\mcpe\protocol\types\ActorEvent;
-use pocketmine\network\mcpe\protocol\types\inventory\NormalTransactionData;
 use pocketmine\network\mcpe\protocol\types\inventory\UseItemOnEntityTransactionData;
 use pocketmine\network\mcpe\protocol\types\inventory\UseItemTransactionData;
 use pocketmine\permission\DefaultPermissions;
@@ -67,10 +66,12 @@ class InGamePacketHandlerX extends InGamePacketHandler{
         $player = $this->session->getPlayer();
 
         if($packet->windowId === 255){
-            $inv = $player->getCurrentWindow();
+            $invManager = $player->getNetworkSession()->getInvManager();
+            $current = $invManager->getWindow($windowId = $invManager->getCurrentWindowId());
 
-            if($inv instanceof TradeInventory){
-                $player->removeCurrentWindow();
+            if($current instanceof TradeInventory){
+                $invManager->onClientRemoveWindow($windowId);
+                return true;
             }
         }
         parent::handleContainerClose($packet);

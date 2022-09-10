@@ -8,10 +8,10 @@
 - Mob Spawner
 - Enchantment Table
 - Anvil
-- Brewing Stand
 - Hopper
 - Command Block (WIP chain)
 - Beacon
+- Smithing Table
 - Ancient Debris
 - Basalt
 - Bee Hive
@@ -62,13 +62,11 @@
 - Warped Sign
 - Crimson Sign
 - Conduit
-- Smithing Table
 - Crying Obsidian
 - Cartography
 - Fletching
 - Honey Blocks
 - Lectern
-- Smithing
 - Smoker
 - Nether Sprouts
 - Stonecutter Block
@@ -95,6 +93,7 @@
 - ArmorStand
 - Shield
 - Firework Rocket
+- Crossbow
 
 #### TODO Items:
 - Fishing Rod
@@ -102,12 +101,10 @@
 - Lead
 - Lingering Potion
 - Map
-- Crossbow
 - Trident
 - 1.17 Items
 
 ### TODO Enchantments
-- Crossbow Enchantments
 - Fishing Rod Enchantments
 
 #### Features:
@@ -115,6 +112,7 @@
 - GameRules
 - Enchantments
 - Swimming
+- Trading
 
 #### TODO Features:
 - More Biomes in Normal World

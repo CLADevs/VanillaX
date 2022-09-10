@@ -17,7 +17,7 @@ use pocketmine\network\mcpe\protocol\types\recipe\ShapelessRecipe;
 use pocketmine\player\Player;
 use pocketmine\world\Position;
 
-class SmithingInventory extends FakeBlockInventory implements TemporaryInventory{
+class SmithingInventory extends FakeBlockInventory implements TemporaryInventory, RecipeInventory{
 
     const BLOCK_NAME = "smithing_table";
 
@@ -28,7 +28,7 @@ class SmithingInventory extends FakeBlockInventory implements TemporaryInventory
         parent::__construct($holder, 3, BlockLegacyIds::AIR, WindowTypes::SMITHING_TABLE);
     }
 
-    public function getResultItem(Player $player, int $netId): Item{
+    public function getResultItem(Player $player, int $netId): ?Item{
         $recipe = InventoryManager::getInstance()->getRecipeByNetId($netId);
         if($recipe === null){
             throw new Exception("Failed to find recipe for smithing table with id of: " . $netId);

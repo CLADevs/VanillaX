@@ -7,13 +7,12 @@ use CLADevs\VanillaX\inventories\FakeBlockInventory;
 use CLADevs\VanillaX\VanillaX;
 use pocketmine\block\BlockLegacyIds;
 use pocketmine\inventory\TemporaryInventory;
-use pocketmine\network\mcpe\protocol\ContainerClosePacket;
-use pocketmine\network\mcpe\protocol\types\CacheableNbt;
+use pocketmine\item\Item;
 use pocketmine\network\mcpe\protocol\types\inventory\WindowTypes;
 use pocketmine\network\mcpe\protocol\UpdateTradePacket;
 use pocketmine\player\Player;
 
-class TradeInventory extends FakeBlockInventory implements TemporaryInventory{
+class TradeInventory extends FakeBlockInventory implements TemporaryInventory, RecipeInventory{
 
     private VillagerEntity $villager;
 
@@ -38,10 +37,6 @@ class TradeInventory extends FakeBlockInventory implements TemporaryInventory{
         VanillaX::getInstance()->getSessionManager()->get($who)->setTradingEntity(null);
         $this->villager->setCustomer(null);
 
-        $pk = new ContainerClosePacket();
-        $pk->windowId = 255;
-        $pk->server = false;
-        $who->getNetworkSession()->sendDataPacket($pk);
         unset($this->viewers[spl_object_hash($who)]);
     }
 
@@ -51,14 +46,18 @@ class TradeInventory extends FakeBlockInventory implements TemporaryInventory{
         $pk->windowId = $who->getNetworkSession()->getInvManager()->getCurrentWindowId();
         $pk->windowType = WindowTypes::TRADING;
         $pk->windowSlotCount = 0;
-        $pk->tradeTier = 0;
+        $pk->tradeTier = $this->villager->getTier();
         $pk->traderActorUniqueId = $this->villager->getId();
         $pk->playerActorUniqueId = $who->getId();
         $pk->displayName = $this->villager->getProfession()->getName();
         $pk->isV2Trading = true;
-        $pk->isEconomyTrading = false;
-        $pk->offers = new CacheableNbt($this->villager->getOffers());
+        $pk->isEconomyTrading = true;
+        $pk->offers = $this->villager->getOffers()->getNbt();
         $who->getNetworkSession()->sendDataPacket($pk);
+    }
+
+    public function getResultItem(Player $player, int $netId): ?Item{
+        return null;
     }
 
     public function getVillager(): VillagerEntity{

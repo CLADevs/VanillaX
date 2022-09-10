@@ -8,10 +8,13 @@ use CLADevs\VanillaX\event\inventory\itemstack\DestroyItemStackEvent;
 use CLADevs\VanillaX\event\inventory\itemstack\DropItemStackEvent;
 use CLADevs\VanillaX\event\inventory\itemstack\MoveItemStackEvent;
 use CLADevs\VanillaX\event\inventory\itemstack\SwapItemStackEvent;
+use CLADevs\VanillaX\event\inventory\TradeItemEvent;
 use CLADevs\VanillaX\inventories\types\AnvilInventory;
 use CLADevs\VanillaX\inventories\types\BeaconInventory;
 use CLADevs\VanillaX\inventories\types\EnchantInventory;
+use CLADevs\VanillaX\inventories\types\RecipeInventory;
 use CLADevs\VanillaX\inventories\types\SmithingInventory;
+use CLADevs\VanillaX\inventories\types\TradeInventory;
 use CLADevs\VanillaX\VanillaX;
 use Exception;
 use pocketmine\block\inventory\CraftingTableInventory;
@@ -305,10 +308,7 @@ class ItemStackRequestHandler{
         $player = $this->session->getPlayer();
         $currentInventory = $player->getCurrentWindow();
 
-        if($currentInventory instanceof EnchantInventory){
-            $this->createdOutput = $currentInventory->getResultItem($player, $netId);
-            return;
-        }elseif($currentInventory instanceof SmithingInventory){
+        if($currentInventory instanceof RecipeInventory){
             $this->createdOutput = $currentInventory->getResultItem($player, $netId);
             return;
         }
@@ -324,7 +324,7 @@ class ItemStackRequestHandler{
         $this->craft($action->getRecipeId(), $action->getRepetitions(), true);
     }
 
-    private function craft(int $netId, int $repetitions = 0, bool $auto = false): void{
+    private function craft(int $netId, int $repetitions = 0, bool $auto = false): void{;
         $recipe = InventoryManager::getInstance()->getRecipeByNetId($netId);
         if($recipe === null){
             throw new Exception("Failed to find recipe for id: " . $netId);
@@ -391,7 +391,45 @@ class ItemStackRequestHandler{
     }
 
     private function handleDeprecatedCraftingResults(DeprecatedCraftingResultsStackRequestAction $action): void{
+        $player = $this->session->getPlayer();
+        $window = $player->getCurrentWindow();
 
+        if($window instanceof TradeInventory){
+            $createdOutput = VanillaItems::AIR();
+            $buyA = $window->getItem(0);
+            $buyB = $window->getItem(1);
+
+            if(!$buyA->isNull()){
+                $result = TypeConverter::getInstance()->netItemStackToCore($action->getResults()[0]);
+
+                foreach($window->getVillager()->getOffers()->getOffers() as $tier => $offers){
+                    foreach($offers as $offer){
+                        if($buyA->equals($offer->getInput()) && $result->equals($offer->getResult())){
+                            if(!$buyB->isNull() && ($offer->getInput2() === null || !$buyB->equals($offer->getInput2()))){
+                                //if buyB is found but slot is null or not equal
+                                continue;
+                            }
+                            if($offer->getUses() >= $offer->getMaxUses()){
+                                //used all max uses
+                                continue;
+                            }
+                            $experience = $offer->getTraderExp();
+
+                            $offer->setUses($offer->getUses() + 1);
+                            if($experience > 0){
+                                $window->getVillager()->setExperience($window->getVillager()->getExperience() + $experience);
+                            }
+                            $createdOutput = $offer->getResult();
+
+                            $ev = new TradeItemEvent($player, $window->getVillager(), $offer->getInput(), $offer->getInput2(), $createdOutput, $experience);
+                            $ev->call();
+                            break 2;
+                        }
+                    }
+                }
+            }
+            $this->createdOutput = $createdOutput;
+        }
     }
 
     private function acceptRequest(int $requestId): void{
@@ -448,8 +486,9 @@ class ItemStackRequestHandler{
             $inventory instanceof CraftingTableInventory => UIInventorySlotOffset::CRAFTING3X3_INPUT,
             $inventory instanceof AnvilInventory => UIInventorySlotOffset::ANVIL,
             $inventory instanceof EnchantInventory => UIInventorySlotOffset::ENCHANTING_TABLE,
+            $inventory instanceof TradeInventory => UIInventorySlotOffset::TRADE2_INGREDIENT,
             $inventory instanceof BeaconInventory => [UIInventorySlotOffset::BEACON_PAYMENT => 0],
-            $inventory instanceof SmithingInventory => [51 => 0, 52 => 2],
+            $inventory instanceof SmithingInventory => UIInventorySlotOffset::SMITHING_TABLE,
             $inventory instanceof PlayerOffHandInventory => [1 => 0],
             default => null
         };

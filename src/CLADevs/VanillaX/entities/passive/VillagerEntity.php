@@ -2,8 +2,9 @@
 
 namespace CLADevs\VanillaX\entities\passive;
 
+use CLADevs\VanillaX\entities\utils\villager\VillagerOffer;
+use CLADevs\VanillaX\entities\utils\villager\VillagerOffersMap;
 use CLADevs\VanillaX\entities\utils\villager\VillagerProfession;
-use CLADevs\VanillaX\entities\utils\villager\VillagerTradeNBTStream;
 use CLADevs\VanillaX\entities\VanillaEntity;
 use CLADevs\VanillaX\inventories\types\TradeInventory;
 use CLADevs\VanillaX\session\SessionManager;
@@ -36,7 +37,7 @@ class VillagerEntity extends VanillaEntity{
     private ?Player $customer = null;
     private TradeInventory $inventory;
     private VillagerProfession $profession;
-    private CompoundTag $offers;
+    private VillagerOffersMap $offers;
 
     protected function initEntity(CompoundTag $nbt): void{
         parent::initEntity($nbt);
@@ -63,18 +64,23 @@ class VillagerEntity extends VanillaEntity{
         }
         $this->profession = VillagerProfession::getProfession($profession);
 
-        $hasOffers = false;
+        $resetTrades = true;
         $tag = $nbt->getTag(self::TAG_OFFER_BUFFER);
         if($tag instanceof StringTag){
-            /** @var CompoundTag $offers */
-            $offers = (new CacheableNbt((new NetworkNbtSerializer())->read($tag->getValue())->mustGetCompoundTag()))->getRoot();
-            $this->offers = $offers;
-            $hasOffers = true;
+            $offers = [];
+
+            /** @var CompoundTag $nbt */
+            foreach((new CacheableNbt((new NetworkNbtSerializer())->read($tag->getValue())->mustGetCompoundTag()))->getRoot()->getValue()[VillagerOffersMap::TAG_RECIPES]->getValue() as $nbt){
+                $tier = $nbt->getInt(VillagerOffer::TAG_TIER);
+                $offers[$tier][] = VillagerOffer::deserialize($nbt);
+                $this->offers = new VillagerOffersMap($this->profession, $offers);
+                $resetTrades = false;
+            }
         }
-        $this->setProfession($this->profession, VillagerProfession::BIOME_PLAINS, $hasOffers);
+        $this->setProfession($this->profession, VillagerProfession::BIOME_PLAINS, $resetTrades);
         $this->setTier($this->tier);
         $this->setExperience($this->experience);
-        $this->getNetworkProperties()->setInt(EntityMetadataProperties::MAX_TRADE_TIER, VillagerProfession::TIER_MASTER);
+        $this->getNetworkProperties()->setInt(EntityMetadataProperties::MAX_TRADE_TIER, VillagerProfession::TIER_MASTER);;
     }
 
     public function getName(): string{
@@ -87,7 +93,7 @@ class VillagerEntity extends VanillaEntity{
         if($this->profession->hasTrades()){
             $nbt->setInt(self::TAG_TIER, $this->tier);
             $nbt->setInt(self::TAG_EXPERIENCE, $this->experience);
-            $nbt->setString(self::TAG_OFFER_BUFFER, (new CacheableNbt($this->offers))->getEncodedNbt());
+            $nbt->setString(self::TAG_OFFER_BUFFER, $this->offers->getNbt()->getEncodedNbt());
         }
         return $nbt;
     }
@@ -127,20 +133,16 @@ class VillagerEntity extends VanillaEntity{
         return $this->experience;
     }
 
-    public function setProfession(VillagerProfession $profession, int $biomeId = VillagerProfession::BIOME_PLAINS, bool $hasBuffer = false): void{
+    public function setProfession(VillagerProfession $profession, int $biomeId = VillagerProfession::BIOME_PLAINS, bool $resetTrades = true): void{
         $this->profession = $profession;
 
-        if(!$hasBuffer && $profession->hasTrades()){
-            $stream = new VillagerTradeNBTStream($profession);
-            $stream->addOffer(VillagerProfession::TIER_NOVICE, $profession->getNovice());
-            $stream->addOffer(VillagerProfession::TIER_APPRENTICE, $profession->getApprentice());
-            $stream->addOffer(VillagerProfession::TIER_JOURNEYMAN, $profession->getJourneyman());
-            $stream->addOffer(VillagerProfession::TIER_EXPERT, $profession->getExpert());
-            $stream->addOffer(VillagerProfession::TIER_MASTER, $profession->getMaster());
-            $stream->initialize();
-            /** @var CompoundTag $offers */
-            $offers = $stream->getStream()->getRoot();
-            $this->offers = $offers;
+        if($resetTrades && $profession->hasTrades()){
+            $this->offers = new VillagerOffersMap($profession);
+            $this->offers->addOffer(VillagerProfession::TIER_NOVICE, $profession->getNovice());
+            $this->offers->addOffer(VillagerProfession::TIER_APPRENTICE, $profession->getApprentice());
+            $this->offers->addOffer(VillagerProfession::TIER_JOURNEYMAN, $profession->getJourneyman());
+            $this->offers->addOffer(VillagerProfession::TIER_EXPERT, $profession->getExpert());
+            $this->offers->addOffer(VillagerProfession::TIER_MASTER, $profession->getMaster());
         }
         $this->getNetworkProperties()->setInt(EntityMetadataProperties::VARIANT, $profession->getId());
         $this->setBiomeType($biomeId);
@@ -162,11 +164,7 @@ class VillagerEntity extends VanillaEntity{
         return $this->biomeType;
     }
 
-    public function setOffers(CompoundTag $offers): void{
-        $this->offers = $offers;
-    }
-
-    public function getOffers(): CompoundTag{
+    public function getOffers(): VillagerOffersMap{
         return $this->offers;
     }
 
