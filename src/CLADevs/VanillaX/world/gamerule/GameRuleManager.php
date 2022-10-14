@@ -162,15 +162,17 @@ class GameRuleManager{
             $data = $provider->getWorldData();
 
             if($data instanceof BedrockWorldData){
-                /** @var CompoundTag $nbt */
                 $nbt = $data->getCompoundTag()->getTag("GameRules");
-                $tag = $nbt->getValue()[$rule->getName()] ?? null;
 
-                if($tag instanceof Tag){
-                    if($stringify && $tag instanceof ByteTag){
-                        return $tag->getValue() ? "true" : "false";
+                if($nbt instanceof CompoundTag){
+                    $tag = $nbt->getValue()[$rule->getName()] ?? null;
+
+                    if($tag instanceof Tag){
+                        if($stringify && $tag instanceof ByteTag){
+                            return $tag->getValue() ? "true" : "false";
+                        }
+                        return $tag instanceof ByteTag ? boolval($tag->getValue()) : intval($tag->getValue());
                     }
-                    return $tag instanceof ByteTag ? boolval($tag->getValue()) : intval($tag->getValue());
                 }
             }
         }
