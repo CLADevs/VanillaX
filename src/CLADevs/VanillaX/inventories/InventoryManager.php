@@ -4,7 +4,6 @@ namespace CLADevs\VanillaX\inventories;
 
 use CLADevs\VanillaX\inventories\recipe\RecipesMap;
 use CLADevs\VanillaX\inventories\types\SmithingInventory;
-use CLADevs\VanillaX\inventories\utils\TypeConverterX;
 use CLADevs\VanillaX\items\LegacyItemIds;
 use CLADevs\VanillaX\utils\Utils;
 use pocketmine\item\Item;
@@ -32,7 +31,6 @@ class InventoryManager{
 
     public function __construct(){
         self::setInstance($this);
-        TypeConverter::setInstance(new TypeConverterX());
     }
 
     public function startup(): void{
@@ -63,7 +61,7 @@ class InventoryManager{
 
     private function registerShapeless(CraftingDataPacket $cache, RecipesMap $map): void{
         $counter = count($cache->recipesWithTypeIds);
-        $converter = TypeConverterX::getInstance();
+        $converter = TypeConverter::getInstance();
         $nullUUID = Uuid::fromString(Uuid::NIL);
 
         foreach($map->getRecipes() as $recipe){
@@ -155,4 +153,5 @@ class InventoryManager{
     public function getRecipes(): array{
         return $this->recipes;
     }
+
 }

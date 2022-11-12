@@ -27,7 +27,7 @@ class MagmaCubeEntity extends VanillaEntity{
     }
     
     public function getXpDropAmount(): int{
-        return $this->getLastHitByPlayer() ? self::NETWORK_ID : 0;
+        return $this->getLastHitByPlayer() ? 1 : 0;
     }
  
     /**

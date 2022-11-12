@@ -7,6 +7,7 @@ use CLADevs\VanillaX\event\inventory\RepairItemEvent;
 use CLADevs\VanillaX\inventories\FakeBlockInventory;
 use CLADevs\VanillaX\items\LegacyItemIds;
 use CLADevs\VanillaX\session\Session;
+use CLADevs\VanillaX\session\SessionManager;
 use Exception;
 use pocketmine\block\Air;
 use pocketmine\block\Anvil;
@@ -44,6 +45,7 @@ class AnvilInventory extends FakeBlockInventory implements TemporaryInventory{
      * @return Item
      */
     public function getResultItem(Player $player, int $filterIndex, array $filterStrings): Item{
+        $session = SessionManager::getInstance()->get($player);
         $item = $this->getItem(self::SLOT_INPUT);
         $material = $this->getItem(self::SLOT_MATERIAL);
         $newName = $filterStrings[$filterIndex];
@@ -99,7 +101,7 @@ class AnvilInventory extends FakeBlockInventory implements TemporaryInventory{
             }
             $xpManager->subtractXpLevels($cost);
         }
-        if($player->getRandom()->nextFloat() < 0.12){
+        if($session->getRandom()->nextFloat() < 0.12){
             $block = $this->holder->getWorld()->getBlock($this->holder);
 
             if($block instanceof Anvil){

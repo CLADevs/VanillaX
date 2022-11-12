@@ -1,6 +1,6 @@
 <?php
 
-namespace CLADevs\VanillaX\inventories;
+namespace CLADevs\VanillaX\network\handler;
 
 use CLADevs\VanillaX\event\inventory\itemstack\CraftItemStackEvent;
 use CLADevs\VanillaX\event\inventory\itemstack\CreativeCreateItemStackEvent;
@@ -9,22 +9,19 @@ use CLADevs\VanillaX\event\inventory\itemstack\DropItemStackEvent;
 use CLADevs\VanillaX\event\inventory\itemstack\MoveItemStackEvent;
 use CLADevs\VanillaX\event\inventory\itemstack\SwapItemStackEvent;
 use CLADevs\VanillaX\event\inventory\TradeItemEvent;
+use CLADevs\VanillaX\inventories\InventoryManager;
 use CLADevs\VanillaX\inventories\types\AnvilInventory;
 use CLADevs\VanillaX\inventories\types\BeaconInventory;
-use CLADevs\VanillaX\inventories\types\EnchantInventory;
 use CLADevs\VanillaX\inventories\types\RecipeInventory;
-use CLADevs\VanillaX\inventories\types\SmithingInventory;
 use CLADevs\VanillaX\inventories\types\TradeInventory;
 use CLADevs\VanillaX\VanillaX;
 use Exception;
-use pocketmine\block\inventory\CraftingTableInventory;
 use pocketmine\crafting\ShapelessRecipe;
 use pocketmine\data\bedrock\EnchantmentIdMap;
 use pocketmine\data\bedrock\EnchantmentIds;
 use pocketmine\inventory\CreativeInventory;
 use pocketmine\inventory\Inventory;
 use pocketmine\inventory\PlayerCraftingInventory;
-use pocketmine\inventory\PlayerOffHandInventory;
 use pocketmine\item\Durable;
 use pocketmine\item\Item;
 use pocketmine\item\VanillaItems;
@@ -57,7 +54,6 @@ use pocketmine\network\mcpe\protocol\types\inventory\stackrequest\TakeStackReque
 use pocketmine\network\mcpe\protocol\types\inventory\stackresponse\ItemStackResponse;
 use pocketmine\network\mcpe\protocol\types\inventory\stackresponse\ItemStackResponseContainerInfo;
 use pocketmine\network\mcpe\protocol\types\inventory\stackresponse\ItemStackResponseSlotInfo;
-use pocketmine\network\mcpe\protocol\types\inventory\UIInventorySlotOffset;
 use pocketmine\network\mcpe\protocol\types\recipe\CraftingRecipeBlockName;
 use pocketmine\network\mcpe\protocol\types\recipe\ShapedRecipe;
 use pocketmine\Server;
@@ -263,7 +259,7 @@ class ItemStackRequestHandler{
         }
         $source = $action->getSource();
         $inventory = $this->getInventory($source->getContainerId());
-        $index = $this->getIndexForInventory($source->getSlotId(), $inventory);
+        $index = ItemStackTranslator::translateSlot($source->getSlotId(), $inventory);
 
         if($inventory instanceof PlayerCraftingInventory){
             $crafting = $this->session->getPlayer()->getCraftingGrid();
@@ -324,7 +320,7 @@ class ItemStackRequestHandler{
         $this->craft($action->getRecipeId(), $action->getRepetitions(), true);
     }
 
-    private function craft(int $netId, int $repetitions = 0, bool $auto = false): void{;
+    private function craft(int $netId, int $repetitions = 0, bool $auto = false): void{
         $recipe = InventoryManager::getInstance()->getRecipeByNetId($netId);
         if($recipe === null){
             throw new Exception("Failed to find recipe for id: " . $netId);
@@ -402,7 +398,7 @@ class ItemStackRequestHandler{
             if(!$buyA->isNull()){
                 $result = TypeConverter::getInstance()->netItemStackToCore($action->getResults()[0]);
 
-                foreach($window->getVillager()->getOffers()->getOffers() as $tier => $offers){
+                foreach($window->getVillager()->getOffers()->getOffers() as $offers){
                     foreach($offers as $offer){
                         if($buyA->equals($offer->getInput()) && $result->equals($offer->getResult())){
                             if(!$buyB->isNull() && ($offer->getInput2() === null || !$buyB->equals($offer->getInput2()))){
@@ -449,7 +445,7 @@ class ItemStackRequestHandler{
     }
 
     private function getInventory(int $id): Inventory{
-        $inventory = $this->translateContainerId($id);
+        $inventory = ItemStackTranslator::translateContainerId($this->session->getPlayer(), $id);
 
         if(!$inventory){
             throw new Exception("Failed to find container with id of $id");
@@ -459,7 +455,7 @@ class ItemStackRequestHandler{
 
     private function getItemFromStack(ItemStackRequestSlotInfo $slotInfo): Item{
         $inventory = $this->getInventory($slotInfo->getContainerId());
-        return $inventory->getItem($this->getIndexForInventory($slotInfo->getSlotId(), $inventory));
+        return $inventory->getItem(ItemStackTranslator::translateSlot($slotInfo->getSlotId(), $inventory));
     }
 
     private function setItemInStack(ItemStackRequestSlotInfo $slotInfo, Item $item): void{
@@ -477,50 +473,6 @@ class ItemStackRequestHandler{
                 $item instanceof Durable ? $item->getDamage() : 0
             )
         ]);
-        $inventory->setItem($this->getIndexForInventory($index, $inventory), $item);
-    }
-
-    private function getIndexForInventory(int $index, Inventory $inventory): int{
-        $slotMap = match(true){
-            $inventory instanceof PlayerCraftingInventory => UIInventorySlotOffset::CRAFTING2X2_INPUT,
-            $inventory instanceof CraftingTableInventory => UIInventorySlotOffset::CRAFTING3X3_INPUT,
-            $inventory instanceof AnvilInventory => UIInventorySlotOffset::ANVIL,
-            $inventory instanceof EnchantInventory => UIInventorySlotOffset::ENCHANTING_TABLE,
-            $inventory instanceof TradeInventory => UIInventorySlotOffset::TRADE2_INGREDIENT,
-            $inventory instanceof BeaconInventory => [UIInventorySlotOffset::BEACON_PAYMENT => 0],
-            $inventory instanceof SmithingInventory => UIInventorySlotOffset::SMITHING_TABLE,
-            $inventory instanceof PlayerOffHandInventory => [1 => 0],
-            default => null
-        };
-        if($slotMap !== null){
-            $index = $slotMap[$index] ?? $index;
-        }
-        return $index;
-    }
-
-    private function translateContainerId(int $containerId): ?Inventory{
-        $player = $this->session->getPlayer();
-        $currentInventory = $player->getCurrentWindow();
-
-        switch($containerId){
-            case ContainerUIIds::OFFHAND:
-                return $player->getOffHandInventory();
-            case ContainerUIIds::CURSOR:
-                return $player->getCursorInventory();
-            case ContainerUIIds::ARMOR:
-                return $player->getArmorInventory();
-            case ContainerUIIds::HOTBAR:
-            case ContainerUIIds::INVENTORY:
-            case ContainerUIIds::COMBINED_HOTBAR_AND_INVENTORY:
-                return $player->getInventory();
-            case ContainerUIIds::CRAFTING_INPUT:
-            case ContainerUIIds::CRAFTING_OUTPUT_PREVIEW:
-            case ContainerUIIds::CREATED_OUTPUT:
-                if($currentInventory instanceof CraftingTableInventory){
-                    return $currentInventory;
-                }
-                return $player->getCraftingGrid();
-        }
-        return $currentInventory;
+        $inventory->setItem(ItemStackTranslator::translateSlot($index, $inventory), $item);
     }
 }

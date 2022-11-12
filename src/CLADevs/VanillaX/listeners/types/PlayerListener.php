@@ -6,8 +6,7 @@ use CLADevs\VanillaX\configuration\features\EnchantmentFeature;
 use CLADevs\VanillaX\configuration\features\ItemFeature;
 use CLADevs\VanillaX\items\types\ElytraItem;
 use CLADevs\VanillaX\items\types\ShieldItem;
-use CLADevs\VanillaX\network\InGamePacketHandlerX;
-use CLADevs\VanillaX\player\VanillaPlayer;
+use CLADevs\VanillaX\network\handler\InGamePacketHandlerX;
 use CLADevs\VanillaX\world\gamerule\GameRule;
 use CLADevs\VanillaX\world\gamerule\GameRuleManager;
 use CLADevs\VanillaX\utils\item\HeldItemChangeTrait;
@@ -22,7 +21,6 @@ use pocketmine\event\entity\EntityTeleportEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerBedLeaveEvent;
 use pocketmine\event\player\PlayerBlockPickEvent;
-use pocketmine\event\player\PlayerCreationEvent;
 use pocketmine\event\player\PlayerDeathEvent;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\event\player\PlayerItemHeldEvent;
@@ -229,9 +227,5 @@ class PlayerListener implements Listener{
                 $newItem->onSlotChange($player, $oldItem, $newItem);
             }
         }
-    }
-
-    public function onCreation(PlayerCreationEvent $event): void{
-        $event->setPlayerClass(VanillaPlayer::class);
     }
 }

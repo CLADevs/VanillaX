@@ -1,6 +1,6 @@
 <?php
 
-namespace CLADevs\VanillaX\network;
+namespace CLADevs\VanillaX\network\handler;
 
 use CLADevs\VanillaX\blocks\tile\CommandBlockTile;
 use CLADevs\VanillaX\entities\EntityManager;
@@ -8,7 +8,6 @@ use CLADevs\VanillaX\entities\utils\EntityInteractResult;
 use CLADevs\VanillaX\entities\utils\EntityInteractable;
 use CLADevs\VanillaX\entities\VanillaEntity;
 use CLADevs\VanillaX\event\player\PlayerEntityPickEvent;
-use CLADevs\VanillaX\inventories\ItemStackRequestHandler;
 use CLADevs\VanillaX\inventories\types\TradeInventory;
 use CLADevs\VanillaX\items\types\CrossbowItem;
 use CLADevs\VanillaX\session\Session;

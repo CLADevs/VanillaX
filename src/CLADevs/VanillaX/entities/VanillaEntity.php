@@ -17,6 +17,7 @@ use pocketmine\item\enchantment\VanillaEnchantments;
 use pocketmine\network\mcpe\protocol\AddActorPacket;
 use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataCollection;
 use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataFlags;
+use pocketmine\network\mcpe\protocol\types\entity\PropertySyncData;
 use pocketmine\player\Player;
 use pocketmine\network\mcpe\protocol\types\entity\Attribute as NetworkAttribute;
 
@@ -57,20 +58,23 @@ abstract class VanillaEntity extends Living{
     }
 
     protected function sendSpawnPacket(Player $player): void{
-        $pk = new AddActorPacket();
-        $pk->actorRuntimeId = $this->getId();
-        $pk->actorUniqueId = $this->getId();
-        $pk->type = static::NETWORK_ID;
-        $pk->position = $this->getPosition();
-        $pk->motion = $this->getMotion();
-        $pk->yaw = $this->location->yaw;
-        $pk->headYaw = $this->location->yaw;
-        $pk->pitch = $this->location->pitch;
-        $pk->attributes = array_map(function(Attribute $attr) : NetworkAttribute{
-            return new NetworkAttribute($attr->getId(), $attr->getMinValue(), $attr->getMaxValue(), $attr->getValue(), $attr->getDefaultValue(), []);
-        }, $this->attributeMap->getAll());
-        $pk->metadata = $this->getAllNetworkData();
-        $player->getNetworkSession()->sendDataPacket($pk);
+        $player->getNetworkSession()->sendDataPacket(AddActorPacket::create(
+            $this->getId(),
+            $this->getId(),
+            static::getNetworkTypeId(),
+            $this->getPosition(),
+            $this->getMotion(),
+            $this->location->pitch,
+            $this->location->yaw,
+            $this->location->yaw,
+            $this->location->yaw,
+            array_map(function(Attribute $attr) : NetworkAttribute{
+                return new NetworkAttribute($attr->getId(), $attr->getMinValue(), $attr->getMaxValue(), $attr->getValue(), $attr->getDefaultValue(), []);
+            }, $this->attributeMap->getAll()),
+            $this->getAllNetworkData(),
+            new PropertySyncData([], []),
+            []
+        ));
     }
 
     /**

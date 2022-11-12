@@ -8,6 +8,7 @@ use CLADevs\VanillaX\enchantments\VanillaEnchantment;
 use CLADevs\VanillaX\event\inventory\EnchantItemEvent;
 use CLADevs\VanillaX\inventories\FakeBlockInventory;
 use CLADevs\VanillaX\items\LegacyItemIds;
+use CLADevs\VanillaX\session\SessionManager;
 use CLADevs\VanillaX\utils\Utils;
 use Exception;
 use pocketmine\block\Air;
@@ -51,7 +52,8 @@ class EnchantInventory extends FakeBlockInventory implements TemporaryInventory,
     }
 
     public function sendEnchantmentOptions(Item $input, Player $player): void{
-        $random = new Random($player->getXpSeed());
+        $session = SessionManager::getInstance()->get($player);
+        $random = new Random($session->getXpSeed());
         $options = [];
 
         if(!$input->isNull() && !$input->hasEnchantments()){

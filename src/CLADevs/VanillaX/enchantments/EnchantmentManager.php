@@ -47,9 +47,7 @@ class EnchantmentManager{
         if(EnchantmentFeature::getInstance()->isEnchantmentEnabled($enchantment->getId())){
             $mcpeId = $enchantment->getMcpeId();
 
-            if(EnchantmentIdMap::getInstance()->fromId($mcpeId) === null){
-                EnchantmentIdMap::getInstance()->register($mcpeId, $enchantment);
-            }
+            EnchantmentIdMap::getInstance()->register($mcpeId, $enchantment);
             StringToEnchantmentParser::getInstance()->override($enchantment->getId(), fn() => $enchantment);
             $this->enchantments[$enchantment->getId()] = $enchantment;
         }

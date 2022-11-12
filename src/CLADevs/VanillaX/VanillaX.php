@@ -10,6 +10,7 @@ use CLADevs\VanillaX\entities\EntityManager;
 use CLADevs\VanillaX\inventories\InventoryManager;
 use CLADevs\VanillaX\items\ItemManager;
 use CLADevs\VanillaX\listeners\ListenerManager;
+use CLADevs\VanillaX\network\NetworkManager;
 use CLADevs\VanillaX\session\SessionManager;
 use CLADevs\VanillaX\world\WorldManager;
 use pocketmine\plugin\PluginBase;
@@ -29,6 +30,7 @@ final class VanillaX extends PluginBase{
     private ListenerManager $listenerManager;
     private WorldManager $worldManager;
     private SettingManager $settingManager;
+    private NetworkManager $networkManager;
 
     public function onLoad(): void{
         self::$instance = $this;
@@ -42,6 +44,7 @@ final class VanillaX extends PluginBase{
         $this->listenerManager = new ListenerManager();
         $this->worldManager = new WorldManager();
         $this->settingManager = new SettingManager();
+        $this->networkManager = new NetworkManager();
     }
 
     /**
@@ -100,5 +103,9 @@ final class VanillaX extends PluginBase{
 
     public function getSettingManager(): SettingManager{
         return $this->settingManager;
+    }
+
+    public function getNetworkManager(): NetworkManager{
+        return $this->networkManager;
     }
 }
