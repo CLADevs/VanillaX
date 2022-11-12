@@ -6,15 +6,10 @@ use CLADevs\VanillaX\entities\passive\VillagerEntity;
 use CLADevs\VanillaX\entities\projectile\TridentEntity;
 use CLADevs\VanillaX\entities\utils\interfaces\EntityRidable;
 use CLADevs\VanillaX\entities\VanillaEntity;
-use CLADevs\VanillaX\network\types\ItemStackInfo;
-use pocketmine\inventory\Inventory;
-use pocketmine\item\Item;
 use pocketmine\math\Vector3;
-use pocketmine\network\mcpe\convert\TypeConverter;
 use pocketmine\network\mcpe\protocol\DataPacket;
 use pocketmine\network\mcpe\protocol\PlaySoundPacket;
 use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataProperties;
-use pocketmine\network\mcpe\protocol\types\inventory\ItemStackWrapper;
 use pocketmine\player\Player;
 use pocketmine\utils\Random;
 use ReflectionProperty;
@@ -35,12 +30,6 @@ class Session{
     private int $xpSeed;
     private int $nextItemStackId = 1;
 
-    /**
-     * @var int[][]
-     * @phpstan-var array<int, array<int, ItemStackInfo>>
-     */
-    private array $itemStackInfos = [];
-
     public function __construct(Player $player){
         $this->player = $player;
         $this->entityId = $player->getId();
@@ -51,48 +40,8 @@ class Session{
         $this->xpSeed = $reflection->getValue($player);
     }
 
-    private function newItemStackId() : int{
+    private function newItemStackId(): int{
         return $this->nextItemStackId++;
-    }
-
-    public function trackItemStack(Inventory $inventory, int $slotId, Item $item, ?int $itemStackRequestId) : ItemStackInfo{
-        $existing = $this->itemStackInfos[spl_object_id($inventory)][$slotId] ?? null;
-        $typeConverter = TypeConverter::getInstance();
-        $itemStack = $typeConverter->coreItemStackToNet($item);
-        if($existing !== null && $existing->getItemStack()->equals($itemStack)){
-            return $existing;
-        }
-
-        $info = new ItemStackInfo($itemStackRequestId, $item->isNull() ? 0 : $this->newItemStackId(), $itemStack);
-        return $this->itemStackInfos[spl_object_id($inventory)][$slotId] = $info;
-    }
-
-    public function wrapItemStack(Inventory $inventory, int $slotId, Item $item) : ItemStackWrapper{
-        $info = $this->trackItemStack($inventory, $slotId, $item, null);
-        return new ItemStackWrapper($info->getStackId(), $info->getItemStack());
-    }
-
-    public function matchItemStack(Inventory $inventory, int $slotId, int $itemStackId) : bool{
-        $inventoryObjectId = spl_object_id($inventory);
-        if(!isset($this->itemStackInfos[$inventoryObjectId])){
-            $this->player->getNetworkSession()->getLogger()->debug("Attempted to match item preimage unsynced inventory " . get_class($inventory) . "#" . $inventoryObjectId);
-            return false;
-        }
-        $info = $this->itemStackInfos[$inventoryObjectId][$slotId] ?? null;
-        if($info === null){
-            $this->player->getNetworkSession()->getLogger()->debug("Attempted to match item preimage for unsynced slot $slotId in " . get_class($inventory) . "#$inventoryObjectId that isn't synced");
-            return false;
-        }
-
-        if(!($itemStackId < 0 ? $info->getRequestId() === $itemStackId : $info->getStackId() === $itemStackId)){
-            $this->player->getNetworkSession()->getLogger()->debug(
-                "Mismatched expected itemstack: " . get_class($inventory) . "#" . $inventoryObjectId . ", " .
-                "slot: $slotId, expected: $itemStackId, actual: " . $info->getStackId() . ", last modified by request: " . ($info->getRequestId() ?? "none")
-            );
-            return false;
-        }
-
-        return true;
     }
 
     public function getEntityId(): int{
