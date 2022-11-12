@@ -14,6 +14,7 @@ use CLADevs\VanillaX\inventories\types\AnvilInventory;
 use CLADevs\VanillaX\inventories\types\BeaconInventory;
 use CLADevs\VanillaX\inventories\types\RecipeInventory;
 use CLADevs\VanillaX\inventories\types\TradeInventory;
+use CLADevs\VanillaX\session\SessionManager;
 use CLADevs\VanillaX\VanillaX;
 use Exception;
 use pocketmine\crafting\ShapelessRecipe;
@@ -259,7 +260,7 @@ class ItemStackRequestHandler{
         }
         $source = $action->getSource();
         $inventory = $this->getInventory($source->getContainerId());
-        $index = ItemStackTranslator::translateSlot($source->getSlotId(), $inventory);
+        $index = ItemStackTranslator::netSlot($source->getSlotId(), $inventory);
 
         if($inventory instanceof PlayerCraftingInventory){
             $crafting = $this->session->getPlayer()->getCraftingGrid();
@@ -455,12 +456,15 @@ class ItemStackRequestHandler{
 
     private function getItemFromStack(ItemStackRequestSlotInfo $slotInfo): Item{
         $inventory = $this->getInventory($slotInfo->getContainerId());
-        return $inventory->getItem(ItemStackTranslator::translateSlot($slotInfo->getSlotId(), $inventory));
+        return $inventory->getItem(ItemStackTranslator::netSlot($slotInfo->getSlotId(), $inventory));
     }
 
     private function setItemInStack(ItemStackRequestSlotInfo $slotInfo, Item $item): void{
+        $session = SessionManager::getInstance()->get($this->session->getPlayer());
         $index = $slotInfo->getSlotId();
         $inventory = $this->getInventory($containerId = $slotInfo->getContainerId());
+        $netSlot = ItemStackTranslator::netSlot($index, $inventory);
+        $itemStack = $session->trackItemStack($inventory, $netSlot, $item, null);
 
 //        var_dump("Index $index " . $item->getName() . " " . $item->getCount() . " " . get_class($inventory));
         $this->containerInfo[] = new ItemStackResponseContainerInfo($containerId, [
@@ -468,11 +472,11 @@ class ItemStackRequestHandler{
                 $index,
                 $index,
                 $item->getCount(),
-                TypeConverter::getInstance()->coreItemStackToNet($item)->getId(),
+                $itemStack->getStackId(),
                 "",
                 $item instanceof Durable ? $item->getDamage() : 0
             )
         ]);
-        $inventory->setItem(ItemStackTranslator::translateSlot($index, $inventory), $item);
+        $inventory->setItem($netSlot, $item);
     }
 }

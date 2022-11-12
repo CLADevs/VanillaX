@@ -3,10 +3,13 @@
 namespace CLADevs\VanillaX\session;
 
 use CLADevs\VanillaX\entities\passive\VillagerEntity;
-use CLADevs\VanillaX\entities\projectile\TridentEntity;
 use CLADevs\VanillaX\entities\utils\interfaces\EntityRidable;
 use CLADevs\VanillaX\entities\VanillaEntity;
+use CLADevs\VanillaX\network\types\ItemStackInfo;
+use pocketmine\inventory\Inventory;
+use pocketmine\item\Item;
 use pocketmine\math\Vector3;
+use pocketmine\network\mcpe\convert\TypeConverter;
 use pocketmine\network\mcpe\protocol\DataPacket;
 use pocketmine\network\mcpe\protocol\PlaySoundPacket;
 use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataProperties;
@@ -21,14 +24,16 @@ class Session{
     private ?VanillaEntity $ridingEntity = null;
     private ?VillagerEntity $tradingEntity = null;
 
-    /** @var TridentEntity[] */
-    private array $thrownTridents = [];
-
     private string $interactiveText = "";
 
     private int $entityId;
     private int $xpSeed;
     private int $nextItemStackId = 1;
+
+    /** @var ItemStackInfo[][] */
+    private array $itemStackInfos = [];
+    /** @var int[] */
+    private array $lastWindowIds = [];
 
     public function __construct(Player $player){
         $this->player = $player;
@@ -42,6 +47,35 @@ class Session{
 
     private function newItemStackId(): int{
         return $this->nextItemStackId++;
+    }
+
+    public function trackItemStack(Inventory $inventory, int $slotId, Item $item, ?int $itemStackRequestId): ItemStackInfo{
+        $existing = $this->itemStackInfos[spl_object_id($inventory)][$slotId] ?? null;
+        $typeConverter = TypeConverter::getInstance();
+        $itemStack = $typeConverter->coreItemStackToNet($item);
+        if($existing !== null && $existing->getItemStack()->equals($itemStack)){
+            return $existing;
+        }
+
+        $info = new ItemStackInfo($itemStackRequestId, $item->isNull() ? 0 : $this->newItemStackId(), $itemStack);
+        return $this->itemStackInfos[spl_object_id($inventory)][$slotId] = $info;
+    }
+
+    public function onContainerOpen(int $windowId): void{
+        $inventory = $this->player->getNetworkSession()->getInvManager()->getWindow($windowId);
+
+        if($inventory !== null){
+            $this->lastWindowIds[$windowId] = spl_object_id($inventory);
+        }
+    }
+
+    public function onContainerClose(int $windowId): void{
+        $id = $this->lastWindowIds[$windowId] ?? null;
+
+        if($id !== null){
+            unset($this->lastWindowIds[$windowId]);
+            unset($this->itemStackInfos[$id]);
+        }
     }
 
     public function getEntityId(): int{
@@ -81,21 +115,6 @@ class Session{
             $this->tradingEntity->setCustomer(null);
         }
         $this->tradingEntity = $tradingEntity;
-    }
-
-    /**
-     * @return TridentEntity[]
-     */
-    public function getThrownTridents(): array{
-        return $this->thrownTridents;
-    }
-
-    public function addTrident(TridentEntity $entity): void{
-        $this->thrownTridents[$entity->getId()] = $entity;
-    }
-
-    public function removeTrident(TridentEntity $entity): void{
-        if(isset($this->thrownTridents[$entity->getId()])) unset($this->thrownTridents[$entity->getId()]);
     }
 
     public function getXpSeed(): int{

@@ -17,8 +17,12 @@ use pocketmine\player\Player;
 
 class ItemStackTranslator{
 
-    public static function translateSlot(int $index, Inventory $inventory): int{
-        $slotMap = match(true){
+    /**
+     * @param Inventory $inventory
+     * @return int[]|null
+     */
+    private static function getSlotMapForInventory(Inventory $inventory): array|null{
+        return match(true){
             $inventory instanceof PlayerCraftingInventory => UIInventorySlotOffset::CRAFTING2X2_INPUT,
             $inventory instanceof CraftingTableInventory => UIInventorySlotOffset::CRAFTING3X3_INPUT,
             $inventory instanceof AnvilInventory => UIInventorySlotOffset::ANVIL,
@@ -29,10 +33,22 @@ class ItemStackTranslator{
             $inventory instanceof PlayerOffHandInventory => [1 => 0],
             default => null
         };
+    }
+
+    public static function netSlot(int $index, Inventory $inventory): int{
+        $slotMap = self::getSlotMapForInventory($inventory);
         if($slotMap !== null){
             $index = $slotMap[$index] ?? $index;
         }
         return $index;
+    }
+
+    public static function clientSlot(int $netSlot, Inventory $inventory): int{
+        $slotMap = self::getSlotMapForInventory($inventory);
+        if($slotMap !== null){
+            $netSlot = array_flip($slotMap)[$netSlot] ?? $netSlot;
+        }
+        return $netSlot;
     }
 
     public static function translateContainerId(Player $player, int $containerId): ?Inventory{
@@ -58,5 +74,15 @@ class ItemStackTranslator{
                 return $player->getCraftingGrid();
         }
         return $currentInventory;
+    }
+
+    public static function getWindowIdAndInventory(Player $player, int $containerId): array{
+        $windowId = null;
+        $inventory = self::translateContainerId($player, $containerId);
+
+        if($inventory !== null){
+            $windowId = $player->getNetworkSession()->getInvManager()->getWindowId($inventory);
+        }
+        return [$windowId, $inventory];
     }
 }

@@ -3,11 +3,19 @@
 namespace CLADevs\VanillaX\listeners\types;
 
 use CLADevs\VanillaX\inventories\FakeBlockInventory;
+use CLADevs\VanillaX\network\handler\ItemStackTranslator;
+use CLADevs\VanillaX\session\SessionManager;
 use CLADevs\VanillaX\VanillaX;
 use pocketmine\event\Listener;
 use pocketmine\event\server\DataPacketReceiveEvent;
 use pocketmine\event\server\DataPacketSendEvent;
+use pocketmine\network\mcpe\convert\TypeConverter;
+use pocketmine\network\mcpe\NetworkSession;
 use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
+use pocketmine\network\mcpe\protocol\ContainerClosePacket;
+use pocketmine\network\mcpe\protocol\ContainerOpenPacket;
+use pocketmine\network\mcpe\protocol\InventoryContentPacket;
+use pocketmine\network\mcpe\protocol\InventorySlotPacket;
 use pocketmine\network\mcpe\protocol\ProtocolInfo;
 use pocketmine\network\mcpe\protocol\StartGamePacket;
 
@@ -15,14 +23,28 @@ class PacketListener implements Listener{
 
     public function onDataPacketSend(DataPacketSendEvent $event): void{
         if(!$event->isCancelled()){
-            foreach($event->getPackets() as $packet){
-                switch($packet::NETWORK_ID){
-                    case ProtocolInfo::AVAILABLE_COMMANDS_PACKET:
-                        if($packet instanceof AvailableCommandsPacket) $this->handleAvailableCommands($packet);
-                        break;
-                    case ProtocolInfo::START_GAME_PACKET:
-                        if($packet instanceof StartGamePacket) $this->handleStartGame($packet);
-                        break;
+            foreach($event->getTargets() as $target){
+                foreach($event->getPackets() as $packet){
+                    switch($packet::NETWORK_ID){
+                        case ProtocolInfo::AVAILABLE_COMMANDS_PACKET:
+                            if($packet instanceof AvailableCommandsPacket) $this->handleAvailableCommands($packet);
+                            break;
+                        case ProtocolInfo::START_GAME_PACKET:
+                            if($packet instanceof StartGamePacket) $this->handleStartGame($packet);
+                            break;
+                        case ProtocolInfo::INVENTORY_CONTENT_PACKET:
+                            if($packet instanceof InventoryContentPacket) $this->handleInventoryContent($target, $packet);
+                            break;
+                        case ProtocolInfo::INVENTORY_SLOT_PACKET:
+                            if($packet instanceof InventorySlotPacket) $this->handleInventorySlot($target, $packet);
+                            break;
+                        case ProtocolInfo::CONTAINER_OPEN_PACKET:
+                            if($packet instanceof ContainerOpenPacket) $this->handleContainerOpen($target, $packet);
+                            break;
+                        case ProtocolInfo::CONTAINER_CLOSE_PACKET:
+                            if($packet instanceof ContainerClosePacket) $this->handleContainerClose($target, $packet);
+                            break;
+                    }
                 }
             }
         }
@@ -62,5 +84,57 @@ class PacketListener implements Listener{
      */
     private function handleStartGame(StartGamePacket $packet): void{
         $packet->enableNewInventorySystem = true;
+    }
+
+    /**
+     * @param NetworkSession $networkSession
+     * @param InventoryContentPacket $packet
+     * Whenever certain inventory contents are changed
+     */
+    private function handleInventoryContent(NetworkSession $networkSession, InventoryContentPacket $packet): void{
+        foreach ($packet->items as $index => $item){
+            $inventory = $networkSession->getInvManager()->getWindow($packet->windowId);
+
+            if($inventory !== null){
+                $session = SessionManager::getInstance()->get($networkSession->getPlayer());
+                $slot = ItemStackTranslator::clientSlot($index, $inventory);
+                $currentItem = TypeConverter::getInstance()->netItemStackToCore($item->getItemStack());
+                $session->trackItemStack($inventory, $slot, $currentItem, null);
+            }
+        }
+    }
+
+    /**
+     * @param NetworkSession $networkSession
+     * @param InventorySlotPacket $packet
+     * Whenever certain inventory slot is item is changed
+     */
+    private function handleInventorySlot(NetworkSession $networkSession, InventorySlotPacket $packet): void{
+        $inventory = $networkSession->getInvManager()->getWindow($packet->windowId);
+
+        if($inventory !== null){
+            $session = SessionManager::getInstance()->get($networkSession->getPlayer());
+            $slot = ItemStackTranslator::clientSlot($packet->inventorySlot, $inventory);
+            $currentItem = TypeConverter::getInstance()->netItemStackToCore($packet->item->getItemStack());
+            $session->trackItemStack($inventory, $slot, $currentItem, null);
+        }
+    }
+
+    /**
+     * @param NetworkSession $networkSession
+     * @param ContainerOpenPacket $packet
+     * Whenever certain inventory is opened
+     */
+    private function handleContainerOpen(NetworkSession $networkSession, ContainerOpenPacket $packet): void{
+        SessionManager::getInstance()->get($networkSession->getPlayer())->onContainerOpen($packet->windowId);
+    }
+
+    /**
+     * @param NetworkSession $networkSession
+     * @param ContainerClosePacket $packet
+     * Whenever certain inventory is closed
+     */
+    private function handleContainerClose(NetworkSession $networkSession, ContainerClosePacket $packet): void{
+        SessionManager::getInstance()->get($networkSession->getPlayer())->onContainerClose($packet->windowId);
     }
 }
