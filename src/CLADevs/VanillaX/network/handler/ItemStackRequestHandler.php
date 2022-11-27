@@ -17,7 +17,6 @@ use CLADevs\VanillaX\inventories\types\TradeInventory;
 use CLADevs\VanillaX\session\SessionManager;
 use CLADevs\VanillaX\VanillaX;
 use Exception;
-use pocketmine\crafting\ShapelessRecipe;
 use pocketmine\data\bedrock\EnchantmentIdMap;
 use pocketmine\data\bedrock\EnchantmentIds;
 use pocketmine\inventory\CreativeInventory;
@@ -57,6 +56,7 @@ use pocketmine\network\mcpe\protocol\types\inventory\stackresponse\ItemStackResp
 use pocketmine\network\mcpe\protocol\types\inventory\stackresponse\ItemStackResponseSlotInfo;
 use pocketmine\network\mcpe\protocol\types\recipe\CraftingRecipeBlockName;
 use pocketmine\network\mcpe\protocol\types\recipe\ShapedRecipe;
+use pocketmine\network\mcpe\protocol\types\recipe\ShapelessRecipe;
 use pocketmine\Server;
 
 class ItemStackRequestHandler{
@@ -332,7 +332,12 @@ class ItemStackRequestHandler{
         if($recipe->getBlockName() !== CraftingRecipeBlockName::CRAFTING_TABLE){
             throw new Exception("This recipe is not for crafting table");
         }
-        $ev = new CraftItemStackEvent($this->session->getPlayer(), $recipe, TypeConverter::getInstance()->netItemStackToCore($recipe->getOutput()[0]), $repetitions, $auto);
+        if($recipe instanceof ShapedRecipe){
+            $outputs = $recipe->getOutput();
+        }else{
+            $outputs = $recipe->getOutputs();
+        }
+        $ev = new CraftItemStackEvent($this->session->getPlayer(), $recipe, TypeConverter::getInstance()->netItemStackToCore($outputs[0]), $repetitions, $auto);
         $ev->call();
         if($ev->isCancelled()){
             $ev->setResult(VanillaItems::AIR());
