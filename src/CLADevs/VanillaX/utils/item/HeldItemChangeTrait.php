@@ -10,8 +10,8 @@ interface HeldItemChangeTrait{
     /**
      * @param Player $player
      * @param Item $old
-     * @param Item $new
+     * @param Item|HeldItemChangeTrait $new
      * Whenever a player changes their held item slot
      */
-    public function onSlotChange(Player $player, Item $old, Item $new): void;
+    public function onSlotChange(Player $player, Item $old, Item|HeldItemChangeTrait $new): void;
 }

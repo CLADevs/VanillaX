@@ -12,8 +12,9 @@ use CLADevs\VanillaX\world\gamerule\GameRuleManager;
 use CLADevs\VanillaX\utils\item\HeldItemChangeTrait;
 use CLADevs\VanillaX\VanillaX;
 use CLADevs\VanillaX\world\weather\WeatherManager;
-use pocketmine\block\BlockFactory;
+use pocketmine\block\Air;
 use pocketmine\block\BlockLegacyIds;
+use pocketmine\block\VanillaBlocks;
 use pocketmine\block\Water;
 use pocketmine\data\bedrock\EnchantmentIdMap;
 use pocketmine\data\bedrock\EnchantmentIds;
@@ -58,11 +59,6 @@ class PlayerListener implements Listener{
         $manager = VanillaX::getInstance()->getSessionManager();
         $session = $manager->get($player);
 
-        foreach($session->getThrownTridents() as $entity){
-            if($entity->isAlive() && !$entity->isFlaggedForDespawn()){
-                $entity->onCollideWithPlayer($player);
-            }
-        }
         $session->setTradingEntity(null, true);
         $manager->remove($player);
     }
@@ -176,7 +172,7 @@ class PlayerListener implements Listener{
             $to = $event->getTo();
             $chestplate = $player->getArmorInventory()->getChestplate();
             $boots = $player->getArmorInventory()->getBoots();
-            $session = VanillaX::getInstance()->getSessionManager()->get($player);
+            VanillaX::getInstance()->getSessionManager()->get($player);
             $belowBlock = $player->getWorld()->getBlock($player->getPosition()->subtract(0, 1, 0));
 
             //frost walker
@@ -184,15 +180,16 @@ class PlayerListener implements Listener{
                 $block = $player->getWorld()->getBlock($player->getPosition());
                 $aboveBlock = $player->getWorld()->getBlock($player->getPosition()->add(0, 1, 0));
 
-                if($block->getId() === BlockLegacyIds::AIR && $aboveBlock->getId() === BlockLegacyIds::AIR && $belowBlock instanceof Water){
+                if($block instanceof Air && $aboveBlock instanceof Air && $belowBlock instanceof Water){
                     $size = 2 + min($boots->getEnchantmentLevel($enchantment), 2);
-                    $ice = BlockFactory::getInstance()->get(BlockLegacyIds::FROSTED_ICE, 0);
+                    $ice = VanillaBlocks::FROSTED_ICE();
 
                     for($x = intval($player->getPosition()->x) - $size; $x <= intval($player->getPosition()->x) + $size; $x++){
                         for($z = intval($player->getPosition()->z) - $size; $z <= intval($player->getPosition()->z) + $size; $z++){
                             $pos = new Vector3($x, intval($player->getPosition()->y - 1), $z);
+                            $current = $player->getWorld()->getBlock($pos);
 
-                            if(in_array($player->getWorld()->getBlock($pos)->getId(), [BlockLegacyIds::AIR, BlockLegacyIds::STILL_WATER, BlockLegacyIds::FROSTED_ICE])){
+                            if(in_array($current->getIdInfo()->getBlockId(), [BlockLegacyIds::AIR, BlockLegacyIds::STILL_WATER, BlockLegacyIds::FROSTED_ICE])){
                                 $player->getWorld()->setBlock($pos, $ice, true);
                             }
                         }

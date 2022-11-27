@@ -7,6 +7,7 @@ use CLADevs\VanillaX\inventories\InventoryManager;
 use CLADevs\VanillaX\world\gamerule\GameRule;
 use CLADevs\VanillaX\world\gamerule\GameRuleManager;
 use CLADevs\VanillaX\session\Session;
+use pocketmine\block\Anvil;
 use pocketmine\block\BlockLegacyIds;
 use pocketmine\data\bedrock\EnchantmentIdMap;
 use pocketmine\data\bedrock\EnchantmentIds;
@@ -37,7 +38,7 @@ class BlockListener implements Listener{
                 $drop = $drops[$key = array_key_first($drops)];
                 $fortune = $drop->getCount();
 
-                switch($block->getId()){
+                switch($block->getIdInfo()->getBlockId()){
                     case BlockLegacyIds::DIAMOND_ORE:
                     case BlockLegacyIds::EMERALD_ORE:
                     case BlockLegacyIds::REDSTONE_ORE:
@@ -64,7 +65,9 @@ class BlockListener implements Listener{
     public function onAnvilLandFall(EntityBlockChangeEvent $event): void{
         if(!$event->isCancelled()){
             $entity = $event->getEntity();
-            if($entity instanceof FallingBlock && ($to = $event->getTo())->getId() === BlockLegacyIds::ANVIL){
+            $to = $event->getTo();
+
+            if($entity instanceof FallingBlock && $to instanceof Anvil){
                 $pk = Session::playSound($to->getPosition(), "random.anvil_land", 1, 1, true);
                 $to->getPosition()->getWorld()->broadcastPacketToViewers($to->getPosition(), $pk);
             }

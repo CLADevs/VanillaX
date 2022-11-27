@@ -2,6 +2,7 @@
 
 namespace CLADevs\VanillaX\utils\instances;
 
+use CLADevs\VanillaX\utils\item\InteractButtonItemTrait;
 use pocketmine\item\Item;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
@@ -9,12 +10,12 @@ use pocketmine\player\Player;
 class InteractButtonResult{
 
     private Player $player;
-    private ?Item $item;
+    private null|Item|InteractButtonItemTrait $item;
     private ?Vector3 $clickPos;
     private ?string $button;
     private bool $interactQueue;
 
-    public function __construct(Player $player, ?Item $item = null, ?string $button = null, ?Vector3 $clickPos = null, bool $interactQueue = true){
+    public function __construct(Player $player, null|Item|InteractButtonItemTrait $item = null, ?string $button = null, ?Vector3 $clickPos = null, bool $interactQueue = true){
         $this->player = $player;
         $this->item = $item;
         $this->button = $button;
@@ -26,7 +27,7 @@ class InteractButtonResult{
         return $this->player;
     }
 
-    public function getItem(): ?Item{
+    public function getItem(): null|Item|InteractButtonItemTrait{
         return $this->item;
     }
 
