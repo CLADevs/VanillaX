@@ -62,11 +62,17 @@ class Session{
     }
 
     public function onContainerOpen(int $windowId): void{
-        $inventory = $this->player->getNetworkSession()->getInvManager()->getWindow($windowId);
+        $located = $this->player->getNetworkSession()->getInvManager()->locateWindowAndSlot($windowId, -1);
 
-        if($inventory !== null){
-            $this->lastWindowIds[$windowId] = spl_object_id($inventory);
+        if($located === null){
+            return;
         }
+        [$inventory] = $located;
+
+        if($inventory === null){
+            return;
+        }
+        $this->lastWindowIds[$windowId] = spl_object_id($inventory);
     }
 
     public function onContainerClose(int $windowId): void{

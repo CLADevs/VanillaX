@@ -66,10 +66,10 @@ class InGamePacketHandlerX extends InGamePacketHandler{
 
         if($packet->windowId === 255){
             $invManager = $player->getNetworkSession()->getInvManager();
-            $current = $invManager->getWindow($windowId = $invManager->getCurrentWindowId());
+            $current = $player->getCurrentWindow();
 
             if($current instanceof TradeInventory){
-                $invManager->onClientRemoveWindow($windowId);
+                $invManager->onClientRemoveWindow($invManager->getCurrentWindowId());
                 return true;
             }
         }

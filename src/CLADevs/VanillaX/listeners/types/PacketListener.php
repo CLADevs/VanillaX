@@ -93,14 +93,20 @@ class PacketListener implements Listener{
      */
     private function handleInventoryContent(NetworkSession $networkSession, InventoryContentPacket $packet): void{
         foreach ($packet->items as $index => $item){
-            $inventory = $networkSession->getInvManager()->getWindow($packet->windowId);
+            $located = $networkSession->getInvManager()->locateWindowAndSlot($packet->windowId, $index);
 
-            if($inventory !== null){
-                $session = SessionManager::getInstance()->get($networkSession->getPlayer());
-                $slot = ItemStackTranslator::clientSlot($index, $inventory);
-                $currentItem = TypeConverter::getInstance()->netItemStackToCore($item->getItemStack());
-                $session->trackItemStack($inventory, $slot, $currentItem, null);
+            if($located === null){
+                continue;
             }
+            [$inventory] = $located;
+
+            if($inventory === null){
+                continue;
+            }
+            $session = SessionManager::getInstance()->get($networkSession->getPlayer());
+            $slot = ItemStackTranslator::clientSlot($index, $inventory);
+            $currentItem = TypeConverter::getInstance()->netItemStackToCore($item->getItemStack());
+            $session->trackItemStack($inventory, $slot, $currentItem, null);
         }
     }
 
@@ -110,14 +116,21 @@ class PacketListener implements Listener{
      * Whenever certain inventory slot is item is changed
      */
     private function handleInventorySlot(NetworkSession $networkSession, InventorySlotPacket $packet): void{
-        $inventory = $networkSession->getInvManager()->getWindow($packet->windowId);
+        $located = $networkSession->getInvManager()->locateWindowAndSlot($packet->windowId, $packet->inventorySlot);
 
-        if($inventory !== null){
-            $session = SessionManager::getInstance()->get($networkSession->getPlayer());
-            $slot = ItemStackTranslator::clientSlot($packet->inventorySlot, $inventory);
-            $currentItem = TypeConverter::getInstance()->netItemStackToCore($packet->item->getItemStack());
-            $session->trackItemStack($inventory, $slot, $currentItem, null);
+        if($located === null){
+            return;
         }
+        [$inventory] = $located;
+
+        if($inventory === null){
+            return;
+        }
+
+        $session = SessionManager::getInstance()->get($networkSession->getPlayer());
+        $slot = ItemStackTranslator::clientSlot($packet->inventorySlot, $inventory);
+        $currentItem = TypeConverter::getInstance()->netItemStackToCore($packet->item->getItemStack());
+        $session->trackItemStack($inventory, $slot, $currentItem, null);
     }
 
     /**
