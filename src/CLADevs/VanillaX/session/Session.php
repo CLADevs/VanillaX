@@ -62,17 +62,19 @@ class Session{
     }
 
     public function onContainerOpen(int $windowId): void{
-        $located = $this->player->getNetworkSession()->getInvManager()->locateWindowAndSlot($windowId, -1);
+        if ($this->player->isConnected()) {
+            $located = $this->player->getNetworkSession()->getInvManager()->locateWindowAndSlot($windowId, -1);
 
-        if($located === null){
-            return;
-        }
-        [$inventory] = $located;
+            if($located === null){
+                return;
+            }
+            [$inventory] = $located;
 
-        if($inventory === null){
-            return;
+            if($inventory === null){
+                return;
+            }
+            $this->lastWindowIds[$windowId] = spl_object_id($inventory);
         }
-        $this->lastWindowIds[$windowId] = spl_object_id($inventory);
     }
 
     public function onContainerClose(int $windowId): void{
@@ -93,8 +95,10 @@ class Session{
     }
 
     public function setInteractiveText(string $interactiveText): void{
-        $this->interactiveText = $interactiveText;
-        $this->player->getNetworkProperties()->setString(EntityMetadataProperties::INTERACTIVE_TAG, $interactiveText);
+        if ($this->player->isConnected()) {
+            $this->interactiveText = $interactiveText;
+            $this->player->getNetworkProperties()->setString(EntityMetadataProperties::INTERACTIVE_TAG, $interactiveText);
+        }
     }
 
     public function getPlayer(): Player{
@@ -106,10 +110,12 @@ class Session{
     }
 
     public function setRidingEntity(?VanillaEntity $ridingEntity): void{
-        if($ridingEntity !== null && $this->ridingEntity instanceof EntityRidable){
-            $this->ridingEntity->onLeftRide($this->player);
+        if ($this->player->isConnected()) {
+            if($ridingEntity !== null && $this->ridingEntity instanceof EntityRidable){
+                $this->ridingEntity->onLeftRide($this->player);
+            }
+            $this->ridingEntity = $ridingEntity;
         }
-        $this->ridingEntity = $ridingEntity;
     }
     
     public function getTradingEntity(): ?VillagerEntity{
