@@ -37,16 +37,14 @@ class Utils{
      * @return int[]
      */
     public static function getBlockIdsMap(): array{
-        $file = "block_id_map.json";
-        return array_merge(json_decode(file_get_contents(BEDROCK_DATA_PATH . "/$file"), true), json_decode(file_get_contents(self::getResourceFile($file)), true));
+        return json_decode((string)file_get_contents(PATH . "vendor/pocketmine/bedrock-block-upgrade-schema/block_legacy_id_map.json"), true);
     }
 
     /**
      * @return int[]
      */
     public static function getItemIdsMap(): array{
-        $file = "item_id_map.json";
-        return array_merge(json_decode(file_get_contents(BEDROCK_DATA_PATH . "/$file"), true), json_decode(file_get_contents(self::getResourceFile($file)), true));
+        return json_decode((string)file_get_contents(PATH . "vendor/pocketmine/bedrock-item-upgrade-schema/item_legacy_id_map.json"), true);
     }
 
     public static function clamp(int|float $value, int|float $min, int|float $max): int|float{
