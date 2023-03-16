@@ -76,20 +76,17 @@ class ItemManager{
     }
 
     private function initializeCreativeItems(): void{
-        $oldCreativeItems = CreativeInventory::getInstance()->getAll();
-        CreativeInventory::getInstance()->clear();
-        $creativeItems = json_decode(file_get_contents(BEDROCK_DATA_PATH . "creativeitems.json"), true);
 
-        foreach($creativeItems as $data){
-            $item = Item::jsonDeserialize($data);
-            if($item->getName() === "Unknown"){
-                continue;
+        $old = CreativeInventory::getInstance();
+        CreativeInventory::reset();
+        $new = CreativeInventory::getInstance();
+
+        foreach($old->getAll() as $item){
+            if(!$new->contains($item)){
+                $new->add($item);
             }
-            CreativeInventory::getInstance()->add($item);
         }
-        foreach($oldCreativeItems as $item){
-            if(!CreativeInventory::getInstance()->contains($item)) CreativeInventory::getInstance()->add($item);
-        }
+
     }
 
     public static function register(Item $item, bool $creative = false, bool $overwrite = true): bool{
