@@ -3,7 +3,7 @@
 namespace CLADevs\VanillaX\utils;
 
 use CLADevs\VanillaX\VanillaX;
-use const pocketmine\BEDROCK_DATA_PATH;
+use const pocketmine\PATH;
 
 class Utils{
 
