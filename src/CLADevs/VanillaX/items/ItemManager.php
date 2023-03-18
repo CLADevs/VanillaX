@@ -25,8 +25,10 @@ use pocketmine\item\SpawnEgg;
 use pocketmine\item\StringToItemParser;
 use pocketmine\math\Vector3;
 use pocketmine\Server;
+use pocketmine\utils\Filesystem;
 use pocketmine\world\World;
-use const pocketmine\BEDROCK_DATA_PATH;
+use Symfony\Component\Filesystem\Path;
+use const pocketmine\RESOURCE_PATH;
 
 class ItemManager{
 
@@ -78,7 +80,7 @@ class ItemManager{
     private function initializeCreativeItems(): void{
         $oldCreativeItems = CreativeInventory::getInstance()->getAll();
         CreativeInventory::getInstance()->clear();
-        $creativeItems = json_decode(file_get_contents(BEDROCK_DATA_PATH . "creativeitems.json"), true);
+        $creativeItems = json_decode(Filesystem::fileGetContents(Path::join(RESOURCE_PATH, "legacy_creativeitems.json")), true);
 
         foreach($creativeItems as $data){
             $item = Item::jsonDeserialize($data);

@@ -3,7 +3,6 @@
 namespace CLADevs\VanillaX\utils;
 
 use CLADevs\VanillaX\VanillaX;
-use const pocketmine\BEDROCK_DATA_PATH;
 
 class Utils{
 
@@ -38,7 +37,7 @@ class Utils{
      */
     public static function getBlockIdsMap(): array{
         $file = "block_id_map.json";
-        return array_merge(json_decode(file_get_contents(BEDROCK_DATA_PATH . "/$file"), true), json_decode(file_get_contents(self::getResourceFile($file)), true));
+        return json_decode(file_get_contents(self::getResourceFile($file)), true);
     }
 
     /**
@@ -46,7 +45,7 @@ class Utils{
      */
     public static function getItemIdsMap(): array{
         $file = "item_id_map.json";
-        return array_merge(json_decode(file_get_contents(BEDROCK_DATA_PATH . "/$file"), true), json_decode(file_get_contents(self::getResourceFile($file)), true));
+        return json_decode(file_get_contents(self::getResourceFile($file)), true);
     }
 
     public static function clamp(int|float $value, int|float $min, int|float $max): int|float{

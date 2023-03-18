@@ -8,6 +8,7 @@ use CLADevs\VanillaX\blocks\block\button\NewWoodenButton;
 use CLADevs\VanillaX\blocks\block\campfire\Campfire;
 use CLADevs\VanillaX\blocks\block\CommandBlock;
 use CLADevs\VanillaX\blocks\block\ComposerBlock;
+use CLADevs\VanillaX\blocks\block\EnchantmentTableBlock;
 use CLADevs\VanillaX\blocks\block\FlowerPotBlock;
 use CLADevs\VanillaX\blocks\block\fungus\Fungus;
 use CLADevs\VanillaX\blocks\block\HopperBlock;
@@ -195,6 +196,7 @@ class BlockManager{
 
         $this->registerAllMeta(new Furnace(new BlockIdentifierFlattened(BlockLegacyIds::FURNACE, [BlockLegacyIds::LIT_FURNACE], 0, null, FurnaceTile::class), "Furnace", new BlockBreakInfo(3.5, BlockToolType::PICKAXE, ToolTier::WOOD()->getHarvestLevel())));
         self::registerAllMeta(new ComposerBlock());
+        self::registerAllMeta(new EnchantmentTableBlock());
         self::registerBlock(new Block(new BlockIdentifier(BlockLegacyIds::SLIME_BLOCK, 0), "Slime", BlockBreakInfo::instant()));
         self::registerBlock(new Opaque(new BlockIdentifier(BlockIds::ANCIENT_DEBRIS, 0, LegacyItemIds::ANCIENT_DEBRIS), "Ancient Debris", new BlockBreakInfo(30, BlockToolType::PICKAXE, ToolTier::WOOD()->getHarvestLevel(), 1200)));
         self::registerBlock(new Opaque(new BlockIdentifier(BlockIds::NETHER_GOLD_ORE, 0, LegacyItemIds::NETHER_GOLD_ORE), "Nether Gold Ore", new BlockBreakInfo(3, BlockToolType::PICKAXE, ToolTier::WOOD()->getHarvestLevel(), 3)));
@@ -388,7 +390,7 @@ class BlockManager{
             $blockId = [$blockId];
         }
         foreach($blockId as $id){
-            if($id !== BlockLegacyIds::AIR && !BlockFeature::getInstance()->isBlockEnabled($id)){
+            if($id !== BlockLegacyIds::AIR && !BlockFeature::getInstance()->isBlockEnabled(BlockFactory::getInstance()->get($id, 0))){
                 return false;
             }
         }
